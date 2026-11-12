@@ -14,6 +14,8 @@ export const SQL_BETA_TAT_CA = 'SELECT qid, beta FROM omni_beta_cau'
 const HAN_BETA_MS = 10 * 60_000
 const TRAN_BETA = 60_000
 let demBat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+/** Mốc (ms) tới lúc thử lại bản tính sẵn sau khi nó không dùng được — tránh mỗi lượt tốn thêm một câu dò. */
+let khongCoAnh = 0
 export function batDemBeta(b: boolean): void { demBat = b; dem = null; khongCoAnh = 0 }
 /** Đệm β: `du` ⇒ đã nạp CẢ BẢNG — mọi qid đều "đã biết" (`has` true; vắng ⇒ `get` null = không có β). */
 export class BetaNho extends Map<string, number | null> {
@@ -23,8 +25,6 @@ export class BetaNho extends Map<string, number | null> {
   override clear(): void { this.du = false; super.clear() }
 }
 let dem: { luc: number; db: object; m: BetaNho } | null = null
-/** Mốc (ms) tới lúc thử lại bản tính sẵn sau khi nó không dùng được — tránh mỗi lượt tốn thêm một câu dò. */
-let khongCoAnh = 0
 
 /** Đệm β hiện hành (qid → β, `null` = câu chưa có β); đệm tắt ⇒ null (nơi gọi đọc thẳng như cũ). */
 export function layBetaNho(env: Env): BetaNho | null {

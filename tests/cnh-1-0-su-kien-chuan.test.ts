@@ -113,6 +113,8 @@ describe('Sự kiện chuẩn: attempt key, assistance, dữ liệu thô (04 §2
     // 05/10: chỉ mục biểu thức idx_skh_em_tc (migration-lam-lai-0510.sql) khoá cột raw_json ⇒ cũng phải bỏ trước khi mô phỏng D1 chưa có cột ấy.
     // D1 trước CNH-1 cũng chưa có trigger giao chữa 0710 phụ thuộc các cột này.
     d.sql.exec('DROP TRIGGER IF EXISTS chua_giao_sai_sau_ghi; DROP TRIGGER IF EXISTS chua_giao_sai_sau_cong_bo')
+    // 12/11 (đợt 3 H1): trigger so_em_dem đọc NEW.received_at — D1 trước CNH-1 chưa có trigger này.
+    d.sql.exec('DROP TRIGGER IF EXISTS so_em_dem_sau_them; DROP TRIGGER IF EXISTS so_em_dem_sau_sua; DROP TRIGGER IF EXISTS so_em_dem_sau_xoa')
     d.sql.exec('DROP INDEX IF EXISTS idx_skh_sua_diem; DROP INDEX IF EXISTS idx_skh_tiep_nhan; DROP INDEX IF EXISTS idx_skh_em_tc')
     for (const c of ['attempt_id', 'assistance', 'visibility', 'correction_of', 'policy_version', 'purpose', 'raw_json', 'subitem_json', 'received_at']) {
       d.sql.exec(`ALTER TABLE su_kien_hoc DROP COLUMN ${c}`)
