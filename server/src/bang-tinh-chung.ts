@@ -2,7 +2,8 @@
 // Vì sao: vài câu đọc KHO (gần như tĩnh) chạy hàng nghìn lượt/ngày, mỗi lượt đọc lại vài trăm – vài nghìn hàng y hệt lần trước: ma trận nhãn Gói 7
 // (5.553 × 4.502), β câu (29.039 × 797), câu của tờ (4.297 × 2.469), chỉ mục câu theo dạng (80.916 × 109). Đệm trong isolate không cứu được (rất nhiều
 // isolate ngắn hạn — xem kho-chung.ts). Nay: KẾT QUẢ THÔ của câu (đúng các dòng D1 trả) cất MỘT dòng trong `bang_tinh_chung`, khoá theo (tên câu + băm câu
-// SQL + tham số), gắn DẤU của đúng các bảng nguồn (`dau_bang`, trigger giữ — migration-z-1211-h2-goi-nhieu.sql: dấu đổi ⇔ có ghi vào bảng).
+// SQL + tham số), gắn DẤU của đúng các bảng nguồn (`dau_bang` — migration-z-1211-h2-goi-nhieu.sql: kho = dấu game_v2_index do trigger giữ, câu kho chỉ
+// ghi cùng lô với nó; omni_q / β = số phiên NƠI GHI tăng mỗi lô + MAX(rowid) — không trigger theo dòng vì GHI đắt gấp 1.000 ĐỌC). Lưới an toàn: dòng cất > 24 giờ ⇒ trượt.
 //   · Trúng: MỘT câu đọc (dấu từng bảng + dòng cất) ≈ 1 + số bảng hàng — thay cho cả câu cũ; cùng số đợt D1 như câu cũ.
 //   · Trượt (dấu đổi / chưa cất): câu cũ chạy CÙNG LÔ với câu đọc dấu (một giao dịch ⇒ dữ liệu cũ không bao giờ mang dấu mới), trả ngay, cất NỀN. Thêm một
 //     đợt D1 — chỉ lần đầu sau mỗi lần kho đổi.
@@ -22,7 +23,12 @@ export function batBangTinhChung(b: boolean): void { bat = b; tatDen = 0 }
 export const LENH_BANG_TINH_CHUNG = ['CREATE TABLE IF NOT EXISTS bang_tinh_chung (khoa TEXT PRIMARY KEY, dau TEXT NOT NULL, json TEXT NOT NULL, luc INTEGER NOT NULL)'] as const
 /** Trên ngưỡng này (ký tự JSON) thì nén gzip ⇒ base64 (tiền tố `z`); sau nén vẫn quá trần thì không cất (D1: dòng ≤ 2 MB). */
 const NGUONG_NEN = 200_000
-const TRAN_CAT = 1_800_000
+const TRAN_CAT = 900_000 // như CO_PHAN của kho-chung.ts (dòng ~900 KB đã chạy thật)
+/** Lưới an toàn: dòng cất quá tuổi này coi như trượt (dù dấu khớp) — chặn trường hợp có lượt ghi lọt khỏi dấu (sửa tay bằng SQL…). Một lần cất / khoá / ngày. */
+export const TUOI_TOI_DA_MS = 24 * 3_600_000
+/** Bảng mà NƠI GHI tự tăng số phiên một lần mỗi lô (không trigger theo dòng — ghi đắt gấp 1.000 đọc): dấu kèm MAX(rowid) (xoá hết / thêm dòng ⇒ đổi). */
+const PHIEN_TAY = new Set(['omni_q', 'omni_beta_cau'])
+// Nơi ghi bảng trong PHIEN_TAY chạy SQL_TANG_PHIEN (dau-kho-cau.ts) ngay sau / cùng lô ghi ⇒ mọi bản tính sẵn theo bảng ấy thành cũ.
 
 /** Băm ngắn (FNV-1a 32 bit, hệ 36) — đưa nội dung câu SQL vào khoá: câu đổi ⇒ khoá đổi ⇒ không dùng nhầm dòng cất của câu cũ. */
 export function bamNgan(s: string): string {
@@ -33,10 +39,10 @@ export function bamNgan(s: string): string {
 /** Biểu thức SQL: dấu ghép của các bảng nguồn (NULL nếu thiếu dòng dấu nào). Tên bảng là hằng trong mã. */
 export function btDauBang(bang: readonly string[]): string {
   if (!bang.length || bang.some((t) => !/^\w+$/.test(t))) throw new Error('bang-tinh-chung: tên bảng nguồn không hợp lệ')
-  return bang.map((t) => `(SELECT dau FROM dau_bang WHERE ten = '${t}')`).join(`||'|'||`)
+  return bang.map((t) => `(SELECT dau FROM dau_bang WHERE ten = '${t}')${PHIEN_TAY.has(t) ? `||'.'||COALESCE((SELECT MAX(rowid) FROM ${t}),'')` : ''}`).join(`||'|'||`)
 }
 export const sqlDocChung = (bang: readonly string[]) =>
-  `SELECT s.d AS d, c.json AS j FROM (SELECT ${btDauBang(bang)} AS d) s LEFT JOIN bang_tinh_chung c ON c.khoa = ? AND c.dau = s.d`
+  `SELECT s.d AS d, c.json AS j FROM (SELECT ${btDauBang(bang)} AS d) s LEFT JOIN bang_tinh_chung c ON c.khoa = ? AND c.dau = s.d AND c.luc >= ?`
 
 async function moJson(j: string): Promise<unknown> {
   return JSON.parse(j.startsWith('z') ? await giaiNen(j.slice(1)) : j)
@@ -63,7 +69,7 @@ export async function docChungNeuCo<R>(env: Env, ten: string, sql: string, thamS
   const khoa = `${ten}.${bamNgan(sql)}|${thamSo}`
   let d: unknown = null
   try {
-    const r = await env.DB.prepare(sqlDocChung(bang)).bind(khoa).first<{ d: string | null; j: string | null }>()
+    const r = await env.DB.prepare(sqlDocChung(bang)).bind(khoa, Date.now() - TUOI_TOI_DA_MS).first<{ d: string | null; j: string | null }>()
     if (r?.j != null) {
       try { const v = await moJson(String(r.j)); if (Array.isArray(v)) return { results: v as R[] } } catch { /* dòng cất hỏng ⇒ đọc lại, cất đè */ }
     }
@@ -75,4 +81,9 @@ export async function docChungNeuCo<R>(env: Env, ten: string, sql: string, thamS
   const dMoi = s?.results?.[0]?.d
   if (dMoi != null) void cat(envGhiRieng(env), khoa, String(dMoi), rows).catch((e) => console.error('[bang-tinh-chung] cất lỗi:', ten, e instanceof Error ? e.message : e))
   return { results: rows }
+}
+
+/** Cron mỗi giờ: xoá dòng cất quá `TUOI_TOI_DA_MS` (câu dò đã coi là trượt) — bảng không phình theo khoá cũ (danh sách tờ đổi…). Không ném. */
+export async function donBangTinhChung(env: Env, now: number): Promise<number> {
+  try { const r = await env.DB.prepare('DELETE FROM bang_tinh_chung WHERE luc < ?').bind(now - TUOI_TOI_DA_MS).run(); return Number(r.meta?.changes ?? 0) } catch { return 0 }
 }

@@ -420,9 +420,9 @@ async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon, khiCoM
 }
 const SQL_CHI_MUC = "SELECT qid, ma_de, json_extract(json,'$.reviewed') AS rv FROM game_v2_question"
 /** Lượt ĐỌC đầu của `metaTheoDang` (chỉ mục câu theo dạng) — không phụ thuộc phạm vi ⇒ nơi gọi bắt đầu SỚM được (tối ưu 05/10, thang làm lại). */
-// 12/11 (H2: 80.916 lượt/ngày × 109 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu game_v2_question — cùng dòng câu cũ.
+// 12/11 (H2: 80.916 lượt/ngày × 109 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) — cùng dòng câu cũ.
 const SQL_CHI_MUC_DANG = `${SQL_CHI_MUC} WHERE dang = ?`
-const docChiMucDang = (env: Env, maDang: string) => docChung<Row>(env, 'cmd', SQL_CHI_MUC_DANG, maDang, ['game_v2_question'], () => env.DB.prepare(SQL_CHI_MUC_DANG).bind(maDang))
+const docChiMucDang = (env: Env, maDang: string) => docChung<Row>(env, 'cmd', SQL_CHI_MUC_DANG, maDang, ['game_v2_index'], () => env.DB.prepare(SQL_CHI_MUC_DANG).bind(maDang))
 export async function docChiMucTheoDang(env: Env, maDang: string): Promise<Row[]> {
   const r = await docChiMucDang(env, maDang)
   return r.results ?? []

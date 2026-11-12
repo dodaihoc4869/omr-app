@@ -9,7 +9,7 @@
 // Công tắc: tắt dưới vitest (test cũ giữ đường theo lô); test riêng bật bằng `batKhoChung`.
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
-import { dauKhoCau } from './dau-kho-cau'
+import { dauKhoCau, SQL_TANG_PHIEN } from './dau-kho-cau'
 import { envGhiRieng } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { dbGoc } from './cau-hinh-dem'
@@ -50,6 +50,8 @@ export function xoaKhoChung(): void { dem = new WeakMap(); dang = new WeakMap() 
 /** Bỏ bản chụp dùng chung (sau khi ghi `omni_q` — thầy duyệt Q / A.I gợi / kiểm định tuần): isolate nào nạp sau cũng đọc toàn bảng mới. Không ném. */
 export async function boKhoChup(env: Env): Promise<void> {
   xoaKhoChung()
+  // 12/11 (H2): mọi lô ghi omni_q đều gọi tới đây ⇒ tăng số phiên dấu omni_q (bang-tinh-chung.ts — một hàng ghi mỗi lô thay cho trigger mỗi dòng). Thiếu bảng ⇒ bỏ qua.
+  await env.DB.prepare(SQL_TANG_PHIEN).bind('omni_q').run().catch(() => undefined)
   try { await chayDdlMotLan(env, 'kho_chup_2810', LENH_BANG_CHUP); await env.DB.prepare('DELETE FROM kho_chup').run() } catch (e) { console.error('[kho-chung] bỏ bản chụp lỗi:', e instanceof Error ? e.message : e) }
 }
 

@@ -440,9 +440,9 @@ const SQL_CAU_BAI = `SELECT ma_de, qid, ${SQL_CAU_GON}, CASE WHEN json_type(json
 async function docCauBaiD1(env: Env, maDe: readonly string[]): Promise<{ soTuLuan: number; kienThuc: string[] }> {
   const goc = [...new Set(maDe.map((m) => tachMaTo(m).goc))]
   // 14/10: câu RÚT GỌN (cau-gon.ts) + nhãn kiến thức riêng — không nạp ảnh/lời giải của cả tờ (~6× nhẹ hơn JSON đầy đủ). Dòng JSON hỏng bị bỏ như cũ.
-  // 12/11 (H2): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu game_v2_question — cùng dòng câu cũ.
+  // 12/11 (H2): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) — cùng dòng câu cũ.
   const thamSo = JSON.stringify(goc)
-  const r = await docChung<Row>(env, 'cbd', SQL_CAU_BAI, thamSo, ['game_v2_question'], () => env.DB.prepare(SQL_CAU_BAI).bind(thamSo))
+  const r = await docChung<Row>(env, 'cbd', SQL_CAU_BAI, thamSo, ['game_v2_index'], () => env.DB.prepare(SQL_CAU_BAI).bind(thamSo))
   const theoGoc = new Map<string, { qid: string; q: Record<string, unknown> }[]>()
   for (const x of r.results ?? []) {
     const gon = cauGonTuDong(x)

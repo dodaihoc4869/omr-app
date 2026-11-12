@@ -17,8 +17,11 @@ CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1),
 --     (dấu kho `COUNT(*)||'|'||MAX(indexed_at)` đọc mọi dòng game_v2_index; vân tay Hành trình đọc cả cau_hoi + chien_dich: 11.604 hàng/lượt).
 --  · game_v2_index: dấu = ĐÚNG chuỗi cũ `COUNT(*)||'|'||COALESCE(MAX(indexed_at),'')`, tính lại trong trigger (bảng nhỏ, chỉ ghi khi lập chỉ mục tờ) ⇒ mọi nơi
 --    so dấu kho / dauTruocLucDoc / kho_chup giữ nguyên giá trị.
---  · bảng khác: SỐ PHIÊN tăng 1 mỗi dòng ghi (mồi bằng mốc ms ⇒ xoá dòng dấu rồi mồi lại không bao giờ trùng số cũ). Dấu tăng ⇔ có ghi ⇒ bản tính sẵn theo dấu
---    không bao giờ cũ. chien_dich chỉ theo đúng các cột vân tay Hành trình đọc (SQL_CD_VT) + thêm/xoá dòng.
+--  · cau_hoi, chien_dich: SỐ PHIÊN tăng 1 mỗi dòng ghi (mồi bằng mốc ms ⇒ xoá dòng dấu rồi mồi lại không bao giờ trùng số cũ); chien_dich chỉ theo đúng các
+--    cột vân tay Hành trình đọc (SQL_CD_VT) + thêm/xoá dòng. Hai bảng ít ghi (nhập đề / gộp chiến dịch) ⇒ thêm ít hàng ghi.
+--  · omni_q, omni_beta_cau: KHÔNG trigger theo dòng (GHI đắt gấp 1.000 ĐỌC — omni_q / β ghi theo lô nhiều dòng): số phiên do NƠI GHI tăng một lần mỗi lô
+--    (kho-chung.ts boKhoChup sau mọi lô ghi omni_q; omni-d1.ts tinhBetaMoiCau trong lô cuối), dấu đọc kèm MAX(rowid) của bảng (xoá hết / thêm dòng ⇒ đổi).
+--  · game_v2_question: KHÔNG trigger — chỉ ghi CÙNG LÔ với game_v2_index (lapChiMucTo, danhCoTuLuanKho; test khoá danh sách nơi ghi) ⇒ dùng dấu game_v2_index.
 --  TRIGGER TẠO TRƯỚC, MỒI SAU: lượt ghi chen giữa hai bước chỉ cập nhật 0 dòng, rồi phần mồi tính từ dữ liệu hiện tại ⇒ không lỡ thay đổi nào.
 --  Mã không bao giờ tự tạo trigger (thiếu bảng dau_bang mà có trigger ⇒ mọi lượt ghi bảng nguồn lỗi): bảng + trigger + mồi chỉ ở tệp này.
 CREATE TABLE IF NOT EXISTS dau_bang (ten TEXT PRIMARY KEY, dau TEXT NOT NULL);
@@ -31,17 +34,8 @@ CREATE TRIGGER IF NOT EXISTS dau_bang_ch_xoa AFTER DELETE ON cau_hoi BEGIN UPDAT
 CREATE TRIGGER IF NOT EXISTS dau_bang_cd_them AFTER INSERT ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
 CREATE TRIGGER IF NOT EXISTS dau_bang_cd_sua AFTER UPDATE OF id, trang_thai, tao_luc, han_nop, the_luc_ngay, huyet_chien ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
 CREATE TRIGGER IF NOT EXISTS dau_bang_cd_xoa AFTER DELETE ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_them AFTER INSERT ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_sua AFTER UPDATE ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_xoa AFTER DELETE ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_oq_them AFTER INSERT ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_oq_sua AFTER UPDATE ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_oq_xoa AFTER DELETE ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_ob_them AFTER INSERT ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_ob_sua AFTER UPDATE ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
-CREATE TRIGGER IF NOT EXISTS dau_bang_ob_xoa AFTER DELETE ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
 INSERT OR REPLACE INTO dau_bang (ten, dau) SELECT 'game_v2_index', COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index;
-INSERT OR IGNORE INTO dau_bang (ten, dau) SELECT x.value, CAST(CAST(strftime('%s','now') AS INTEGER) * 1000 AS TEXT) FROM json_each('["cau_hoi","chien_dich","game_v2_question","omni_q","omni_beta_cau"]') x;
+INSERT OR IGNORE INTO dau_bang (ten, dau) SELECT x.value, CAST(CAST(strftime('%s','now') AS INTEGER) * 1000 AS TEXT) FROM json_each('["cau_hoi","chien_dich","omni_q","omni_beta_cau"]') x;
 
 -- (9)(1)(12)(7) BẢN TÍNH SẴN DÙNG CHUNG (server/src/bang-tinh-chung.ts): kết quả thô của câu đọc kho, một dòng mỗi (câu, tham số), gắn dấu các bảng nguồn ở trên.
 CREATE TABLE IF NOT EXISTS bang_tinh_chung (khoa TEXT PRIMARY KEY, dau TEXT NOT NULL, json TEXT NOT NULL, luc INTEGER NOT NULL);

@@ -13,7 +13,7 @@
 import { coTheNapBetaDu, docBetaDong, ghiBetaNho, layBetaNho, napBetaDu } from './beta-dem'
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
-import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { dauKhoCau, dauTruocLucDoc, SQL_TANG_PHIEN } from './dau-kho-cau'
 import { layKhoChung, xoaKhoChung, type KhoChung } from './kho-chung'
 import { LENH_BANG_DIEM_GON, lenhDiemGon } from './diem-gon'
 import {
@@ -1533,6 +1533,7 @@ export async function tinhBetaMoiCau(env: Env, nowMs: number, ts: ThamSoOmni = T
   }
   // Một giao dịch cho mỗi gói; gói đầu có DELETE ⇒ bảng không bao giờ "rỗng giữa chừng" lâu hơn một gói.
   for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
+  await env.DB.prepare(SQL_TANG_PHIEN).bind('omni_beta_cau').run().catch(() => undefined) // 12/11 H2: β đổi ⇒ bản tính sẵn β cũ (bang-tinh-chung.ts)
   return so
 }
 /** Em đang bật OMNI (theo SBD tăng dần) sau `sau`, tối đa `n`. */

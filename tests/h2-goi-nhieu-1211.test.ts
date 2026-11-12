@@ -177,17 +177,11 @@ describe('dấu bảng (dau_bang) — trigger giữ dấu đúng mọi kiểu gh
     for (const t of ['them', 'sua', 'xoa']) d.sql.exec(`DROP TRIGGER dau_bang_gvi_${t}`)
     expect(await dauKhoCau(d.env)).toBe(cu())
   })
-  it('số phiên: MỖI lượt ghi (thêm / OR REPLACE / UPSERT / sửa / xoá) đổi dấu, không lặp lại; chiến dịch chỉ theo đúng cột vân tay', () => {
+  it('số phiên (cau_hoi, chien_dich — bảng ít ghi): MỖI lượt ghi đổi dấu, không lặp lại; chiến dịch chỉ theo đúng cột vân tay; bảng ghi theo lô (omni_q, β, câu kho) KHÔNG có trigger theo dòng', () => {
     const d = taoD1That()
     const lenh: Record<string, string[]> = {
       cau_hoi: ["INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','x')", "INSERT OR REPLACE INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','y')",
         "INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','z') ON CONFLICT(qid) DO UPDATE SET cap_nhat_luc=excluded.cap_nhat_luc", "UPDATE cau_hoi SET muc_do='NB'", "DELETE FROM cau_hoi"],
-      game_v2_question: ["INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('A','q1','1','g','d','{}')",
-        "UPDATE game_v2_question SET json='{\"reviewed\":true}'", "DELETE FROM game_v2_question"],
-      omni_q: ["INSERT INTO omni_q(qid,y,vkn_json,nguon) VALUES('q1',-1,'[]','thay')", "INSERT OR REPLACE INTO omni_q(qid,y,vkn_json,nguon) VALUES('q1',-1,'[\"a\"]','thay')",
-        "UPDATE omni_q SET duyet_luc='x'", "DELETE FROM omni_q"],
-      omni_beta_cau: ["INSERT INTO omni_beta_cau(qid,beta,n,cap_nhat_luc) VALUES('q1',1.5,3,'d')", "INSERT OR REPLACE INTO omni_beta_cau(qid,beta,n,cap_nhat_luc) VALUES('q1',2,3,'d')",
-        'UPDATE omni_beta_cau SET n=4', 'DELETE FROM omni_beta_cau'],
       chien_dich: ["INSERT INTO chien_dich(id,ten,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('c1','T','[]','[]','[]','2026-12-01','x')",
         "UPDATE chien_dich SET trang_thai='da_dong'", "UPDATE chien_dich SET han_nop='2026-12-09'", 'UPDATE chien_dich SET the_luc_ngay=36', 'UPDATE chien_dich SET huyet_chien=0',
         "UPDATE chien_dich SET tao_luc='y'", "DELETE FROM chien_dich"],
@@ -197,6 +191,9 @@ describe('dấu bảng (dau_bang) — trigger giữ dấu đúng mọi kiểu gh
       expect(Number(dau(d, ten))).toBeGreaterThan(1.7e12) // mồi bằng mốc ms
       for (const s of ds) { d.sql.exec(s); const v = dau(d, ten); expect(da.has(v), `${ten}: ${s}`).toBe(false); da.add(v) }
     }
+    // GHI đắt gấp 1.000 ĐỌC: bảng ghi theo lô nhiều dòng không gắn trigger (dấu do nơi ghi tăng một lần mỗi lô — bang-tinh-chung.ts)
+    const tg = (d.sql.prepare("SELECT tbl_name FROM sqlite_master WHERE type='trigger' AND name LIKE 'dau_bang_%'").all() as { tbl_name: string }[]).map((x) => x.tbl_name)
+    expect([...new Set(tg)].sort()).toEqual(['cau_hoi', 'chien_dich', 'game_v2_index'])
     d.sql.exec("INSERT INTO chien_dich(id,ten,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('c2','T','[]','[]','[]','2026-12-01','x')")
     const v = dau(d, 'chien_dich')
     d.sql.exec("UPDATE chien_dich SET ten='T2', sbd_json='[\"E1\"]', qid_json='[\"q\"]', dong_luc='z'") // cột KHÔNG thuộc vân tay ⇒ dấu giữ nguyên (như chuỗi cũ)

@@ -12,6 +12,8 @@ export const SQL_DAU_KHO_CAU_CU = `SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at
  *  dòng vắng ⇒ tính như cũ (COALESCE chỉ chạy vế sau khi vế đầu NULL — đo miniflare). Bảng `dau_bang` chưa có ⇒ câu lỗi ⇒ nơi gọi lùi `SQL_DAU_KHO_CAU_CU`. */
 export const BT_DAU_KHO = `COALESCE((SELECT dau FROM dau_bang WHERE ten = 'game_v2_index'), (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index))`
 export const SQL_DAU_KHO_CAU = `SELECT ${BT_DAU_KHO} d`
+/** Tăng số phiên dấu một bảng ghi theo lô (omni_q, omni_beta_cau — bang-tinh-chung.ts): nơi ghi chạy ngay sau / cùng lô ghi. */
+export const SQL_TANG_PHIEN = 'UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = ?'
 
 /** Dấu kho hiện tại; lỗi đọc ⇒ '' (nơi gọi coi như "không chắc" ⇒ đọc lại đầy đủ như cũ). */
 let cuDen = 0 // câu dấu mới lỗi (D1 chưa chạy migration-z-1211-h2-goi-nhieu.sql) ⇒ một phút đi thẳng câu cũ, khỏi thêm một câu hỏng mỗi lượt

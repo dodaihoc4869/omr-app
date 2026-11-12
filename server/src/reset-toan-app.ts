@@ -213,6 +213,9 @@ export const BANG_GIU: readonly string[] = [
   'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
   // Thử tải 28/10 (migration-2810-tai-cao-diem.sql): bảng TÍNH SẴN từ hồ sơ / kho (tự hết hiệu lực theo mốc ảnh chụp, ngày, dấu kho) ⇒ GIỮ = không đụng.
   'kho_chup', 'omni_p_gon', 'omni_prior_em',
+  // 12/11 H2 (migration-z-1211-h2-goi-nhieu.sql): dấu bảng do trigger / nơi ghi giữ + bản tính sẵn tự hết hiệu lực theo dấu + bản chép tên lược đồ ⇒ GIỮ
+  // (xoá `dau_bang` = tắt lặng lẽ bản tính sẵn tới khi chạy lại migration).
+  'dau_bang', 'bang_tinh_chung', 'ddl_ten_chung',
   // Tự sửa lỗi theo ngày (#554, 28/10) — chưa được phân loại ⇒ cổng reset đỏ trên main; GIỮ = không đụng (an toàn nhất, như goi_bai_7_*).
   'tu_sua_khoa_ngay', 'tu_sua_viec_ngay', 'tu_sua_muc_tieu_ngay',
   // Gói Tự sửa lỗi đóng sẵn (31/10, goi-sua-dem.ts): chỉ dấu «đã đóng gói hôm nay», tự hết hiệu lực theo ngày ⇒ GIỮ = không đụng.
