@@ -38,7 +38,7 @@ describe('Live theo khối — máy thầy: một luật điều hướng', () =
   it('Esc chỉ LÙI màn, không đóng tấm hoạt động / tờ; có nút «Về màn chiếu»', () => {
     expect(lop).not.toContain('dongHoatDong')
     expect(lop).toContain('if (hdMo && hdDuoi()) { hienHoatDong(); return true }')
-    expect(lop.match(/Về màn chiếu<\/button>/g)?.length).toBe(2) // ở bảng danh sách + nổi trên tấm hoạt động
+    expect(lop.match(/Về màn chiếu<\/button>/g)?.length).toBe(3) // ở bảng danh sách + nổi trên tấm hoạt động + trong bảng chọn «Hôm nay làm gì?»
     expect(lop).toContain('coVe={coToChieu()}')
     expect(lop).toContain('const sanh = dang && (sanhTay ?? k.che === \'sanh\')')
   })
@@ -76,9 +76,9 @@ describe('Live theo khối — «Lên bảng» và Đạt / Chưa đạt trên t
   const khoi = doc('src/lib/live-khoi-to-chieu.ts'), noi = doc('src/components/live/thay-noi.ts')
   it('tờ: em xếp sẵn được gọi ⇒ việc len kèm sbd; tờ chưa có em ⇒ L / nút «Lên bảng» xin bảng chọn em; chấm ⇒ việc cham', () => {
     expect(khoi).toContain("function lvLen(sbd) { if (sbd) { LV.len = sbd; lvGui('len', { sbd: sbd }); } }")
-    expect(khoi).toContain("if (!S.bpuLen) lvLen(lvSbdThe());")
+    expect(khoi).toContain("if (!lvS.bpuLen) lvLen(lvSbdThe());")
     expect(khoi).toContain("document.addEventListener('mc-doi-em'")
-    expect(khoi).toContain("function lvChuaCoEm() { var p = pha(); return lvKhoi() && !S.bpuLen && (!p || (p === 'cho' && !lvSbdThe())); }")
+    expect(khoi).toContain("function lvChuaCoEm() { var p = lvPha(); return lvKhoi() && !lvS.bpuLen && (!p || (p === 'cho' && !lvSbdThe())); }")
     expect(khoi).toContain("lvGui('len', {}); return true; }")
     expect(khoi).toContain("if (LV.len) { LV.len = ''; lvGui('cham', { dat: !!dat }); }")
     expect(doc('src/lib/live-to-chieu.ts')).toContain('${JS_LIVE_KHOI_TO_CHIEU}')
@@ -88,10 +88,26 @@ describe('Live theo khối — «Lên bảng» và Đạt / Chưa đạt trên t
     expect(len).toContain("layPhong()?.gui({ t: 'goi', sbd, lyDo: [] }); setTimeout(() => layPhong()?.gui({ t: 'lam-bang' }), 250)")
     expect(len).toContain('g.goiTuTo()')
     expect(len).toContain("lenh: 'live-bao'")
-    expect(noi).toContain("case 'cham': if (view?.live?.khoi) { layPhong()?.gui({ t: 'dat', v: m.dat === true }); setTimeout(() => layPhong()?.gui({ t: 'mo' }), 150) } break")
+    expect(noi).toContain("case 'cham': if (view?.live?.khoi) { layPhong()?.gui({ t: 'dat', v: (m as { dat?: unknown }).dat === true }); setTimeout(() => layPhong()?.gui({ t: 'mo' }), 150) } break")
     expect(ganGv).toContain('export function goiTuTo(): void { if (phienLive) nhanGoi?.() }')
     expect(ganGv).toContain('goiNgay: phienLive || em.goiNgay !== false')
     expect(bang).toContain('}, () => void goiLen())')
+  })
+})
+
+// Thầy 12/11: «vẫn có một chỗ bấm vào full màn hình trên app gv, sửa triệt để» · «vẫn bị khóa xoay ngang máy học sinh, chỉ ép ngang không khóa theo chiều cố định nào cả».
+describe('Live theo khối — toàn màn hình máy thầy và chiều xoay máy em', () => {
+  it('máy thầy: chặn toàn màn hình TẠI GỐC suốt phiên live, hết phiên trả lại; phím F trên tờ không bật toàn màn hình', () => {
+    expect(ganGv).toContain("if (k) { de.requestFullscreen = () => Promise.resolve(); if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } else delete de.requestFullscreen")
+    expect(ganGv).toContain("phienLive = !!o.live; cheLive = 'cho'; khoaToanMan(phienLive)")
+    expect(ganGv).toContain("boQid = ''; khoaToanMan(false)")
+    expect(doc('src/lib/live-khoi-to-chieu.ts')).toContain("if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation();")
+  })
+  it('máy em: chỉ ép NGANG (cầm bên nào cũng được), không khoá một chiều', () => {
+    for (const t of ['src/components/live/LopLive.tsx', 'src/components/live-khoi/LopNoiEm.tsx']) { expect(doc(t)).toMatch(/lock\??\.?\('landscape'\)/); expect(doc(t)).not.toContain("('landscape-primary')") }
+  })
+  it('chế độ Bảng: thẻ tên em vừa lên bảng cũng ẩn', () => {
+    expect(doc('src/lib/live-to-chieu.ts')).toContain('body.mc-che-bang .mc-em.bpu-the:not([hidden]){display:none!important}')
   })
 })
 

@@ -41,7 +41,7 @@ body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai{display:block!important;grid-
 body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai::after{content:""!important;display:block!important;position:absolute;left:66.667%;top:0;bottom:0;width:2px;background:var(--mc-bang-nut);pointer-events:none}
 body.mc-lk{--mc-den:var(--mc-bang)}
 body.mc-lk .mc-thanh .mc-lv-nut{display:none!important}
-body.mc-che-bang .mc-buoc,body.mc-che-bang #mc-pha,body.mc-che-bang #mc-len-bang,body.mc-che-bang #mc-phim-nhom>:not(.mc-khay),body.mc-che-bang #mc-tiep,body.mc-che-bang .mc-em{display:none!important}
+body.mc-che-bang .mc-buoc,body.mc-che-bang #mc-pha,body.mc-che-bang #mc-len-bang,body.mc-che-bang #mc-phim-nhom>:not(.mc-khay),body.mc-che-bang #mc-tiep,body.mc-che-bang .mc-em,body.mc-che-bang .mc-em.bpu-the:not([hidden]){display:none!important}
 body.mc-che-bang .mc-khay-nhom:not(.mc-khay-lk){display:none}
 body.mc .mc-thanh .mc-lv-nut,body.mc .mc-thanh .mc-lv-tat{flex:none;display:inline-flex;align-items:center;gap:.5em;min-height:calc(var(--u)*2.5);padding:0 1em 0 .8em;border:0;border-radius:999px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);font:800 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer}
 .mc-lv-nut i{display:block;width:.68em;height:.68em;border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 .22em color-mix(in srgb,var(--mc-do) 30%,transparent)}

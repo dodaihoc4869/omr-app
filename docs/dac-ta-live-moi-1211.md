@@ -126,3 +126,9 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Đang chọn đáp án: màn rộng (máy tính bảng, máy tính) giấy nới tới 70 % bề ngang, bảng còn ≥ 420 px cho tấm chọn; điện thoại giữ 60 % (`KhungDocLap.tsx`).
     - Câu có hình / bảng (máy em dựng riêng, `GiayDe`): hệ số phóng 1–1,9 … 1,3–3,2 (trước 1–1,6 … 1,25–2,6).
     - Giới hạn nói thẳng: muốn to hơn nữa thì chọn «Chữ cực lớn»; đề dài khi ấy tờ thầy phải lật trang / cuộn.
+29. **«Lên bảng» và Đạt / Chưa đạt làm NGAY TRÊN TỜ, tới được máy em** (thầy 12/11 «lên bảng máy hs chưa hiện thông báo, bấm đạt không đạt cũng chưa hiện»). Buổi live bảng Bình Phản Ứng ẩn nên tờ phải báo app, app gửi lệnh vào phòng (`src/lib/live-khoi-to-chieu.ts`, `src/components/live/thay-noi.ts` việc `len` / `cham`):
+    - Tờ có em xếp sẵn (Chữa câu khó, đầu giờ…): L / «Lên bảng» / «Gọi em khác» ⇒ phòng gọi ĐÚNG em trên thẻ tên; em chưa vào phòng live ⇒ tờ báo thầy gọi em khác.
+    - Tờ bài chọn từ kho (thẻ «Cả lớp» / chưa có thẻ): nút «Lên bảng» luôn bấm được ⇒ bảng (đang ẩn) chọn em đúng luật phím L rồi giao lại cho tờ, mời luôn (một lần bấm).
+    - Chấm (nút, D / K) ⇒ phòng ghi + mở đáp án ⇒ máy em hiện con dấu; máy thầy ở nguyên màn chiếu.
+30. **«Học» trong khay khi màn Học là tấm hoạt động:** về đúng tấm (và tờ của nó), không ra bảng chọn. Bảng chọn «Hôm nay làm gì?» có nút «Về màn chiếu». Chế độ Bảng ẩn cả thẻ tên em vừa lên bảng.
+31. **Toàn màn hình máy thầy chặn tại gốc** suốt phiên live (`gan-gv.tsx` `khoaToanMan`), phím F trên tờ không bật toàn màn hình; nút «Toàn màn hình» trong Cài đặt của tờ còn cho lúc thầy chủ động. **Máy em chỉ ép ngang** (`lock('landscape')`), cầm bên nào cũng được.

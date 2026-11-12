@@ -22,24 +22,26 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   //  · tờ có em xếp sẵn (Chữa câu khó, đầu giờ…): thầy bấm L / «Lên bảng» / «Gọi em khác» ⇒ việc len kèm sbd của thẻ tên;
   //  · tờ chưa có em (bài chọn từ kho): L / nút «Lên bảng» ⇒ việc len KHÔNG sbd ⇒ bảng (đang ẩn) chọn em như phím L của bảng rồi giao lại cho tờ;
   //  · chấm em xếp sẵn (mọi đường đều qua dauKq) ⇒ việc cham. Em do bảng giao thì tờ đã báo bằng tin bpu-cham sẵn có.
+  // Biến của tờ (len-bang-moi-to-chieu.ts) đọc phòng thủ: đoạn này cũng được dựng riêng trong test với phạm vi tối thiểu (body · tao · thanh · dichApp · baoNhanh).
+  var lvS = typeof S === 'object' && S ? S : {};
+  function lvPha() { return body.getAttribute('data-pha') || ''; }
   function lvKhoi() { return !!(LV.tt && LV.tt.khoi) && !body.classList.contains('mc-che-bang'); }
   function lvLen(sbd) { if (sbd) { LV.len = sbd; lvGui('len', { sbd: sbd }); } }
-  function lvSbdThe() { var d = dot(), t = d ? d.querySelector('.mc-em[id]') : null, s = t ? t.querySelector('.mc-sbd') : null; return s ? String(s.textContent || '').trim() : ''; }
-  var lvPhaCu = pha();
+  function lvSbdThe() { var d = window.__mcDot ? window.__mcDot() : null, t = d ? d.querySelector('.mc-em[id]') : null, s = t ? t.querySelector('.mc-sbd') : null; return s ? String(s.textContent || '').trim() : ''; }
+  var lvPhaCu = lvPha();
   new MutationObserver(function () {
-    var p = pha(), cu = lvPhaCu; lvPhaCu = p;
+    var p = lvPha(), cu = lvPhaCu; lvPhaCu = p;
     lvNutLen();
     if (!lvKhoi() || (p !== 'goi' && p !== 'chua') || cu === 'goi' || cu === 'chua') return;
-    if (!S.bpuLen) lvLen(lvSbdThe());
+    if (!lvS.bpuLen) lvLen(lvSbdThe());
   }).observe(body, { attributes: true, attributeFilter: ['data-pha'] });
-  document.addEventListener('mc-doi-em', function (e) { var d = (e && e.detail) || {}; if (lvKhoi() && !S.bpuLen && d.sbd) lvLen(String(d.sbd)); });
-  var lvDauKq = dauKq;
-  dauKq = function (khoa, dat) { lvDauKq(khoa, dat); if (LV.len) { LV.len = ''; lvGui('cham', { dat: !!dat }); } };
+  document.addEventListener('mc-doi-em', function (e) { var d = (e && e.detail) || {}; if (lvKhoi() && !lvS.bpuLen && d.sbd) lvLen(String(d.sbd)); });
+  if (typeof dauKq === 'function') { var lvDauKq = dauKq; dauKq = function (khoa, dat) { lvDauKq(khoa, dat); if (LV.len) { LV.len = ''; lvGui('cham', { dat: !!dat }); } }; }
   // «chưa có em»: đợt không có thẻ tên (pha rỗng) HOẶC thẻ «Cả lớp» không mang số báo danh (tờ bài chọn từ kho) ⇒ xin bảng chọn em thay cho màn gọi «Cả lớp»
-  function lvChuaCoEm() { var p = pha(); return lvKhoi() && !S.bpuLen && (!p || (p === 'cho' && !lvSbdThe())); }
+  function lvChuaCoEm() { var p = lvPha(); return lvKhoi() && !lvS.bpuLen && (!p || (p === 'cho' && !lvSbdThe())); }
   function lvXinGoi(e) { if (!lvChuaCoEm()) return false; if (e) { e.preventDefault(); e.stopImmediatePropagation(); } lvGui('len', {}); return true; }
   // nút «Lên bảng» của thanh đáy vốn ẩn khi đợt chưa có em — buổi live phải bấm được (bảng ẩn, không còn nút nào khác để gọi em)
-  function lvNutLen() { var n = document.getElementById('mc-len-bang'); if (!n || !lvKhoi() || pha() || S.bpuLen) return; if (n.hidden) n.hidden = false; if (n.disabled) n.disabled = false; if (n.textContent !== 'Lên bảng') n.textContent = 'Lên bảng'; }
+  function lvNutLen() { var n = document.getElementById('mc-len-bang'); if (!n || !lvKhoi() || lvPha() || lvS.bpuLen) return; if (n.hidden) n.hidden = false; if (n.disabled) n.disabled = false; if (n.textContent !== 'Lên bảng') n.textContent = 'Lên bảng'; }
   (function () { var n = document.getElementById('mc-len-bang'); if (!n) return; new MutationObserver(lvNutLen).observe(n, { attributes: true, attributeFilter: ['hidden', 'disabled'] }); })();
   document.addEventListener('click', function (e) { var t = e.target; if (t && t.closest && t.closest('#mc-len-bang')) lvXinGoi(e); }, true);
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: nút ống nghiệm «ai đã nộp» trên màn chiếu (máy thầy, live theo khối, chế độ Học)</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --mat: #202f36; --mat2: #263840; --vien: #37464f; --chu: #f1f7fb; --chu2: #c4d0d6; --chu3: #8fa1ab; --giay: #f4efe4; --muc: #1f2429; --dung: #00d497; --sai: #f7498f; --vang: #f5a524; --nhan: #0b57d0;
+  --na: #f5a524; --k: #a78bfa; --cu: #34d399; --ca: #f87171; --k1: calc(100vw / 1366); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+.man { position: fixed; inset: 0; display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr calc(56 * var(--k1)); gap: calc(10 * var(--k1)); padding: calc(10 * var(--k1)); }
+.giay { background: var(--giay); color: var(--muc); border-radius: calc(18 * var(--k1)); padding: calc(22 * var(--k1)) calc(34 * var(--k1)); font-size: calc(33 * var(--k1)); line-height: 1.5; }
+.chip { display: flex; gap: calc(10 * var(--k1)); margin-bottom: calc(14 * var(--k1)); font-size: calc(17 * var(--k1)); font-weight: 800; }
+.chip b { background: #d9e4fb; padding: calc(4 * var(--k1)) calc(14 * var(--k1)); border-radius: 99px; }
+.chip span { background: #e6e0d2; color: #5d6770; padding: calc(4 * var(--k1)) calc(14 * var(--k1)); border-radius: 99px; }
+.pa { display: flex; gap: calc(22 * var(--k1)); margin-top: calc(8 * var(--k1)); }
+.pa b { color: var(--nhan); font-weight: 800; }
+.bang { position: relative; border-radius: calc(18 * var(--k1)); min-width: 0; }
+.bang .net { position: absolute; left: 8%; top: 10%; width: 70%; opacity: .5; }
+/* thanh đáy */
+.thanh { grid-column: 1 / -1; background: #1a262c; border-radius: calc(16 * var(--k1)); display: flex; align-items: center; gap: calc(14 * var(--k1)); padding: 0 calc(10 * var(--k1)); }
+.live { display: flex; align-items: center; gap: calc(8 * var(--k1)); background: #c8262b; border-radius: 99px; padding: calc(7 * var(--k1)) calc(16 * var(--k1)); font-size: calc(15 * var(--k1)); font-weight: 800; }
+.live i { width: calc(8 * var(--k1)); height: calc(8 * var(--k1)); border-radius: 50%; background: #fff; }
+.dot { color: var(--vang); font-weight: 800; font-size: calc(17 * var(--k1)); }
+.pha { background: #cfe3ff; color: #12325f; font-weight: 800; font-size: calc(14 * var(--k1)); padding: calc(5 * var(--k1)) calc(12 * var(--k1)); border-radius: 99px; }
+.gian { flex: 1; }
+.tron { width: calc(40 * var(--k1)); height: calc(40 * var(--k1)); border-radius: 50%; background: #2c3a42; border: 1.5px solid #4a5a63; display: grid; place-items: center; position: relative; flex: none; }
+.tron.o4 svg { width: 44%; height: 44%; }
+/* NÚT ỐNG NGHIỆM */
+.ong { position: relative; height: calc(40 * var(--k1)); padding: 0 calc(14 * var(--k1)) 0 calc(8 * var(--k1)); border-radius: 99px; display: flex; align-items: center; gap: calc(8 * var(--k1)); flex: none;
+  background: linear-gradient(180deg, #2f3f48, #25333b); border: 1.5px solid #4a5a63; font-weight: 800; font-size: calc(16 * var(--k1)); color: var(--chu); }
+.ong svg { height: calc(30 * var(--k1)); width: calc(18 * var(--k1)); overflow: visible; }
+.ong small { font-size: calc(12.5 * var(--k1)); font-weight: 600; color: var(--chu3); margin-left: calc(2 * var(--k1)); }
+.ong.mo { border-color: var(--vang); box-shadow: 0 0 0 calc(3 * var(--k1)) rgba(245,165,36,.18), 0 0 calc(22 * var(--k1)) rgba(245,165,36,.35); }
+.ong.vua { border-color: #ffd27a; box-shadow: 0 0 calc(26 * var(--k1)) rgba(255,190,80,.55); }
+.ong .tia { position: absolute; left: calc(-4 * var(--k1)); bottom: calc(2 * var(--k1)); width: calc(40 * var(--k1)); height: calc(86 * var(--k1)); pointer-events: none; overflow: visible; }
+.cong1 { position: absolute; right: calc(8 * var(--k1)); bottom: calc(58 * var(--k1)); background: rgba(32,47,54,.96); border: 1px solid #55666f; border-radius: 99px; padding: calc(6 * var(--k1)) calc(14 * var(--k1)) calc(6 * var(--k1)) calc(8 * var(--k1)); font-size: calc(14.5 * var(--k1)); font-weight: 700; display: flex; align-items: center; gap: calc(8 * var(--k1)); white-space: nowrap; box-shadow: 0 calc(8 * var(--k1)) calc(22 * var(--k1)) rgba(0,0,0,.4); }
+.cong1 i { width: calc(10 * var(--k1)); height: calc(10 * var(--k1)); border-radius: 50%; }
+/* TẤM DANH SÁCH — chỉ phủ cột bảng đen */
+.tam { position: absolute; inset: calc(6 * var(--k1)) 0 0 0; border-radius: calc(20 * var(--k1)); padding: calc(18 * var(--k1)) calc(18 * var(--k1)) calc(14 * var(--k1)); display: flex; flex-direction: column; gap: calc(12 * var(--k1)); overflow: hidden;
+  background: linear-gradient(165deg, rgba(42,58,66,.97), rgba(24,36,42,.98)); border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 calc(24 * var(--k1)) calc(60 * var(--k1)) rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12); }
+.tam::before { content: ''; position: absolute; left: -20%; top: -30%; width: 90%; height: 60%; background: radial-gradient(closest-side, rgba(245,165,36,.22), transparent); pointer-events: none; }
+.tam::after { content: ''; position: absolute; right: -30%; bottom: -20%; width: 90%; height: 55%; background: radial-gradient(closest-side, rgba(0,212,151,.13), transparent); pointer-events: none; }
+.tam > * { position: relative; z-index: 1; }
+.dau { display: flex; align-items: flex-end; gap: calc(10 * var(--k1)); }
+.dau h2 { margin: 0; font-size: calc(21 * var(--k1)); font-weight: 800; line-height: 1.1; }
+.dau p { margin: calc(3 * var(--k1)) 0 0; font-size: calc(13.5 * var(--k1)); color: var(--chu3); font-weight: 600; }
+.dau .so { margin-left: auto; text-align: right; font-size: calc(30 * var(--k1)); font-weight: 800; line-height: 1; color: #ffd27a; }
+.dau .so small { font-size: calc(15 * var(--k1)); color: var(--chu2); font-weight: 700; }
+.ti { height: calc(8 * var(--k1)); border-radius: 99px; background: rgba(255,255,255,.09); display: flex; overflow: hidden; }
+.ti i { display: block; height: 100%; } .ti .d { background: var(--dung); } .ti .s { background: var(--sai); }
+.chu-ti { display: flex; gap: calc(14 * var(--k1)); font-size: calc(13 * var(--k1)); font-weight: 700; margin-top: calc(-4 * var(--k1)); }
+.chu-ti b.d { color: var(--dung); } .chu-ti b.s { color: var(--sai); } .chu-ti span { color: var(--chu3); margin-left: auto; font-weight: 600; }
+.nhan { font-size: calc(12.5 * var(--k1)); letter-spacing: .08em; text-transform: uppercase; font-weight: 800; color: var(--chu3); display: flex; align-items: center; gap: calc(8 * var(--k1)); }
+.nhan::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+.ds { display: flex; flex-direction: column; gap: calc(6 * var(--k1)); min-height: 0; overflow: hidden; }
+.em { display: grid; grid-template-columns: calc(26 * var(--k1)) 1fr auto auto auto; align-items: center; gap: calc(9 * var(--k1)); padding: calc(7 * var(--k1)) calc(10 * var(--k1)); border-radius: calc(12 * var(--k1)); background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.07); font-size: calc(16 * var(--k1)); font-weight: 700; }
+.em.nhat { background: linear-gradient(90deg, rgba(245,165,36,.2), rgba(255,255,255,.05)); border-color: rgba(245,165,36,.45); }
+.em .hang { width: calc(24 * var(--k1)); height: calc(24 * var(--k1)); border-radius: 50%; display: grid; place-items: center; font-size: calc(12.5 * var(--k1)); background: rgba(255,255,255,.1); color: var(--chu2); }
+.em.nhat .hang { background: var(--vang); color: #2a1a00; }
+.em .ten { display: flex; align-items: center; gap: calc(7 * var(--k1)); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.em .ten i { flex: none; width: calc(9 * var(--k1)); height: calc(9 * var(--k1)); border-radius: 50%; }
+.em .gio { font-size: calc(13.5 * var(--k1)); color: var(--chu2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.em .chon { min-width: calc(26 * var(--k1)); text-align: center; padding: calc(1 * var(--k1)) calc(7 * var(--k1)); border-radius: calc(7 * var(--k1)); background: rgba(255,255,255,.1); font-size: calc(13.5 * var(--k1)); }
+.em .kq { width: calc(24 * var(--k1)); height: calc(24 * var(--k1)); border-radius: 50%; display: grid; place-items: center; }
+.em .kq.d { background: rgba(0,212,151,.18); color: var(--dung); } .em .kq.s { background: rgba(247,73,143,.18); color: var(--sai); }
+.em .kq svg { width: 60%; height: 60%; }
+.chua { display: flex; flex-wrap: wrap; gap: calc(6 * var(--k1)); }
+.chua span { display: inline-flex; align-items: center; gap: calc(6 * var(--k1)); padding: calc(5 * var(--k1)) calc(11 * var(--k1)); border-radius: 99px; background: rgba(255,255,255,.04); border: 1px dashed rgba(255,255,255,.2); font-size: calc(14.5 * var(--k1)); font-weight: 600; color: var(--chu2); }
+.chua span i { width: calc(8 * var(--k1)); height: calc(8 * var(--k1)); border-radius: 50%; opacity: .75; }
+.chan { margin-top: auto; font-size: calc(12.5 * var(--k1)); color: var(--chu3); font-weight: 600; text-align: center; }
+.rong { margin: auto; text-align: center; color: var(--chu2); font-size: calc(17 * var(--k1)); font-weight: 700; } .rong small { display: block; margin-top: calc(6 * var(--k1)); color: var(--chu3); font-size: calc(13.5 * var(--k1)); font-weight: 600; }
+</style></head><body>
+<div class="man">
+  <section class="giay">
+    <div class="chip"><b>Câu 1</b><span>Phần I · Trắc nghiệm</span></div>
+    Alcohol nào sau đây là alcohol bậc II?
+    <div class="pa"><b>A.</b>CH₃–CH₂–OH</div><div class="pa"><b>B.</b>CH₃–CH(OH)–CH₃</div><div class="pa"><b>C.</b>(CH₃)₃C–OH</div><div class="pa"><b>D.</b>CH₃–OH</div>
+  </section>
+  <section class="bang" id="bang"></section>
+  <footer class="thanh">
+    <span class="live"><i></i>LIVE 12:40</span><span class="dot">◂ &nbsp;Câu 1/2&nbsp; ▸</span><span class="pha">CẢ LỚP ĐANG LÀM</span>
+    <span class="gian"></span>
+    <span id="ong"></span>
+    <span class="tron o4"><svg viewBox="0 0 20 20"><rect x="1" y="1" width="7.5" height="7.5" rx="2" fill="#f1f7fb"/><rect x="11.5" y="1" width="7.5" height="7.5" rx="2" fill="#f1f7fb"/><rect x="1" y="11.5" width="7.5" height="7.5" rx="2" fill="#f1f7fb"/><rect x="11.5" y="11.5" width="7.5" height="7.5" rx="2" fill="#f1f7fb"/></svg></span>
+  </footer>
+</div>
+<script>
+var k = new URLSearchParams(location.search).get('k') || 'nut'
+var DOI = { na: 'var(--na)', k: 'var(--k)', cu: 'var(--cu)', ca: 'var(--ca)' }
+var NOP = [['Phạm Khánh Vy', 'k', '0:08', 'B', 1], ['Nguyễn Thị Hà', 'na', '0:11', 'B', 1], ['Lê Gia Huy', 'k', '0:14', 'C', 0], ['Đỗ Hoàng Nam', 'na', '0:19', 'B', 1], ['Vũ Ngọc Lan', 'cu', '0:27', 'A', 0]]
+var CHUA = [['Trần Minh Anh', 'na'], ['Ngô Gia Bảo', 'ca'], ['Bùi Đức Anh', 'cu']]
+// ống nghiệm: mực dâng theo tỉ lệ đã nộp; tia lửa xoắn ốc từ đáy lên miệng mỗi khi một em gửi (như ống nghiệm ở màn điểm danh)
+function ong(n, tong, lop) {
+  var muc = 26 - 20 * (tong ? n / tong : 0)
+  var tia = lop === 'vua' ? '<svg class="tia" viewBox="0 0 40 86"><defs><linearGradient id="gt" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb347" stop-opacity="0"/><stop offset="1" stop-color="#fff2c2"/></linearGradient><filter id="lo"><feGaussianBlur stdDeviation="1.6"/></filter></defs>'
+    + '<path d="M13 78 C 30 72, 30 64, 13 58 C -2 52, -2 44, 13 38 C 28 32, 28 24, 15 18" fill="none" stroke="url(#gt)" stroke-width="2.4" stroke-linecap="round"/>'
+    + '<circle cx="15" cy="18" r="5" fill="#ffd27a" filter="url(#lo)"/><circle cx="15" cy="18" r="2.4" fill="#fff8e0"/><circle cx="24" cy="30" r="1.2" fill="#ffd27a"/><circle cx="6" cy="46" r="1" fill="#ffb347"/><circle cx="27" cy="62" r="1.1" fill="#ffb347"/></svg>' : ''
+  return '<span class="ong ' + (lop || '') + '">' + tia
+    + '<svg viewBox="0 0 18 30"><defs><linearGradient id="gm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#f7498f"/></linearGradient><clipPath id="co"><path d="M4 2 V22 a5 5 0 0 0 10 0 V2 Z"/></clipPath></defs>'
+    + '<g clip-path="url(#co)"><rect x="0" y="' + muc + '" width="18" height="30" fill="url(#gm)"/><circle cx="7" cy="' + (muc + 5) + '" r="1.1" fill="#fff" opacity=".7"/><circle cx="11" cy="' + (muc + 9) + '" r=".8" fill="#fff" opacity=".6"/></g>'
+    + '<path d="M4 2 V22 a5 5 0 0 0 10 0 V2" fill="none" stroke="#e6eef2" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 2 H15.6" stroke="#e6eef2" stroke-width="1.8" stroke-linecap="round"/></svg>'
+    + n + '/' + tong + '<small>đã nộp</small></span>'
+}
+var V = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3.2L13 5"/></svg>', X = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>'
+function tam(nop, chua) {
+  var d = nop.filter(function (e) { return e[4] }).length, s = nop.length - d, t = nop.length + chua.length
+  var h = '<div class="tam"><div class="dau"><div><h2>Ai đã nộp</h2><p>Câu 1 · xếp theo em gửi nhanh nhất</p></div><div class="so">' + nop.length + '<small>/' + t + '</small></div></div>'
+    + '<div class="ti"><i class="d" style="width:' + (100 * d / t) + '%"></i><i class="s" style="width:' + (100 * s / t) + '%"></i></div><div class="chu-ti"><b class="d">' + d + ' đúng</b><b class="s">' + s + ' sai</b><span>' + chua.length + ' em chưa nộp</span></div>'
+  if (!nop.length) h += '<div class="rong">Chưa em nào gửi đáp án<small>Em nào gửi là hiện ngay ở đây, nhanh nhất đứng đầu.</small></div>'
+  else { h += '<div class="nhan">Đã nộp · ' + nop.length + '</div><div class="ds">' + nop.map(function (e, i) { return '<div class="em' + (i === 0 ? ' nhat' : '') + '"><span class="hang">' + (i + 1) + '</span><span class="ten"><i style="background:' + DOI[e[1]] + '"></i>' + e[0] + '</span><span class="gio">' + e[2] + '</span><b class="chon">' + e[3] + '</b><span class="kq ' + (e[4] ? 'd' : 's') + '">' + (e[4] ? V : X) + '</span></div>' }).join('') + '</div>' }
+  if (chua.length) h += '<div class="nhan">Chưa nộp · ' + chua.length + '</div><div class="chua">' + chua.map(function (e) { return '<span><i style="background:' + DOI[e[1]] + '"></i>' + e[0] + '</span>' }).join('') + '</div>'
+  return h + '<div class="chan">Chỉ máy thầy thấy · bấm ống nghiệm lần nữa để đóng</div></div>'
+}
+var net = '<svg class="net" viewBox="0 0 300 120" fill="none" stroke="#e8eef2" stroke-width="3" stroke-linecap="round"><path d="M10 40 q30 -30 60 0 t60 0"/><path d="M20 90 h160"/></svg>'
+var o = document.getElementById('ong'), b = document.getElementById('bang')
+if (k === 'nut') { o.outerHTML = ong(4, 8, ''); b.innerHTML = net }
+if (k === 'vua') { o.outerHTML = ong(5, 8, 'vua') ; b.innerHTML = net + '<div class="cong1"><i style="background:var(--cu)"></i>Vũ Ngọc Lan vừa gửi · 0:27</div>' }
+if (k === 'ds') { o.outerHTML = ong(5, 8, 'mo'); b.innerHTML = tam(NOP, CHUA) }
+if (k === 'rong') { o.outerHTML = ong(0, 8, 'mo'); b.innerHTML = tam([], NOP.map(function (e) { return [e[0], e[1]] }).concat(CHUA)) }
+</script>
+</body></html>
