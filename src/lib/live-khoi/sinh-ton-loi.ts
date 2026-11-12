@@ -128,9 +128,12 @@ export function taoBanDo(cap: number): BanDo {
   }
   const tuong = ghep(PT_TUONG), thung = ghep(PT_THUNG), chan = [...tuong, ...thung]
   const cot = Math.ceil(rong / O), hang = Math.ceil(cao / O), luoi = new Uint8Array(cot * hang)
-  for (let j = 0; j < hang; j++) for (let i = 0; i < cot; i++) {
-    const x = i * O + O / 2, y = j * O + O / 2
-    if (chan.some((v) => trongHop(v, x, y, BK_NV + 2))) luoi[j * cot + i] = 1
+  // Mỗi vật chặn chỉ xét các ô quanh nó (±1 ô cho chắc), phép thử vẫn là `trongHop` ⇒ kết quả y hệt quét cả lưới × cả vật chặn (sân ghép 4800 × 3000 có ~290 vật × 9000 ô).
+  const NOI = BK_NV + 2
+  for (const v of chan) {
+    const i0 = Math.max(0, Math.floor((v.x - NOI) / O) - 1), i1 = Math.min(cot - 1, Math.ceil((v.x + v.w + NOI) / O) + 1)
+    const j0 = Math.max(0, Math.floor((v.y - NOI) / O) - 1), j1 = Math.min(hang - 1, Math.ceil((v.y + v.h + NOI) / O) + 1)
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (trongHop(v, i * O + O / 2, j * O + O / 2, NOI)) luoi[j * cot + i] = 1
   }
   const bd: BanDo = {
     cap: c, rong, cao, tuong, thung, bui: ghep(PT_BUI), chan, cot, hang, luoi,
