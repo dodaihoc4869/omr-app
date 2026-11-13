@@ -454,7 +454,7 @@ kiem('6b tờ: giấy đề ẩn, cột bảng phủ gần kín bề ngang, bút
 const aGv1 = await mucVungGv(gv, ...netA.gv), aEm1 = await mucVung(em1, ...netA.em)
 kiem('6x BẢNG GIỮ NÉT: nét A viết trên bảng trắng (trước khi chọn bài) còn nguyên trên máy thầy và máy em', aGv1 > 60 && aEm1 > 30, JSON.stringify({ thay: [aGv0, aGv1], em: [aEm0, aEm1] }))
 const khayLk = await to.locator('body').evaluate(() => { const t = document.getElementById('mc-them'), tr = t?.getBoundingClientRect(); t?.click(); const g = document.querySelector('.mc-khay-lk'), ds = [...(g?.querySelectorAll('[data-lk]') ?? [])].filter((x) => !x.hidden && x.getBoundingClientRect().width > 0).map((x) => `${x.textContent}${x.getAttribute('aria-pressed') === 'true' ? '*' : ''}`); const em = document.querySelector('.mc-em'); t?.click(); return { nut: !!tr && tr.width > 20, ds, theTen: em ? getComputedStyle(em).display : 'không có' } })
-kiem('6y ở tờ KHÔNG còn cụm nổi của app; khay nút bốn ô có nhóm «Buổi live»: Học · Bảng (đang chọn) · Lớp · Tin nhắn', (await gv.locator('.lkt-vien').count()) === 0 && khayLk.nut && khayLk.ds.join('|') === 'Học|Bảng*|Lớp|Tin nhắn', JSON.stringify(khayLk))
+kiem('6y ở tờ KHÔNG còn cụm nổi của app; khay nút bốn ô có nhóm «Buổi live»: Học · Bảng (đang chọn) · Lớp · Nghỉ · Tin nhắn', (await gv.locator('.lkt-vien').count()) === 0 && khayLk.nut && khayLk.ds.join('|') === 'Học|Bảng*|Lớp|Nghỉ|Tin nhắn', JSON.stringify(khayLk))
 kiem('6z2 chế độ Bảng: nút ống nghiệm ẨN (chỉ có ở Học)', await gv.frameLocator('.lop-xem-phieu iframe').locator('#mc-nop').isHidden())
 kiem('6z chế độ Bảng: thẻ tên trên bảng ẩn', khayLk.theTen === 'none' || khayLk.theTen === 'không có', khayLk.theTen)
 kiem('6c máy em: bảng live phủ kín', await em1.evaluate(() => { const b = document.querySelector('.lv-bang'), r = b?.getBoundingClientRect(); return !!r && r.width > innerWidth * 0.85 }))
@@ -567,7 +567,7 @@ await chup(em1, 'ng-2-em-nghi')
   kiem('NG3 đang nghỉ: em rời app rồi quay lại KHÔNG bị trừ kJ, không bị ghi rời màn', st()?.ds?.find((e) => e.sbd === 'S1')?.kj === kj0 && st()?.ds?.find((e) => e.sbd === 'S1')?.roi === roi0 && (await gv.locator('.bpu-roi-gon').count()) === 0, `${kj0} → ${st()?.ds?.find((e) => e.sbd === 'S1')?.kj}`) }
 await gv.locator('.lkt-cho[data-nghi] .lkt-bat-dau').click(); await ngu(600)
 const ng4 = await em1.evaluate(() => { const v = document.querySelector('.lke-vao-lai'); return v ? v.innerText.replace(/\s+/g, ' ') : '' })
-kiem('NG4 thầy bấm «Học tiếp» ⇒ phòng gỡ cờ nghỉ, live chạy lại; máy em hiện «Thầy gọi học tiếp» đếm 3 giây (vẫn trên sân trò)', !st()?.live?.khoi?.giaiLao && st()?.live?.nghi === false && /Hết giờ nghỉ Thầy gọi học tiếp Em vào lại đúng chỗ thầy đang dạy\. [123]/.test(ng4), ng4)
+kiem('NG4 thầy bấm «Học tiếp» ⇒ phòng gỡ cờ nghỉ, live chạy lại; máy em hiện «Thầy gọi học tiếp» đếm 3 giây (vẫn trên sân trò)', !st()?.live?.khoi?.giaiLao && st()?.live?.nghi === false && /hết giờ nghỉ thầy gọi học tiếp em vào lại đúng chỗ thầy đang dạy\. [123]/i.test(ng4), ng4)
 await chup(em1, 'ng-3-em-thay-goi-hoc-tiep')
 await ngu(3600)
 const sauNghi = { che: st()?.live?.khoi?.che, net: await gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => window.__mcBut.xuat().net.length), emBang: await em1.locator('.lv-bang').first().isVisible(), emCho: await em1.evaluate(() => !!document.querySelector('.lke.cho, .lke-vao-lai, .lke-nghi')), gvTo: await trenCung(gv), cot: await gv.locator('.lkt-cot').count() }
