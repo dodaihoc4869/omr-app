@@ -1,0 +1,38 @@
+# SOI «NHẬT KÝ BÀI DẠY» TRÊN BẢN SỐNG (CHỈ ĐỌC, 14/11) — thầy báo «Nhật ký của bài live K12 chưa có». Đi đúng đường máy em / máy thầy: vé tệp của buổi (qua
+# /gv/live-ds bằng mã GV) ⇒ HEAD nhat-ky.json ⇒ đếm cảnh / trang ⇒ trang tĩnh /nhat-ky/ trên Pages. Chỉ in MÃ TRẠNG THÁI + SỐ ĐẾM (repo công khai).
+name: Soi nhật ký bài dạy bản sống (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      buoi:
+        description: 'Mã buổi (BH-…)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  soi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Soi (chỉ đọc)
+        env:
+          K: ${{ secrets.OMR_MA_BI_MAT }}
+          W: https://omr.ttadodaihoc.workers.dev
+          P: https://omr-app-b3u.pages.dev
+        run: |
+          B=$(jq -r '.inputs.buoi' "$GITHUB_EVENT_PATH" | tr -cd 'A-Za-z0-9_-')
+          K=$(printf '%s' "$K" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          curl -s -X POST -H "x-ma-bi-mat: $K" -H 'content-type: application/json' -d '{}' "$W/gv/live-ds" -o ds.json -w "gv/live-ds %{http_code}\n"
+          jq -c --arg b "$B" '.buoi[] | select(.id == $b) | {trangThai, ban, soCau, soDoan, coVe: (.ve != null)}' ds.json
+          VE=$(jq -r --arg b "$B" '.buoi[] | select(.id == $b) | .ve // empty' ds.json)
+          V=$(jq -rn --arg v "$VE" '$v|@uri')
+          curl -s -I "$W/live-tep/$B/nhat-ky.json?ve=$V" -o /dev/null -w "HEAD nhat-ky.json %{http_code}\n"
+          curl -s "$W/live-tep/$B/nhat-ky.json?ve=$V" -o nk.json -w "GET nhat-ky.json %{http_code} %{size_download}B\n"
+          jq -c '{canh: (.canh|length), nguoiSoan: .nguon.nguoiSoan, coNguong: (.nguong != null), trangCanh: [.canh[].nguon.trang], buoiBan: .buoi.ban}' nk.json 2>/dev/null || echo "(nhat-ky.json không đọc được)"
+          curl -s "$W/live-tep/$B/trang.json?ve=$V" -o tr.json -w "GET trang.json %{http_code} %{size_download}B\n"
+          jq -c '[.trang[] | {stt, loai, net: (.net|length)}]' tr.json 2>/dev/null || echo "(trang.json không đọc được)"
+          curl -s -X POST -H "x-ma-bi-mat: $K" -H 'content-type: application/json' -d '{}' "$W/gv/live-nhat-ky-ds" | jq -c --arg b "$B" '.ds[] | select(.buoiId == $b) | {ban, canSoan, nhatKy}'
+          curl -s -L "$P/nhat-ky/" -o trang.html -w "Pages /nhat-ky/ %{http_code} %{content_type}\n"; echo "có id=nk: $(grep -c 'id="nk"' trang.html)"
+          curl -s -L "$P/nhat-ky/khuon.js" -o /dev/null -w "Pages khuon.js %{http_code} %{content_type}\n"
+          curl -s -L -o /dev/null -w "Pages khuon.css %{http_code} %{content_type}\n" "$P/nhat-ky/khuon.css"
