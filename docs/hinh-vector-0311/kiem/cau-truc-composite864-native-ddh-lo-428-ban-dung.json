@@ -1,0 +1,29 @@
+[
+  {
+    "i": 864,
+    "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+    "fileNguon": "anh/9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6.png",
+    "svg": "composite864-native-ddh-2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f.svg",
+    "hashSvg": "2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f",
+    "byteSvg": 22960,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C4-B13-II-9",
+        "de": "Vật liệu composite là một loại vật liệu kết hợp hai hay nhiều vật liệu khác nhau để tạo ra một sản phẩm với các tính chất vượt trội.",
+        "refs": [
+          {
+            "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+            "where": "12-C4-B13-II-9.hinh.0.du_lieu",
+            "hashDataUrl": "ce136ea3de52f662b12777bc469dce81ec677f72f29a1986a8308eb4a35b4d01"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2BLACKwireframecubes3visiblefacesEACH/LEFT30individualfibers9TOP16FRONT5SIDE/RIGHT21FILLEDparticles6TOP11FRONT4SIDE/2regularUPRIGHTBLACKcaptionsEXACTComposite cốt sợi-Composite cốt hạt/0heads-ticks-charge-chemicalformula/NOaddedhiddenedges-particles-node-labels-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

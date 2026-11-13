@@ -1,0 +1,992 @@
+{
+  "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+  "native": [
+    879,
+    342
+  ],
+  "questions": [
+    {
+      "qid": "12-C4-B13-II-9",
+      "de": "Vật liệu composite là một loại vật liệu kết hợp hai hay nhiều vật liệu khác nhau để tạo ra một sản phẩm với các tính chất vượt trội.",
+      "refs": [
+        {
+          "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+          "where": "12-C4-B13-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "ce136ea3de52f662b12777bc469dce81ec677f72f29a1986a8308eb4a35b4d01"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "2BLACKwireframecubes3visiblefacesEACH/LEFT30individualfibers9TOP16FRONT5SIDE/RIGHT21FILLEDparticles6TOP11FRONT4SIDE/2regularUPRIGHTBLACKcaptionsEXACTComposite cốt sợi-Composite cốt hạt/0heads-ticks-charge-chemicalformula/NOaddedhiddenedges-particles-node-labels-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicde12-C4-B13-II-9; OWNLEFT/RIGHTcube3x+captions2x. 30separatefibers9top16front5side;21solidparticles6top11front4side. Individualnonperiodicpositions/angles/curves; neither count inferredfromcompositetheory. SourceflatlineillustrationNOTphoto. AllcaptionsregularUPRIGHT; no inferredchemicalformula/answer. NativeapproxNOTsubpixel.",
+  "sourceIndependentAudit": {
+    "i": 864,
+    "assetIndexProvided": 487,
+    "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6.png",
+    "size": [
+      879,
+      342
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C4-B13-II-9",
+        "de": "Vật liệu composite là một loại vật liệu kết hợp hai hay nhiều vật liệu khác nhau để tạo ra một sản phẩm với các tính chất vượt trội.",
+        "allHinh": [
+          {
+            "hash": "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6",
+            "where": "12-C4-B13-II-9.hinh.0.du_lieu",
+            "hashDataUrl": "ce136ea3de52f662b12777bc469dce81ec677f72f29a1986a8308eb4a35b4d01"
+          }
+        ],
+        "missingHashes": [
+          "9d7115ce87e3776aa5b39a97e4086cb0438cf73551c98a8ba936e27b504e64a6"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/428-864-full3x.png",
+        "/workspace/scratch/428-864-fibers4x.png",
+        "/workspace/scratch/428-864-particles4x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "classification": "Twoflattechnicalillustrationcubeswithsymbolicfiberstrokes/solidparticleblobs, NOTphotograph. No labelsforphysicalparticles/chemicalspecies.",
+    "geometry": {
+      "counts": {
+        "cubes": 2,
+        "leftFiberTop": 9,
+        "leftFiberFront": 16,
+        "leftFiberSide": 5,
+        "leftFibersTotal": 30,
+        "rightParticleTop": 6,
+        "rightParticleFront": 11,
+        "rightParticleSide": 4,
+        "rightParticlesTotal": 21,
+        "captions": 2
+      },
+      "leftCube": {
+        "frontRect": [
+          85,
+          108,
+          310,
+          244
+        ],
+        "topFace": [
+          [
+            85,
+            108
+          ],
+          [
+            148,
+            45
+          ],
+          [
+            372,
+            45
+          ],
+          [
+            310,
+            108
+          ]
+        ],
+        "sideFace": [
+          [
+            310,
+            108
+          ],
+          [
+            372,
+            45
+          ],
+          [
+            372,
+            181
+          ],
+          [
+            310,
+            244
+          ]
+        ],
+        "wireEdges": [
+          [
+            [
+              85,
+              108
+            ],
+            [
+              148,
+              45
+            ],
+            [
+              372,
+              45
+            ],
+            [
+              372,
+              181
+            ],
+            [
+              310,
+              244
+            ],
+            [
+              85,
+              244
+            ],
+            [
+              85,
+              108
+            ]
+          ],
+          [
+            [
+              85,
+              108
+            ],
+            [
+              310,
+              108
+            ],
+            [
+              372,
+              45
+            ]
+          ],
+          [
+            [
+              310,
+              108
+            ],
+            [
+              310,
+              244
+            ]
+          ]
+        ],
+        "fibers": {
+          "top": [
+            [
+              [
+                121,
+                93
+              ],
+              [
+                137,
+                73
+              ]
+            ],
+            [
+              [
+                156,
+                66
+              ],
+              [
+                190,
+                60
+              ]
+            ],
+            [
+              [
+                149,
+                82
+              ],
+              [
+                173,
+                84
+              ],
+              [
+                181,
+                88
+              ],
+              [
+                185,
+                96
+              ]
+            ],
+            [
+              [
+                213,
+                78
+              ],
+              [
+                219,
+                86
+              ],
+              [
+                218,
+                92
+              ],
+              [
+                215,
+                94
+              ]
+            ],
+            [
+              [
+                224,
+                67
+              ],
+              [
+                249,
+                73
+              ]
+            ],
+            [
+              [
+                248,
+                50
+              ],
+              [
+                249,
+                59
+              ]
+            ],
+            [
+              [
+                267,
+                88
+              ],
+              [
+                275,
+                77
+              ],
+              [
+                285,
+                69
+              ],
+              [
+                295,
+                64
+              ]
+            ],
+            [
+              [
+                289,
+                50
+              ],
+              [
+                327,
+                59
+              ]
+            ],
+            [
+              [
+                305,
+                76
+              ],
+              [
+                316,
+                85
+              ]
+            ]
+          ],
+          "front": [
+            [
+              [
+                106,
+                139
+              ],
+              [
+                123,
+                123
+              ]
+            ],
+            [
+              [
+                146,
+                124
+              ],
+              [
+                175,
+                119
+              ]
+            ],
+            [
+              [
+                177,
+                141
+              ],
+              [
+                193,
+                137
+              ],
+              [
+                205,
+                139
+              ],
+              [
+                211,
+                148
+              ],
+              [
+                222,
+                149
+              ]
+            ],
+            [
+              [
+                259,
+                123
+              ],
+              [
+                269,
+                134
+              ],
+              [
+                276,
+                138
+              ],
+              [
+                282,
+                139
+              ]
+            ],
+            [
+              [
+                120,
+                149
+              ],
+              [
+                144,
+                156
+              ]
+            ],
+            [
+              [
+                98,
+                177
+              ],
+              [
+                122,
+                164
+              ]
+            ],
+            [
+              [
+                170,
+                160
+              ],
+              [
+                174,
+                173
+              ],
+              [
+                178,
+                181
+              ],
+              [
+                187,
+                186
+              ]
+            ],
+            [
+              [
+                202,
+                167
+              ],
+              [
+                242,
+                169
+              ]
+            ],
+            [
+              [
+                257,
+                156
+              ],
+              [
+                258,
+                166
+              ],
+              [
+                252,
+                177
+              ],
+              [
+                239,
+                193
+              ]
+            ],
+            [
+              [
+                267,
+                171
+              ],
+              [
+                295,
+                188
+              ]
+            ],
+            [
+              [
+                125,
+                197
+              ],
+              [
+                132,
+                190
+              ],
+              [
+                144,
+                186
+              ],
+              [
+                158,
+                186
+              ]
+            ],
+            [
+              [
+                97,
+                196
+              ],
+              [
+                112,
+                227
+              ]
+            ],
+            [
+              [
+                144,
+                210
+              ],
+              [
+                173,
+                224
+              ]
+            ],
+            [
+              [
+                204,
+                196
+              ],
+              [
+                205,
+                211
+              ],
+              [
+                208,
+                219
+              ],
+              [
+                214,
+                224
+              ]
+            ],
+            [
+              [
+                235,
+                210
+              ],
+              [
+                240,
+                218
+              ],
+              [
+                241,
+                229
+              ],
+              [
+                242,
+                236
+              ]
+            ],
+            [
+              [
+                260,
+                204
+              ],
+              [
+                270,
+                211
+              ],
+              [
+                278,
+                217
+              ],
+              [
+                286,
+                224
+              ]
+            ]
+          ],
+          "side": [
+            [
+              [
+                321,
+                115
+              ],
+              [
+                323,
+                108
+              ],
+              [
+                332,
+                103
+              ],
+              [
+                342,
+                100
+              ]
+            ],
+            [
+              [
+                352,
+                92
+              ],
+              [
+                355,
+                132
+              ]
+            ],
+            [
+              [
+                330,
+                129
+              ],
+              [
+                346,
+                160
+              ]
+            ],
+            [
+              [
+                328,
+                167
+              ],
+              [
+                326,
+                187
+              ],
+              [
+                323,
+                205
+              ]
+            ],
+            [
+              [
+                338,
+                189
+              ],
+              [
+                361,
+                161
+              ]
+            ]
+          ]
+        },
+        "fiberStyle": "Blackthin~1.5–2pxmanualstraight/Beziercurves. Orderedpointsperstroke are handreadguides, notautomatictrace. Count eachcurveasONEfiber evenwhenbent; no branches/dots added."
+      },
+      "rightCube": {
+        "frontRect": [
+          517,
+          105,
+          747,
+          241
+        ],
+        "topFace": [
+          [
+            517,
+            105
+          ],
+          [
+            581,
+            40
+          ],
+          [
+            811,
+            40
+          ],
+          [
+            747,
+            105
+          ]
+        ],
+        "sideFace": [
+          [
+            747,
+            105
+          ],
+          [
+            811,
+            40
+          ],
+          [
+            811,
+            177
+          ],
+          [
+            747,
+            241
+          ]
+        ],
+        "wireEdges": [
+          [
+            [
+              517,
+              105
+            ],
+            [
+              581,
+              40
+            ],
+            [
+              811,
+              40
+            ],
+            [
+              811,
+              177
+            ],
+            [
+              747,
+              241
+            ],
+            [
+              517,
+              241
+            ],
+            [
+              517,
+              105
+            ]
+          ],
+          [
+            [
+              517,
+              105
+            ],
+            [
+              747,
+              105
+            ],
+            [
+              811,
+              40
+            ]
+          ],
+          [
+            [
+              747,
+              105
+            ],
+            [
+              747,
+              241
+            ]
+          ]
+        ],
+        "particles": {
+          "top": [
+            {
+              "c": [
+                580,
+                79
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                619,
+                83
+              ],
+              "r": [
+                12,
+                8
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                645,
+                61
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                696,
+                76
+              ],
+              "r": [
+                6,
+                10
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                738,
+                67
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                758,
+                55
+              ],
+              "r": [
+                8,
+                12
+              ],
+              "rot": -35
+            }
+          ],
+          "front": [
+            {
+              "c": [
+                536,
+                125
+              ],
+              "r": [
+                8,
+                12
+              ],
+              "rot": -35
+            },
+            {
+              "c": [
+                602,
+                137
+              ],
+              "r": [
+                7,
+                9
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                655,
+                124
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                713,
+                144
+              ],
+              "r": [
+                12,
+                8
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                542,
+                163
+              ],
+              "r": [
+                12,
+                8
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                580,
+                177
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                655,
+                172
+              ],
+              "r": [
+                8,
+                11
+              ],
+              "rot": -30
+            },
+            {
+              "c": [
+                548,
+                212
+              ],
+              "r": [
+                7,
+                9
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                613,
+                208
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                649,
+                220
+              ],
+              "r": [
+                12,
+                8
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                707,
+                202
+              ],
+              "r": [
+                7,
+                8
+              ],
+              "rot": 0
+            }
+          ],
+          "side": [
+            {
+              "c": [
+                790,
+                92
+              ],
+              "r": [
+                7,
+                10
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                771,
+                123
+              ],
+              "r": [
+                8,
+                11
+              ],
+              "rot": -35
+            },
+            {
+              "c": [
+                788,
+                154
+              ],
+              "r": [
+                12,
+                8
+              ],
+              "rot": 0
+            },
+            {
+              "c": [
+                772,
+                183
+              ],
+              "r": [
+                7,
+                7
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        "particleStyle": "Solidblackcircle/irregularovalblobs, centers/radii/rotationapprox. Preserve21separateblobs withnativeasymmetry; no graincount. CanmanualBezierovalnotautotrace/photorealballs."
+      },
+      "frameStrokeApprox": 1.5,
+      "faceFill": "WHITEallfaces, no gray3Dshading",
+      "captions": [
+        {
+          "literal": "Composite cốt sợi",
+          "bbox": [
+            66,
+            275,
+            279,
+            300
+          ],
+          "font": "Regularuprightsans"
+        },
+        {
+          "literal": "Composite cốt hạt",
+          "bbox": [
+            542,
+            275,
+            757,
+            300
+          ],
+          "font": "Regularuprightsans"
+        }
+      ],
+      "colors": "Blacklines/particlesonwhite. ScanAAgraynotintentionalcoloredcomponents.",
+      "noAdded": [
+        "No materialsnames",
+        "No scientificcountsascaption",
+        "No arrowheads",
+        "No labelsontheparticles",
+        "No extra cubehiddenedges",
+        "No phototexture",
+        "No repeatedgridnormalization"
+      ]
+    },
+    "measurementLimits": "OwnnativeFULLandEACHcube4xopened. Each30fibertrace/21particlecountvisualindependent. Approxcoords±1–2px, manualBezierguidesnotexactautotrace. Sourcefiguresymbolicshapesnotatoms, no chemicalinference.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootOldNewXmlAudit": {
+    "oldHash": "3156bd947002f5e9cb28a32b6dfce4cf1e7c411eb0fef0bb56bb567b4d2c6593",
+    "finalHash": "2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f",
+    "children": 56,
+    "onlyChangedZeroBasedChildren": [
+      54,
+      55
+    ],
+    "allOtherXmlExact": true,
+    "allGlyphPathDataExact": true,
+    "change": "Only2captionsfont28→24; no claimedinkcollision."
+  },
+  "rootActualReview": {
+    "hashSvg": "2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f",
+    "ownNativeFull": true,
+    "allPublicRefs": 1,
+    "ownFreshChromiumFull3x": true,
+    "verdict": "Đạt",
+    "detail": "OWNnativeeachcube3x/captions2x; freshFINALFULL3x/EACHcube3x+captions3x opened. Count30fibers9+16+5/21particles6+11+4;2wirecubes, allindividualnativeapproxanchors/curves/ellipserotations. Caption24regularuprightfitsnativewidth/gaps. No addedhiddenedges/answer/chemicallabels. NoSVGproofoldhashcarry."
+  },
+  "readonlyRuntimeAudit": {
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/composite864-native-ddh-2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f.svg 2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f\n864 { x: 0, y: 0, width: 879, height: 342 }\n\nPOSTSHOT_SHA 2ffdb477f5776001510d440a426aa3fdfb28c1d0eaefbd89784f0f9d5f8eb40f\nCOMMAND node /workspace/scratch/agent-render428.cjs\nCONTEXT 12-C4-B13-II-9.hinh.0.du_lieu public de/one ref only; no answers.\n",
+    "sha256": "df67fa2507a9464930459bc15e6e53eba08550ccaae018fd7e4295c6435c60fd"
+  }
+}
