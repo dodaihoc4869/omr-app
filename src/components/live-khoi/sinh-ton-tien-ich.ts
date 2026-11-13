@@ -6,7 +6,16 @@ import type { SinhTonAnh } from '../../lib/live-khoi/kieu'
 import { ANH_MS, MAU_DAY, coKhien, docDong, laMay, ngoaiVong, type BanDo, type Diem, type NhanVat, type Toi, type Vong } from '../../lib/live-khoi/sinh-ton-loi'
 import { taoBangMau, type BangMau, type Rgb } from './sinh-ton-hinh'
 import { cauChuoi, veBanDoNho, type NvVe } from './sinh-ton-ve'
-import type { Bao, DongVang, KetQua } from './sinh-ton-phu'
+import type { Bao, DongVang, KetQua, ThanhLon } from './sinh-ton-phu'
+
+/** Nguồn thanh máu: vòng khung ghi (≤ 2 lần / giây), chỉ hai lớp phủ đọc — không vẽ lại cả màn trò mỗi lần máu đổi. */
+export class NguonThanh {
+  private v: ThanhLon = { thay: null, boss: null }
+  private f = new Set<() => void>()
+  lay = (): ThanhLon => this.v
+  nghe = (f: () => void): (() => void) => { this.f.add(f); return () => { this.f.delete(f) } }
+  dat(v: ThanhLon): void { this.v = v; for (const f of this.f) f() }
+}
 
 export const kepDoi = (d: number): number => (d >= 0 && d < 4 ? Math.floor(d) : 0)
 /** Hai chữ cuối của tên (tên gọi của người Việt), cắt ở 16 ký tự cho gọn trên sân. */
@@ -63,7 +72,8 @@ export function xepHangVan(diemCu: string, soHa: ReadonlyMap<string, number>, te
     let nhat = '', nhieu = 0
     // Máy bù không bao giờ được vinh danh (không có thật).
     for (const [id, soLan] of soHa) if (soLan > nhieu && !laMay(id) && doiCua(id) === doi) { nhieu = soLan; nhat = `${tenCua(id)} ${soLan} lượt hạ · nhiều nhất đội` }
-    return { doi, diem: d[doi] ?? 0, nhat, xep: d.filter((x) => x > (d[doi] ?? 0)).length }
+    // Hạng = số đội HƠN HẲN (bằng điểm ⇒ cùng hạng, hạng sau nhảy cóc: 5 · 3 · 3 · 1 ⇒ 0 · 1 · 1 · 3); `hoa` = có đội khác cùng điểm (chữ «Cùng …» — `chuXep`).
+    return { doi, diem: d[doi] ?? 0, nhat, xep: d.filter((x) => x > (d[doi] ?? 0)).length, hoa: d.filter((x) => x === (d[doi] ?? 0)).length > 1 }
   }).sort((a, b) => b.diem - a.diem)
 }
 
@@ -91,10 +101,10 @@ export function chonBao(chet: boolean, nghi: boolean, matMang: boolean, vui: { c
 }
 
 /** Bản đồ nhỏ góc màn (130 px ngang) = đồng đội trong ảnh + chấm `dd` + sao thủ khoa; cỡ canvas theo dpr (máy yếu dpr 1). */
-export function veNho(nho: HTMLCanvasElement, gn: CanvasRenderingContext2D, yeu: boolean, bd: BanDo, bm: BangMau, v: Vong, nvVe: readonly NvVe[], doiEm: number, dd: readonly number[], sao: Diem | null): void {
+export function veNho(nho: HTMLCanvasElement, gn: CanvasRenderingContext2D, yeu: boolean, bd: BanDo, bm: BangMau, v: Vong, nvVe: readonly NvVe[], doiEm: number, dd: readonly number[], sao: Diem | null, boss: Diem | null = null): void {
   const r = 130, c = Math.round((r * bd.cao) / bd.rong), d2 = Math.min(yeu ? 1 : 2, window.devicePixelRatio || 1)
   if (nho.width !== Math.round(r * d2) || nho.height !== Math.round(c * d2)) { nho.width = Math.round(r * d2); nho.height = Math.round(c * d2) }
-  veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm, dd, sao)
+  veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm, dd, sao, boss)
 }
 
 /** Nhân vật khác đang nội suy giữa hai ảnh chụp; `hl` = lúc bắt đầu hiện ra (0 = không), `hs` = hiện kiểu sống lại.

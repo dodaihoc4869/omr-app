@@ -366,7 +366,7 @@ function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang 
         <button type="button" className="lkt-dong" onClick={() => void dong()} disabled={dang}>{nghi ? 'Kết thúc buổi' : 'Đóng phòng'}</button>
       </header>
       {thiDua ? <Suspense fallback={null}><ThiDuaTuanThay khoi={khoi} onDong={() => setThiDua(false)} /></Suspense> : null}
-      <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi /></Suspense></div>
+      <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi thayVao /></Suspense></div>
       <div className="lkt-doi">
         {DOI_BPU.map((d, i) => {
           const em = vao.filter((e) => e.doi === i)

@@ -244,3 +244,33 @@
   .st-vv { grid-template-columns: 1fr; }
   .st-vv-ben p:nth-child(n + 3) { display: none; }
 }
+/* ── Đợt 3 (ảnh 10 · 11 · 12): thanh máu lớn Thầy / Ma Mực, dải báo, nút «Thầy vào trận» của máy thầy. Chỉ biến màu có sẵn (--st-* · --tr-hs · --tr-sai · đội). ── */
+.st-hp { position: absolute; left: 50%; top: 42px; z-index: 1; width: min(520px, calc(100% - 300px)); min-width: 220px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.st-hp-dong { display: flex; flex-direction: column; gap: 2px; }
+.st-hp-ten { align-self: center; padding: 0 8px; font-size: 15px; line-height: 1.2; color: var(--st-chu); background: color-mix(in srgb, var(--st-nen) 82%, transparent); white-space: nowrap; }
+.st-hp-vach { display: block; height: 10px; border: 2px solid var(--st-chu); background: var(--st-nen); }
+.st-hp-vach i { display: block; height: 100%; background: var(--tr-hs); transform-origin: left center; transition: transform .25s linear; }
+.st-hp-doi { display: flex; height: 6px; }
+.st-hp-doi i { min-width: 0; flex: 0 1 0; background: var(--doi); }
+.st-hp-pt { display: flex; justify-content: space-between; gap: 6px; }
+.st-hp-pt small { padding: 0 4px; font-size: 13px; line-height: 1.2; color: var(--st-chu); background: color-mix(in srgb, var(--st-nen) 82%, transparent); border-bottom: 2px solid var(--doi); white-space: nowrap; }
+.st-hp ~ .st-truy { top: 96px; }
+.st-hp[data-hai] ~ .st-truy { top: 128px; }
+.st-hp ~ .st-bao { top: 96px; }
+.st-hp ~ .st-truy ~ .st-bao { top: 156px; }
+.st-dai b { font-size: 22px; }
+.st[data-em] .st-hp-vach i { transition: none; }
+.st-thay { position: absolute; left: 8px; bottom: 8px; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: calc(100% - 16px); }
+.st-thay-goi { margin: 0; padding: 3px 10px; border: 1.5px dashed color-mix(in srgb, var(--st-chu) 60%, transparent); background: var(--st-kinh); color: var(--st-chu); font-size: 14px; }
+.st-thay-hang { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.st-thay-the { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 2px solid var(--st-chu); border-radius: 18px; background: var(--st-kinh); color: var(--st-chu); font-size: 15px; }
+.st-thay-the i { width: 10px; height: 10px; border-radius: 50%; background: var(--tr-sai); }
+.st-thay-nut { min-width: 44px; min-height: 44px; padding: 0 18px; border: 2px solid var(--st-chu); border-radius: 22px; background: var(--tr-hs); color: var(--st-chu); font: inherit; font-size: 17px; cursor: pointer; }
+.st-thay-nut[data-trong] { background: var(--tr-sai); }
+.st-thay-nut:focus-visible { outline: 2px solid var(--st-chu); outline-offset: 3px; }
+@container gl (max-width: 720px) {
+  .st-hp { left: 60px; width: calc(54% - 66px); min-width: 0; transform: none; }
+  .st-hp-ten { align-self: flex-start; font-size: 13px; }
+  .st-hp ~ .st-truy { top: 104px; }
+  .st-hp[data-hai] ~ .st-truy { top: 140px; }
+}
