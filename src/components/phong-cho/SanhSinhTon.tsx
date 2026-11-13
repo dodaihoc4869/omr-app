@@ -231,7 +231,7 @@ function TheEm({ du }: { du: DuLieuTuDo }) {
       </div>
     </div>
     <div className="sst-td">
-      <p>Thi đua tuần này{du.thiDua.chuTuan ? ` (${du.thiDua.chuTuan})` : ''} · lượt hạ cộng dồn</p>
+      <p title={du.thiDua.chuTuan ? `Tuần ${du.thiDua.chuTuan}` : undefined}>Thi đua tuần này · lượt hạ cộng dồn</p>
       <ul aria-label="Lượt hạ của bốn đội trong tuần">
         {xep.map(({ ha, i }) => <li key={i} data-em={i === doi || undefined} style={{ ['--d' as string]: `var(${DOI_SANH[i][2]})` } as CSSProperties}>
           <span>{DOI_SANH[i][1]}</span><i aria-hidden="true"><b style={{ width: `${Math.round((ha / max) * 100)}%` }} /></i><span>{ha}</span>
