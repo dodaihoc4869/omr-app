@@ -10,25 +10,29 @@ import type { TinChat } from '../src/lib/live-khoi/chat-loi'
 
 describe('hình học cột chat cố định', () => {
   it('phần chiếu thu ĐỀU: tỉ lệ rộng / cao giữ nguyên ở mọi cỡ màn ⇒ tỉ lệ bảng gửi máy em không đổi', () => {
-    for (const [w, h] of [[1024, 600], [1280, 720], [1366, 768], [1536, 864], [1920, 1080], [2560, 1440]] as const) {
+    for (const [w, h] of [[880, 480], [1000, 590], [1024, 600], [1280, 720], [1366, 768], [1536, 864], [1920, 1080], [2560, 1440]] as const) {
       const g = hinhCot(w, h)!
-      expect(g.c).toBeGreaterThanOrEqual(248); expect(g.c).toBeLessThanOrEqual(340)
+      expect(g.c).toBeGreaterThanOrEqual(232); expect(g.c).toBeLessThanOrEqual(340)
       const rong = w * g.s, cao = h * g.s
       expect(rong).toBeCloseTo(w - g.c, 6) // phần chiếu sát mép trái cột, không hở, không đè
       expect(rong / cao).toBeCloseTo(w / h, 9) // cùng tỉ lệ với khi không có cột
       expect(Math.abs(g.d - (h - cao))).toBeLessThanOrEqual(0.5) // dải dưới lấp đúng phần dư
     }
     expect(hinhCot(1366, 768)).toEqual({ c: 273, s: (1366 - 273) / 1366, d: 153 })
+    // thanh bên trái của app chiếm 18 px ⇒ tờ bắt đầu từ x = 18: phần chiếu vẫn sát mép trái cột
+    const g18 = hinhCot(1366, 768, 18)!; expect(18 + (1366 - 18) * g18.s).toBeCloseTo(1366 - g18.c, 6)
+    // cửa sổ máy xách tay thấp (thầy 13/11 «chưa thấy cột nhắn tin»): 1000 × 590 vẫn dựng cột
+    expect(hinhCot(1000, 590)).not.toBeNull()
   })
   it('cửa sổ nhỏ (điện thoại, cửa sổ thu hẹp) ⇒ không dựng cột cố định', () => {
     expect(hinhCot(COT_MAN_RONG - 1, 900)).toBeNull(); expect(hinhCot(1400, COT_MAN_CAO - 1)).toBeNull(); expect(hinhCot(844, 390)).toBeNull(); expect(hinhCot(NaN, NaN)).toBeNull()
   })
-  it('vùng phần chiếu: có cờ ở gốc trang thì trừ cột và dải, không thì kín cửa sổ', () => {
+  it('vùng phần chiếu: gốc trang có số đo cột thì trừ cột và dải, không thì kín cửa sổ', () => {
     Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true }); Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true })
     expect(vungChieu()).toEqual({ w: 1366, h: 768 })
-    document.documentElement.setAttribute('data-lk-cot', '')
+    const g = document.documentElement.style; g.setProperty('--lkc-w', '273px'); g.setProperty('--lkc-s', String(1093 / 1366))
     const v = vungChieu(); expect(v.w).toBe(1093); expect(v.h).toBeCloseTo(768 * (1093 / 1366), 6)
-    document.documentElement.removeAttribute('data-lk-cot')
+    g.removeProperty('--lkc-w'); g.removeProperty('--lkc-s')
   })
 })
 

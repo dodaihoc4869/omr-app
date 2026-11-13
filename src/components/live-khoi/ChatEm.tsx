@@ -1,6 +1,6 @@
 // CHAT TRONG LIVE THEO KHỐI — MÁY EM (thầy chốt build 12/11; bản vẽ docs/ban-ve-live-moi-1211 ảnh 10 · 11 · 13). Tin đi qua kênh lớp sẵn có của
 // phòng (`KenhLop`), phòng đóng dấu người gửi và phát lại cho mọi máy ⇒ máy chỉ hiện tin phòng phát về (không tự chèn tin vừa gõ).
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as TroReact } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { chuCongThuc, chuanGui, docKhoa, docTin, duocGui, gioHien, nhanTin, tenTat, type TinChat } from '../../lib/live-khoi/chat-loi'
 import { CHAT_DAI, CHAT_NHIP_MS, type ChatGui, type KenhLop } from '../../lib/live-khoi/kieu'
@@ -222,7 +222,7 @@ export function CuaChatEm({ chat, toiSbd, onDong }: { chat: ChatLop; toiSbd: str
 }
 
 // ── NGĂN «TIN NHẮN LỚP» MÁY EM (thầy duyệt bản vẽ 60–66 ngày 13/11: «hs vuốt từ mép bên phải vào thì hiện luôn khung chat … giống như thiết kế của gv») ──
-// Điện thoại xoay ngang: ngăn trượt từ mép phải theo ngón tay (LopLive báo `ddh-lk-keo` / `ddh-lk-tha`), kéo tay nắm của ngăn sang phải / chạm ra ngoài ⇒ đóng;
+// Điện thoại xoay ngang: em bấm thanh vàng ⇒ «Nhắn cả lớp» thì ngăn trượt ra từ mép phải (13/11 lần 2: thầy bỏ vuốt vì khó vuốt); ✕ / chạm ra ngoài ⇒ đóng;
 // bàn phím bật ⇒ ngăn co lên trên bàn phím, chỉ còn tin mới + ô nhập. Máy tính: ngăn GHIM thành cột bên phải (màn live co sang trái), Enter gõ ngay, Esc về bài.
 const NHAN_NHANH_NGAN = ['Em hiểu rồi ạ', 'Thầy giảng lại ạ', 'Em chưa rõ ạ'] as const
 /** Bề cao đáy cửa sổ đang bị bàn phím ảo che (px); 0 = không có bàn phím / trình duyệt không báo. */
@@ -237,23 +237,19 @@ function useBanPhim(): number {
   }, [])
   return px
 }
-export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, keo, tieuDiem, trucX, onDong, onGhim }: {
+export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong, onGhim }: {
   chat: ChatLop; toiSbd: string; soEm: number
   /** đang ghim thành cột (máy tính) */ ghim: boolean; /** máy này ghim được (máy tính màn rộng) */ coGhim: boolean
-  /** đang kéo mở: số px đã kéo vào (null = không kéo) */ keo: number | null
   /** đổi số ⇒ đưa con trỏ vào ô nhập (phím Enter) */ tieuDiem: number
-  /** hoành độ con trỏ theo trục của HÌNH (hình xoay 90° thì đổi trục) */ trucX: (e: { clientX: number; clientY: number }) => number
   onDong: () => void; onGhim: (b: boolean) => void
 }) {
   const [chu, setChu] = useState('')
   const [nhanhQua, setNhanhQua] = useState(false)
   const [veCuoi, setVeCuoi] = useState(0)
-  const [lech, setLech] = useState<number | null>(null)
-  const goc = useRef<HTMLDivElement>(null), o = useRef<HTMLInputElement>(null), k = useRef<{ id: number; x0: number } | null>(null)
+  const o = useRef<HTMLInputElement>(null)
   const banPhim = useBanPhim()
   const { ds, khoa, danhDauDoc } = chat
-  const dangKeo = keo != null
-  useEffect(() => { if (!dangKeo) danhDauDoc() }, [ds, danhDauDoc, dangKeo])
+  useEffect(() => { danhDauDoc() }, [ds, danhDauDoc])
   useEffect(() => { if (tieuDiem) o.current?.focus({ preventScroll: true }) }, [tieuDiem])
   // Esc: đang gõ ⇒ rời ô nhập (về bài); ngăn trượt ⇒ đóng. Cột ghim không gõ ⇒ để Esc cho màn bên dưới.
   useEffect(() => {
@@ -275,23 +271,9 @@ export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, keo, tieuDiem, tr
   }, [nhanhQua])
   const gui = (c: string) => { const kq = chat.gui(c); setNhanhQua(kq === 'nhanh-qua'); if (kq === 'ok') setVeCuoi((n) => n + 1); return kq === 'ok' }
   const khiGui = (e: FormEvent) => { e.preventDefault(); if (gui(chu)) setChu('') }
-  // kéo tay nắm của ngăn sang phải ⇒ ngăn theo ngón tay; quá 30 % bề ngang (hoặc chỉ chạm) ⇒ đóng
-  const xuong = (e: TroReact<HTMLElement>) => { k.current = { id: e.pointerId, x0: trucX(e) }; try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* trình duyệt cũ */ } }
-  const di = (e: TroReact<HTMLElement>) => { const c = k.current; if (c && c.id === e.pointerId) setLech(Math.max(0, trucX(e) - c.x0)) }
-  const nha = (e: TroReact<HTMLElement>) => {
-    const c = k.current
-    k.current = null
-    if (!c || c.id !== e.pointerId) return
-    const d = Math.max(0, trucX(e) - c.x0)
-    setLech(null)
-    if (d < 6 || d > (goc.current?.offsetWidth ?? 320) * 0.3) onDong()
-  }
   const go = banPhim > 80
-  const dich = dangKeo ? `translateX(max(0px, calc(100% - ${Math.round(keo)}px)))` : lech ? `translateX(${Math.round(lech)}px)` : undefined
   return (
-    <div ref={goc} className={`lc-goc lc-khung lc-ngan${ghim ? ' lc-ghim' : ''}${go ? ' go' : ''}`} role="dialog" aria-label="Tin nhắn lớp" data-keo={dangKeo || lech != null || undefined}
-      style={{ transform: dich, ...(banPhim > 0 ? { bottom: banPhim } : {}) }}>
-      {ghim ? null : <i className="lc-ngan-tay" aria-hidden="true" onPointerDown={xuong} onPointerMove={di} onPointerUp={nha} onPointerCancel={nha} />}
+    <div className={`lc-goc lc-khung lc-ngan${ghim ? ' lc-ghim' : ''}${go ? ' go' : ''}`} role="dialog" aria-label="Tin nhắn lớp" style={banPhim > 0 ? { bottom: banPhim } : undefined}>
       <div className="lc-dau">
         <span className="lc-dau-ten">Tin nhắn lớp<small>{soEm} em</small></span>
         {coGhim && !ghim ? <button type="button" className="lc-o44" onClick={() => onGhim(true)} aria-label="Ghim tin nhắn thành cột bên phải" title="Ghim thành cột"><BieuTuongChat ten="ghim" co={18} /></button> : null}

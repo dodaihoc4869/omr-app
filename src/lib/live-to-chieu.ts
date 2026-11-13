@@ -533,7 +533,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (!g) {
       g = LV.lk = document.createElement('div'); g.className = 'mc-khay-nhom mc-khay-lk'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Buổi live');
       g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Buổi live · phím Tab đổi Học ⇄ Bảng</span>';
-      ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
+      ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['nghi', 'Nghỉ'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
       for (i = 0; i < ds.length; i++) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-nut-phim'; b.setAttribute('data-lk', ds[i][0]); b.innerHTML = '<span class="mc-nut-chu">' + ds[i][1] + '</span>'; g.appendChild(b); }
       g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null, v = n ? n.getAttribute('data-lk') : ''; if (v === 'hoc' || v === 'bang') lvDoiChe(v); else if (n) lvGui('lk', { v: v }); });
       k.insertBefore(g, k.firstChild);

@@ -100,6 +100,9 @@ export const lenhMic = (t: 'live-moi' | 'live-ha-tay' | 'live-thu-mic', sbd?: st
 export const datLuat = (bat: boolean, n: number): void => layPhong()?.gui({ t: 'live-dat', luat: { bat, n } })
 export const duyetLuat = (sbd: string, ok: boolean): void => layPhong()?.gui({ t: 'live-luat-duyet', sbd, ok })
 export const datKhoi = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }): void => layPhong()?.gui({ t: 'live-dat', khoi: k })
+/** NÚT «NGHỈ» / «HỌC TIẾP» (13/11): nghỉ ⇒ cả lớp về màn chờ chơi trò + live tạm dừng (mic thầy và nét ngừng tới); học tiếp ⇒ gỡ cờ, live chạy lại,
+ *  `che` không đổi nên mọi máy vào lại đúng chỗ đang dạy. */
+export const datGiaiLao = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }, nghi: boolean): void => layPhong()?.gui({ t: 'live-dat', khoi: { k: k.k, gd: k.gd, che: k.che, ...(nghi ? { giaiLao: Date.now() } : {}) }, nghi })
 // TỰ BẬT TIẾNG (thầy 12/11): buổi đã «Bắt đầu live» (`gd = dang`) mà phòng chưa ghi nhận live ⇒ bật qua phần live máy thầy (thay-noi.ts), thử lại mỗi
 // 2 giây tới khi phòng báo `bat` (tối đa 8 lần). Đã bật được MỘT lần trong buổi ⇒ thôi tự bật (thầy tự «Kết thúc live» / «Tạm dừng» trên tờ được tôn trọng).
 let tiengBuoi = '', tiengDaBat = false, tiengLan = 0

@@ -61,8 +61,6 @@
    khi không chạm; bút của thầy tới gần ⇒ `data-ne` mờ hẳn. KHÔNG còn nút / huy hiệu nổi riêng: trạng thái là các DẤU 15 px xếp dọc ngay trên viên thuốc. */
 .lv .lv-nam, .lv-phu .lv-nam { position: absolute; right: var(--lv-at-phai, 0px); top: 50%; width: 44px; height: 76px; min-height: 76px; margin: -38px 0 0; padding: 0 3px 0 0; border: 0; background: none; display: grid; place-items: center end;
   cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; z-index: 3; transition: opacity 0.18s; }
-/* Dải vuốt mép phải (live theo khối, điện thoại): vuốt sang trái ⇒ khung «Tin nhắn lớp». Nằm DƯỚI tay nắm (tay nắm vẫn chạm / kéo dọc như cũ). */
-.lv .lv-vuot, .lv-phu .lv-vuot { position: absolute; right: 0; top: 0; bottom: 0; width: 28px; touch-action: none; }
 .lv-nam i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--doi); opacity: 0.55; transition: transform 0.12s, opacity 0.18s;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 25%, transparent), 0 0 14px color-mix(in srgb, var(--doi) 55%, transparent); }
 .lv-nam:active i { opacity: 1; transform: scale(0.9, 0.97); }
