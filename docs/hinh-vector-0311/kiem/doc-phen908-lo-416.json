@@ -1,0 +1,1075 @@
+{
+  "hash": "a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3",
+  "native": [
+    812,
+    349
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B14-D2-III-5",
+      "de": "Hình 1.a biểu diễn công thức polymer trong nhựa novolac, polymer này thu được khi formaldehyde và phenol phản ứng trùng ngưng theo tỉ lệ 1 : 1. Nếu dư formaldehyde, phân tử HCHO tham gia phản ứng tạo thành nhóm $\\ce{-CH2OH}$ ở vị trí số 4 hoặc 2 của nhân benzene (Hình 1.b), khi đó polymer thu được dùng làm nhựa rezol.\nNếu lượng phenol và formaldehyde đã phản ứng lần lượt là 1 tấn và 0,4 tấn để tạo loại nhựa rezol X. Trong X, cứ trung bình k mắt xích kiểu nhựa novolac ($\\ce{-C6H4(OH)-CH2-}$) thì có thêm 1 nhóm $\\ce{CH2OH}$ gắn vào vòng benzene. Giá trị của k là bao nhiêu? (Không làm tròn các bước tính trung gian, làm tròn kết quả cuối cùng đến hàng phần trăm)",
+      "refs": [
+        {
+          "hash": "a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3",
+          "where": "VIP27-C4-B14-D2-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "fed7570a8b70626c7e421069bd649fc2b2d65047ab3f110f91b5eaf67ae347bf"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "71visibleC13O-excludesUNKNOWNoutside2ellipsis/10individualsixrings6TOP4BOTTOM10innerCIRCLES-NOalternatingdouble/8CH2bridges3CH2OHgroups10phenolicOH/2individual3dotellipsis/ALLchemicalregularUPRIGHT-ONLY2captionsTRUEdamBLACKUPRIGHT-EXACT(Hình 1.a)-(Hình 1.b)/HOCH2LEFT-CH2OHBOTTOMandUPRIGHT-HOlastOterminalDOWN/NOaddedH-n-formula-monomer-arrow-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/dotsTOPBOTTOM4x/captions4x/allpublicde. Nativecaptiondominantblackpixels/rededgeAA-notmaroon. 10rings=6TOP4BOTTOM,71visibleC13Oexclunknownellipsis/nativeapproxNOTsubpixel.",
+  "independentSourceAudit": {
+    "i": 908,
+    "assetIndexProvided": 1370,
+    "hash": "a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3.png",
+    "size": [
+      812,
+      349
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B14-D2-III-5",
+        "de": "Hình 1.a biểu diễn công thức polymer trong nhựa novolac, polymer này thu được khi formaldehyde và phenol phản ứng trùng ngưng theo tỉ lệ 1 : 1. Nếu dư formaldehyde, phân tử HCHO tham gia phản ứng tạo thành nhóm $\\ce{-CH2OH}$ ở vị trí số 4 hoặc 2 của nhân benzene (Hình 1.b), khi đó polymer thu được dùng làm nhựa rezol.\nNếu lượng phenol và formaldehyde đã phản ứng lần lượt là 1 tấn và 0,4 tấn để tạo loại nhựa rezol X. Trong X, cứ trung bình k mắt xích kiểu nhựa novolac ($\\ce{-C6H4(OH)-CH2-}$) thì có thêm 1 nhóm $\\ce{CH2OH}$ gắn vào vòng benzene. Giá trị của k là bao nhiêu? (Không làm tròn các bước tính trung gian, làm tròn kết quả cuối cùng đến hàng phần trăm)",
+        "allHinh": [
+          {
+            "hash": "a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3",
+            "where": "VIP27-C4-B14-D2-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "fed7570a8b70626c7e421069bd649fc2b2d65047ab3f110f91b5eaf67ae347bf"
+          }
+        ],
+        "missingHashes": [
+          "a636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/416-full2x.png",
+        "/workspace/scratch/416-top2x.png",
+        "/workspace/scratch/416-bottom2x.png",
+        "/workspace/scratch/416-caption2x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "ringsTop": 6,
+        "ringsBottom": 4,
+        "ringsTotal": 10,
+        "innerCircles": 10,
+        "CH2BridgeLabels": 8,
+        "CH2OH_HOCH2Labels": 3,
+        "phenolicOH_HOLabels": 10,
+        "knownVisibleC": 71,
+        "knownVisibleO": 13,
+        "ellipsisGroups": 2,
+        "dotsEachEllipsis": 3,
+        "unknownOutsideEllipsis": "Do notinferwholepolymerformula/mass"
+      },
+      "font": {
+        "chemical": "Regular upright sans,2SUB; no actualbold",
+        "captions": "TRUEBOLD UPRIGHT serif BLACK. Native red/coloredfringes antialias notintentionalmaroonfont."
+      },
+      "rings": [
+        {
+          "id": "a1",
+          "vertices": [
+            [
+              50,
+              54
+            ],
+            [
+              76,
+              69
+            ],
+            [
+              76,
+              99
+            ],
+            [
+              50,
+              114
+            ],
+            [
+              24,
+              99
+            ],
+            [
+              24,
+              69
+            ]
+          ],
+          "circle": [
+            50,
+            84,
+            19
+          ]
+        },
+        {
+          "id": "a2",
+          "vertices": [
+            [
+              167,
+              43
+            ],
+            [
+              197,
+              43
+            ],
+            [
+              212,
+              69
+            ],
+            [
+              197,
+              95
+            ],
+            [
+              167,
+              95
+            ],
+            [
+              152,
+              69
+            ]
+          ],
+          "circle": [
+            182,
+            69,
+            19
+          ]
+        },
+        {
+          "id": "a3",
+          "vertices": [
+            [
+              289,
+              86
+            ],
+            [
+              319,
+              86
+            ],
+            [
+              334,
+              112
+            ],
+            [
+              319,
+              138
+            ],
+            [
+              289,
+              138
+            ],
+            [
+              274,
+              112
+            ]
+          ],
+          "circle": [
+            304,
+            112,
+            19
+          ]
+        },
+        {
+          "id": "a4",
+          "vertices": [
+            [
+              422,
+              45
+            ],
+            [
+              448,
+              60
+            ],
+            [
+              448,
+              90
+            ],
+            [
+              422,
+              105
+            ],
+            [
+              396,
+              90
+            ],
+            [
+              396,
+              60
+            ]
+          ],
+          "circle": [
+            422,
+            75,
+            19
+          ]
+        },
+        {
+          "id": "a5",
+          "vertices": [
+            [
+              586,
+              45
+            ],
+            [
+              612,
+              60
+            ],
+            [
+              612,
+              90
+            ],
+            [
+              586,
+              105
+            ],
+            [
+              560,
+              90
+            ],
+            [
+              560,
+              60
+            ]
+          ],
+          "circle": [
+            586,
+            75,
+            19
+          ]
+        },
+        {
+          "id": "a6",
+          "vertices": [
+            [
+              702,
+              11
+            ],
+            [
+              732,
+              11
+            ],
+            [
+              747,
+              37
+            ],
+            [
+              732,
+              63
+            ],
+            [
+              702,
+              63
+            ],
+            [
+              687,
+              37
+            ]
+          ],
+          "circle": [
+            717,
+            37,
+            19
+          ]
+        },
+        {
+          "id": "b1",
+          "vertices": [
+            [
+              192,
+              228
+            ],
+            [
+              218,
+              243
+            ],
+            [
+              218,
+              273
+            ],
+            [
+              192,
+              288
+            ],
+            [
+              166,
+              273
+            ],
+            [
+              166,
+              243
+            ]
+          ],
+          "circle": [
+            192,
+            258,
+            19
+          ]
+        },
+        {
+          "id": "b2",
+          "vertices": [
+            [
+              319,
+              228
+            ],
+            [
+              345,
+              243
+            ],
+            [
+              345,
+              273
+            ],
+            [
+              319,
+              288
+            ],
+            [
+              293,
+              273
+            ],
+            [
+              293,
+              243
+            ]
+          ],
+          "circle": [
+            319,
+            258,
+            19
+          ]
+        },
+        {
+          "id": "b3",
+          "vertices": [
+            [
+              457,
+              228
+            ],
+            [
+              483,
+              243
+            ],
+            [
+              483,
+              273
+            ],
+            [
+              457,
+              288
+            ],
+            [
+              431,
+              273
+            ],
+            [
+              431,
+              243
+            ]
+          ],
+          "circle": [
+            457,
+            258,
+            19
+          ]
+        },
+        {
+          "id": "b4",
+          "vertices": [
+            [
+              614,
+              218
+            ],
+            [
+              644,
+              218
+            ],
+            [
+              659,
+              244
+            ],
+            [
+              644,
+              270
+            ],
+            [
+              614,
+              270
+            ],
+            [
+              599,
+              244
+            ]
+          ],
+          "circle": [
+            629,
+            244,
+            19
+          ]
+        }
+      ],
+      "OHlabels": [
+        {
+          "ring": "a1",
+          "literal": "OH",
+          "bbox": [
+            40,
+            16,
+            76,
+            35
+          ],
+          "bond": [
+            [
+              50,
+              54
+            ],
+            [
+              50,
+              39
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "a2",
+          "literal": "OH",
+          "bbox": [
+            229,
+            59,
+            265,
+            80
+          ],
+          "bond": [
+            [
+              212,
+              69
+            ],
+            [
+              226,
+              69
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "a3",
+          "literal": "OH",
+          "bbox": [
+            352,
+            101,
+            388,
+            122
+          ],
+          "bond": [
+            [
+              334,
+              112
+            ],
+            [
+              349,
+              112
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "a4",
+          "literal": "OH",
+          "bbox": [
+            412,
+            6,
+            450,
+            26
+          ],
+          "bond": [
+            [
+              422,
+              45
+            ],
+            [
+              422,
+              30
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "a5",
+          "literal": "OH",
+          "bbox": [
+            576,
+            6,
+            613,
+            26
+          ],
+          "bond": [
+            [
+              586,
+              45
+            ],
+            [
+              586,
+              30
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "a6",
+          "literal": "OH",
+          "bbox": [
+            763,
+            29,
+            800,
+            49
+          ],
+          "bond": [
+            [
+              747,
+              37
+            ],
+            [
+              760,
+              37
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "b1",
+          "literal": "OH",
+          "bbox": [
+            183,
+            191,
+            220,
+            211
+          ],
+          "bond": [
+            [
+              192,
+              228
+            ],
+            [
+              192,
+              213
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "b2",
+          "literal": "OH",
+          "bbox": [
+            310,
+            191,
+            347,
+            211
+          ],
+          "bond": [
+            [
+              319,
+              228
+            ],
+            [
+              319,
+              213
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "b3",
+          "literal": "OH",
+          "bbox": [
+            448,
+            191,
+            485,
+            211
+          ],
+          "bond": [
+            [
+              457,
+              228
+            ],
+            [
+              457,
+              213
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        {
+          "ring": "b4",
+          "literal": "HO",
+          "bbox": [
+            586,
+            290,
+            622,
+            309
+          ],
+          "bond": [
+            [
+              614,
+              270
+            ],
+            [
+              614,
+              284
+            ]
+          ],
+          "anchor": "LAST O at614"
+        }
+      ],
+      "bridges": [
+        {
+          "rings": [
+            "a1",
+            "a2"
+          ],
+          "labelBox": [
+            95,
+            59,
+            137,
+            85
+          ],
+          "bonds": [
+            [
+              [
+                76,
+                69
+              ],
+              [
+                91,
+                69
+              ]
+            ],
+            [
+              [
+                139,
+                69
+              ],
+              [
+                152,
+                69
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "a2",
+            "a3"
+          ],
+          "labelBox": [
+            214,
+            103,
+            258,
+            128
+          ],
+          "bonds": [
+            [
+              [
+                197,
+                95
+              ],
+              [
+                211,
+                107
+              ]
+            ],
+            [
+              [
+                260,
+                112
+              ],
+              [
+                274,
+                112
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "a3",
+            "a4"
+          ],
+          "labelBox": [
+            334,
+            51,
+            378,
+            76
+          ],
+          "bonds": [
+            [
+              [
+                319,
+                86
+              ],
+              [
+                332,
+                71
+              ]
+            ],
+            [
+              [
+                380,
+                60
+              ],
+              [
+                396,
+                60
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "a4",
+            "a5"
+          ],
+          "labelBox": [
+            468,
+            51,
+            511,
+            76
+          ],
+          "bonds": [
+            [
+              [
+                448,
+                60
+              ],
+              [
+                463,
+                60
+              ]
+            ],
+            [
+              [
+                513,
+                60
+              ],
+              [
+                522,
+                60
+              ]
+            ],
+            [
+              [
+                546,
+                60
+              ],
+              [
+                560,
+                60
+              ]
+            ]
+          ],
+          "ellipsis": [
+            [
+              527,
+              60
+            ],
+            [
+              534,
+              60
+            ],
+            [
+              541,
+              60
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "a5",
+            "a6"
+          ],
+          "labelBox": [
+            626,
+            27,
+            671,
+            53
+          ],
+          "bonds": [
+            [
+              [
+                612,
+                60
+              ],
+              [
+                625,
+                47
+              ]
+            ],
+            [
+              [
+                673,
+                37
+              ],
+              [
+                687,
+                37
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "b1",
+            "b2"
+          ],
+          "labelBox": [
+            235,
+            232,
+            280,
+            257
+          ],
+          "bonds": [
+            [
+              [
+                218,
+                243
+              ],
+              [
+                232,
+                243
+              ]
+            ],
+            [
+              [
+                282,
+                243
+              ],
+              [
+                293,
+                243
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "b2",
+            "b3"
+          ],
+          "labelBox": [
+            364,
+            232,
+            409,
+            257
+          ],
+          "bonds": [
+            [
+              [
+                345,
+                243
+              ],
+              [
+                360,
+                243
+              ]
+            ],
+            [
+              [
+                415,
+                243
+              ],
+              [
+                431,
+                243
+              ]
+            ]
+          ]
+        },
+        {
+          "rings": [
+            "b3",
+            "b4"
+          ],
+          "labelBox": [
+            500,
+            232,
+            545,
+            257
+          ],
+          "bonds": [
+            [
+              [
+                483,
+                243
+              ],
+              [
+                495,
+                243
+              ]
+            ],
+            [
+              [
+                547,
+                244
+              ],
+              [
+                562,
+                244
+              ]
+            ],
+            [
+              [
+                585,
+                244
+              ],
+              [
+                599,
+                244
+              ]
+            ]
+          ],
+          "ellipsis": [
+            [
+              567,
+              244
+            ],
+            [
+              574,
+              244
+            ],
+            [
+              581,
+              244
+            ]
+          ]
+        }
+      ],
+      "bridgeLiteral": "Each CH₂, two-sidedbondsgaparoundwholelabelnative; do notdrawbondthroughsub2oraddbareCaftertext.",
+      "extraCH2OH": [
+        {
+          "ring": "b1",
+          "literal": "HOCH₂",
+          "bbox": [
+            66,
+            232,
+            151,
+            257
+          ],
+          "anchor": "LAST C (CH2) towardring, NOTfirstH/O",
+          "bond": [
+            [
+              153,
+              243
+            ],
+            [
+              166,
+              243
+            ]
+          ]
+        },
+        {
+          "ring": "b2",
+          "literal": "CH₂OH",
+          "bbox": [
+            310,
+            307,
+            395,
+            333
+          ],
+          "anchor": "FIRST C underbottomringvertex",
+          "bond": [
+            [
+              319,
+              288
+            ],
+            [
+              319,
+              303
+            ]
+          ]
+        },
+        {
+          "ring": "b4",
+          "literal": "CH₂OH",
+          "bbox": [
+            657,
+            190,
+            742,
+            216
+          ],
+          "anchor": "FIRST C",
+          "bond": [
+            [
+              644,
+              218
+            ],
+            [
+              655,
+              207
+            ]
+          ]
+        }
+      ],
+      "captions": [
+        {
+          "literal": "(Hình 1.a)",
+          "bbox": [
+            436,
+            134,
+            554,
+            159
+          ]
+        },
+        {
+          "literal": "(Hình 1.b)",
+          "bbox": [
+            438,
+            318,
+            556,
+            343
+          ]
+        }
+      ],
+      "colors": {
+        "coreInk": "#000000",
+        "background": "#ffffff",
+        "AA": "Coloredfringesnotdata; notrenderedredbonds/captions"
+      },
+      "noAdded": [
+        "No thirdellipsis",
+        "No 9ringcount",
+        "No3alternatingdoubleinsteadcircle",
+        "No answerfork",
+        "No reactionarrows",
+        "No polymerbracketsn",
+        "No hiddenunitsinellipsis"
+      ]
+    },
+    "measurementLimits": "Tenrings individuallyidentified, mixpoint-top/flat-topnativeorientations, no normalizationtoonehexorientation. Approxcoords±1–2px/circleradii±1px. SourceblackpixelcolorcheckedtoclarifyAAfringesonly, no image-thresholdapproval.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "sourceFull2xDotsAndCaptions4x": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": true,
+    "ownTopBottomBridges5xCH2OH5xDots5x": true,
+    "exactHash": "952c407fb2a85893d8b6f9b72ed7acf440210af0cac347aae447572bbf5e6564",
+    "verdict": "Đạt root; cần readonly riêng",
+    "tenRingsTenCirclesEightCH2ThreeCH2OHTenPhenolicOH": true,
+    "visible71C13O_unknownOutsideEllipsis": true,
+    "allChemicalRegularUprightCaptionsTrueDamBlack": true,
+    "noSvgNegative": true
+  }
+}
