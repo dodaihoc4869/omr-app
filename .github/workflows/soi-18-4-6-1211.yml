@@ -7,6 +7,10 @@ name: Soi 18/4/6 ngày 11/11 (chỉ đọc)
 on:
   # 12/11: chỉ chạy tay NGOÀI GIỜ HỌC (câu K/K2 đọc ~3 triệu hàng; 07:23 VN đã gặp D1 7429 quá tải).
   workflow_dispatch:
+    inputs:
+      ngay:
+        description: 'Ngày Sửa cần soi (YYYY-MM-DD)'
+        default: '2026-11-11'
 permissions:
   contents: read
 concurrency:
@@ -31,4 +35,5 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          NGAY: ${{ inputs.ngay }}
         run: node scripts/soi-5-em-de28-1311.mjs

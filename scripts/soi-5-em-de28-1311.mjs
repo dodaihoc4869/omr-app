@@ -40,6 +40,7 @@ const dsQ = [...tatCa]
 for (let i = 0; i < dsQ.length; i += 200) for (const x of await q(`SELECT qid,json_extract(json,'$.phan') p FROM game_v2_question WHERE qid IN (${ds(dsQ.slice(i, i + 200))})`)) phan.set(x.qid, x.p)
 
 const nhom = { du28: 0, thieuIII: 0, thieuIII_khongLamLai: 0 }
+const gop = []
 const soi = []
 for (const s of em) {
   const ps = phien.get(s) ?? []
@@ -56,6 +57,9 @@ for (const s of em) {
   const dau = giao.slice(0, 28), iii = dau.filter((x) => x.p === 'III').length
   if (iii >= 6) continue
   nhom.thieuIII++
+  // 13/11: gộp cho CẢ nhóm thiếu III (kể cả em có câu làm lại): tổng câu giao, III trong 28 / sau 28 / cả ngày, số câu làm lại.
+  const iiiTong = giao.filter((x) => x.p === 'III').length
+  gop.push({ n: giao.length, iii28: iii, iiiTong, lamLai, coGoiNgay: ps.some((p) => p.j.goiNgay === 1) })
   const sk = so.get(s) ?? []
   const tuLuyen = sk.filter((x) => x.nguon === 'tu_luyen' || x.nguon === 'luyen').length
   if (lamLai || tuLuyen) continue
@@ -63,6 +67,12 @@ for (const s of em) {
   soi.push({ s, ps, giao, dau, sk })
 }
 console.log(JSON.stringify(nhom))
+{ const dem = (f) => gop.filter(f).length
+  console.log(JSON.stringify({ nhomThieuIII: gop.length, giao_dung28: dem((x) => x.n === 28), giao_29_30: dem((x) => x.n >= 29 && x.n <= 30), giao_hon30: dem((x) => x.n > 30),
+    caNgayDu6III: dem((x) => x.iiiTong >= 6), caNgayDu6III_maTrong28Thieu: dem((x) => x.iiiTong >= 6 && x.iii28 < 6), caNgayThieuIII: dem((x) => x.iiiTong < 6),
+    coLamLai: dem((x) => x.lamLai > 0), coGoiNgay: dem((x) => x.coGoiNgay), tbIII28: +(gop.reduce((t, x) => t + x.iii28, 0) / Math.max(1, gop.length)).toFixed(2), tbIIITong: +(gop.reduce((t, x) => t + x.iiiTong, 0) / Math.max(1, gop.length)).toFixed(2) }))
+  const hist = {}; for (const x of gop) { const k = `n${x.n}|III28=${x.iii28}|IIIca=${x.iiiTong}`; hist[k] = (hist[k] ?? 0) + 1 }
+  console.log(JSON.stringify(Object.entries(hist).sort((a, b) => b[1] - a[1]).slice(0, 15))) }
 const lam = (sk) => new Set(sk.map((x) => goc(x.qid)))
 soi.sort((a, b) => (a.s < b.s ? -1 : 1))
 for (const [i, x] of soi.entries()) {
