@@ -7,6 +7,7 @@
 // (tự bật lúc gọi em lên bảng, tự tắt lúc mở lượt mới) — công tắc «Bảng → máy em» trong cụm Live để thầy bật / tắt tay. Em lên bảng mở mic ⇒ thẻ «Đang nói» + «Thu mic».
 // Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · bang · thu-mic · nghe-em · but · anh · vung
 //             · mic 11/11: loc { v: 'tu' | 'bat' | 'tat' } («Lọc tiếng ồn + khử vọng»: tự động / luôn bật / luôn tắt); `live-muc` kèm `cd` = dòng chẩn đoán mic
+//             · 13/11: tang { v: '0' | '3' | '6' | '9' } («Tăng tiếng» dB)
 //             · đợt 2 (11/11, đặc tả 4.8): moi { sbd } · ha-tay { sbd? } · thu-mic { sbd? } (không sbd = «Tắt mic tất cả») · xa { v } · giay { giay }
 // App → tờ:  { nguon:'bpu-bang', lenh:'live-tt', tt }  (toàn bộ trạng thái để vẽ)   ·   { nguon:'bpu-bang', lenh:'live-muc', v, em }  (mức âm mic thầy / em đang nói 0..1, ~11 lần / giây)
 // ĐỢT 2: thẻ gọn «N em giơ tay» (bấm ⇒ hàng chờ, mỗi em «Mời nói», dưới cùng «Hạ hết tay») · thẻ «Đang nói» có sóng âm + «Thu mic» + «Tắt mic tất cả» ·
@@ -354,6 +355,8 @@ export const JS_LIVE_TO_CHIEU = `
         ly = mi.locOn === 'thay' && mi.tg && mi.tg.indexOf('Đã tự tắt') === 0 ? mi.tg.slice(mi.tg.indexOf('(') + 1, mi.tg.lastIndexOf(')')) : '';
         if (ly) h += lvCanh('Chỉ giọng thầy đã tự tắt: ' + lvSach(ly));
         h += lvCai('Tiếng', lvChon('kieu-tieng', 'c', 'lam-ro', 'Làm rõ', mi.kieuTieng !== 'chuan') + lvChon('kieu-tieng', 'c', 'chuan', 'Chuẩn trình duyệt', mi.kieuTieng === 'chuan'));
+        // TĂNG TIẾNG (thầy 13/11: «chỉ thêm tăng tiếng thôi»): Gốc (y như trước) · +3 · +6 · +9 dB — khuếch đại cố định trước khâu chặn đỉnh, dùng ở cả Làm rõ lẫn Chuẩn
+        h += lvCai('Tăng tiếng', lvChon('tang', 'c', '0', 'Gốc', !mi.tang) + lvChon('tang', 'c', '3', '+3', mi.tang === 3) + lvChon('tang', 'c', '6', '+6', mi.tang === 6) + lvChon('tang', 'c', '9', '+9', mi.tang === 9));
         h += lvCai('Khử vọng', lvChon('loc', 'c', 'tu', 'Tự động', mi.cheDo === 'tu') + lvChon('loc', 'c', 'bat', 'Bật', mi.cheDo === 'bat') + lvChon('loc', 'c', 'tat', 'Tắt', mi.cheDo === 'tat'));
       }
       // LOA: ô chọn + «Thử loa» cùng một hàng. Trình duyệt không chọn được đầu ra ⇒ t.loa rỗng ⇒ không hiện.

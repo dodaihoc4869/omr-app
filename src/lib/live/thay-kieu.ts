@@ -23,6 +23,8 @@ export interface TuyChonLiveThay {
   kieuTieng?: 'lam-ro' | 'chuan'
   /** Lọc ồn RIÊNG trong chuỗi (bỏ trống = 'vua'). */
   locOn?: MucLocOn
+  /** «Tăng tiếng» (13/11) lúc mở: 0 / vắng = Gốc (y như trước) · 3 · 6 · 9 dB khuếch đại cố định trước khâu chặn đỉnh. */
+  tang?: number
   /** Tự chỉnh âm lượng của TRÌNH DUYỆT ở bậc mở đầu (bỏ trống = bật). */
   agc?: boolean
   /** Tên mic thầy đã chọn (nhớ ở máy) — mã thiết bị đổi (cắm cổng USB khác) thì tìm lại mic ấy theo tên (thang-mic.ts). */
@@ -75,6 +77,8 @@ export interface ChanDoanMic {
   treThu: number | null
   /** Chuỗi làm rõ tiếng (cộng kênh, lọc 80 Hz, nén nâng mức, chặn đỉnh) đang chạy; false = đang gửi thẳng track mic. */
   chuoi: boolean
+  /** «Tăng tiếng» thầy chọn (dB, 0 = Gốc). */
+  tang?: number
   /** Lưới an toàn phía gửi đã bỏ chuỗi vì ra CÂM (lý do, '' = chưa). */
   luoi?: string
 }

@@ -11,7 +11,7 @@ import { taoLiveThay, type TrangThaiLiveThay } from '../src/lib/live'
 import { OPUS_EM, OPUS_THAY, docSoGui, suaSdpOpus } from '../src/lib/live/sfu'
 import { taoPhong, viewBang, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { datCoLive, liveBat, liveDat, liveMicBat, liveMoi, liveSan, liveTat, liveThuMic } from '../src/lib/bpu/phong-live'
-import { LAM_RO, THAM_LOC_ON, type MucLocOn } from '../src/lib/live/chuoi-tieng'
+import { LAM_RO, THAM_LOC_ON, heSoTang, type MucLocOn } from '../src/lib/live/chuoi-tieng'
 
 // «CHỈ GIỌNG THẦY» (12/11): đếm số lần lõi tách được NẠP (mảnh lười) + mô hình giả (không gọi mạng) — mục «Chỉ giọng thầy — mặc định không đổi» cuối tệp.
 const tachGiong = vi.hoisted(() => ({ nap: 0 }))
@@ -103,14 +103,14 @@ function dungTrinhDuyet() {
   } })
 }
 const T0 = 1_700_000_000_000
-function dung(tuy: { loc?: 'tu' | 'bat' | 'tat'; micTen?: string; kieuTieng?: 'lam-ro' | 'chuan'; locOn?: MucLocOn } = {}) {
+function dung(tuy: { loc?: 'tu' | 'bat' | 'tat'; micTen?: string; kieuTieng?: 'lam-ro' | 'chuan'; locOn?: MucLocOn; tang?: number } = {}) {
   const st: TrangThaiPhong = taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: [{ sbd: 'S1', ten: 'Em Một', coMat: true, luc: T0 }] })
   datCoLive(st, { cho: true, sfu: true }, T0)
   const tin: Record<string, unknown>[] = [], tt: TrangThaiLiveThay[] = []
   let thietBiDoi = 0
   const micMoi: string[] = []
   const lt = taoLiveThay({
-    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, micTen: tuy.micTen, kieuTieng: tuy.kieuTieng, locOn: tuy.locOn, khiMicMoi: (id) => { micMoi.push(id) }, khiThietBi: () => { thietBiDoi += 1 },
+    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, micTen: tuy.micTen, kieuTieng: tuy.kieuTieng, locOn: tuy.locOn, ...(tuy.tang ? { tang: tuy.tang } : {}), khiMicMoi: (id) => { micMoi.push(id) }, khiThietBi: () => { thietBiDoi += 1 },
     kenh: { gui: (t) => { tin.push(t); if (t.t === 'live-bat') liveBat(st, T0 + 1); if (t.t === 'live-tat') liveTat(st, T0 + 3); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, T0); if (t.t === 'live-dat') liveDat(st, t as never, T0 + 2); if (t.t === 'live-bat' || t.t === 'live-dat') lt.nhanTinPhong(viewBang(st)) }, guiNhiPhan: () => {} },
     khiTrangThai: (t) => tt.push(t),
     moiTruong: { taoPc: () => new PcGia() as unknown as RTCPeerConnection, fetch: (async (u: string) => new Response(JSON.stringify(String(u).endsWith('/noi') ? { ok: true, phien: 'p'.repeat(16), sdp: SDP } : { ok: true, id: 1 }))) as never },
@@ -690,5 +690,114 @@ describe('«Chỉ giọng thầy» — mặc định không đổi (12/11, đư�
       expect(b.boGui().track).toBe(micGoc(b))
       expect('tg' in b.lt.chanDoan()).toBe(false)
     } finally { g.tra() }
+  })
+})
+
+describe('«Tăng tiếng» (13/11, thầy: «chỉ thêm tăng tiếng thôi») — Gốc y như cũ, +N khuếch đại cố định ở cả «Làm rõ» lẫn «Chuẩn trình duyệt»', () => {
+  function khungGia() {
+    const ws: { tin: unknown[]; onmessage: ((e: { data: unknown }) => void) | null; onerror: (() => void) | null }[] = []
+    const g = { cam: false }
+    let micDangXuLy: TrackGia | null = null
+    vi.stubGlobal('MediaStreamTrackProcessor', class { readable = {}; constructor(o: { track: TrackGia }) { micDangXuLy = o.track } })
+    vi.stubGlobal('MediaStreamTrackGenerator', class extends TrackGia { writable = {}; constructor() { super('khung', {}, () => (g.cam ? 0 : micDangXuLy?.ra() ?? 0)) } })
+    vi.stubGlobal('AudioData', class {})
+    vi.stubGlobal('Worker', class { tin: unknown[] = []; onmessage = null; onerror = null; constructor() { ws.push(this as never) } postMessage(m: unknown) { this.tin.push(m) } terminate() { /* dừng */ } })
+    const U = URL as unknown as { createObjectURL?: unknown; revokeObjectURL?: unknown }, cu = [U.createObjectURL, U.revokeObjectURL]
+    U.createObjectURL = () => 'blob:khung'; U.revokeObjectURL = () => undefined
+    return { ws, g, tra: () => { U.createObjectURL = cu[0]; U.revokeObjectURL = cu[1] } }
+  }
+  const coKd = (tin: unknown[]) => tin.some((t) => typeof t === 'object' && t !== null && 'kd' in t)
+  const micGoc = (b: ReturnType<typeof dung>) => b.lt.luongMic()!.getAudioTracks()[0]
+
+  for (const kieuTieng of ['lam-ro', 'chuan'] as const) {
+    it(`GỐC (${kieuTieng}): không tin tăng tiếng nào tới Worker, track gửi + ràng buộc mic + chẩn đoán như cũ`, async () => {
+      const k = khungGia()
+      try {
+        const b = dung({ kieuTieng })
+        await b.lt.bat({})
+        expect(coKd(k.ws[0]!.tin)).toBe(false)
+        expect(b.boGui().track!.label).toBe(kieuTieng === 'chuan' ? 'Micro máy tính' : 'khung')
+        expect(goiGum[0]).toMatchObject(kieuTieng === 'chuan' ? { echoCancellation: true, noiseSuppression: true, autoGainControl: true } : { echoCancellation: false, noiseSuppression: false, autoGainControl: true })
+        expect('tang' in b.lt.chanDoan()).toBe(false)
+        expect(b.lt.tangTieng()).toBe(0)
+      } finally { k.tra() }
+    })
+  }
+  it('«Làm rõ»: đổi Gốc → +6 → +9 → Gốc giữa lúc live ⇒ Worker nhận hệ số (đường cũ, chiKd false), track gửi giữ nguyên, KHÔNG mở lại mic, không lúc nào câm', async () => {
+    const k = khungGia()
+    try {
+      const b = dung()
+      await b.lt.bat({})
+      const tin = k.ws[0]!.tin, track = b.boGui().track, soMo = goiGum.length
+      for (const db of [6, 9, 0]) {
+        b.lt.datTang(db); await troi(10)
+        expect(tin[tin.length - 1]).toEqual({ kd: heSoTang(db), chiKd: false })
+        expect(b.boGui().track).toBe(track)
+        expect(mucGui(b)).toBeCloseTo(0.2)
+      }
+      expect(goiGum.length).toBe(soMo)
+    } finally { k.tra() }
+  })
+  it('«Chuẩn trình duyệt»: +6 ⇒ gửi chuỗi khung CHỈ khuếch đại (chiKd), ràng buộc mic không đổi; +9 chỉ đổi hệ số; Gốc ⇒ lại thẳng track mic + hệ số 1', async () => {
+    const k = khungGia()
+    try {
+      const b = dung({ kieuTieng: 'chuan' })
+      await b.lt.bat({})
+      const tin = k.ws[0]!.tin, soMo = goiGum.length
+      expect(b.boGui().track).toBe(micGoc(b))
+      b.lt.datTang(6); await troi(10)
+      expect(tin[tin.length - 1]).toEqual({ kd: heSoTang(6), chiKd: true })
+      expect(b.boGui().track!.label).toBe('khung')
+      expect(mucGui(b)).toBeCloseTo(0.2)
+      expect(b.lt.chanDoan()).toMatchObject({ chuoi: true, tang: 6, vong: true, on: true, agc: true })
+      const khung = b.boGui().track
+      b.lt.datTang(9); await troi(10)
+      expect(tin[tin.length - 1]).toEqual({ kd: heSoTang(9), chiKd: true })
+      expect(b.boGui().track).toBe(khung)
+      b.lt.datTang(0); await troi(10)
+      expect(tin[tin.length - 1]).toEqual({ kd: 1, chiKd: false })
+      expect(b.boGui().track).toBe(micGoc(b))
+      expect(goiGum.length).toBe(soMo)
+    } finally { k.tra() }
+  })
+  it('đổi «Chuẩn» ⇄ «Làm rõ» khi đang +6 ⇒ Worker đổi đường (chiKd true ⇄ false), hệ số giữ; mở live ở bậc đã nhớ ⇒ chuỗi mới nhận hệ số ngay', async () => {
+    const k = khungGia()
+    try {
+      const b = dung({ kieuTieng: 'chuan', tang: 6 })
+      await b.lt.bat({})
+      const w = k.ws[k.ws.length - 1]!
+      expect(w.tin).toContainEqual({ kd: heSoTang(6), chiKd: true }) // chuỗi vừa dựng nhận bậc đang chọn ngay
+      expect(b.boGui().track!.label).toBe('khung')
+      b.lt.datKieuTieng(false); await troi(50)
+      const w2 = k.ws[k.ws.length - 1]!
+      expect(w2.tin[w2.tin.length - 1]).toEqual({ kd: heSoTang(6), chiKd: false })
+      expect(b.boGui().track!.label).toBe('khung')
+      expect(mucGui(b)).toBeCloseTo(0.2)
+    } finally { k.tra() }
+  })
+  it('KHÔNG MẤT TIẾNG VÌ CHUỖI: không có kiểu khung ⇒ «Chuẩn» +6 vẫn gửi THẲNG mic (không rơi vào bộ nén); Worker lỗi / ra câm ⇒ về track mic', async () => {
+    const a = dung({ kieuTieng: 'chuan', tang: 6 })
+    await a.lt.bat({})
+    expect(a.boGui().track).toBe(micGoc(a))
+    expect(mucGui(a)).toBeCloseTo(0.2)
+    a.lt.huy()
+    const k = khungGia()
+    try {
+      const b = dung({ kieuTieng: 'chuan', tang: 6 })
+      await b.lt.bat({})
+      expect(b.boGui().track!.label).toBe('khung')
+      k.ws[k.ws.length - 1]!.onerror!(); await troi(10)
+      expect(b.boGui().track).toBe(micGoc(b))
+      expect(mucGui(b)).toBeCloseTo(0.2)
+      b.lt.huy()
+      const c = dung({ kieuTieng: 'chuan', tang: 6 })
+      await c.lt.bat({})
+      expect(c.boGui().track!.label).toBe('khung')
+      k.g.cam = true
+      expect(mucGui(c)).toBe(0)
+      await troi(6000)
+      expect(c.boGui().track).toBe(micGoc(c))
+      expect(mucGui(c)).toBeCloseTo(0.2)
+    } finally { k.tra() }
   })
 })
