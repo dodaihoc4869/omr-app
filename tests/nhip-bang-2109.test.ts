@@ -45,6 +45,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/may-tinh/MayTinhThay.tsx': 1, // 12/11 máy tính FX4869 (máy thầy): 4 s gửi lại MỘT tin nhỏ qua kết nối phòng sẵn có cho em vào muộn — chỉ khi máy tính ĐANG HIỆN; ẩn máy tính / hết live ⇒ dừng. Không gọi máy chủ (0 fetch, 0 D1)
   'src/components/may-tinh/MayTinhEm.tsx': 1, // 12/11 máy tính FX4869 (máy em): 3 s soát «thầy im quá 13 giây thì cất máy tính» — cục bộ, không gọi máy chủ; chỉ chạy trong buổi live (lớp nổi live gỡ là dừng)
   'src/components/live-khoi/BangLiveThay.tsx': 1, // 12/11 Live theo khối (bảng «Live» máy thầy): 30 s vẽ lại giờ để nút «Mở phòng chờ» của buổi hẹn hiện đúng lúc còn ≤ 30 phút, cục bộ, không gọi máy chủ; đóng bảng ⇒ dừng
+  'src/lib/but-bang-to-chieu.ts': 1, // 13/11 chấm laze (tờ chiếu, trong iframe): 0,4 s nhắc vị trí bút LƠ LỬNG cho máy em qua đường bút sẵn có (gói con trỏ 6 byte), CHỈ khi bút bật và con trỏ còn trên lớp bút; con trỏ rời tờ / tắt bút ⇒ dừng. Không gọi máy chủ, 0 D1
   'src/lib/live-to-chieu.ts': 1, // 10/11 Live (tờ chiếu, trong iframe): 1 s vẽ đồng hồ «LIVE 12:34» CHỈ khi đang live; cục bộ, không gọi máy chủ
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
   'src/lib/html-phieu.ts': 2, // 20/10 đo giây: +1 vòng 1 s TRONG trang phiếu (iframe), chỉ cục bộ, không gọi máy chủ; dừng khi tab ẩn / 180 giây không chạm
