@@ -27,7 +27,8 @@ export class MaySinhTon {
   private bd: BanDo = taoBanDo(0)
   private hop: [number, string] = [-1, '']
   private lucNhip = 0
-  constructor(private rng: () => number = Math.random) {}
+  /** `tenTranh` = tên em thật mà máy bù phải tránh (máy mang tên như học sinh — src/lib/live-khoi/ten-may.ts); chỉ gọi lúc phải thêm máy. */
+  constructor(private rng: () => number = Math.random, private tenTranh?: () => Iterable<string>) {}
 
   /** Số em THẬT đang có trên sân (đã gửi gói trong 5 giây gần nhất, tính tới nhịp vừa rồi). */
   get soEm(): number { return this.tro.size }
@@ -81,7 +82,7 @@ export class MaySinhTon {
       this.van = van; this.soVan++; this.may = []
       this.bd = taoBanDo(capBanDo(soEm.reduce((t, n) => t + Math.max(4, n), 0)))
     }
-    this.may = khopMay(this.bd, this.may, soEm, nay, this.rng)
+    this.may = khopMay(this.bd, this.may, soEm, nay, this.rng, this.tenTranh)
     const that: NhanVat[] = []
     for (const [s, v] of this.tro) that.push({ id: s, x: v.p[0], y: v.p[1], mau: v.p[2], doi: v.p[3], cap: v.p[4], t: v.p[5] })
     const dt = Math.min(1000, Math.max(0, nay - this.lucNhip))

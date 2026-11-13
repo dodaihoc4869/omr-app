@@ -76,9 +76,9 @@ describe('một nhịp của máy', () => {
     // Cuối ván vòng co về giữa: máy ở trại chạy về phía giữa sân.
     const cuoi = 1000 * VAN_MS + VAN_CHOI_MS - 10_000
     const n = { ...taoMay(bd, '~1', 0, cuoi, 0), batTuDen: 0 }
-    const dau = Math.hypot(n.x - 800, n.y - 500)
+    const gx = bd.rong / 2, gy = bd.cao / 2, dau = Math.hypot(n.x - gx, n.y - gy)
     for (let i = 0; i < 8; i++) buocMay(bd, n, [], cuoi + i * 250, 250, rnd)
-    expect(Math.hypot(n.x - 800, n.y - 500)).toBeLessThan(dau - 150)
+    expect(Math.hypot(n.x - gx, n.y - gy)).toBeLessThan(dau - 150)
   })
   it('máy không bắn đồng đội và không bị đồng đội hạ (thầy 12/11)', () => {
     const m = { ...taoMay(bd, '~0', 0, T0, 0), x: 800, y: 700, batTuDen: 0, mau: 5, lucTrung: T0 } // lucTrung = T0 ⇒ 3 giây đầu chưa hồi máu
@@ -86,9 +86,10 @@ describe('một nhịp của máy', () => {
     for (let i = 0; i < 6; i++) expect(buocMay(bd, m, ds, T0 + i * 250, 250, rnd)).toBe('')
     expect(m.mau).toBe(5); expect(m.t).toBe('')
   })
-  it('súng của máy tối đa cấp 2 ⇒ các em luôn có cửa thắng', () => {
+  it('súng của máy tối đa cấp 3 (Súng Bọt) ⇒ các em luôn có cửa thắng', () => {
+    expect(CAP_MAY_TOI_DA).toBe(3)
     const m = taoMay(bd, '~0', 0, T0, 0)
-    mayLenCap(m); mayLenCap(m); mayLenCap(m)
+    mayLenCap(m); mayLenCap(m); mayLenCap(m); mayLenCap(m)
     expect(m.cap).toBe(CAP_MAY_TOI_DA)
   })
 })

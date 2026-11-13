@@ -39,7 +39,8 @@ export class PhongSinhTonCa {
   private nguoi = new Map<string, NguoiSt>()
   private theoKn = new Map<KetNoi, NguoiSt>()
   private may: MaySinhTon
-  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0) { this.may = new MaySinhTon(rng) }
+  // Máy bù mang tên như học sinh: tránh tên em đang trong phòng (phòng ca không có danh sách lớp).
+  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0) { this.may = new MaySinhTon(rng, () => [...this.nguoi.values()].map((n) => n.ten)) }
 
   get soNguoi(): number { return this.nguoi.size }
   /** Còn em thật vừa gửi gói ⇒ giữ nhịp 250 ms; hết ⇒ Durable Object được ngủ (kết nối vẫn giữ). */

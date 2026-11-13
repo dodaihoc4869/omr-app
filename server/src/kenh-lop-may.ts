@@ -16,10 +16,13 @@ export class KenhLopMay {
   private lucChat = new Map<string, number>()
   private lucHieu = new Map<string, number>()
   /** Trò Sinh Tồn ở phòng chờ: máy trò dùng chung với phòng chờ ca kiểm tra (sinh-ton-may-chu.ts); lớp này chỉ lo hẹn giờ + phát tin. */
-  private tro = new MaySinhTon()
+  private tro: MaySinhTon
   private hen: ReturnType<typeof setTimeout> | null = null
   private dauDs = ''
-  constructor(private ctx: DurableObjectState, private nho: () => TrangThaiPhong | null | undefined) {}
+  constructor(private ctx: DurableObjectState, private nho: () => TrangThaiPhong | null | undefined) {
+    // Máy bù mang tên như học sinh: tránh tên MỌI em trong danh sách lớp (cả em chưa vào — em vắng không thấy «mình» đang chơi).
+    this.tro = new MaySinhTon(Math.random, () => (this.nho()?.ds ?? []).map((e) => e.ten))
+  }
 
   private gui(ws: WsMayChu, d: string): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
   private moiMay(d: string, caThay = true): void {

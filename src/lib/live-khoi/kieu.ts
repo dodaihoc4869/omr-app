@@ -24,12 +24,13 @@ export const CHAT_NHIP_MS = 2000
 // ── TRÒ SINH TỒN ── (thầy chốt 12/11; đặc tả docs/dac-ta-sinh-ton-1211.md). Sân = bản đồ theo `c` (src/lib/live-khoi/sinh-ton-loi.ts). Máy em gửi tối đa
 // 4 lần / giây `gui('tro', { p: [x, y, máu, cấp súng], t?, a?, h? })`: `t` = mã nhân vật súng mình đang bắn ('' = không bắn); `a` = mã kẻ vừa HẠ mình (máy bị
 // hạ tự báo); `h` = số hộp tiếp tế mình vừa chạm. Phòng gom, tính MÁY BÙ CHỖ (mã bắt đầu bằng '~') và phát mỗi 250 ms MỘT ảnh chụp (s = '').
-/** Một nhân vật trong ảnh chụp: [x, y, máu 0..100, đội 0..3, cấp súng 1..4, mã mục tiêu đang bắn]. */
+/** Một nhân vật trong ảnh chụp: [x, y, máu 0..100, đội 0..3, cấp súng 1..6, mã mục tiêu đang bắn]. Mã máy bù `~<chỉ số tên>-<số thứ tự>` (tên: ten-may.ts `tenMay`). */
 export type SinhTonDong = [number, number, number, number, number, string]
 export interface SinhTonGui { p: [number, number, number, number]; t?: string; a?: string; h?: number }
-/** `an` = các lượt hạ từ ảnh chụp trước [kẻ hạ, bị hạ]; `d` = lượt hạ bốn đội trong ván; `v` = số thứ tự ván (1, 2, …); `c` = cỡ bản đồ 0..2; `h` = [số hộp, mã em đã nhặt]. */
+/** `an` = các lượt hạ từ ảnh chụp trước [kẻ hạ, bị hạ]; `d` = lượt hạ bốn đội trong ván; `v` = số thứ tự ván (1, 2, …); `c` = cỡ bản đồ 0..4; `h` = [số hộp, mã em đã nhặt]. */
 export interface SinhTonAnh { ds: Record<string, SinhTonDong>; an: [string, string][]; d: [number, number, number, number]; v: number; c: number; h: [number, string] }
 /** Phiên bản giao thức trò Sinh Tồn ở phòng chờ CA KIỂM TRA (13/11; phòng: server/src/sinh-ton-ca.ts). Gói vào `{ t: 'vao', tro: 'st', v, ve }` phải mang đúng số
  *  này; đổi dạng `SinhTonGui` / `SinhTonAnh` không tương thích ⇒ tăng số, máy còn mảnh cũ bị phòng đóng sạch (mã 4010) thay vì nhận ảnh nó không đọc được. */
 // 2 (13/11): năm cỡ sân — cỡ 2 đổi nghĩa (ghép 2 × 2 khu), thêm cỡ 3 · 4 ⇒ máy còn mảnh cũ dựng sai sân.
-export const PHIEN_BAN_ST = 2
+// 3 (13/11, bản 2 «Trang vở»): sáu cấp súng (cấp 1..6 trong ảnh) + thang cỡ sân mới (mọi cỡ ghép trang 1600 × 1000, cỡ 0 = 2 × 2) + mã máy bù mang chỉ số tên.
+export const PHIEN_BAN_ST = 3
