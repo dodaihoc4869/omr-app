@@ -185,17 +185,6 @@ kiem('3T2 «Học»: thầy kẻ nét ngang 20–80 % bề ngang ở 30 % chiề
   const kb = [await coNgang(em1), await coNgang(em2), await coNgang(em3)]
   kiem('BT1 «Học»: ô bảng máy em co theo bề ngang khung như trước (giữ cỡ nét cho học sinh), không thu nhỏ để vừa chiều cao', kb.every((k) => !!k && Math.abs(k[0] - k[1]) <= 3), JSON.stringify(kb))
 }
-{ // (thầy 13/11 «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường»)
-  await gv.mouse.move(oB.x + oB.w * 0.5, oB.y + oB.h * 0.6, { steps: 4 }); await ngu(1100)
-  const lzGv = await toT.locator('body').evaluate(() => { const c = document.querySelector('.mc-laze'), r = c?.getBoundingClientRect(), cv = document.querySelector('canvas.mc-but'); return { hien: !!c && !c.hidden, x: r ? Math.round(r.left + r.width / 2) : null, y: r ? Math.round(r.top + r.height / 2) : null, conTro: cv ? getComputedStyle(cv).cursor : '' } })
-  const anh = (await em1.screenshot({ type: 'png' })).toString('base64')
-  const lzEm = await em1.evaluate(async ([b64, tiLe]) => { const k = document.querySelector('.lv-bang').getBoundingClientRect(); const i = new Image(); i.src = 'data:image/png;base64,' + b64; await i.decode(); const c = document.createElement('canvas'); c.width = i.width; c.height = i.height; const g = c.getContext('2d'); g.drawImage(i, 0, 0); const d = g.getImageData(Math.round(k.left), Math.round(k.top), Math.round(k.width), Math.round(k.height)); let n = 0, sx = 0, sy = 0; for (let y = 0; y < d.height; y++) for (let x = 0; x < d.width; x++) { const o = (y * d.width + x) * 4; if (d.data[o] > 190 && d.data[o + 1] < 110 && d.data[o + 2] < 110) { n++; sx += x; sy += y } } const oW = Math.min(k.width, (k.height - 26) / tiLe); return { n, x: n ? sx / n / oW : null, y: n ? sy / n / (oW * tiLe) : null, khung: [Math.round(k.width), Math.round(k.height)] } }, [anh, tiLeHoc])
-  await chup(em1, 'lz-1-em-cham-laze'); await chup(gv, 'lz-1-gv-cham-laze')
-  kiem('LZ1 thầy đưa bút lơ lửng trên bảng (chưa đặt bút): tờ của thầy hiện CHẤM ĐỎ đúng chỗ con trỏ, con trỏ hệ thống ẩn; máy em hiện chấm đỏ đúng chỗ ấy trên bảng (không còn hình cây bút)', lzGv.hien && lzGv.conTro === 'none' && lzEm.n >= 20 && Math.abs(lzEm.x - 0.5) < 0.06 && Math.abs(lzEm.y - 0.6) < 0.06, JSON.stringify({ lzGv, lzEm }))
-  await gv.mouse.move(1300, 300, { steps: 3 }); await ngu(500) // rời tờ (sang cột tin nhắn) ⇒ chấm ẩn, các bước đo nét phía sau không dính chấm
-  kiem('LZ2 con trỏ rời lớp bút ⇒ chấm đỏ trên tờ ẩn', await toT.locator('body').evaluate(() => document.querySelector('.mc-laze').hidden))
-  await ngu(1800) // máy em tự ẩn con trỏ sau 1,5 giây không có tin mới
-}
 if (process.env.DO_3T) { await chup(gv, '3T-gv-hoc'); await chup(em1, '3T-em-hoc'); process.exit(3) }
 // Tab ⇒ Bảng: CHÍNH tờ ấy sang chế độ Bảng tức thì (không dựng tờ thứ hai), phòng sang «bang»
 const soToTruoc = (await soTo()).length

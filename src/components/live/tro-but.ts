@@ -119,18 +119,6 @@ export const K_BUT_LE = 1.3
 
 /** VẼ con trỏ (cây bút, hoặc bàn tay cầm bút) vào `g` (đã đặt phép biến đổi sao cho gốc = ngòi bút, 1 đơn vị = `co / 60` px). Vẽ ĐẶC (nơi gọi dán cả hình với độ rõ cần có).
  *  `bong` = có bóng đổ nhẹ. */
-/** CHẤM LAZE (thầy 13/11: «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường»): vẽ tại
- *  gốc (0, 0), đơn vị px CSS — quầng đỏ ba bậc bán kính `LAZE_R`, lõi đỏ đặc mép nét, viền sáng mảnh, đốm sáng giữa. `yeu` ⇒ bỏ quầng. */
-export const LAZE_R = 13, LAZE_TRE_MS = 320
-export function veLaze(g: G, mauDo: string, mauSang: string, yeu: boolean): void {
-  const tron = (r: number): void => { g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2) }
-  g.fillStyle = mauDo
-  if (!yeu) for (const [r, a] of [[LAZE_R, 0.16], [9.8, 0.3], [7.2, 0.5]] as const) { g.globalAlpha = a; tron(r); g.fill() }
-  g.globalAlpha = 1; tron(5); g.fill()
-  g.lineWidth = 1.2; g.strokeStyle = mauSang; g.globalAlpha = 0.95; tron(5.5); g.stroke()
-  g.fillStyle = mauSang; g.globalAlpha = 1; tron(2); g.fill()
-  g.globalAlpha = 1
-}
 export function veTay(g: G, dang: DangTay, mau: MauBut, bong: boolean): void {
   const vien = dang === 'vien', gon = dang === 'gon'
   g.lineJoin = 'round'; g.lineCap = 'round'

@@ -5,10 +5,6 @@ import { JS_LIVE_NOP } from './live-nop-to-chieu'
 import { CSS_LIVE_MT, JS_LIVE_MT } from './live-mt-to-chieu'
 
 export const CSS_LIVE_KHOI = `
-/* CHẤM LAZE của thầy (JS ở cuối tệp): lõi đỏ nét, viền sáng mảnh, quầng đỏ. Lúc chấm hiện thì ẩn con trỏ hệ thống trên lớp bút; đang viết (.mc-viet) ⇒ con trỏ viết cũ. */
-.mc-laze{position:fixed;left:0;top:0;z-index:2147483600;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;background:var(--mc-do);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--mc-bang-chu) 85%,transparent),0 0 10px 4px color-mix(in srgb,var(--mc-do) 70%,transparent),0 0 22px 9px color-mix(in srgb,var(--mc-do) 32%,transparent);will-change:transform}
-.mc-laze[hidden]{display:none}
-body.mc-lk.mc-co-but canvas.mc-but:not(.mc-viet){cursor:none}
 /* THẺ TÊN EM LÊN BẢNG TRONG BUỔI LIVE (thầy 13/11: «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»): một viên nhỏ ôm sát
    tên, đứng giữa đầu cột bảng; chỉ còn TÊN (+ dấu Đạt / Không đạt). Nhãn «Dự kiến làm được…», số báo danh, «Chi tiết ›», ảnh linh thú ẩn — phần chỗ trả cho
    bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng. Một ô có hơn một thẻ ⇒ chỉ hiện thẻ ĐẦU (lệnh gọi lên bảng ghi tên vào thẻ đầu,
@@ -93,21 +89,4 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);
-  // CHẤM LAZE (thầy 13/11 «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường»): buổi live,
-  // đang bật bút, con trỏ ở trên lớp bút mà CHƯA đặt bút ⇒ con trỏ thành chấm đỏ; đặt bút viết ⇒ về con trỏ viết như cũ. Chấm là một phần tử bám con trỏ
-  // (chỉ đổi transform); lớp đánh dấu đặt trên CHÍNH lớp bút (không đổi lớp ở body ⇒ không tính lại kiểu cả tờ giữa lúc viết). Máy em tự vẽ chấm của nó.
-  (function () {
-    var cham = document.createElement('i'), nhan = false, cv = null;
-    cham.className = 'mc-laze'; cham.hidden = true; cham.setAttribute('aria-hidden', 'true'); document.body.appendChild(cham);
-    function laBut(t) { return !!(t && t.classList && t.classList.contains('mc-but')); }
-    document.addEventListener('pointermove', function (e) {
-      if (nhan || e.pointerType === 'touch' || !laBut(e.target) || !body.classList.contains('mc-lk') || !body.classList.contains('mc-co-but')) { if (!cham.hidden) cham.hidden = true; return; }
-      cham.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)';
-      if (cham.hidden) cham.hidden = false;
-    }, true);
-    document.addEventListener('pointerdown', function (e) { nhan = true; cham.hidden = true; if (laBut(e.target)) { cv = e.target; cv.classList.add('mc-viet'); } }, true);
-    function nha() { nhan = false; if (cv) { cv.classList.remove('mc-viet'); cv = null; } }
-    document.addEventListener('pointerup', nha, true); document.addEventListener('pointercancel', nha, true);
-    document.documentElement.addEventListener('mouseleave', function () { cham.hidden = true; });
-  })();
 ${JS_LIVE_NOP}${JS_LIVE_MT}`

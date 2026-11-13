@@ -157,7 +157,9 @@ describe('bảng phóng to: tầm nhìn của máy em thấp hơn của thầy',
     m.v.datBut({ x: 0.8, y: B1 + caoThay * 0.9, cham: false }, 0)
     chay(m.v, 90)
     const c = m.v.cuon()
-    expect(c.dich).toBeCloseTo(caoThay - nhin, 2) // kẹp ở đáy tầm nhìn của thầy (ô bảng đi theo khoá trang, tròn phần nghìn)
+    // 13/11: trôi VỪA ĐỦ để bút nằm ở 85 % khung của em (không nhảy cả khúc), vẫn trong tầm nhìn của thầy
+    expect(c.dich).toBeCloseTo(caoThay * 0.9 - nhin * 0.85, 2)
+    expect(c.dich).toBeLessThanOrEqual(caoThay - nhin + 1e-6)
     expect(c.y).toBeCloseTo(c.dich, 3)
     // bút lên đầu bảng ⇒ về đầu
     m.v.datBut({ x: 0.8, y: B1 + 0.01, cham: false }, 0)
@@ -201,33 +203,5 @@ describe('em tự vuốt bảng xem lại', () => {
     chay(m.v, 120, t)
     expect(m.v.cuon().y).toBeCloseTo(m.v.cuon().dich, 3)
     expect(Math.abs(m.v.cuon().y - taiThay)).toBeLessThan(0.2)
-  })
-})
-
-// Thầy 13/11: «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường».
-describe('chấm laze khi thầy nhấc bút', () => {
-  it('veLaze: quầng ba bậc + lõi đặc + đốm sáng (máy yếu bỏ quầng); bán kính quầng = LAZE_R', async () => {
-    const { veLaze, LAZE_R, LAZE_TRE_MS } = await import('../src/components/live/tro-but')
-    const g = ctxGia(), y = ctxGia()
-    veLaze(g as unknown as CanvasRenderingContext2D, 'red', 'white', false); veLaze(y as unknown as CanvasRenderingContext2D, 'red', 'white', true)
-    expect(g.lenh.filter((l) => l.loai === 'fill')).toHaveLength(5); expect(y.lenh.filter((l) => l.loai === 'fill')).toHaveLength(2)
-    expect(Math.max(...g.lenh.flatMap((l) => l.duong))).toBe(LAZE_R)
-    expect(LAZE_TRE_MS).toBeGreaterThanOrEqual(250); expect(LAZE_TRE_MS).toBeLessThanOrEqual(500) // nhấc bút giữa hai nét của một chữ không kịp đổi sang chấm
-  })
-  it('đang viết ⇒ hình cây bút (lệch ngòi, có thể ngả); nhấc bút quá LAZE_TRE_MS ⇒ chấm dán THẲNG, tâm đúng chỗ ngòi; đặt bút lại ⇒ về cây bút ngay', async () => {
-    const { LAZE_TRE_MS } = await import('../src/components/live/tro-but')
-    const m = dung(), x = (B0 + B2) / 2, yy = (B1 + B3) / 2
-    const anhCuoi = () => m.lenh(m.cvSong).filter((l) => l.loai === 'anh').at(-1)!
-    m.v.datBut({ x, y: yy, cham: true, net: 'b_1' }); let t = chay(m.v, 6)
-    const viet = anhCuoi().T.slice()
-    m.v.datBut({ x, y: yy, cham: false }); t = chay(m.v, 6, t) // mới nhấc: vẫn là cây bút
-    m.v.datBut({ x, y: yy + 0.001, cham: false }); t = chay(m.v, Math.ceil((LAZE_TRE_MS + 400) / (1000 / 60)), t)
-    const laze = anhCuoi().T.slice()
-    expect(laze[0]).toBe(1); expect(laze[1]).toBe(0); expect(laze[2]).toBeCloseTo(0, 10); expect(laze[3]).toBe(1) // không ngả
-    // tâm chấm = chỗ ngòi lúc viết (cùng điểm của thầy), lệch không quá 2 px
-    expect(Math.abs(laze[4]! - viet[4]!)).toBeLessThanOrEqual(2); expect(Math.abs(laze[5]! - viet[5]!)).toBeLessThanOrEqual(2)
-    const soAnh = m.lenh(m.cvSong).filter((l) => l.loai === 'anh').length
-    m.v.datBut({ x: x + 0.01, y: yy, cham: true, net: 'b_2' }); chay(m.v, 2, t)
-    expect(m.lenh(m.cvSong).filter((l) => l.loai === 'anh').length).toBeGreaterThan(soAnh)
   })
 })

@@ -83,20 +83,20 @@ describe('bảng đen cuộn trên máy em', () => {
     m.v.ap({ loai: 'trang', trang: TRANG, tiLe: 16 / 9, net: [] })
     expect([m.cvChot.style.visibility, m.khung.style.visibility]).toEqual(['hidden', 'hidden'])
   })
-  it('nét bảng có y > 1 (thầy đã cuộn): máy em TỰ TRÔI tới — êm dần từng khung (không nhảy một phát), bút về khoảng giữa bảng; `toiPx` đã trừ độ cuộn', () => {
+  it('nét bảng có y > 1 (thầy đã cuộn): máy em TỰ TRÔI tới — êm dần từng khung (không nhảy một phát), bút vào trong khung VỪA ĐỦ (mép dưới 85 % — thầy 13/11 «không muốn … tự nảy»); `toiPx` đã trừ độ cuộn', () => {
     const m = dung()
     m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('b_n1', 1.35), xong: true })
     const dich = m.v.cuon().dich
-    expect(dich).toBeGreaterThan(0.6)
+    expect(dich).toBeGreaterThan(0.5)
     expect(m.v.cuon().y).toBe(0)
     const vet: number[] = []
     for (let i = 0; i < 60; i++) { m.v.veSong(1000 + i * (1000 / 60)); vet.push(m.v.cuon().y) }
     for (let i = 1; i < vet.length; i++) expect(vet[i]).toBeGreaterThanOrEqual(vet[i - 1])
     expect(Math.max(...vet.slice(1).map((y, i) => y - vet[i])) * 900).toBeLessThan(dich * 900 * 0.25) // mỗi khung đi chưa tới 1/4 quãng
     expect(vet[vet.length - 1]).toBe(dich)
-    // bút ở y = 1,35 hiện ở khoảng 40–70 % bề cao ô bảng
+    // bút ở y = 1,35 hiện ở khoảng 85 % bề cao ô bảng (trôi vừa đủ, không đưa về giữa)
     const o = m.v.cuon().bang, [, py] = m.v.toiPx(0.8, 1.35, 'b_n1')
-    expect((py - o.y) / o.h).toBeGreaterThan(0.4); expect((py - o.y) / o.h).toBeLessThan(0.7)
+    expect((py - o.y) / o.h).toBeGreaterThan(0.8); expect((py - o.y) / o.h).toBeLessThan(0.9)
     expect(m.khung.firstElementChild!.getAttribute('style')).toContain(`translate3d(0,${-Math.round(dich * 900)}px,0)`)
     // điểm trên giấy đề không trừ độ cuộn; điểm trong cột bảng (không biết mã nét) thì trừ
     expect(m.v.toiPx(0.2, 0.5)[1]).toBe(450)
@@ -177,13 +177,11 @@ describe('nét dở trên máy em = đúng nét xong; cây bút vẽ cùng lư�
     m.v.datBut({ x: 0.8, y: 0.3, cham: false })
     let t = chay(m.v, 12, 1032)
     expect(anh().pop()!.mo).toBe(RO_TAY.viet)
-    // SỬA CÓ CHỦ ĐÍCH 13/11 (thầy «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ»): lơ lửng lâu hơn ⇒ thay cây bút bằng CHẤM LAZE, luôn sáng hết cỡ
-    // kể cả khi thầy giữ yên > 1,6 giây để giảng (trước đây cây bút mờ dần về RO_TAY.lo rồi RO_TAY.nghi)
-    expect(RO_TAY.lo).toBeLessThan(RO_TAY.viet); expect(RO_TAY.nghi).toBeLessThan(RO_TAY.lo)
+    // lơ lửng lâu hơn: mờ dần về mức lơ lửng; đứng yên > 1,6 giây: mờ gần hết
     t = chay(m.v, 50, t)
-    expect(anh().pop()!.mo).toBe(1)
+    expect(anh().pop()!.mo).toBe(RO_TAY.lo)
     t = chay(m.v, 120, t)
-    expect(anh().pop()!.mo).toBe(1)
+    expect(anh().pop()!.mo).toBe(RO_TAY.nghi)
     expect(ctx.get(hinh)!.lenh.length).toBe(soVe) // suốt quãng đó hình không dựng lại
     // thư viện báo null ⇒ xoá, không dán nữa
     m.v.datBut(null)
