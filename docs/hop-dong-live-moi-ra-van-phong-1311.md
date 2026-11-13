@@ -39,7 +39,7 @@ Trả về:
 |---|---|
 | `buoiId`, `ten`, `khoi`, `moLuc`, `dongLuc` | buổi nào, khối mấy, giờ mở / đóng (ISO, `dongLuc` null = chưa đóng) |
 | `coPhong`, `dangLive`, `ketThuc` | phòng có trả lời không, đang live không, buổi đã kết thúc chưa |
-| `luat` | `{ daBat, dangBat, n, batLuc }` — buổi này thầy đã từng bật luật rời màn chưa, đang bật không, số lần, giờ bật lần đầu |
+| `luat` | `{ bat, n, daBat, dangBat, batLuc }` — `bat` = nút luật ĐANG bật (đọc thẳng từ phòng đang mở; `dangBat` là tên cũ, cùng giá trị) · `n` = số lần thầy đặt trên nút · `daBat` = buổi này đã từng bật · `batLuc` = giờ bật lần đầu (HH:mm). Thầy mở phòng chưa bật luật ⇒ `bat: false, daBat: false` |
 | `siSo`, `soCoMat`, `soVang` | sĩ số khối (em chưa khoá), số em đã vào live, số em KHÔNG vào live |
 | `coMat[]` | `{ sbd, ten, tenGoi, lop, roi }` — em đã vào, `roi` = số lần rời màn hình (xếp nhiều → ít) |
 | `roiMan[]` | `{ sbd, ten, tenGoi, lop, lan }` — chỉ các em có rời màn hình |

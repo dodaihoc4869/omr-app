@@ -99,9 +99,12 @@ describe('/gv/bpu/live-thong-ke — số liệu cho tin kết thúc buổi của
     const r = await gvLiveThongKe(env, {}, async () => ({ ok: false })) as Record<string, any>
     expect(r).toMatchObject({ ok: true, buoiId: 'moi', khoi: 10, coPhong: false, soCoMat: 0, soVang: 1, moiRa: [], luat: { daBat: false, dangBat: false } }) // buổi không bật luật ⇒ văn phòng không nhắn nhóm về rời màn
     await ghiMoiRa(env, { ...BUOI, buoiId: 'moi' }, [{ loai: 'bat', sbd: '', luc: NAY, n: 3 }])
-    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toEqual({ daBat: true, dangBat: true, n: 3, batLuc: '19:30' })
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toEqual({ bat: true, daBat: true, dangBat: true, n: 3, batLuc: '19:30' })
     await ghiMoiRa(env, { ...BUOI, buoiId: 'moi' }, [{ loai: 'tat', sbd: '', luc: NAY + 60_000, n: 3 }])
-    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toMatchObject({ daBat: true, dangBat: false })
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toMatchObject({ bat: false, daBat: true, dangBat: false })
+    // (Javis 13/11 «chỉ cần thêm một trường: luat: { bat, n }») phòng đang mở trả lời ⇒ nút luật theo PHÒNG: đang bật 5 lần ⇒ bat true, n 5; phòng báo 0 ⇒ bat false
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: true, dangLive: true, luat: 5, em: [] })) as Record<string, any>).luat).toMatchObject({ bat: true, dangBat: true, daBat: true, n: 5 })
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: true, dangLive: true, luat: 0, em: [] })) as Record<string, any>).luat).toMatchObject({ bat: false, dangBat: false, daBat: true })
     expect((await goiWorker(worker, env, '/gv/bpu/live-thong-ke', {}, false)).ok).toBe(false)
     expect(await goiWorker(worker, env, '/gv/bpu/live-thong-ke', { buoiId: 'moi' }, true)).toMatchObject({ ok: true, buoiId: 'moi', coPhong: false })
   })
