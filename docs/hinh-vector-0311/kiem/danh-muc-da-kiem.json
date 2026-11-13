@@ -8029,6 +8029,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2": {
+      "tep": "enzyme789-native-ddh-3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639.svg",
+      "hashSvg": "3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639",
+      "byteSvg": 31407,
+      "byteGzip": 8602,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746": {
       "tep": "hinh-ddh-9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b.svg",
       "hashSvg": "9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b",
@@ -12893,6 +12902,20 @@
       ]
     },
     {
+      "qid": "12-C3-B10-D2-II-16",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2",
+          "where": "12-C3-B10-D2-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "aaf9550a1b4d657767884f4649dd7f74870748d7532b7d9b22111f902df8372a",
+          "vector": "enzyme789-native-ddh-3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C3-B10-D2-II-18",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -13215,6 +13238,20 @@
           "where": "12-C3-B11-D2-I-7.hinh.0.du_lieu",
           "hashDataUrl": "61f5f2d6a1e6083d3e4769d1fb1abf822e8aef300a4626bf27f7f6ec1db0ac96",
           "vector": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B11-D2-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2",
+          "where": "12-C3-B11-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "aaf9550a1b4d657767884f4649dd7f74870748d7532b7d9b22111f902df8372a",
+          "vector": "enzyme789-native-ddh-3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639.svg"
         }
       ]
     },
@@ -32365,6 +32402,7 @@
     "12-C3-B10-D2-II-11",
     "12-C3-B10-D2-II-12",
     "12-C3-B10-D2-II-15",
+    "12-C3-B10-D2-II-16",
     "12-C3-B10-D2-II-18",
     "12-C3-B10-D2-II-21",
     "12-C3-B10-D2-II-22",
@@ -32387,6 +32425,7 @@
     "12-C2-B7-D2-I-12",
     "12-C2-B7-D2-I-16",
     "12-C3-B11-D2-I-7",
+    "12-C3-B11-D2-II-1",
     "12-C3-B11-D2-III-1",
     "12-C3-B11-D2-III-3",
     "12-C3-B11-D2-III-6",

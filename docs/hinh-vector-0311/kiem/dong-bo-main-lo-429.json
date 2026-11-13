@@ -1,0 +1,9 @@
+{
+  "lo": 429,
+  "main": "fe5e82b172aa0588c6b23cf7ae7ff27b0166f543",
+  "previousMain": "1ca269c3dfe097d0446c311810e9561b7829b285",
+  "newMain": true,
+  "notMerged": true,
+  "diffStat": " .github/workflows/soi-nhat-ky-song-1411.yml | 40 +++++++++++++++++++++++++++++\n DIEU-PHOI.md                                |  1 +\n scripts/soi-khuc-pages-1411.mjs             | 16 ++++++++++++\n 3 files changed, 57 insertions(+)\n",
+  "note": "Mainmới chỉworkflow/scriptsoiPagesnhậtký+journal,app-server-Vite-DDHfont-mốcnguyênbyte. Khônggộp. Latestmainbuild-speed/fullTHEOTÊN/cathi/nooverlap trướcmerge-release vẫn bắtbuộc."
+}

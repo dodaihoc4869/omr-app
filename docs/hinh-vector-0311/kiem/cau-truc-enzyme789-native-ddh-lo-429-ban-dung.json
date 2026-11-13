@@ -1,0 +1,40 @@
+[
+  {
+    "i": 789,
+    "hash": "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2",
+    "fileNguon": "anh/92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2.png",
+    "svg": "enzyme789-native-ddh-3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639.svg",
+    "hashSvg": "3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639",
+    "byteSvg": 31407,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-16",
+        "de": "Hoạt tính xúc tác của enzyme càng cao, tốc độ thủy phân protein càng lớn. Hoạt tính của enzyme phụ thuộc vào nhiều yếu tố môi trường như nhiệt độ, pH. Một nhóm học sinh đã tiến hành khảo sát ảnh hưởng của pH đến hoạt tính của các enzyme tiêu hoá protein ở người.\nNhóm đã thực hiện thí nghiệm thủy phân albumin (một loại protein có nhiều trong lòng trắng trứng) bằng enzyme pepsin ở điều kiện nhiệt độ không đổi, nhưng thay đổi pH của môi trường. Kết quả thí nghiệm được ghi nhận trong bảng.\nSau đó, nhóm học sinh tiến hành một thí nghiệm tương tự nhưng thay thế enzyme pepsin bằng enzyme chymotrypsin. Kết quả khảo sát sự phụ thuộc của tốc độ phản ứng vào pH của hai enzyme này được thể hiện qua đồ thị (pepsin: đỉnh tại pH ≈ 2; chymotrypsin: đỉnh tại pH ≈ 8).",
+        "refs": [
+          {
+            "hash": "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2",
+            "where": "12-C3-B10-D2-II-16.hinh.0.du_lieu",
+            "hashDataUrl": "aaf9550a1b4d657767884f4649dd7f74870748d7532b7d9b22111f902df8372a"
+          }
+        ]
+      },
+      {
+        "qid": "12-C3-B11-D2-II-1",
+        "de": "Hoạt tính xúc tác của enzyme càng cao, tốc độ thủy phân protein càng lớn. Hoạt tính của enzyme phụ thuộc vào nhiều yếu tố môi trường như nhiệt độ, pH. Một nhóm học sinh đã tiến hành khảo sát ảnh hưởng của pH đến hoạt tính của các enzyme tiêu hoá protein ở người.\nNhóm đã thực hiện thí nghiệm thủy phân albumin (một loại protein có nhiều trong lòng trắng trứng) bằng enzyme pepsin ở điều kiện nhiệt độ không đổi, nhưng thay đổi pH của môi trường. Kết quả thí nghiệm được ghi nhận trong bảng.\nSau đó, nhóm học sinh tiến hành một thí nghiệm tương tự nhưng thay thế enzyme pepsin bằng enzyme chymotrypsin. Kết quả khảo sát sự phụ thuộc của tốc độ phản ứng vào pH của hai enzyme này được thể hiện qua đồ thị (pepsin: đỉnh tại pH ≈ 2; chymotrypsin: đỉnh tại pH ≈ 8).",
+        "refs": [
+          {
+            "hash": "92ec0e58a9762f475b718fd88d7179967ab7962bcdf397eefcfb20b94c62c1e2",
+            "where": "12-C3-B11-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "aaf9550a1b4d657767884f4649dd7f74870748d7532b7d9b22111f902df8372a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2plotsPepsinSOLID-Chymotrypsin75individualDOTS/1GRAYdottedPepsinguide/2GRAYfilledaxisheads-0ticks/12Xlabels1..12-NOYlabels/ALLtrueDAMUPRIGHT-Pepsin-Chymotrypsin-pH-Tốc độ phản ứngROTminus90/TOPcroppedtablerule2stubsKEEP/NOaddedtable-data-intensity-units-answer/Chymopeaknative330NOTnormalize8tick353/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "3ee81c16a42f919be7ae21e1e73657e6f5646563092902d6991cf196237df639",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
