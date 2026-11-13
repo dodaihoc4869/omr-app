@@ -18,6 +18,7 @@ const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 const MayTinhThay = lazy(() => import('../may-tinh/MayTinhThay'))
 const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
+const TinhTheCoVu = lazy(() => import('../live/TinhTheCoVu'))
 const LuatRoiThay = lazy(() => import('./LuatRoiThay'))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
@@ -27,6 +28,18 @@ const coToRieng = (): boolean => !!document.querySelector('.lop-xem-phieu:not([a
 const coLopPhu = (): boolean => !!document.querySelector('.lop-xem-phieu')
 /** Mép trái (px) của lớp phủ tờ trên cùng: 0 khi tờ kín cửa sổ, > 0 khi thanh bên trái của app đang chiếm chỗ. */
 const mepTraiTo = (): number => { const ds = document.querySelectorAll<HTMLElement>('.lop-xem-phieu'); return ds.length ? ds[ds.length - 1]!.offsetLeft : 0 }
+const KHONG_TIEP: readonly number[] = [0, 0, 0, 0]
+/** Tinh thể cổ vũ: tâm THẺ TÊN em lên bảng (thẻ có sẵn trong tờ chiếu trên cùng), tính theo cửa sổ — tờ có thể đang thu nhỏ nhường cột tin nhắn.
+ *  Không có thẻ đang hiện (thầy ở màn khác) ⇒ null: không bay. */
+function dichTheTo(): { x: number; y: number; the: Element } | null {
+  const ds = document.querySelectorAll<HTMLIFrameElement>('.lop-xem-phieu iframe'), kh = ds.length ? ds[ds.length - 1]! : null
+  try {
+    const the = Array.from(kh?.contentDocument?.querySelectorAll<HTMLElement>('.mc-em') ?? []).find((e) => !e.hidden && e.getClientRects().length > 0)
+    if (!kh || !the) return null
+    const o = kh.getBoundingClientRect(), r = the.getBoundingClientRect(), s = o.width / Math.max(1, kh.clientWidth)
+    return { x: o.left + (r.left + r.width / 2) * s, y: o.top + (r.top + r.height / 2) * s, the }
+  } catch { return null }
+}
 const ngheToRieng = (f: () => void): (() => void) => { const mo = new MutationObserver(f); mo.observe(document.body, { childList: true }); return () => mo.disconnect() }
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
@@ -46,6 +59,7 @@ export default function LopNoiThay() {
   const [sanhTay, setSanh] = useState<boolean | null>(null)
   const [loi, setLoi] = useState('')
   const dang = k?.gd === 'dang'
+  const goiBang = v?.luot?.goi ?? null
   // bảng chọn bài nạp SẴN ngay khi vào live ⇒ bấm «Học» là hiện liền (trước: lần bấm đầu còn chờ tải mảnh, thầy tưởng không ăn — «phải bấm 2 lần»)
   useEffect(() => { if (dang) void import('../bpu/ChonCauBpu').catch(() => {}) }, [dang])
   // Tấm hoạt động (đầu giờ / chữa câu / ôn tập) của «Học» đang mở. Đóng tấm mà buổi chưa có bài nào đang chiếu ⇒ quay lại bảng chọn (không để màn trống).
@@ -71,7 +85,9 @@ export default function LopNoiThay() {
   // bật / tắt tính trên giá trị MỚI NHẤT (các trình nghe phím đăng ký một lần, không được giữ `chat` cũ): chưa từng bật / tắt ⇒ lấy mặc định theo cỡ cửa sổ lúc bấm
   const setChat = (f: boolean | ((c: boolean) => boolean)): void => setChatMuon((m) => (typeof f === 'function' ? f(m ?? !!hinhCot(window.innerWidth, window.innerHeight, mepTraiTo())) : f))
   const coPhu = useSyncExternalStore(ngheToRieng, coLopPhu)
-  const cot = hinh && chat && dang && !k?.giaiLao && !sanh && !chon && !(hdMo && hdTren) && coPhu ? hinh : null
+  // Tấm hoạt động đang che tờ thì không dựng cột — TRỪ khi tấm đang chiếu tờ RIÊNG của nó (kiểm tra đầu giờ / chữa câu: «Đợt 1/2», «Lên bảng»): lúc đó thứ thầy
+  // nhìn là tờ, cột phải hiện (13/11 lần 2, thầy: «chưa thấy cột nhắn tin trên app thầy» — đúng là đang dạy bằng tờ riêng).
+  const cot = hinh && chat && dang && !k?.giaiLao && !sanh && !chon && !(hdMo && hdTren && !toRieng) && coPhu ? hinh : null
   const cotC = cot?.c ?? 0, cotS = cot?.s ?? 1, cotD = cot?.d ?? 0
   // Gốc trang mang cờ + ba số đo ⇒ CSS thu đều lớp phủ tờ (thay-khoi.css) và các lớp bám theo phần chiếu (hỏi hiểu, viên «Rời màn hình», máy tính) dời theo.
   useLayoutEffect(() => {
@@ -226,6 +242,7 @@ export default function LopNoiThay() {
       )}
       {cot ? <aside className="lkt-cot"><Suspense fallback={null}><CotChatThay kenh={kenh} coDinh /></Suspense></aside> : chat && !hinh ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
       {mtHien ? <Suspense fallback={null}><MayTinhThay kenh={kenh} /></Suspense> : null}
+      {dang && !sanh && !chon && goiBang && goiBang.dat == null && v.luot?.pha !== 'mo' ? <Suspense fallback={null}><TinhTheCoVu coDinh khoa={`${v.luot?.so}:${goiBang.sbd}`} dem={goiBang.tiepDoi ?? KHONG_TIEP} dich={dichTheTo} /></Suspense> : null}
       {hieu && dang && !sanh && !chon ? <Suspense fallback={null}><HoiHieuThay kenh={kenh} tong={v.live?.xem || v.ds.filter((e) => e.vao).length} /></Suspense> : null}
     </div>
   )

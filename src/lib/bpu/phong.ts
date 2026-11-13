@@ -40,7 +40,8 @@ export const KJ = {
   thanhThat: 20,
 } as const
 export const NGUONG_KICH_HOAT = 0.75
-export const TIEP_SUC_TOI_DA = 10
+/** Mỗi em, mỗi lần một bạn lên bảng: tối đa 12 lần bấm «Tiếp sức» / «Cổ vũ» (thầy 13/11: «mỗi học sinh mỗi lần cổ vũ chỉ có 12 lần bấm»; trước là 10). */
+export const TIEP_SUC_TOI_DA = 12
 /** Gửi trễ hơn hạn bao lâu vẫn nhận (mạng chậm). */
 export const AN_HAN_MS = 2000
 /** Số mục biến động kJ giữ trong phòng (mới nhất). */
@@ -421,6 +422,8 @@ export function chamLenBang(st: TrangThaiPhong, dat: boolean, nay: number): bool
   return true
 }
 export const tongTiep = (g: GoiLenBang | null): number => (g ? Object.values(g.tiep).reduce((a, b) => a + b, 0) : 0)
+/** Lượt cổ vũ theo ĐỘI của người bấm [Na, K, Cu, Ca] — máy em / máy thầy tô màu tinh thể lửa theo đội (13/11). */
+export function tiepTheoDoi(st: TrangThaiPhong, g: GoiLenBang): number[] { const ra = [0, 0, 0, 0]; for (const [s, n] of Object.entries(g.tiep)) { const d = st.ds.find((e) => e.sbd === s)?.doi ?? 0; if (d >= 0 && d < 4) ra[d]! += n } return ra }
 
 /** Chấm một câu trả lời. `chamSo` = luật so đáp số Phần III của app (truyền vào để module này không kéo bộ chấm). */
 export function chamTra(l: Pick<LuotPhong, 'phan' | 'dung' | 'tuLuan'>, chon: string, chamSo: (traLoi: string, dapAn: string) => boolean): { dung: boolean; soY: number | null } {
@@ -538,7 +541,7 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
       // (12/11, nút ống nghiệm «Ai đã nộp» trên màn chiếu của buổi LIVE THEO KHỐI — chỉ view của THẦY, mọi pha) em đã gửi ⇒ [kết quả, giây, đáp án em chọn];
       // kết quả 1 đúng · 0 sai · 2 không chấm tự động (tự luận / phòng không có bộ chấm) · 3 em báo «chưa biết làm». Buổi trên lớp không gửi (bảng đua đã có).
       ...(live?.khoi ? { nop: Object.fromEntries(Object.entries(l.tra).map(([s, t]) => [s, [t.kb ? 3 : l.tuLuan || !chamSo ? 2 : chamTra(l, t.chon, chamSo).dung ? 1 : 0, Math.max(1, Math.round(t.t / 1000)), t.kb ? '' : String(t.chon).slice(0, 24)] as [0 | 1 | 2 | 3, number, string]])) } : {}),
-      goi: l.goi ? { sbd: l.goi.sbd, lyDo: l.goi.lyDo, dat: l.goi.dat, doanDung: Object.values(l.goi.duDoan).filter((v) => v === 1).length, doanSai: Object.values(l.goi.duDoan).filter((v) => v === 0).length, tiep: tongTiep(l.goi) } : null,
+      goi: l.goi ? { sbd: l.goi.sbd, lyDo: l.goi.lyDo, dat: l.goi.dat, doanDung: Object.values(l.goi.duDoan).filter((v) => v === 1).length, doanSai: Object.values(l.goi.duDoan).filter((v) => v === 0).length, tiep: tongTiep(l.goi), tiepDoi: tiepTheoDoi(st, l.goi) } : null,
       ...(l.pha === 'mo' ? { dung: l.dung, chon: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, t.chon])), ketQua: l.ketQua } : {}),
     } : null,
   }
@@ -551,7 +554,7 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
   const e = em(st, sbd), l = st.luot
   const xep = xepEm(st), hang = e ? xep.findIndex((x) => x.sbd === sbd) + 1 : 0
   const d = e ? e.doi : 0
-  const goi = l?.goi ? (() => { const g = l.goi!, h = em(st, g.sbd); return { sbd: g.sbd, ten: h?.ten ?? g.sbd, doi: h?.doi ?? 0, lyDo: g.lyDo, emDoan: g.duDoan[sbd] ?? null, emTiep: g.tiep[sbd] ?? 0, tiep: tongTiep(g), dat: g.dat, ...(l.pha === 'mo' && g.kjDoi != null ? { kjDoi: g.kjDoi } : {}) } })() : null
+  const goi = l?.goi ? (() => { const g = l.goi!, h = em(st, g.sbd); return { sbd: g.sbd, ten: h?.ten ?? g.sbd, doi: h?.doi ?? 0, lyDo: g.lyDo, emDoan: g.duDoan[sbd] ?? null, emTiep: g.tiep[sbd] ?? 0, tiep: tongTiep(g), tiepDoi: tiepTheoDoi(st, g), dat: g.dat, ...(l.pha === 'mo' && g.kjDoi != null ? { kjDoi: g.kjDoi } : {}) } })() : null
   return {
     t: 'em' as const,
     ketThuc: st.ketThuc, soLuot: st.soLuot,

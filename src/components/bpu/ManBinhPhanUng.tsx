@@ -583,7 +583,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           {q && !che ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span>{deChang(q, l.so, null, false, null)}</div> : null}
         </>
       )
-      day = <button type="button" className="bpu-nut tiep" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{cung ? `Tiếp sức ${DOI_BPU[g.doi]?.ten}` : 'Cổ vũ bạn ấy'} · {g.emTiep}/10</button>
+      day = <button type="button" className="bpu-nut tiep" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }} disabled={g.emTiep >= 12} onClick={() => gui({ t: 'tiep' })}>{cung ? `Tiếp sức ${DOI_BPU[g.doi]?.ten}` : 'Cổ vũ bạn ấy'} · {g.emTiep}/12</button>
     }
   } else if (q) {
     const daGui = !!l.emTra

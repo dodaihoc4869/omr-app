@@ -70,10 +70,9 @@
 @keyframes hh-da { 0% { opacity: 0; transform: scale(0.8); } 18%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 @media (prefers-reduced-motion: reduce) { .hh-troi, .hh-troi::before, .hh-sao, .hh-so, .hh-dom, .hh-dom::after, .hh-the { animation: none; } }
 html.may-yeu .hh-the { animation: none; }
-/* 13/11 — BẢNG PHẲNG: hoà vào nền xanh than của bảng, vừa khít ô 1/3 phải (vị trí do HoiHieuThay đo lớp phủ tờ). Không viền, không bóng, không bo góc;
-   quầng màu chỉ còn rất nhẹ. (Luật `.hh-troi` ở trên giữ nguyên khai báo cũ theo luật giữ màu; lớp `.phang` ghi đè.) */
-.hh-lop .hh-troi.phang { border-radius: 0; box-shadow: inset 1.5px 0 0 var(--tr-chieu-mat-3); animation: hh-hien 0.3s ease-out both;
-  background: radial-gradient(110% 60% at 24% 22%, color-mix(in srgb, var(--p-xanh) 12%, transparent), transparent 62%), radial-gradient(110% 60% at 80% 26%, color-mix(in srgb, var(--hh-b) 10%, transparent), transparent 62%), var(--tr-chieu-bang); }
-.hh-lop .hh-troi.phang::before { opacity: 0.35; }
+/* 13/11 — KHÔNG LỚP NỀN (thầy: «không cần phải một lớp nữa đâu, hoà luôn vào nền của bảng đen xanh ấy»): bảng «Hiểu chưa?» của máy thầy trong suốt, số và
+   chấm sáng hiện thẳng trên nền bảng, vừa khít ô 1/3 phải (vị trí do HoiHieuThay đo lớp phủ tờ). Không nền, không viền, không bóng, không quầng màu xoay.
+   (Luật `.hh-troi` ở trên giữ nguyên khai báo cũ theo luật giữ màu; lớp `.phang` ghi đè.) */
+.hh-lop .hh-troi.phang { border-radius: 0; box-shadow: none; background: transparent; animation: hh-hien 0.3s ease-out both; }
+.hh-lop .hh-troi.phang::before { display: none; }
 @keyframes hh-hien { from { opacity: 0; } }
-
