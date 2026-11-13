@@ -9280,6 +9280,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62": {
+      "tep": "biodiesel1053-native-ddh-cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323.svg",
+      "hashSvg": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+      "byteSvg": 108061,
+      "byteGzip": 18432,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b": {
       "tep": "model-electron-native1029-ddh-8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd.svg",
       "hashSvg": "8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd",
@@ -31587,6 +31596,20 @@
           "vector": "cau-truc-ddh-3923228e00f0a4150087b43b758d42329159b576e146f9d7f6a600b216f23bc8.svg"
         }
       ]
+    },
+    {
+      "qid": "VIP27-CDK-XAPHONG-III-21",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+          "where": "VIP27-CDK-XAPHONG-III-21.hinh.0.du_lieu",
+          "hashDataUrl": "60778f7bceda71988ec2f0afac29420f30494f070bb4e37d07b508d3411f189e",
+          "vector": "biodiesel1053-native-ddh-cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323.svg"
+        }
+      ]
     }
   ],
   "cauDuMoiHinh": [
@@ -33006,7 +33029,8 @@
     "VIP27-CDK-ACIDBASE-II-7",
     "VIP27-CDK-ACIDBASE-II-11",
     "VIP27-CDK-ACIDBASE-II-19",
-    "VIP27-CDK-ACIDBASE-III-13"
+    "VIP27-CDK-ACIDBASE-III-13",
+    "VIP27-CDK-XAPHONG-III-21"
   ],
   "cauMoiXongMotPhan": [
     "DB-12-B1-P1-D2-III-114",

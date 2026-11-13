@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1053,
+    "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+    "fileNguon": "anh/be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62.png",
+    "svg": "biodiesel1053-native-ddh-cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323.svg",
+    "hashSvg": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+    "byteSvg": 108061,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-XAPHONG-III-21",
+        "de": "Dầu ăn thải là nguồn nguyên liệu rẻ tiền để sản xuất biodiesel nhưng thường chứa một lượng đáng kể các acid béo tự do (FFA). Nếu dùng ngay xúc tác base để chuyển hóa thành phần chính triglyceride, FFA sẽ phản ứng tạo xà phòng gây tắc nghẽn hệ thống. Để khắc phục, quy trình công nghiệp vận hành liên tục buộc phải sử dụng dây chuyền gồm hai thiết bị phản ứng nối tiếp R1 và R2 như sơ đồ.\nQuá trình này bao gồm hai phản ứng hóa học (chưa rõ thứ tự xảy ra ở các thiết bị):\n(a) $\\ce{RCOOH(l) + CH3OH(l) <=>[H+] RCOOCH3(l) + H2O(l)}$\n(b) $\\ce{(RCOO)3C3H5 + 3CH3OH(l) ->[OH-] 3RCOOCH3(l) + C3H5(OH)3(l)}$\nTrong quá trình vận hành, hệ thống ghi nhận dòng (2) (biodiesel, khối lượng phân tử trung bình là 296 g/mol) ở đầu ra cuối cùng đạt mức 150,0 tấn/ngày. Đồng thời, tại đáy tháp D1 thu hồi được dòng (5) tinh khiết với lưu lượng 10,0 tấn/ngày. Lưu lượng của dòng (6) (tính bằng tấn/ngày) được tách ra khỏi hệ thống là bao nhiêu? (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần trăm).",
+        "refs": [
+          {
+            "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+            "where": "VIP27-CDK-XAPHONG-III-21.hinh.0.du_lieu",
+            "hashDataUrl": "60778f7bceda71988ec2f0afac29420f30494f070bb4e37d07b508d3411f189e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6RECTboxes/16FULLFILLEDconcaveheads13RIGHT1LEFT1DOWN1UP/3RIGHTnativeCROPPEDshafts6-5-2NOaddedheads/EXACTĐầu vào-R1-S1-D1-R2-S2/ALLnumsBASELINE-commaflows1,2,4,6-1,6-2,4-1,2,5-1,5/EXACTR1, R2: Thiết bị phản ứng-S1, S2: Buồng phân tách-D1: Tháp chưng cất/ONLYCác dòng vật chất:TRUEdam-restALLregularUPRIGHT/EXACT(1) Methanol-(2) Biodiesel-(3) Dầu thải-(4) Triglyceride-(5) Glycerol-(6) Nước/individualpaths-heads/NOaddedcatalystR1R2-massflow-condition-answer-alias",
+    "hashSvgDaSoat": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

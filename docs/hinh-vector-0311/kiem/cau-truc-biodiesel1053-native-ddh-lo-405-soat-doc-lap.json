@@ -1,0 +1,20 @@
+[
+  {
+    "i": 1053,
+    "hashSvg": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-XAPHONG-III-21.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và top/bottomheads/legend-rightcropmacros. Tự đếm16đầu đặc lõm=13RIGHT1LEFT1DOWN1UP, sáu box Đầu vào/R1/S1/D1/R2/S2 đúng kết nối; ba shaft phải dòng6/5/2cắt mép giữ không thêm head. Các nhãn dòng1,2,4,6/1,6/2,4/1,2,5/1,5 cùng dấu phẩy baseline đúng; legendR1,R2/S1,S2/D1 và6dòngvậtchất đúng chữ/dấu. Chỉ Các dòng vật chất: đậm, còn lại thường thẳng; không thấy chạm/cắt thêm/tràn hay mass/catalyst/đápán thêm.",
+    "render": "/workspace/scratch/soat405-1053-fresh.png",
+    "macro": [
+      "/workspace/scratch/biodiesel1053-topheads.png",
+      "/workspace/scratch/biodiesel1053-bottomheads.png",
+      "/workspace/scratch/biodiesel1053-legend.png"
+    ],
+    "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+    "hashSvgDaSoat": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+    "runtimeProof": {
+      "sha256": "667bedce464f5e2f41ac39fb0aa013fe8049e9fa1f7f222e3b03f71ddaecb401",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/biodiesel1053-native-ddh-cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323.svg cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323\n1053 { x: 0, y: 0, width: 898, height: 571 }\nPOSTSHOT_SHA cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323\n"
+    }
+  }
+]

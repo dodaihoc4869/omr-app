@@ -1,0 +1,674 @@
+{
+  "i": 1053,
+  "assetIndexProvided": 1427,
+  "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62.png",
+  "size": [
+    898,
+    571
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-XAPHONG-III-21",
+      "de": "Dầu ăn thải là nguồn nguyên liệu rẻ tiền để sản xuất biodiesel nhưng thường chứa một lượng đáng kể các acid béo tự do (FFA). Nếu dùng ngay xúc tác base để chuyển hóa thành phần chính triglyceride, FFA sẽ phản ứng tạo xà phòng gây tắc nghẽn hệ thống. Để khắc phục, quy trình công nghiệp vận hành liên tục buộc phải sử dụng dây chuyền gồm hai thiết bị phản ứng nối tiếp R1 và R2 như sơ đồ.\nQuá trình này bao gồm hai phản ứng hóa học (chưa rõ thứ tự xảy ra ở các thiết bị):\n(a) $\\ce{RCOOH(l) + CH3OH(l) <=>[H+] RCOOCH3(l) + H2O(l)}$\n(b) $\\ce{(RCOO)3C3H5 + 3CH3OH(l) ->[OH-] 3RCOOCH3(l) + C3H5(OH)3(l)}$\nTrong quá trình vận hành, hệ thống ghi nhận dòng (2) (biodiesel, khối lượng phân tử trung bình là 296 g/mol) ở đầu ra cuối cùng đạt mức 150,0 tấn/ngày. Đồng thời, tại đáy tháp D1 thu hồi được dòng (5) tinh khiết với lưu lượng 10,0 tấn/ngày. Lưu lượng của dòng (6) (tính bằng tấn/ngày) được tách ra khỏi hệ thống là bao nhiêu? (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần trăm).",
+      "allHinh": [
+        {
+          "hash": "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62",
+          "where": "VIP27-CDK-XAPHONG-III-21.hinh.0.du_lieu",
+          "hashDataUrl": "60778f7bceda71988ec2f0afac29420f30494f070bb4e37d07b508d3411f189e"
+        }
+      ],
+      "missingHashes": [
+        "be847ba15fd2247554fec2518dd3fc0ebf766a7ea3fd92074fe42507e45dcb62"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/405-full4x.png",
+      "/workspace/scratch/405-legend2x.png",
+      "/workspace/scratch/405-right2x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "boxes": 6,
+      "visibleFilledArrowheads": 16,
+      "RIGHT": 13,
+      "LEFT": 1,
+      "DOWN": 1,
+      "UP": 1,
+      "rightCroppedOutletLinesWithoutVisibleHeads": 3
+    },
+    "font": {
+      "onlyTrueBold": "Các dòng vật chất:",
+      "allOtherText": "Regular upright sans, plainbaseline numbers R1/R2/S1/S2/D1 noSUB. Commasinflowsliteralwithoutaddedspaces."
+    },
+    "boxes": [
+      {
+        "label": "Đầu vào",
+        "rect": [
+          84,
+          14,
+          174,
+          78
+        ],
+        "labelBox": [
+          98,
+          39,
+          160,
+          57
+        ]
+      },
+      {
+        "label": "R1",
+        "rect": [
+          268,
+          134,
+          378,
+          215
+        ],
+        "labelBox": [
+          309,
+          168,
+          337,
+          186
+        ]
+      },
+      {
+        "label": "S1",
+        "rect": [
+          495,
+          135,
+          591,
+          215
+        ],
+        "labelBox": [
+          530,
+          168,
+          556,
+          186
+        ]
+      },
+      {
+        "label": "D1",
+        "rect": [
+          708,
+          134,
+          826,
+          215
+        ],
+        "labelBox": [
+          752,
+          168,
+          778,
+          186
+        ]
+      },
+      {
+        "label": "R2",
+        "rect": [
+          484,
+          312,
+          598,
+          389
+        ],
+        "labelBox": [
+          527,
+          343,
+          555,
+          362
+        ]
+      },
+      {
+        "label": "S2",
+        "rect": [
+          708,
+          312,
+          825,
+          389
+        ],
+        "labelBox": [
+          752,
+          343,
+          779,
+          362
+        ]
+      }
+    ],
+    "paths": [
+      {
+        "id": "incoming1",
+        "vertices": [
+          [
+            5,
+            45
+          ],
+          [
+            84,
+            45
+          ]
+        ],
+        "tips": [
+          [
+            49,
+            45
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1",
+        "labelBox": [
+          35,
+          12,
+          48,
+          33
+        ]
+      },
+      {
+        "id": "inputToR1",
+        "vertices": [
+          [
+            127,
+            78
+          ],
+          [
+            127,
+            155
+          ],
+          [
+            268,
+            155
+          ]
+        ],
+        "tips": [
+          [
+            195,
+            155
+          ],
+          [
+            268,
+            155
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1",
+        "labelBox": [
+          184,
+          120,
+          197,
+          141
+        ]
+      },
+      {
+        "id": "oilToR1",
+        "vertices": [
+          [
+            126,
+            205
+          ],
+          [
+            268,
+            205
+          ]
+        ],
+        "tips": [
+          [
+            195,
+            205
+          ],
+          [
+            268,
+            205
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "3",
+        "labelBox": [
+          183,
+          222,
+          197,
+          244
+        ]
+      },
+      {
+        "id": "R1ToS1",
+        "vertices": [
+          [
+            378,
+            175
+          ],
+          [
+            495,
+            175
+          ]
+        ],
+        "tips": [
+          [
+            447,
+            175
+          ],
+          [
+            495,
+            175
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1,2,4,6",
+        "labelBox": [
+          403,
+          138,
+          469,
+          160
+        ]
+      },
+      {
+        "id": "S1ToD1",
+        "vertices": [
+          [
+            591,
+            175
+          ],
+          [
+            708,
+            175
+          ]
+        ],
+        "tips": [
+          [
+            655,
+            175
+          ],
+          [
+            708,
+            175
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1,6",
+        "labelBox": [
+          629,
+          137,
+          659,
+          159
+        ]
+      },
+      {
+        "id": "S1ToR2",
+        "vertices": [
+          [
+            541,
+            215
+          ],
+          [
+            541,
+            312
+          ]
+        ],
+        "tips": [
+          [
+            541,
+            273
+          ]
+        ],
+        "direction": "DOWN",
+        "label": "2,4",
+        "labelBox": [
+          562,
+          251,
+          594,
+          273
+        ]
+      },
+      {
+        "id": "inputToR2",
+        "vertices": [
+          [
+            103,
+            78
+          ],
+          [
+            103,
+            350
+          ],
+          [
+            484,
+            350
+          ]
+        ],
+        "tips": [
+          [
+            314,
+            350
+          ],
+          [
+            484,
+            350
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1",
+        "labelBox": [
+          303,
+          318,
+          316,
+          338
+        ]
+      },
+      {
+        "id": "R2ToS2",
+        "vertices": [
+          [
+            598,
+            350
+          ],
+          [
+            708,
+            350
+          ]
+        ],
+        "tips": [
+          [
+            655,
+            350
+          ],
+          [
+            708,
+            350
+          ]
+        ],
+        "direction": "RIGHT",
+        "label": "1,2,5",
+        "labelBox": [
+          627,
+          318,
+          676,
+          338
+        ]
+      },
+      {
+        "id": "S2ToD1",
+        "vertices": [
+          [
+            766,
+            312
+          ],
+          [
+            766,
+            215
+          ]
+        ],
+        "tips": [
+          [
+            766,
+            215
+          ]
+        ],
+        "direction": "UP",
+        "label": "1,5",
+        "labelBox": [
+          785,
+          251,
+          817,
+          273
+        ]
+      },
+      {
+        "id": "D1RecycleToInput",
+        "vertices": [
+          [
+            768,
+            134
+          ],
+          [
+            768,
+            43
+          ],
+          [
+            174,
+            43
+          ]
+        ],
+        "tips": [
+          [
+            555,
+            43
+          ]
+        ],
+        "direction": "LEFT",
+        "label": "1",
+        "labelBox": [
+          557,
+          12,
+          570,
+          33
+        ]
+      },
+      {
+        "id": "D1out6",
+        "vertices": [
+          [
+            826,
+            155
+          ],
+          [
+            897,
+            155
+          ]
+        ],
+        "tips": [],
+        "direction": "CROPPEDUNKNOWN",
+        "label": "6",
+        "labelBox": [
+          864,
+          124,
+          878,
+          145
+        ]
+      },
+      {
+        "id": "D1out5",
+        "vertices": [
+          [
+            826,
+            198
+          ],
+          [
+            897,
+            198
+          ]
+        ],
+        "tips": [],
+        "direction": "CROPPEDUNKNOWN",
+        "label": "5",
+        "labelBox": [
+          864,
+          170,
+          878,
+          191
+        ]
+      },
+      {
+        "id": "S2out2",
+        "vertices": [
+          [
+            825,
+            350
+          ],
+          [
+            897,
+            350
+          ]
+        ],
+        "tips": [],
+        "direction": "CROPPEDUNKNOWN",
+        "label": "2",
+        "labelBox": [
+          864,
+          318,
+          878,
+          339
+        ]
+      }
+    ],
+    "headStyle": {
+      "type": "Fullfilledblack, concaverear/chevron-like triangularhead",
+      "sizeApprox": {
+        "RIGHT": "tipx withrearx−13, y±6; innernotchrearx−9,ycenter",
+        "LEFT": "mirrored",
+        "UPDOWN": "rotatedsameform"
+      },
+      "warning": "Do not addheadstorecropoutlets. TwoRIGHTheads onsamepathare intentionalflowmarkers, notdoubleline."
+    },
+    "legend": [
+      {
+        "literal": "R1, R2: Thiết bị phản ứng",
+        "bbox": [
+          103,
+          432,
+          347,
+          456
+        ],
+        "baselineApprox": 453,
+        "weight": "regular"
+      },
+      {
+        "literal": "S1, S2: Buồng phân tách",
+        "bbox": [
+          103,
+          471,
+          338,
+          496
+        ],
+        "baselineApprox": 492,
+        "weight": "regular"
+      },
+      {
+        "literal": "D1: Tháp chưng cất",
+        "bbox": [
+          103,
+          510,
+          291,
+          535
+        ],
+        "baselineApprox": 531,
+        "weight": "regular"
+      },
+      {
+        "literal": "Các dòng vật chất:",
+        "bbox": [
+          471,
+          432,
+          659,
+          456
+        ],
+        "baselineApprox": 453,
+        "weight": "TRUEBOLD"
+      },
+      {
+        "literal": "(1) Methanol",
+        "bbox": [
+          471,
+          470,
+          593,
+          495
+        ],
+        "baselineApprox": 492,
+        "weight": "regular"
+      },
+      {
+        "literal": "(2) Biodiesel",
+        "bbox": [
+          471,
+          507,
+          593,
+          531
+        ],
+        "baselineApprox": 528,
+        "weight": "regular"
+      },
+      {
+        "literal": "(3) Dầu thải",
+        "bbox": [
+          471,
+          540,
+          583,
+          565
+        ],
+        "baselineApprox": 563,
+        "weight": "regular"
+      },
+      {
+        "literal": "(4) Triglyceride",
+        "bbox": [
+          672,
+          470,
+          817,
+          495
+        ],
+        "baselineApprox": 492,
+        "weight": "regular"
+      },
+      {
+        "literal": "(5) Glycerol",
+        "bbox": [
+          672,
+          507,
+          784,
+          531
+        ],
+        "baselineApprox": 528,
+        "weight": "regular"
+      },
+      {
+        "literal": "(6) Nước",
+        "bbox": [
+          672,
+          540,
+          757,
+          565
+        ],
+        "baselineApprox": 563,
+        "weight": "regular"
+      }
+    ],
+    "strokeApprox": 1.5,
+    "crop": "Threeoutletshafts6/5/2continuepastnativeRIGHTx897; do not capwithnewheads orrestoreoutside. Allboxlabelsinsideframe. Bottomlegendfullyvisible.",
+    "noAdded": [
+      "No answersforflows",
+      "No catalystassignmentR1/R2",
+      "No massflowvaluesfrompublicstem",
+      "No iconography",
+      "No reconstructedrightoutletarrowheads"
+    ]
+  },
+  "measurementLimits": "Approxnativecoords/bboxes ±1–2px. Full4x viewerresized; ownlegend/right2x openedseparately. Eachpath andhead separatelycounted fromsource, no inferencefromprocesslogic.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "nativeFull2xOpened": true,
+    "nativeHeads2xOpened": true,
+    "nativeLegend2xOpened": true,
+    "independentCounts": "6boxes/16FULLFILLEDconcaveheads=13RIGHT1LEFT1DOWN1UP/3RIGHTcroppedshaftsNOaddedheads",
+    "allPublicDeRead": true,
+    "oneHinhOnly": true,
+    "nativeApproxNotSubpixel": true,
+    "font": "Only heading Các dòng vật chất: TRUEdam, every other literal regularupright. DDH font sizes fit nativeanchoredblocks; do not keep rastertext/fallback.",
+    "sourceAgentInitialRight12CountCorrectedTo13BeforeBuilder": true
+  },
+  "rootActualReview": {
+    "hashSvg": "cff1c7f309893cd2955de2c9b7204902d16157eab0f3b5f3c6418a69d702e323",
+    "nativeFullHeadsLegend2xOpened": true,
+    "all1PublicDeRefRead": true,
+    "freshFinalChromium3xFullOpened": true,
+    "freshFinalHeadsLegendLowerReturnMacrosOpened": true,
+    "verdict": "Đạt scoped exactSVG:6boxes16FULLFILLEDconcaveheads13RIGHT1LEFT1DOWN1UP/3RIGHTcroppedshaftsNOaddedheads/literalalllabels-commas-baseline/ONLYheadingTRUEdam-restregularUPRIGHT/0addedmass-catalysts-answer. NativeapproxNOTsubpixel/noSVGnegative405."
+  }
+}
