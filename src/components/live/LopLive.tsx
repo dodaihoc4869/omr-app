@@ -44,6 +44,7 @@ import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '.
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
 import { cotEmGhim, laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
+import { tranGiay } from './cuon-giay'
 import { DauDat, TamTra, type DuLieuTra } from './TamTra'
 import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
@@ -627,7 +628,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
-        <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
+        <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h, ...tranGiay(giay.o, giay.h) } : null} khoaGiay={khoaDe}
           coTra={!!bangTra} duoiGiay={bangTra} bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>

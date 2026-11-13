@@ -7,10 +7,13 @@
 //   · BẢNG: `.…-bang` (khung, cắt) > khung cuộn `.lv-cuon` của lớp vẽ (canvas nét đã chốt của bảng, dời bằng transform).
 //   · LỚP «ĐANG VIẾT» `.…-net`: một canvas nhỏ đi theo đầu bút, chạy trong cả hình.
 // Mỗi khung hình KHÔNG vẽ lại React: mũi tên «Thầy đang viết ở dưới», nút «Về chỗ thầy đang viết» bật / tắt bằng thuộc tính.
+// EM TỰ CUỘN GIẤY (13/11, cuon-giay.ts): hình xoay 90° (điện thoại cầm dọc) ⇒ trình duyệt không cuộn hộ khung nằm trong khối xoay ⇒ khung giấy tự cuộn theo
+// ngón tay + quán tính; giấy soi cuộn được HẾT đề, kể cả phần nằm ngoài ô giấy thầy đang thấy (`tamGoc.tren` / `tamGoc.duoi`).
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { toaDoXoay } from './chieu-xoay'
+import { buocQuanTinh, cuonSauThayCuon, taoKeoCuon, type KeoCuon } from './cuon-giay'
 import { giaiTrang, khungChieu, type AnToan, type KhungChieu, type VungChieu } from './bo-cuc'
 import { DAU_BANG, DAU_DU, NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, mocChia, netOBang, oDauBang, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
 import { taoVeBang, type VeBang } from './ve-bang'
@@ -47,7 +50,11 @@ export interface PropsKhungDL {
   giay: (k: { rong: number; cao: number }) => ReactNode
   /** Khổ GỐC của tấm giấy do nơi dùng dựng (giấy soi: px của giấy thầy). Có ⇒ chữ đề dựng MỘT lần ở khổ ấy rồi co bằng transform — khung nở / thu không phải
    *  dựng lại chữ (đo CPU ×4: bớt ~40 ms mỗi lần nở). Vắng ⇒ nơi dùng dựng lại theo khổ tấm giấy trên máy em mỗi lần xếp. */
-  tamGoc?: { rong: number; cao: number } | null
+  tamGoc?: { rong: number; cao: number
+    /** Phần đề nằm NGOÀI ô giấy thầy đang thấy (px của giấy thầy, `tranGiay`): `tren` = thầy đã cuộn qua, `duoi` = thầy chưa cuộn tới ⇒ em vẫn cuộn tới được. */
+    tren?: number; duoi?: number } | null
+  /** Khoá của CÂU đang chiếu: đổi ⇒ giấy về đầu đề (không kẹt ở độ cuộn của đề trước). */
+  khoaGiay?: string
   /** Chữ gợi ý khi bảng đen chưa có nét. */
   bangTrong?: ReactNode
   /** DẢI THẺ TÊN em đang lên bảng (LenBang.tsx): có ⇒ khung bảng nhường `DAU_BANG` px phía trên, dải nằm NGOÀI mép trên khung bảng (không đè nét). */
@@ -75,7 +82,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   const goc = useRef<HTMLDivElement>(null), kG = useRef<HTMLDivElement>(null), cuonG = useRef<HTMLDivElement>(null), kB = useRef<HTMLDivElement>(null), net = useRef<HTMLDivElement>(null)
   const cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), vach = useRef<HTMLDivElement>(null), noiB = useRef<HTMLDivElement>(null), dauB = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
-  const [d, setD] = useState<{ bc: BoCucDL; kc: KhungChieu; vung: VungChieu } | null>(null)
+  const [d, setD] = useState<{ bc: BoCucDL; kc: KhungChieu; vung: VungChieu; xoay: boolean } | null>(null)
   const P = useRef(p)
   P.current = p
   const [dau] = useState(() => ({ tay: docChia(kho()), uu: taoUuTien() }))
@@ -87,6 +94,9 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     /** Lớp vẽ đã nhận khung lần đầu chưa · còn chờ đặt khung cho lớp vẽ (đặt cùng lượt với lúc trình duyệt nhận bố cục mới) · các chuyển động nở đang chạy. */
     daDat: false, choDat: false, hoat: [] as Animation[],
     cuonGiay: 0, dichGiay: null as number | null, cuonAo: 0, lucChamGiay: -1e9, lucChamBang: -1e9, lucKhung: 0, vungBut: 'bang' as Vung, mui: 0, ve: false,
+    /** Giấy soi: phần đề phía TRÊN tấm giấy (px; thầy đã cuộn qua) — `scrollTop` của khung = `cuonGiay` + `duG` · khung giấy đang bật cuộn · em đang kéo giấy
+     *  bằng tay (hình xoay) · vòng trôi quán tính đang chạy. */
+    duG: 0, tuCuon: false, keoG: null as { id: number; el: HTMLElement; k: KeoCuon } | null, troiG: 0,
     chamCuoi: { giay: -1e9, bang: -1e9 }, chamG: null as { id: number; x: number; y: number; luc: number } | null, keoB: null as { id: number; y: number; keo: boolean } | null, keoV: null as { id: number; x0: number } | null,
   })
 
@@ -106,7 +116,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null
     s.bc = moi; s.kc = kc; s.vung = vung
-    setD({ bc: moi, kc, vung })
+    setD({ bc: moi, kc, vung, xoay: hinh.xoay })
     // lớp vẽ nhận khung CÙNG LƯỢT với lúc hai khung đổi chỗ trên màn (hiệu ứng bên dưới) — không có khung hình nào nét một cỡ, khung một cỡ.
     // Riêng lần đầu đặt ngay: nơi dùng áp bảng (`ap`) liền sau đó, lớp vẽ phải có khung để tới thẳng chỗ nét mới nhất.
     if (s.daDat) s.choDat = true
@@ -122,7 +132,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const s = S.current
     P.current.khiTay?.(s.tay != null)
     xep()
-    return () => { veB.current = null; s.daDat = false; clearTimeout(s.henNo) }
+    return () => { veB.current = null; s.daDat = false; clearTimeout(s.henNo); cancelAnimationFrame(s.troiG) }
   }, [xep])
   // Giấy đổi giữa «soi khớp» và «dựng thường», đổi cỡ chữ của giấy thầy, bật / tắt tự ưu tiên ⇒ chia lại.
   const daDung = useRef(false)
@@ -137,14 +147,29 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     s.hoat = []
     if (s.bc) { if (kG.current) kG.current.style.height = `${s.bc.giay.h}px`; if (kB.current) kB.current.style.height = `${s.bc.bang.h}px` }
   }, [])
-  // Sau mỗi lần xếp: giữ chỗ em đang đọc trên giấy, rồi (nếu được) cho hai khung NỞ / THU êm từ bố cục cũ sang bố cục mới — chỉ transform.
+  // Giấy soi có khổ gốc: phép co của tấm giấy + phần đề nằm ngoài ô giấy thầy đang thấy (px máy em): `du` phía trên (thầy đã cuộn qua), `duDuoi` phía dưới.
+  const tiLeTam = d && p.netGiay && p.tamGoc && p.tamGoc.rong > 0 ? d.bc.tam.w / p.tamGoc.rong : 0
+  const du = Math.round((p.tamGoc?.tren ?? 0) * tiLeTam), duDuoi = (p.tamGoc?.duoi ?? 0) * tiLeTam
+  // Sau mỗi lần xếp / mỗi lần thầy cuộn giấy của thầy: giữ chỗ em đang đọc trên giấy.
   useLayoutEffect(() => {
     const s = S.current, moi = s.bc, c = cuonG.current
     if (!moi || !d) return
     if (s.choDat) datKhungVe()
     // giấy đang cuộn dở mà phép co đổi ⇒ co độ cuộn theo (em vẫn thấy đúng dòng đang đọc). Không cuộn thì không đụng (đọc / ghi độ cuộn buộc trình duyệt bố cục ngay).
-    if (c && s.truoc && s.truoc.sG !== moi.sG && s.cuonGiay > 0) { s.cuonGiay = (s.cuonGiay * moi.sG) / s.truoc.sG; c.scrollTop = s.cuonGiay; s.dichGiay = null; veB.current?.datCuonGiay(s.cuonGiay) }
+    // Thầy cuộn giấy của thầy (`du` đổi): em không tự cuộn gần đây ⇒ đi theo giấy thầy như trước; em vừa tự cuộn ⇒ chữ em đang đọc đứng yên (cuon-giay.ts).
+    const r = s.truoc && s.truoc.sG !== moi.sG ? moi.sG / s.truoc.sG : 1, duCu = s.duG * r
+    s.duG = du
+    if (c && (r !== 1 || du !== duCu) && (s.cuonGiay !== 0 || du > 0 || duCu > 0)) {
+      s.cuonGiay = cuonSauThayCuon(s.cuonGiay * r, duCu, du, Math.abs(du - duCu) > 0.5 && performance.now() - s.lucChamGiay < NHUONG_MS)
+      // (đọc lại độ cuộn thật: trình duyệt kẹp ở đầu / cuối đề mà không phát `scroll` khi khung vốn đang đứng ở mép đó)
+      c.scrollTop = s.cuonGiay + du; s.cuonGiay = c.scrollTop - du; s.dichGiay = null; veB.current?.datCuonGiay(s.cuonGiay)
+    }
     s.truoc = moi
+  }, [d, du, datKhungVe])
+  // Rồi (nếu được) cho hai khung NỞ / THU êm từ bố cục cũ sang bố cục mới — chỉ transform.
+  useLayoutEffect(() => {
+    const s = S.current, moi = s.bc
+    if (!moi || !d) return
     const cu = s.cho
     s.cho = null
     donNo()
@@ -161,7 +186,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     if (cu.vach != null && moi.vach != null) chay(vach.current, cu.vach - moi.vach, 0, 1)
     chay(dauB.current, cu.bang.x - moi.bang.x, 0, 1) // dải thẻ tên đi theo mép trái khung bảng
     s.henNo = setTimeout(donNo, NO_MS + 40)
-  }, [d, donNo, datKhungVe])
+  }, [d, donNo])
 
   /** Toạ độ con trỏ theo trục của HÌNH (hình xoay 90° ⇒ đổi trục; trình phát nhúng trong trang ⇒ trừ góc khung). */
   const toaDo = (e: { clientX: number; clientY: number }): { x: number; y: number } => {
@@ -228,7 +253,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
       }
       if (c && s.dichGiay != null) {
         s.cuonAo = q.dong ? buocTroi(s.cuonAo, s.dichGiay, nay - s.lucKhung) : s.dichGiay
-        c.scrollTop = s.cuonAo
+        c.scrollTop = s.cuonAo + s.duG
         s.cuonGiay = s.cuonAo; v.datCuonGiay(s.cuonGiay)
         if (s.cuonAo === s.dichGiay) s.dichGiay = null
       }
@@ -248,14 +273,57 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   const nay = (): number => performance.now()
   // ── khung giấy: em cuộn bằng tay ⇒ khung nhường (không tự trôi) 4 giây ──
   const emCuon = (): void => { S.current.lucChamGiay = nay(); S.current.dichGiay = null }
+  /** Khung đang cuộn được của giấy: giấy dựng thường ⇒ khối đề `.…-de` bên trong (đề dài hơn khung); giấy soi ⇒ chính khung cuộn. */
+  const khungCuonGiay = (): HTMLElement | null => {
+    const g = cuonG.current, de = g?.querySelector<HTMLElement>(`.${P.current.lop}-de`)
+    return de && de.scrollHeight > de.clientHeight + 1 ? de : S.current.tuCuon ? g : null
+  }
+  /** Nhả tay sau khi kéo (hình xoay): trôi tiếp theo quán tính — dừng khi hết đà, chạm đầu / cuối đề, hoặc em đặt ngón xuống lại. */
+  const troiTay = (el: HTMLElement, v0: number): void => {
+    const s = S.current
+    let v = v0, luc = nay(), vt = el.scrollTop
+    const buoc = (t: number): void => {
+      const b = buocQuanTinh(v, t - luc)
+      luc = t; v = b.v; vt += b.di
+      el.scrollTop = vt
+      emCuon()
+      s.troiG = v && Math.abs(el.scrollTop - vt) < 1.5 ? requestAnimationFrame(buoc) : 0
+    }
+    if (v) s.troiG = requestAnimationFrame(buoc)
+  }
   // (chạm = ấn rồi nhả tại chỗ trong 0,3 giây; em vuốt cuộn thì trình duyệt huỷ con trỏ ⇒ hai cú vuốt nhanh KHÔNG bị tính là chạm hai lần)
-  const giayXuong = (e: React.PointerEvent): void => { emCuon(); S.current.chamG = { id: e.pointerId, x: e.clientX, y: e.clientY, luc: e.timeStamp } }
+  const giayXuong = (e: React.PointerEvent): void => {
+    const s = S.current
+    emCuon(); cancelAnimationFrame(s.troiG); s.troiG = 0
+    s.chamG = { id: e.pointerId, x: e.clientX, y: e.clientY, luc: e.timeStamp }
+    // HÌNH XOAY 90° (điện thoại cầm dọc): trình duyệt không cuộn hộ khung nằm trong khối xoay ⇒ khung tự cuộn theo ngón tay, theo trục của HÌNH
+    const el = P.current.layHinh().xoay && e.button === 0 ? khungCuonGiay() : null
+    s.keoG = el ? { id: e.pointerId, el, k: taoKeoCuon(toaDo(e).y, e.timeStamp) } : null
+  }
+  const giayDi = (e: React.PointerEvent<HTMLDivElement>): void => {
+    const k = S.current.keoG
+    if (!k || k.id !== e.pointerId) return
+    const truoc = k.k.dangKeo(), q = k.k.di(toaDo(e).y, e.timeStamp)
+    if (!truoc && k.k.dangKeo()) { try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* trình duyệt cũ */ } }
+    if (q) { k.el.scrollTop += q; emCuon() }
+  }
   const giayNha = (e: React.PointerEvent): void => {
-    const k = S.current.chamG
-    S.current.chamG = null
+    const s = S.current, k = s.chamG, kg = s.keoG
+    s.chamG = null; s.keoG = null
+    if (e.type !== 'pointerup') return
+    if (kg && kg.id === e.pointerId && kg.k.dangKeo()) { troiTay(kg.el, kg.k.nha(e.timeStamp)); return }
     if (k && k.id === e.pointerId && e.timeStamp - k.luc < 300 && Math.abs(e.clientX - k.x) + Math.abs(e.clientY - k.y) < 12) cham('giay', e.timeStamp)
   }
-  const giayCuon = (e: React.UIEvent<HTMLDivElement>): void => { const s = S.current; if (s.dichGiay == null) { s.cuonGiay = e.currentTarget.scrollTop; veB.current?.datCuonGiay(s.cuonGiay) } }
+  const giayCuon = (e: React.UIEvent<HTMLDivElement>): void => { const s = S.current; if (s.dichGiay == null) { s.cuonGiay = e.currentTarget.scrollTop - s.duG; veB.current?.datCuonGiay(s.cuonGiay) } }
+  // Hình xoay: chặn trình duyệt tự giành cú vuốt trên giấy (kể cả khối đề bên trong còn `touch-action: pan-y`) — con trỏ không bị huỷ giữa chừng, khung tự cuộn.
+  const xoayNay = !!d?.xoay
+  useEffect(() => {
+    const c = cuonG.current
+    if (!c || !xoayNay) return
+    const chan = (e: TouchEvent): void => { if (e.cancelable) e.preventDefault() }
+    c.addEventListener('touchmove', chan, { passive: false })
+    return () => c.removeEventListener('touchmove', chan)
+  }, [xoayNay])
   const toiThay = (e: React.SyntheticEvent): void => { e.stopPropagation(); S.current.lucChamGiay = -1e9 }
   // ── khung bảng: vuốt dọc xem lại phần trên; chạm hai lần phóng kín ──
   const bangXuong = (e: React.PointerEvent<HTMLDivElement>): void => {
@@ -326,6 +394,20 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     return { WebkitClipPath: cat, clipPath: cat }
   }
   const soi = p.netGiay && !!bc
+  /** Khung giấy bật cuộn: giấy soi mà CẢ ĐỀ (tấm giấy + phần đề ngoài ô giấy thầy đang thấy) cao hơn vùng đọc. Giấy dựng thường: khối đề bên trong tự cuộn. */
+  const tuCuon = soi && du + bc.tam.h + duDuoi > bc.giay.h - caoDuoi + 1
+  S.current.tuCuon = tuCuon
+  // Sang CÂU KHÁC, hoặc khung giấy thôi / bắt đầu cuộn (giấy soi ⇄ dựng thường, đề ngắn lại): về ĐẦU đề. Trước đây khung giữ độ cuộn của đề trước ⇒ giấy
+  // dựng thường (khung không cuộn) bị đẩy lên, mất mấy dòng đầu mà không kéo về được.
+  const khoaGiay = p.khoaGiay
+  useLayoutEffect(() => {
+    const s = S.current, c = cuonG.current
+    if (!c) return
+    cancelAnimationFrame(s.troiG); s.troiG = 0; s.keoG = null; s.dichGiay = null
+    const de = c.querySelector<HTMLElement>(`.${P.current.lop}-de`), dau = tuCuon ? s.duG : 0
+    if (de && de.scrollTop) de.scrollTop = 0
+    if (s.cuonGiay !== 0 || c.scrollTop !== dau) { c.scrollTop = dau; s.cuonGiay = 0; veB.current?.datCuonGiay(0) }
+  }, [khoaGiay, tuCuon])
   /** Chữ đề: giấy soi có khổ gốc ⇒ dựng ở khổ gốc rồi co; còn lại dựng theo khổ trên máy em. Cùng khổ thì KHÔNG dựng lại (khung nở / thu chỉ đổi phép co). */
   const goc0 = soi && p.tamGoc && p.tamGoc.rong > 0 ? p.tamGoc : null
   const rongDung = !bc ? 0 : goc0 ? goc0.rong : soi ? bc.tam.w : bc.giay.w, caoDung = !bc ? 0 : goc0 ? goc0.cao : soi ? bc.tam.h : Math.max(60, bc.giay.h - caoDuoi)
@@ -335,9 +417,9 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   return (
     <div ref={goc} className={`${L}-dl`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }} data-phong={bc?.phong || undefined}>
       <div ref={kG} className={`${L}-giay`} style={o(bc?.giay)}>
-        <div ref={cuonG} className={`${L}-kg-cuon`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: caoDuoi ? `calc(100% - ${caoDuoi}px)` : '100%', overflowX: 'hidden', overflowY: soi && bc.tam.h > bc.giay.h - caoDuoi + 1 ? 'auto' : 'hidden', touchAction: 'pan-y', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
-          onPointerDown={giayXuong} onPointerUp={giayNha} onPointerCancel={() => { S.current.chamG = null }} onTouchMove={emCuon} onWheel={emCuon} onScroll={giayCuon}>
-          <div className={`${L}-kg-tam`} style={{ position: 'relative', marginLeft: soi ? bc.tam.x : 0, width: soi ? bc.tam.w : '100%', height: soi ? bc.tam.h : '100%' }}>
+        <div ref={cuonG} className={`${L}-kg-cuon`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: caoDuoi ? `calc(100% - ${caoDuoi}px)` : '100%', overflowX: 'hidden', overflowY: tuCuon ? 'auto' : 'hidden', touchAction: xoayNay ? 'none' : 'pan-y', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
+          onPointerDown={giayXuong} onPointerMove={giayDi} onPointerUp={giayNha} onPointerCancel={giayNha} onTouchMove={emCuon} onWheel={emCuon} onScroll={giayCuon}>
+          <div className={`${L}-kg-tam`} style={{ position: 'relative', marginLeft: soi ? bc.tam.x : 0, marginTop: soi ? du : 0, width: soi ? bc.tam.w : '100%', height: soi ? bc.tam.h : '100%' }}>
             <div style={goc0 && bc ? { position: 'absolute', left: 0, top: 0, width: goc0.rong, height: goc0.cao, transformOrigin: '0 0', transform: `scale(${bc.tam.w / goc0.rong})` } : { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>{noiDung}</div>
             <canvas ref={cvChot} className={`${L}-cv`} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', display: p.netGiay ? undefined : 'none' }} />
           </div>

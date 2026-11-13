@@ -8,6 +8,7 @@ import { extname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { build } from 'esbuild'
 import { WebSocketServer } from 'ws'
+import { CAU_DAI } from './cau-dai.mjs'
 
 const GOC = resolve(import.meta.dirname, '../..')
 const LOAI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.webp': 'image/webp' }
@@ -43,6 +44,8 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
   const CAU_GV = [
     { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] },
     { qid: 'Q2', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', choices: ['NaCl', 'NaOH', 'HCl', 'NaHCO₃'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+    // 13/11 «cuộn đề»: hai câu đề dài (cau-dai.mjs) — câu công khai của lượt lấy `textEm` nếu có (giấy lệch tờ của thầy ⇒ máy em dựng giấy thường)
+    ...CAU_DAI.map((c) => ({ qid: c.qid, maDe: 'm', version: '1', group: 'g', phan: 'I', text: c.textEm ?? c.text, choices: c.choices, ideas: [], hinhAnh: [], dang: null, tenDang: 'Alcohol – Phenol', mucDo: 'van-dung', sao: 3, kienThuc: [] })),
   ]
   const PUB = join(GOC, 'public')
   const http = createServer(async (req, res) => {
