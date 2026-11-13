@@ -181,6 +181,16 @@ export default function LopNoiThay() {
     window.addEventListener('pointerdown', f, true)
     return () => window.removeEventListener('pointerdown', f, true)
   }, [chat, hinh])
+  // 13/11 PHÍM P ở cửa sổ app (tiêu điểm ngoài tờ: cột tin nhắn, tấm hoạt động) = bật / tắt chấm laze — cùng trạng thái với phím P trên tờ (thay-noi.ts giữ).
+  useEffect(() => {
+    if (!dang) return
+    const f = (e: KeyboardEvent) => {
+      if ((e.code !== 'KeyP' && e.key !== 'p' && e.key !== 'P') || e.ctrlKey || e.metaKey || e.altKey || e.repeat || (e.target as HTMLElement | null)?.closest?.('input,textarea,select,[contenteditable]')) return
+      e.preventDefault(); void import('../live/thay-noi').then((m) => m.doiLaze()).catch(() => {})
+    }
+    window.addEventListener('keydown', f, true)
+    return () => window.removeEventListener('keydown', f, true)
+  }, [dang])
   // Phím M đóng / mở cột tin nhắn (không khi thầy đang gõ chữ).
   useEffect(() => {
     if (!dang) return

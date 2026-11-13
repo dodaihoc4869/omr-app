@@ -117,6 +117,19 @@ function but(g: G, mau: MauBut, k = 1): void {
 /** Cây bút đứng một mình (dáng `but`) phóng bấy nhiêu lần so với cây bút trong bàn tay. */
 export const K_BUT_LE = 1.3
 
+/** CHẤM LAZE (thầy 13/11: «nút laze để lại nhưng cho tôi một phím tắt để bật tắt … soi được mọi chỗ trên màn chiếu, mặc định tắt»): thầy bật bằng phím P
+ *  trên tờ ⇒ con trỏ lơ lửng mang cờ `lz` ⇒ máy em vẽ chấm đỏ tại gốc (0, 0), đơn vị px CSS — quầng đỏ ba bậc bán kính `LAZE_R`, lõi đỏ đặc mép nét,
+ *  viền sáng mảnh, đốm sáng giữa. `yeu` ⇒ bỏ quầng. Thầy vừa đặt bút viết thì giữ cây bút thêm `LAZE_TRE_MS` (nhấc giữa hai nét của một chữ không chớp chấm). */
+export const LAZE_R = 13, LAZE_TRE_MS = 320
+export function veLaze(g: G, mauDo: string, mauSang: string, yeu: boolean): void {
+  const tron = (r: number): void => { g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2) }
+  g.fillStyle = mauDo
+  if (!yeu) for (const [r, a] of [[LAZE_R, 0.16], [9.8, 0.3], [7.2, 0.5]] as const) { g.globalAlpha = a; tron(r); g.fill() }
+  g.globalAlpha = 1; tron(5); g.fill()
+  g.lineWidth = 1.2; g.strokeStyle = mauSang; g.globalAlpha = 0.95; tron(5.5); g.stroke()
+  g.fillStyle = mauSang; g.globalAlpha = 1; tron(2); g.fill()
+  g.globalAlpha = 1
+}
 /** VẼ con trỏ (cây bút, hoặc bàn tay cầm bút) vào `g` (đã đặt phép biến đổi sao cho gốc = ngòi bút, 1 đơn vị = `co / 60` px). Vẽ ĐẶC (nơi gọi dán cả hình với độ rõ cần có).
  *  `bong` = có bóng đổ nhẹ. */
 export function veTay(g: G, dang: DangTay, mau: MauBut, bong: boolean): void {

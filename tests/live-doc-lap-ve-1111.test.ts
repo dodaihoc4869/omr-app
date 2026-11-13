@@ -205,3 +205,38 @@ describe('em tự vuốt bảng xem lại', () => {
     expect(Math.abs(m.v.cuon().y - taiThay)).toBeLessThan(0.2)
   })
 })
+
+// Thầy 13/11: «nút laze để lại nhưng cho tôi một phím tắt để bật tắt … soi được mọi chỗ trên màn chiếu, mặc định tắt» — chấm laze CHỈ khi con trỏ của thầy mang
+// cờ `lz` (phím P bật trên tờ); không cờ ⇒ cây bút như thường (mặc định tắt).
+describe('chấm laze khi thầy bật phím P', () => {
+  it('veLaze: quầng ba bậc + lõi đặc + đốm sáng (máy yếu bỏ quầng); bán kính quầng = LAZE_R', async () => {
+    const { veLaze, LAZE_R, LAZE_TRE_MS } = await import('../src/components/live/tro-but')
+    const g = ctxGia(), y = ctxGia()
+    veLaze(g as unknown as CanvasRenderingContext2D, 'red', 'white', false); veLaze(y as unknown as CanvasRenderingContext2D, 'red', 'white', true)
+    expect(g.lenh.filter((l) => l.loai === 'fill')).toHaveLength(5); expect(y.lenh.filter((l) => l.loai === 'fill')).toHaveLength(2)
+    expect(Math.max(...g.lenh.flatMap((l) => l.duong))).toBe(LAZE_R)
+    expect(LAZE_TRE_MS).toBeGreaterThanOrEqual(250); expect(LAZE_TRE_MS).toBeLessThanOrEqual(500) // nhấc bút giữa hai nét của một chữ không kịp đổi sang chấm
+  })
+  it('con trỏ KHÔNG mang cờ laze ⇒ luôn là cây bút (mặc định tắt); mang cờ ⇒ nhấc bút quá LAZE_TRE_MS thì chấm dán thẳng, tâm đúng chỗ ngòi; đặt bút lại ⇒ cây bút ngay', async () => {
+    const { LAZE_TRE_MS } = await import('../src/components/live/tro-but')
+    const m = dung(), x = (B0 + B2) / 2, yy = (B1 + B3) / 2
+    const anhCuoi = () => m.lenh(m.cvSong).filter((l) => l.loai === 'anh').at(-1)!
+    const n = Math.ceil((LAZE_TRE_MS + 400) / (1000 / 60))
+    m.v.datBut({ x, y: yy, cham: true, net: 'b_1' }); let t = chay(m.v, 6)
+    const viet = anhCuoi().T.slice()
+    // không cờ: lơ lửng lâu vẫn là cây bút (ảnh cây bút lệch ngòi, không phải chấm tâm đúng ngòi)
+    m.v.datBut({ x, y: yy + 0.001, cham: false }); t = chay(m.v, n, t)
+    const butThuong = anhCuoi().T.slice()
+    expect(Math.abs(butThuong[4]! - viet[4]!) + Math.abs(butThuong[5]! - viet[5]!)).toBeGreaterThan(2)
+    // có cờ laze
+    m.v.datBut({ x, y: yy, cham: true, net: 'b_2' }); t = chay(m.v, 6, t)
+    m.v.datBut({ x, y: yy, cham: false, lz: true }); t = chay(m.v, 6, t) // mới nhấc: vẫn là cây bút
+    m.v.datBut({ x, y: yy + 0.001, cham: false, lz: true }); t = chay(m.v, n, t)
+    const laze = anhCuoi().T.slice()
+    expect(laze[0]).toBe(1); expect(laze[1]).toBe(0); expect(laze[2]).toBeCloseTo(0, 10); expect(laze[3]).toBe(1) // không ngả
+    expect(Math.abs(laze[4]! - viet[4]!)).toBeLessThanOrEqual(2); expect(Math.abs(laze[5]! - viet[5]!)).toBeLessThanOrEqual(2)
+    const soAnh = m.lenh(m.cvSong).filter((l) => l.loai === 'anh').length
+    m.v.datBut({ x: x + 0.01, y: yy, cham: true, net: 'b_3' }); chay(m.v, 2, t)
+    expect(m.lenh(m.cvSong).filter((l) => l.loai === 'anh').length).toBeGreaterThan(soAnh)
+  })
+})

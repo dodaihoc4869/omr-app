@@ -24,7 +24,7 @@
 //     to) ⇒ máy em tự trôi theo bút TRONG tầm nhìn của thầy. Em tự vuốt bảng xem lại: `vuotBang`. `dl` vắng ⇒ y như trước (một phép co).
 import type { KhungBut, LoiBut, NetBut, SuKienBut, XuLyBut } from '../../lib/but-bang-loi'
 import { giaiTrang, VUNG_MAC_DINH, type O4 } from './bo-cuc'
-import { O_TAY, coTay, taoTroBut, tiLeTay, veTay, type DangTay, type MauBut } from './tro-but'
+import { LAZE_R, LAZE_TRE_MS, O_TAY, coTay, taoTroBut, tiLeTay, veLaze, veTay, type DangTay, type MauBut } from './tro-but'
 
 type G2 = CanvasRenderingContext2D
 /** Trần diện tích của lớp chốt (điểm ảnh thật). */
@@ -100,7 +100,9 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   // ── BÀN TAY CẦM BÚT CỦA THẦY: hình dựng sẵn trong canvas rời, mỗi khung dán vào lớp «đang viết» ──
   const yeu = typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
   const but = taoTroBut({ yeu })
-  let butDich: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean } | null = null
+  let butDich: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean; lz?: boolean } | null = null
+  // CHẤM LAZE (13/11, phím P trên tờ): con trỏ lơ lửng mang cờ `lz` ⇒ chấm đỏ đúng chỗ ngòi thay cây bút; vừa viết xong thì giữ cây bút LAZE_TRE_MS
+  let cvLaze: HTMLCanvasElement | null = null, gLaze: G2 | null = null, hinhLaze = '', mauLaze = 'red', lucChamBut = -1e12, laze = false
   const mauBut: MauBut = { than: 'white', dai: 'orange', bong: 'black', muc: '' }
   let cvTay: HTMLCanvasElement | null = null, gTay: G2 | null = null
   /** Dáng tay · cỡ tay (px CSS) · khoá hình đã dựng · chỗ ngòi trong hình dựng sẵn (px thiết bị) · khoá của khung vừa vẽ khi lớp sống CHỈ có bàn tay. */
@@ -133,6 +135,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     gB = nguCanh(cvB)
     cvTay = doc.createElement('canvas')
     gTay = nguCanh(cvTay)
+    cvLaze = doc.createElement('canvas'); gLaze = nguCanh(cvLaze)
   }
   /** Nét thuộc BẢNG: mã «b_…»; bố cục độc lập còn tính cả nét mã thường BẮT ĐẦU trong ô bảng đen (bản ghi / máy thầy trước khi có mã «b_»: nét ấy vốn nằm
    *  trên cột bảng, toạ độ theo cửa sổ thầy = toạ độ bảng lúc chưa cuộn) — hai khung co riêng nên nét phải theo phép của khung nó nằm trên. */
@@ -266,6 +269,16 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     datGoc(true)
     trong!.style.transform = `translate3d(0,${-cuonPx()}px,0)`
   }
+  /** Dựng chấm laze vào canvas rời — chỉ khi màu / mật độ đổi. Tâm chấm = tâm canvas. */
+  function dungHinhLaze(): void {
+    const d = kv!.dpr, khoa = `${mauLaze}|${mauBut.than}|${d}|${yeu}`
+    if (khoa === hinhLaze || !cvLaze || !gLaze) return
+    hinhLaze = khoa
+    const canh = Math.ceil((LAZE_R + 1) * 2 * d)
+    cvLaze.width = canh; cvLaze.height = canh
+    gLaze.setTransform(d, 0, 0, d, canh / 2, canh / 2)
+    veLaze(gLaze, mauLaze, mauBut.than, yeu)
+  }
   /** Bút của thầy đang ở y (theo bảng): sát mép tầm nhìn ⇒ trôi vừa đủ giữ bút trong khung (dưới 85 % · trên 8 %). `ngay` = tới luôn. */
   function theo(y: number, ngay = false): void {
     if (!kv || !gB) return
@@ -325,7 +338,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     // kiểu cả cây ngay giữa lúc khung đang đổi chỗ)
     if (!dl || !daDocMau) try {
       const cs = getComputedStyle(cvSong), lay = (ten: string, thay: string): string => cs.getPropertyValue(ten).trim() || thay
-      mauBut.than = lay('--tr-chieu-giay', 'white'); mauBut.bong = lay('--tr-chieu-bang', 'black'); mauBut.dai = lay('--p-cam', 'orange')
+      mauBut.than = lay('--tr-chieu-giay', 'white'); mauBut.bong = lay('--tr-chieu-bang', 'black'); mauBut.dai = lay('--p-cam', 'orange'); mauLaze = lay('--p-do', 'red')
       daDocMau = true
     } catch { /* không có kiểu (test) ⇒ màu dự phòng */ }
     datBang()
@@ -459,7 +472,17 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       if (butDich) { const q = toiPx(butDich.x, butDich.y, butDich.net); if (butDich.mau) mauBut.muc = butDich.mau; hb = but.buoc({ x: q[0], y: q[1], cham: butDich.cham, sat: butDich.sat }, nay) }
       else but.buoc(null, nay)
     }
-    if (hb) {
+    if (butDich?.cham) lucChamBut = nay
+    laze = !!hb && !!butDich && !!butDich.lz && !butDich.cham && nay - lucChamBut > LAZE_TRE_MS
+    if (hb && laze) {
+      dungHinhLaze()
+      px = Math.round(hb.x * dd); py = Math.round(hb.y * dd)
+      if (butDich?.sat && !yeu) { px = Math.round(hb.x * dd * 8) / 8; py = Math.round(hb.y * dd * 8) / 8 }
+      khoa = `L|${px}|${py}|${hb.mo}|${hinhLaze}`
+      if (!ve.length && khoa === tayVe) return 0
+      const r = LAZE_R + 4
+      if (hb.x - r < h[0]) h[0] = hb.x - r; if (hb.y - r < h[1]) h[1] = hb.y - r; if (hb.x + r > h[2]) h[2] = hb.x + r; if (hb.y + r > h[3]) h[3] = hb.y + r
+    } else if (hb) {
       dungHinhTay()
       // ngòi làm tròn theo điểm ảnh thiết bị (hình dán không bị nhoè); lơ lửng thì nhấc chếch phải-trên một chút
       px = (hb.x + 0.07 * coT * hb.nang) * dd; py = (hb.y - 0.15 * coT * hb.nang) * dd
@@ -488,7 +511,13 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       to(gS, p, mau, false, gocX(bang) + sx, gocY(bang) + sy, bang ? KHB.k : KH.k)
       if (dl) gS.restore()
     }
-    if (hb) {
+    if (hb && laze) {
+      // chấm laze: không ngả, tâm đúng chỗ ngòi
+      gS.setTransform(1, 0, 0, 1, px - Math.round(sx * dd), py - Math.round(sy * dd))
+      gS.globalAlpha = Math.min(1, hb.mo * 8) // chấm chỉ bài LUÔN sáng hết cỡ, kể cả khi thầy giữ yên để giảng (cây bút lơ lửng thì mờ dần); chỉ mờ ở nhịp bút ẩn hẳn
+      gS.drawImage(cvLaze!, -cvLaze!.width / 2, -cvLaze!.height / 2)
+      gS.globalAlpha = 1
+    } else if (hb) {
       // dán hình bàn tay: gốc = ngòi bút, ngả quanh đúng ngòi, độ rõ đều cả hình
       const c = Math.cos(hb.goc), s2 = Math.sin(hb.goc)
       gS.setTransform(c, s2, -s2, c, px - Math.round(sx * dd), py - Math.round(sy * dd))
@@ -511,7 +540,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   function theoBut(x: number, y: number, net?: string): void { if (theoBang(x, net)) theo(y) }
   /** Chỗ cây bút của thầy ở khung này (`KhungLiveEm.but` của thư viện live; toạ độ 0..1) — gọi TRƯỚC `veSong`. null = ẩn bút.
    *  `cuonCuaThay` = `KhungLiveEm.cuon`: độ cuộn bảng đen của thầy (null = chưa biết ⇒ tự trôi theo bút; bỏ trống = giữ như cũ). */
-  function datBut(b: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean } | null, cuonCuaThay?: number | null): void { butDich = b; if (cuonCuaThay !== undefined) cuonThay = cuonCuaThay }
+  function datBut(b: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean; lz?: boolean } | null, cuonCuaThay?: number | null): void { butDich = b; if (cuonCuaThay !== undefined) cuonThay = cuonCuaThay }
   /** Độ cuộn của khung GIẤY (px CSS; bố cục độc lập) — đuôi nét và cây bút trên giấy dời theo. */
   function datCuonGiay(px: number): void { if (dl && px !== cuonG) { cuonG = px; tayVe = '' } }
   /** Em tự vuốt bảng đen xem lại: dời tầm nhìn `dy` px (dương = xem phần dưới). `null` = thôi, về chỗ thầy đang viết. Đang tự vuốt ⇒ bảng không tự trôi theo bút. */

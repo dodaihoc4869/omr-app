@@ -391,7 +391,10 @@ ${JS_LOI_BUT}
     function buoc(ts) { var k; ts = ts || gio(); if (!t0) t0 = ts; k = Math.min(1, (ts - t0) / 280); aCuon = 0; datCuon(tu + (dich - tu) * (1 - Math.pow(1 - k, 3))); if (k < 1 && !N) aCuon = khungSau(buoc); }
     aCuon = khungSau(buoc);
   }
-  function baoTro() { so.tro(tx0 / KH.W, (ty0 + (B && tx0 >= B[0] * KH.W && tx0 <= B[2] * KH.W ? CY / dpr : 0)) / KH.H); }
+  function baoTro() { so.tro(tx0 / KH.W, (ty0 + (B && tx0 >= B[0] * KH.W && tx0 <= B[2] * KH.W ? CY / dpr : 0)) / KH.H, S.lz ? 1 : 0); if (S.lz) nhipLz(); }
+` + /* laze đứng yên: nhắc vị trí 0,7 s/lần (máy em ẩn con trỏ sau 1,5 s) */ `
+  var hLz = 0, ngoaiLz = 0;
+  function nhipLz() { clearTimeout(hLz); hLz = setTimeout(function () { hLz = 0; if (S.lz && KH && !N && !ngoaiLz) baoTro(); }, 700); }
 ` + /* Vạch cuộn: dài bằng phần bảng đang thấy so với cả phần đã viết. */ `
   function veRay() {
     var co = !!B && S.but, dai;
@@ -491,6 +494,13 @@ ${JS_LOI_BUT}
     if (co) { if (!n.xem.length || n.xem[n.xem.length - 1][2] - n.tgVe >= 6) veSong(n); else n.can = true; if (DO) { t0 = gio() - t0; DO.tCho += t0; } hen(); }
   }
   cv.addEventListener('pointermove', vao);
+` + /* 13/11 laze (phím P, live-laze-to-chieu.ts): báo vị trí ở MỌI chỗ, cả khi bút tắt */ `
+  document.addEventListener('pointermove', function (e) {
+    ngoaiLz = 0;
+    if (!S.lz || N || XT || !KH || e.pointerType === 'touch' || (S.but && e.target === cv) || e.timeStamp - luotTro <= 15) return;
+    luotTro = e.timeStamp; tx0 = e.clientX; ty0 = e.clientY; baoTro();
+  }, true);
+  document.documentElement.addEventListener('mouseleave', function () { ngoaiLz = 1; });
 ` + /* nút thân bút Wacom = chuột phải: đang cầm bút thì không bật trình đơn của trình duyệt giữa chừng */ `
   cv.addEventListener('contextmenu', function (e) { if (S.but) e.preventDefault(); });
 ` + /* Hết chạm theo mọi đường: nhấc bút · máy huỷ · mất quyền giữ con trỏ · con trỏ rời bảng (khi không giữ được con trỏ). */ `

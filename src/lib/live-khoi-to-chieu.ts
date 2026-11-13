@@ -3,6 +3,7 @@
 // Tin ra: { nguon:'to-chieu', loai:'live', viec:'len', sbd? } · { …, viec:'cham', dat }   ·   tin vào: { nguon:'bpu-bang', lenh:'live-bao', chu } (live-to-chieu.ts).
 import { JS_LIVE_NOP } from './live-nop-to-chieu'
 import { CSS_LIVE_MT, JS_LIVE_MT } from './live-mt-to-chieu'
+import { CSS_LIVE_LAZE, JS_LIVE_LAZE } from './live-laze-to-chieu'
 
 export const CSS_LIVE_KHOI = `
 /* CHẤM LAZE của thầy (13/11: thầy «để lại, phím tắt bật tắt, mặc định tắt» — JS bật / tắt làm ở đợt sau; chưa có JS thì chấm không bao giờ dựng): lõi đỏ nét, viền sáng mảnh, quầng đỏ. Lúc chấm hiện thì ẩn con trỏ hệ thống trên lớp bút; đang viết (.mc-viet) ⇒ con trỏ viết cũ. */
@@ -25,7 +26,7 @@ body.mc-lk .mc-em:not([hidden]) .mc-phu,body.mc-lk .mc-em:not([hidden]) .mc-xem-
 .mc-lv-dau small{display:block;margin-top:.25em;font-size:.2em;font-weight:800;letter-spacing:.12em}
 @keyframes mc-lv-dau{0%{opacity:0;transform:translate(-50%,-58%) rotate(-16deg) scale(3)}7%{opacity:1;transform:translate(-50%,-50%) rotate(-10deg) scale(.9)}10%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.06)}13%{transform:translate(-50%,-50%) rotate(-11deg) scale(.98)}16%,86%{opacity:1;transform:translate(-50%,-50%) rotate(-10deg) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) rotate(-10deg) scale(1.03)}}
 @media (prefers-reduced-motion:reduce){.mc-lv-dau{animation:none}}
-${CSS_LIVE_MT}`
+${CSS_LIVE_MT}${CSS_LIVE_LAZE}`
 
 export const JS_LIVE_KHOI_TO_CHIEU = `
   // CỠ CHỮ ĐỀ CỦA BUỔI LIVE (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá»): máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét
@@ -100,4 +101,4 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   function lvCuonLien() { if (typeof S !== 'undefined' && !S.bpuCuon && body.classList.contains('mc-lk')) { S.bpuCuon = true; document.dispatchEvent(new Event('mc-bo-cuc-xong')); } }
   new MutationObserver(lvCuonLien).observe(body, { attributes: true, attributeFilter: ['class'] });
   lvCuonLien();
-${JS_LIVE_NOP}${JS_LIVE_MT}`
+${JS_LIVE_NOP}${JS_LIVE_MT}${JS_LIVE_LAZE}`
