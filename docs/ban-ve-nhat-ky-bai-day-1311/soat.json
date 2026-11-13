@@ -11,7 +11,7 @@
  "anh": [
   {
    "anh": "01-nhat-ky-may-tinh-1366-sang.jpg",
-   "kb": 144,
+   "kb": 146,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -29,7 +29,7 @@
   },
   {
    "anh": "03-nhat-ky-ngang-844-sang.jpg",
-   "kb": 141,
+   "kb": 140,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -38,7 +38,7 @@
   },
   {
    "anh": "04-nhat-ky-ngang-844-toi-cong-thuc-electron.jpg",
-   "kb": 82,
+   "kb": 83,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -47,7 +47,7 @@
   },
   {
    "anh": "05-nhat-ky-doc-390-sang.jpg",
-   "kb": 138,
+   "kb": 142,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -56,7 +56,7 @@
   },
   {
    "anh": "06-nhat-ky-doc-390-toi-doan-nhanh-da-cham.jpg",
-   "kb": 132,
+   "kb": 128,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -83,7 +83,7 @@
   },
   {
    "anh": "09-khung-giua-thang-kim-nay-844-sang.jpg",
-   "kb": 83,
+   "kb": 87,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -128,7 +128,7 @@
   },
   {
    "anh": "15-xem-nhu-thay-giang-doc-390-toi.jpg",
-   "kb": 114,
+   "kb": 112,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -137,7 +137,7 @@
   },
   {
    "anh": "14-bang-thay-phong-to-390-sang.jpg",
-   "kb": 123,
+   "kb": 121,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -148,13 +148,13 @@
  "video": [
   {
    "video": "video-nhat-ky-may-tinh-1366.mp4",
-   "giay": 38,
-   "mb": 1.75
+   "giay": 39,
+   "mb": 1.66
   },
   {
    "video": "video-nhat-ky-dien-thoai-390.mp4",
    "giay": 36,
-   "mb": 0.59
+   "mb": 0.62
   }
  ]
 }

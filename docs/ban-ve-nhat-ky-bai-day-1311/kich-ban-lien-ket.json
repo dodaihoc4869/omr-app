@@ -1,7 +1,7 @@
 {
  "phienBan": 2,
  "ghiChu": "DỮ LIỆU MẪU của bản vẽ. Chữ trên bảng (nguon.chep) chép đúng bảng Thầy viết 12/11. Lời Thầy (loi) và giờ tiếng (tu, den: giây trên trục tiếng của buổi) là MẪU, viết theo giọng Thầy suy từ nội dung bảng; bản thật do Gemini nghe tieng.mp3 và chép lại. Phần GEMINI sinh: bia, canh[].khuon / tieuDe / nguon.trang, cot, tu, den, chep / loi / khop / duLieu. Phần MÁY điền: buoi, nguon (đầu tệp), canh[].nguon.vung (từ nét trong đoạn tu đến den), tong-ket y[].giay. Cảnh x1 là cảnh KHÔNG có nguồn, để thử cổng tự kiểm (máy bỏ).",
- "buoi": { "ten": "Liên kết cộng hoá trị phân cực và không phân cực", "tenBang": "K10 · Liên kết CHT phân cực, không phân cực", "lop": "Live Khối 10", "ngay": "2026-11-12", "thu": "Thứ Năm", "gioBatDau": "20:18", "phutLive": 39, "tepTieng": "", "tiengMau": true },
+ "buoi": { "ten": "Liên kết cộng hoá trị phân cực và không phân cực", "tenBang": "K10 · Liên kết CHT phân cực, không phân cực", "lop": "Live Khối 10", "ngay": "2026-11-12", "thu": "Thứ Năm", "gioBatDau": "20:18", "phutLive": 39, "tepTieng": "tieng-mau.mp3", "lechTieng": 187, "tiengMau": true },
  "nguon": { "soTrangBang": 1, "moHinh": "gemini-3.1-flash-lite", "luc": "2026-11-12T20:59:10+07:00", "token": { "tieng": 57000, "anh": 1100, "chu": 8000, "ra": 14000 }, "uocUsd": 0.052 },
  "bia": {
   "loi": "Thầy giảng lại cả bài bằng hoạt hoạ, đúng giọng Thầy trong buổi live. Em bấm «Xem như Thầy giảng» hoặc tự đọc từng cảnh.",

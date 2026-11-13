@@ -27,7 +27,7 @@ for (const t of readdirSync(DAY).filter((x) => /^kich-ban-.+\.json$/.test(x)).so
 writeFileSync(join(DAY, 'kich-ban-nhung.js'), `// TỰ SINH bởi chup.mjs từ kich-ban-*.json. KHÔNG sửa tay. Chỉ dùng khi mở thẳng tệp HTML từ ổ đĩa (file://), nơi trình duyệt chặn đọc JSON.\nwindow.KB_NHUNG = ${JSON.stringify(nhung)}\n`)
 
 // ── 2. máy chủ tĩnh nhỏ ở gốc repo ──
-const KIEU = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png' }
+const KIEU = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp3': 'audio/mpeg' }
 const may = http.createServer((yc, tl) => {
   const u = decodeURIComponent(yc.url.split('?')[0]), f = join(GOC, u)
   if (!f.startsWith(GOC) || !existsSync(f) || !statSync(f).isFile()) { tl.writeHead(404); return tl.end() }

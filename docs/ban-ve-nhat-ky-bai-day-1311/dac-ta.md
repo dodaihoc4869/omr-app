@@ -14,14 +14,14 @@ Lời Thầy 13/11: «Html tôi muốn bạn thiết kế lại thông minh hi�
 ## Xem bản vẽ
 
 - **Hai video** (chế độ «Xem như Thầy giảng» chạy liền, đồng hồ giả chạy nhanh ×2,6 và ×2,4 cho vừa 40 giây):
-  - `video-nhat-ky-may-tinh-1366.mp4` (38 giây, 1,8 MB, nền sáng): bìa, em bấm «Xem như Thầy giảng», cảnh 1 kéo co, cảnh 2 quy tắc, cảnh 3 công thức electron O₂, cảnh 4 đoán nhanh H₂ (chạm đáp án, nghe lời Thầy). Nét phấn của Thầy tự viết ra ở khung bên phải, câu Thầy đang nói sáng lên.
+  - `video-nhat-ky-may-tinh-1366.mp4` (39,6 giây, 1,7 MB, nền sáng): bìa, em bấm «Xem như Thầy giảng», cảnh 1 kéo co, cảnh 2 quy tắc, cảnh 3 công thức electron O₂, cảnh 4 đoán nhanh H₂ (chạm đáp án, nghe lời Thầy). Nét phấn của Thầy tự viết ra ở khung bên phải, câu Thầy đang nói sáng lên.
   - `video-nhat-ky-dien-thoai-390.mp4` (36 giây, 0,6 MB, nền tối): vào thẳng chế độ giảng từ cảnh 5: lệch sức rồi thành ion, quy tắc «Δχ > 1,7», ví dụ CH₄; phụ đề lời Thầy chạy trên thanh giảng.
 - **Mở chạy thật**: `nhat-ky.html` (bài 12/11), `nhat-ky.html?kb=fes2` (bài tính FeS₂), `cho-gan.html` (màn Xem lại Live có thẻ). Mở thẳng từ ổ đĩa vẫn chạy (`kich-ban-nhung.js` tự sinh từ JSON).
 - **Chụp, quay, tự soát**: `node docs/ban-ve-nhat-ky-bai-day-1311/chup.mjs --video` (kết quả ở `soat.json`). **Kiểm kịch bản và cổng**: `node docs/ban-ve-nhat-ky-bai-day-1311/kiem-kich-ban.mjs`. **Dựng lại nét phấn mẫu**: `dung-net-mau.mjs`.
 
 | Ảnh | Nội dung |
 |---|---|
-| 01 | Máy tính 1366, sáng: bìa (kéo co ba pha chạy lặp), hai nút «Xem như Thầy giảng» và «Tự đọc từng cảnh», mục lục cảnh |
+| 01 | Máy tính 1366, sáng: bìa (kéo co ba pha chạy lặp), hai nút «Xem như Thầy giảng» và «Tự đọc, tự cuộn», mục lục cảnh |
 | 02 | Máy tính 1366, tối: Ví dụ 1 CH₄ (sơ đồ cột dọc, phép tính), bảng của Thầy, lời Thầy |
 | 03 | Điện thoại ngang 844, sáng: bìa hai cột |
 | 04 | Điện thoại ngang 844, tối: công thức electron O₂ cạnh nét phấn «O₂ ⇒ O ⁘ O ⇒ LK CHT kpc» của Thầy |
@@ -36,7 +36,7 @@ Lời Thầy 13/11: «Html tôi muốn bạn thiết kế lại thông minh hi�
 | 14 | Điện thoại 390, sáng: em phóng to bảng của Thầy 2,3 lần (nút − / + / vừa khung, chụm hai ngón) |
 | 15 | «Xem như Thầy giảng» trên điện thoại 390, tối: phụ đề câu Thầy đang nói nằm trên thanh giảng |
 
-**Dữ liệu mẫu**: chữ trên bảng (`nguon.chep`) chép đúng bảng Thầy viết 12/11. Lời Thầy, giờ tiếng và nét phấn là MẪU (lời viết theo giọng Thầy suy từ nội dung bảng; nét phấn dựng bằng phông một nét). Bản vẽ không kèm tệp tiếng: một tệp im lặng 38 phút nặng hơn 1 MB mà không cho thấy gì thêm, máy cũng không có bộ đọc tiếng Việt. Thay vào đó là **đồng hồ giả** chạy đúng thời lượng từng đoạn tiếng, cùng giao diện với đồng hồ tiếng thật (`DongHo` trong `khuon.js`; có `tepTieng` thì phát `<audio>` thật). Ô viền đứt màu tím chỉ có trong bản vẽ.
+**Dữ liệu mẫu**: chữ trên bảng (`nguon.chep`) chép đúng bảng Thầy viết 12/11. Lời Thầy, giờ tiếng và nét phấn là MẪU (lời viết theo giọng Thầy suy từ nội dung bảng; nét phấn dựng bằng phông một nét, chỗ hai bạn Thầy ví không viết tên). **Tệp tiếng mẫu** `tieng-mau.mp3`: 30 giây im lặng (30 KB, máy không có bộ đọc tiếng Việt), đặt ở giây 187 của trục buổi nên phủ đúng cảnh 1; `DongHo` trong `khuon.js` phát `<audio>` thật ở cảnh 1 (đã chạy thử: đồng hồ đọc giờ từ `<audio>`, tua trước khi tệp tải xong, máy chặn tự phát tiếng thì chuyển sang đồng hồ giả). Các cảnh khác nằm ngoài tệp mẫu nên chạy **đồng hồ giả** đúng thời lượng đoạn tiếng, cùng giao diện. Ô viền đứt màu tím chỉ có trong bản vẽ.
 
 ## Quy trình sau mỗi buổi live (máy tự làm hết)
 
@@ -44,7 +44,7 @@ Lời Thầy 13/11: «Html tôi muốn bạn thiết kế lại thông minh hi�
 |---|---|---|
 | 1 | Có sẵn | Thầy kết thúc live, máy chủ chốt buổi (`chotThat`, `server/src/live-xem-lai.ts`): `net.bin` (mọi nét, có giờ), `tieng.mp3`. |
 | 2 | Máy thầy | Dựng **ảnh từng trang bảng** từ nét (canvas, cùng bộ vẽ nét của trình phát; chia trang: bảng mới, xoá hết, nghỉ viết từ 45 giây), PNG 1600 × 900 có vạch 2/3. Tải lên R2. Worker không có canvas nên làm ở máy thầy. |
-| 3 | Máy chủ gọi Gemini | Gửi **tệp tiếng** (Files API của Gemini) + **ảnh các trang** + tên buổi, lớp, câu đã chữa + lời nhắc hệ thống + lược đồ `luoc-do.json` (`responseMimeType: application/json`, `responseJsonSchema`). Khoá `env.GEMINI_API_KEY` đã có (`server/src/hoi-tro-ly.ts`, `tram-gemini.ts`). |
+| 3 | Máy chủ gọi Gemini | Gửi **`tieng.mp3`** của buổi (Files API của Gemini) + **ảnh các trang** + tên buổi, lớp, câu đã chữa + lời nhắc hệ thống + lược đồ `luoc-do.json` (`responseMimeType: application/json` + `responseJsonSchema`; repo hiện gọi `responseSchema` dạng OpenAPI ở `server/src/hoi-tro-ly.ts`, nếu giữ cách đó thì đổi lược đồ sang dạng OpenAPI: bỏ `$ref`, `const`). Khoá `env.GEMINI_API_KEY` đã có (`hoi-tro-ly.ts`, `tram-gemini.ts`). |
 | 4 | Máy chủ | Điền phần của máy: `nguon.vung` (hộp bao các nét trong đoạn `tu` tới `den` của trang đó), phút nghe ở tổng kết. Chạy **cổng tự kiểm**. |
 | 5 | Máy chủ | Cổng đạt: ghi `nhat-ky.json` (chỉ cảnh đạt, chữ đã chuẩn hoá) cạnh tệp của buổi, thêm `nhatKy` vào `buoi.json`. Cổng không đạt: gọi lại **một lần** bằng mô hình mạnh hơn; vẫn không đạt thì không phát hành. |
 | 6 | Học sinh | Thẻ «Nhật ký bài dạy» hiện ở màn Xem lại Live của đúng lớp đó. |
@@ -62,14 +62,14 @@ Thường xong trong vài phút sau buổi live. Thầy không phải làm gì.
 **Trang bài học** (`nhat-ky.html`):
 
 1. Thanh trên dính: lùi, «Nhật ký bài dạy», tên buổi, «Cảnh 3/12» + vạch tiến độ.
-2. Bìa: tên bài, ngày, lớp, nút chính **«Xem như Thầy giảng»**, nút phụ «Tự đọc từng cảnh», dòng «12 cảnh · giọng Thầy · khoảng 4 phút»; bảng kéo co chạy lặp.
+2. Bìa: tên bài, ngày, lớp, nút chính **«Xem như Thầy giảng»**, nút phụ «Tự đọc, tự cuộn», dòng «12 cảnh · giọng Thầy · khoảng 4 phút»; bảng kéo co chạy lặp.
 3. Mỗi cảnh: số, nhãn khuôn, tên; **bảng hoạt hoạ** (trái / trên); **Bảng của Thầy** (nét phấn thật của trang đó, nút − / mức phóng / + / vừa khung ở đầu thẻ, không che nét); **Thầy giảng** (phụ đề từng câu, câu đang nói sáng lên), nút «Nghe Thầy giảng cảnh này», «Xem lại cảnh này», dòng nguồn.
 4. Tổng kết: ý chốt, mỗi ý nút «Nghe Thầy giảng đoạn này · mm:ss»; bên cạnh là **bảng cuối buổi** của Thầy (phóng to được).
 
 Hai chế độ:
 
 - **Xem như Thầy giảng**: tự chạy liền các cảnh theo giọng Thầy như một video. Trang tự cuộn tới cảnh đang giảng, bảng sáng viền, chuyển cảnh mượt (bảng sáng dần lên). Thanh giảng dính đáy: cảnh trước, tạm dừng / giảng tiếp, cảnh sau, «Thầy giảng · 3/12», tên cảnh, vạch tiến độ, «Thoát». Điện thoại: **phụ đề câu Thầy đang nói nằm ngay trên thanh giảng** (thẻ lời nằm dưới màn). Tới câu đoán nhanh thì dừng chờ em chạm; chạm xong mở đáp án rồi phát lời Thầy giảng câu đó.
-- **Tự đọc**: em tự cuộn; mỗi cảnh chạy hoạt hoạ khi cuộn tới, lời Thầy hiện đủ để đọc, bảng của Thầy hiện trọn đoạn. Muốn nghe cảnh nào thì bấm «Nghe Thầy giảng cảnh này».
+- **Tự đọc, tự cuộn**: không tiếng; trang tự chạy hoạt hoạ từng cảnh, cuộn tới lời Thầy, dừng đủ lâu để đọc (2,5 giây + 0,3 giây mỗi chữ) rồi cuộn sang cảnh kế; thanh dưới ghi «Tự đọc · 3/12». Em chạm hay cuộn tay là thôi tự cuộn, trang thành đọc tay như thường: mỗi cảnh chạy hoạt hoạ khi cuộn tới, lời Thầy hiện đủ, bảng của Thầy hiện trọn đoạn, muốn nghe cảnh nào thì bấm «Nghe Thầy giảng cảnh này».
 
 Theo khổ: điện thoại dọc một cột (bảng hoạt hoạ, bảng của Thầy, lời Thầy); bảng kéo co tự chuyển bố cục gọn để chữ trên bảng không dưới 15 px. Điện thoại ngang và máy tính: hai cột (hoạt hoạ 58 %, bảng + lời 42 %); máy tính có mục lục cảnh dính bên trái.
 
@@ -102,7 +102,7 @@ Theo khổ: điện thoại dọc một cột (bảng hoạt hoạ, bảng của
 |---|---|---|
 | `khuon`, `tieuDe`, `duLieu` | Gemini | Một trong 7 khuôn và dữ liệu của nó |
 | `nguon.trang`, `nguon.cot`, `nguon.chep` | Gemini | Trang bảng, cột, chép nguyên văn chữ trên bảng (không hiện cho học sinh, máy dùng để kiểm nguồn) |
-| `nguon.tu`, `nguon.den` | Gemini | Giây trên trục tiếng của buổi: đoạn Thầy giảng phần này |
+| `nguon.tu`, `nguon.den` | Gemini | Giây trên **trục tiếng của `tieng.mp3`** (0 = đầu tệp; các lần tắt / bật live nối liền; khoảng câu chưa mở đáp án đã cắt). Nét trong `net.bin` dùng CÙNG trục này (`src/lib/live/xem-lai-kieu.ts`), nên giờ Gemini nghe được, giờ nét phấn và giờ phát tiếng khớp nhau, không cần quy đổi |
 | `loi[] {chu, tu, den}` | Gemini | Từng câu Thầy nói, chép lại đúng cách nói của Thầy (bỏ nói lắp, ậm ừ, không thêm ý, không quá 30 chữ), có giờ |
 | `khop[]` | Gemini | Bước k của khuôn bắt đầu đúng lúc Thầy nói câu `khop[k]` |
 | `nguon.vung` | Máy | Hộp bao các nét trong đoạn `tu` tới `den` của trang đó (khung bảng của Thầy) |
@@ -138,6 +138,8 @@ Chạy trong `khuon.js` (`kiemCong`, `quaCong`). Bản vẽ: bài 12/11 **12/13 
 | (c) Nguồn | `trang` ≥ 1 và có đoạn tiếng (`den` > `tu`); mọi câu lời Thầy nằm trong đoạn (lệch tối đa 1 giây); **mọi số và công thức trên cảnh có trong chữ bảng hoặc lời Thầy** của buổi (trừ phương án sai của câu đoán và mốc ngưỡng) | Bỏ cảnh |
 | Chữ | Câu quá 30 chữ, emoji, chữ tiền / nhà / giàu / thuế, lộ mã khuôn | Bỏ cảnh |
 | Chữ | Viết tắt của bảng (VD, LK, CHT, KPC, PC, ntố, ko, QT) và dấu «—» | Tự sửa (Ví dụ, liên kết, cộng hoá trị…) |
+| Tên người | Mọi chữ học sinh thấy (kể cả lời Thầy) so với **danh sách lớp** máy chủ có sẵn; trùng tên thì thay bằng «một bạn» (đã tự thử: «Bạn Minh Anh với bạn Long kéo co» ⇒ «Một bạn với một bạn kéo co»). Khung bảng của Thầy hiện nét phấn y như bảng (như màn Xem lại đang hiện) | Tự che |
+| Bản phát hành | Không mang chữ chép bảng (`chep`), không mang cảnh bị bỏ | Tự bỏ |
 | Ngưỡng Δχ | **Bảng hoặc lời Thầy có ghi thì dùng đúng như Thầy**, không thì SGK Hoá 10 (2018). Buổi 12/11: không phân cực khi Δχ < 0,4 (SGK, bảng không ghi); liên kết ion khi **Δχ > 1,7 (theo bảng Thầy)** | Không áp dụng |
 | (d) Phát hành | Ít nhất **4 cảnh** đạt và ít nhất **60 %** số cảnh | Gọi lại Gemini một lần (mô hình mạnh hơn); vẫn không đạt thì không phát hành, chỉ hiện bảng gốc như cũ |
 
@@ -175,6 +177,8 @@ Chạy trong `khuon.js` (`kiemCong`, `quaCong`). Bản vẽ: bài 12/11 **12/13 
 
 **Máy chủ**: mỗi buổi 1 lượt tải tệp tiếng lên Gemini + 1 lượt gọi (hiếm khi 2), ghi R2 2 đến 8 tệp, không thêm vòng chờ nối tiếp vào lệnh nóng nào.
 
+**Tệp tiếng**: phát `tieng.mp3` sẵn có của buổi theo Range đúng đoạn `tu` tới `den`; máy chặn tự phát tiếng thì hoạt hoạ và phụ đề vẫn chạy theo đồng hồ, lần chạm đầu bật tiếng.
+
 **Tốc độ tải**: trang bài học là mảnh nạp lười, chỉ tải khi em bấm «Mở nhật ký»: thư viện khuôn khoảng 20 KB nén gzip (bản vẽ: `khuon.js` + `khuon.css`, chưa rút gọn), kịch bản 10 đến 20 KB, nét phấn dùng chung `net.bin` trình phát đã tải. Tiếng phát theo Range đúng đoạn, không tải cả tệp. Thẻ ở Xem lại: số cảnh nằm sẵn trong `buoi.json`. Lượt mở ba app không thêm byte nào (`npm run kiem:toc-do` 0 đỏ). Hoạt hoạ chỉ đổi transform / opacity (khung phấn vẽ bằng stroke-dashoffset, ít phần tử); nét phấn vẽ trên một canvas mỗi cảnh, chỉ cảnh đang xem chạy.
 
 **Ai xem được**: chỉ lớp của buổi (cùng vé `/live-tep` của Xem lại Live) và Thầy. Bản phát hành không mang chữ chép bảng (`chep`) và không mang cảnh bị bỏ.
@@ -190,9 +194,11 @@ Chạy trong `khuon.js` (`kiemCong`, `quaCong`). Bản vẽ: bài 12/11 **12/13 
 
 ## 8. Điều chưa chắc
 
-1. **Độ đúng của Gemini Flash-Lite** khi nghe tiếng Việt có thuật ngữ Hoá và đọc chữ viết tay: chưa đo. Cổng chặn được số sai và điều không nguồn, nhưng không chặn được câu chép lời sai chữ thường. Chạy thử trên 3 buổi đã có (không phát hành) rồi mới bật.
-2. **Giờ câu nói** (`tu`, `den`) Gemini trả có thể lệch vài giây; nếu lệch nhiều, máy chủ khớp lại bằng giờ nét phấn (Thầy thường viết khi nói).
-3. **Giá Gemini** tra qua kết quả tìm kiếm (trang giá không mở thẳng được trong phiên này); số token ảnh chưa đo.
-4. **Luật đáp án CLAUDE.md**: ngoại lệ 31/10 nói về câu luyện tập có tem niêm phong; câu Đoán nhanh trong nhật ký cần ghi thêm vào ngoại lệ đó khi build.
-5. **Nhảy đúng phút** trong trình phát Xem lại từ nút «Nghe Thầy giảng đoạn này»: cần thêm «tới giờ T» (chạm `TrinhPhat.tsx`).
-6. **Màu**: bản vẽ chép đúng giá trị biến màu của app học sinh, màn chiếu, bốn màu phấn; bản build phải dùng biến (không hex thô).
+1. **Độ đúng của Gemini Flash-Lite** khi nghe tiếng Việt có thuật ngữ Hoá và đọc chữ viết tay: chưa đo. Chạy thử trên 3 buổi đã có (không phát hành) rồi mới bật.
+2. **Giới hạn của cổng**: cổng so cảnh với chữ chép bảng (`chep`) và lời Thầy (`loi`), mà cả hai cũng do Gemini viết. Một lời chép bịa mà tự khớp với nhau thì cổng không bắt được (số và hoá học sai thì vẫn bắt, vì máy tính lại). Cách bịt khi build: (a) gọi Gemini **hai lượt**: lượt 1 chỉ chép nguyên văn tiếng có giờ (không dựng cảnh), lượt 2 dựng cảnh và mỗi câu `loi` phải trích đúng từ bản chép lượt 1; (b) cảnh nói «có trên bảng» phải có **nét phấn thật** trong đoạn `tu` tới `den` (hoặc trước đó) ở đúng trang và cột, máy chủ kiểm bằng `net.bin`.
+3. **Giờ câu nói** (`tu`, `den`) Gemini trả có thể lệch vài giây; nếu lệch nhiều, máy chủ khớp lại bằng giờ nét phấn (Thầy thường viết khi nói).
+4. **Giá Gemini** tra qua kết quả tìm kiếm (trang giá ai.google.dev không mở thẳng được vì mạng của phiên chặn); số token ảnh chưa đo.
+5. **`luoc-do.json` chưa gửi Gemini lần nào.** Lược đồ viết chặt theo luật chung của các bộ sinh JSON có ràng buộc (không trường tuỳ chọn, chỉ 3 chỗ anyOf, không null); cần một lượt gọi thật để xác nhận Gemini nhận đúng như vậy.
+6. **Luật đáp án CLAUDE.md**: ngoại lệ 31/10 nói về câu luyện tập có tem niêm phong; câu Đoán nhanh trong nhật ký cần ghi thêm vào ngoại lệ đó khi build.
+7. **Nhảy đúng phút** trong trình phát Xem lại từ nút «Nghe Thầy giảng đoạn này»: cần thêm «tới giờ T» (chạm `TrinhPhat.tsx`).
+8. **Màu**: bản vẽ chép đúng giá trị biến màu của app học sinh, màn chiếu, bốn màu phấn; bản build phải dùng biến (không hex thô).

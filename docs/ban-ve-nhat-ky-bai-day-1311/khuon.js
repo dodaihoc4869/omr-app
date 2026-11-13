@@ -532,22 +532,34 @@
   const DUNG = { 'keo-co': keoCo, 'thang-delta': thangDelta, lewis, 'quy-tac': quyTac, 'vi-du-cot-doc': viDuCotDoc, 'doan-nhanh': doanNhanh, 'tong-ket': tongKet }
 
   // ═══════════ ĐỒNG HỒ TIẾNG ═══════════
-  // Bản thật: <audio> phát tieng.mp3 của buổi (đoạn tu → den, máy chủ trả theo Range). Bản vẽ chưa có tệp tiếng thật ⇒ đồng hồ giả
-  // chạy đúng thời lượng đoạn tiếng (cùng giao diện). Mọi hoạt hoạ, phụ đề, nét phấn đều đọc giờ từ đây ⇒ khớp lời Thầy.
+  // Bản thật: <audio> phát tieng.mp3 của buổi; giờ trong JSON (tu, den, giờ nét) là giây trên TRỤC TIẾNG của tieng.mp3 (0 = đầu tệp,
+  // cùng trục với nét trong net.bin: src/lib/live/xem-lai-kieu.ts) ⇒ lech = 0. Bản vẽ: tieng-mau.mp3 (30 giây im lặng) đặt ở giây `lech`
+  // của trục buổi, chỉ phủ cảnh 1; ngoài tệp, tiếng chưa tải, hết tệp hay máy chặn tự phát ⇒ đồng hồ giả chạy tiếp đúng thời lượng.
   class DongHo {
-    constructor(tep) { this.au = null; this.tep = tep || ''; this.t0 = 0; this.tu = 0; this.chay = false; this.dungLuc = 0 }
+    constructor(tep, lech) { this.tep = tep || ''; this.lech = +lech || 0; this.au = null; this.dungAu = false; this.t0 = 0; this.tu = 0; this.chay = false; this.dungLuc = 0 }
+    neo(T) { this.tu = T; this.t0 = performance.now() }
     batDau(tu) {
-      this.tu = tu; this.dungLuc = tu; this.chay = true; this.t0 = performance.now()
-      if (this.tep) {
-        if (!this.au) { this.au = new Audio(this.tep); this.au.preload = 'auto' }
-        try { this.au.currentTime = tu } catch (e) { /* chưa tải */ }
-        const p = this.au.play(); if (p && p.catch) p.catch(() => { this.au = null; this.tep = '' })
+      this.neo(tu); this.dungLuc = tu; this.chay = true; this.dungAu = false
+      if (!this.tep) return
+      if (!this.au) {
+        const au = (this.au = new Audio(this.tep)); au.preload = 'auto'
+        au.addEventListener('ended', () => { if (this.dungAu) { this.dungAu = false; this.neo(this.lech + au.duration) } })
       }
+      const au = this.au, vt = tu - this.lech
+      const phat = () => {
+        if (!this.chay || !(vt >= 0 && vt < (au.duration || 0) - 0.05)) return
+        try { au.currentTime = vt } catch (e) { return }
+        au.playbackRate = TOC
+        const p = au.play(); this.dungAu = true
+        if (p && p.catch) p.catch(() => { this.dungAu = false })
+      }
+      if (au.readyState >= 1) phat(); else au.addEventListener('loadedmetadata', phat, { once: true })
     }
-    get bay() { if (!this.chay) return this.dungLuc; if (this.au && !this.au.paused) return this.au.currentTime; return this.tu + ((performance.now() - this.t0) / 1000) * TOC }
+    get dangTieng() { return !!(this.dungAu && this.au && !this.au.paused && !this.au.ended) }
+    get bay() { if (!this.chay) return this.dungLuc; if (this.dangTieng) return this.lech + this.au.currentTime; return this.tu + ((performance.now() - this.t0) / 1000) * TOC }
     tamDung() { this.dungLuc = this.bay; this.chay = false; if (this.au) this.au.pause() }
-    tiep() { this.tu = this.dungLuc; this.t0 = performance.now(); this.chay = true; if (this.au) { const p = this.au.play(); if (p && p.catch) p.catch(() => {}) } }
-    dung() { this.chay = false; if (this.au) this.au.pause() }
+    tiep() { this.neo(this.dungLuc); this.chay = true; if (this.dungAu && this.au) { const p = this.au.play(); if (p && p.catch) p.catch(() => { this.dungAu = false }) } }
+    dung() { this.chay = false; this.dungAu = false; if (this.au) this.au.pause() }
   }
 
   // ═══════════ BẢNG PHẤN CỦA THẦY: nét thật của trang bảng, vẽ theo giờ tiếng; em phóng to / thu nhỏ / kéo xem ═══════════
@@ -837,11 +849,14 @@
     const phatHanh = dat.length >= CONG.itNhat && dat.length / kb.canh.length >= CONG.tiLe
     return { nguong: ng, dat, bo, chiTiet, phatHanh, soCau: kb.canh.length }
   }
-  /** Kịch bản sau cổng: bỏ cảnh hỏng, sửa chữ viết tắt, tổng kết bỏ ý của cảnh đã bỏ. */
-  function quaCong(kb) {
-    const cong = kiemCong(kb), giu = new Set(cong.dat)
-    const sach = (v) => (typeof v === 'string' ? sachChu(v) : Array.isArray(v) ? v.map(sach) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, ['chep', 'khuon', 'loai', 'kieu', 'ky', 'ct', 'nt', 'tuCt', 'denCt', 'tro'].includes(k) ? x : sach(x)])) : v)
-    const canh = kb.canh.filter((c) => giu.has(c.id)).map(sach)
+  /** Che tên người: tên trong danh sách lớp (máy chủ có sẵn) xuất hiện trong chữ học sinh thấy (kể cả lời Thầy) ⇒ «một bạn». */
+  const cheTen = (t, tenLop) => (tenLop || []).filter(Boolean).reduce((x, ten) => x.replace(new RegExp(`(^|[^\\p{L}])(?:[Bb]ạn\\s+)?${ten.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}])`, 'gu'), (m, truoc, vt) => truoc + (vt === 0 || /[.!?]\s*$/.test(x.slice(0, vt + truoc.length)) ? 'Một bạn' : 'một bạn')), t)
+  /** Kịch bản sau cổng: bỏ cảnh hỏng, sửa chữ viết tắt, che tên người, tổng kết bỏ ý của cảnh đã bỏ. */
+  function quaCong(kb, opt) {
+    const cong = kiemCong(kb), giu = new Set(cong.dat), tenLop = (opt && opt.tenLop) || []
+    const sach = (v) => (typeof v === 'string' ? cheTen(sachChu(v), tenLop) : Array.isArray(v) ? v.map(sach) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, ['chep', 'khuon', 'loai', 'kieu', 'ky', 'ct', 'nt', 'tuCt', 'denCt', 'tro'].includes(k) ? x : sach(x)])) : v)
+    // bản phát hành không mang chữ chép bảng (chep) và không mang cảnh bị bỏ
+    const canh = kb.canh.filter((c) => giu.has(c.id)).map(sach).map((c) => Object.assign(c, { nguon: Object.assign({}, c.nguon, { chep: '' }) }))
     canh.forEach((c) => { if (c.khuon === 'tong-ket') c.duLieu.y = c.duLieu.y.filter((y) => giu.has(y.canh)) })
     return { kb: Object.assign({}, kb, { canh }), cong }
   }
@@ -857,5 +872,5 @@
     }))
   }
 
-  window.NKB = { CHI, E_NGOAI, KHOI, CONG, TEN_LOAI, TEN_KHUON, KHUON, GIAM, TOC, Dong, DongHo, BangPhan, dungCanh, kiemCong, quaCong, kiemCanh, kiemChu, sachChu, nguongTuDong, taiKichBan, gio, soDelta, soChi, soGon, h, s, dam, boDam, phanLoai, khoiMol }
+  window.NKB = { cheTen, CHI, E_NGOAI, KHOI, CONG, TEN_LOAI, TEN_KHUON, KHUON, GIAM, TOC, Dong, DongHo, BangPhan, dungCanh, kiemCong, quaCong, kiemCanh, kiemChu, sachChu, nguongTuDong, taiKichBan, gio, soDelta, soChi, soGon, h, s, dam, boDam, phanLoai, khoiMol }
 })()

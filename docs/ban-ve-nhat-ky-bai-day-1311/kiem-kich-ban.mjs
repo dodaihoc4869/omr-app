@@ -71,5 +71,10 @@ const it = doc('kich-ban-lien-ket.json'); it.canh.forEach((c, i) => { if (i > 1)
 const ph = N.kiemCong(it).phatHanh
 console.log(`Tự thử (chỉ 2 cảnh có nguồn): phát hành ${ph ? 'CÓ (HỎNG)' : 'không, chỉ hiện bảng gốc'}`)
 if (ph) hong++
+// tự thử: tên người trong lời Thầy bị che theo danh sách lớp; bản phát hành không mang chữ chép bảng
+const ten = doc('kich-ban-lien-ket.json'); ten.canh[0].loi[0].chu = 'Bạn Minh Anh với bạn Long kéo co, cặp electron là vạch ở giữa.'
+const ph2 = N.quaCong(ten, { tenLop: ['Minh Anh', 'Long'] }).kb, chuCe = ph2.canh[0].loi[0].chu, conChep = ph2.canh.some((c) => c.nguon.chep)
+console.log(`Tự thử che tên: «${chuCe}» · bản phát hành còn chữ chép bảng: ${conChep ? 'CÓ (HỎNG)' : 'không'}`)
+if (/Minh Anh|Long/.test(chuCe) || conChep) hong++
 console.log(hong ? `HỎNG ${hong} mục` : 'TẤT CẢ ĐẠT')
 process.exit(hong ? 1 : 0)

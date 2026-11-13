@@ -161,7 +161,7 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
   </div>
   <i class="thanh-tien" id="thanh-tien" aria-hidden="true"></i>
 </header>
-<p class="bv bv-dai" id="bv-dai"><b>Bản vẽ.</b> Giọng Thầy, lời Thầy và nét phấn là DỮ LIỆU MẪU (chép đúng chữ trên bảng 12/11). Bản vẽ chưa kèm tệp tiếng: đồng hồ giả chạy đúng thời lượng từng đoạn tiếng. Ô viền đứt chỉ có trong bản vẽ.</p>
+<p class="bv bv-dai" id="bv-dai"><b>Bản vẽ.</b> Giọng Thầy, lời Thầy và nét phấn là DỮ LIỆU MẪU (chép đúng chữ trên bảng 12/11). Tệp tiếng mẫu là 30 giây im lặng, chỉ phủ cảnh 1; các cảnh khác chạy đồng hồ giả đúng thời lượng đoạn tiếng. Ô viền đứt chỉ có trong bản vẽ.</p>
 <main class="nk" id="nk"><p class="dang-tai">Đang mở nhật ký…</p></main>
 <div class="trinh" id="trinh" hidden role="region" aria-label="Xem như Thầy giảng">
   <p class="trinh-pd" id="tr-pd"></p>
@@ -197,19 +197,19 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
 
   function dung(kbGoc) {
     // CỔNG TỰ KIỂM: cảnh sai số / không nguồn bị bỏ; không đủ cảnh tin được thì không phát hành (chỉ hiện bảng gốc như cũ)
-    const { kb, cong } = N.quaCong(kbGoc)
+    const { kb, cong } = N.quaCong(kbGoc, { tenLop: kbGoc.buoi.tenLop || [] })
     const b = kb.buoi, nk = document.getElementById('nk'), ng = cong.nguong, NET = (window.NET_MAU || {})[TEN_KB]
     document.title = `Bản vẽ: Nhật ký bài dạy · ${b.ten}`
     document.getElementById('thanh-ten').textContent = b.ten
     if (kb.mau) document.getElementById('bv-dai').innerHTML = '<b>Bản vẽ.</b> Kịch bản MẪU (không phải buổi thật) để thử cùng thư viện khuôn với một bài tính toán. Giọng Thầy, lời Thầy, nét phấn là dữ liệu mẫu; bản vẽ chưa kèm tệp tiếng.'
     nk.innerHTML = ''
     if (!cong.phatHanh) { nk.append(h('p', { class: 'dang-tai', text: 'Buổi này chưa có bài hoạt hoạ. Em xem bảng của Thầy trong Xem lại Live.' })); document.documentElement.setAttribute('data-san', ''); return }
-    const ds = kb.canh, dongHo = new N.DongHo(b.tepTieng)
+    const ds = kb.canh, dongHo = new N.DongHo(b.tepTieng, b.lechTieng)
     const tongGiay = ds.filter((c) => c.khuon !== 'tong-ket').reduce((s, c) => s + Math.max(0, c.nguon.den - c.nguon.tu), 0)
     // BÌA
     const bangBia = h('div', { class: 'bang bia-bang' })
     const nutGiang = h('button', { type: 'button', class: 'nut-giang', id: 'nut-giang', html: `<i>${ICON.nghe}</i>Xem như Thầy giảng` })
-    const nutDoc = h('button', { type: 'button', class: 'nut-doc', html: 'Tự đọc từng cảnh<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>' })
+    const nutDoc = h('button', { type: 'button', class: 'nut-doc', html: 'Tự đọc, tự cuộn<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>' })
     nk.append(h('section', { class: 'bia', 'aria-labelledby': 'bia-ten' }, [
       h('div', { class: 'bia-chu' }, [
         h('p', { class: 'bia-nhan' }, [h('i', { 'aria-hidden': 'true' }), 'Nhật ký bài dạy']),
@@ -269,7 +269,8 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
     const tienDo = (c) => (p, T) => { trRay.style.transform = `scaleX(${p})`; const l = c.loi.find((x) => T >= x.tu && T < x.den), chu = l ? l.chu.replace(/\*\*/g, '') : ''; if (trPd.textContent !== chu) trPd.textContent = chu }
     const Giang = {
       bat: false, canh: null, dangDung: false, hen: 0, rieng: null,
-      batDau(i) { this.dungRieng(); this.bat = true; document.documentElement.classList.add('che-giang'); trinh.hidden = false; this.toi(i || 0) },
+      che: 'giang',
+      batDau(i, che) { this.dungRieng(); this.che = che || 'giang'; this.bat = true; document.documentElement.classList.add('che-giang'); trinh.hidden = false; this.toi(i || 0) },
       toi(i) {
         clearTimeout(this.hen); if (this.canh) { dk[this.canh].dungGiang(); the[this.canh].sec.classList.remove('dang-giang') }
         if (i >= ds.length) return this.thoat(true)
@@ -281,11 +282,19 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
         // chuyển cảnh mượt: bảng sáng dần lên
         if (!N.GIAM) the[c.id].sec.querySelector('.bang').animate([{ opacity: 0.35, transform: 'scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' })
         if (c.khuon === 'doan-nhanh') { trPd.textContent = ''; d.chay(); trNhan.textContent = `Đoán nhanh · ${i + 1}/${ds.length} · chạm một đáp án`; return }
+        if (this.che === 'doc') { trPd.textContent = ''; trNhan.textContent = `Tự đọc · ${i + 1}/${ds.length}`; d.chay(() => this.docXong(i)); return }
         if (c.khuon === 'tong-ket') { d.chay(() => { this.hen = setTimeout(() => this.thoat(true), 1500) }); return }
         trPd.textContent = ''
         this.hen = setTimeout(() => d.giang(dongHo, () => { this.hen = setTimeout(() => this.toi(i + 1), 700) }, tienDo(c)), N.GIAM ? 0 : 450)
       },
-      phatLoi(id) { const i = ds.findIndex((c) => c.id === id); trNhan.textContent = `Thầy giảng · ${i + 1}/${ds.length}`; dk[id].giang(dongHo, () => { this.hen = setTimeout(() => this.toi(i + 1), 900) }, tienDo(ds[i])) },
+      /** Tự đọc: hoạt hoạ xong thì cuộn tới lời Thầy, đợi đủ lâu để đọc (theo số chữ), rồi sang cảnh kế. */
+      docXong(i) {
+        const c = ds[i], chu = c.loi.reduce((s, l) => s + l.chu.split(/\s+/).length, 0), ms = (2500 + chu * 300) / N.TOC, loi = the[c.id].theLoi
+        if (loi && loi.getBoundingClientRect && loi.getBoundingClientRect().bottom > innerHeight - 110) window.scrollTo({ top: scrollY + loi.getBoundingClientRect().bottom - innerHeight + 130, behavior: N.GIAM ? 'auto' : 'smooth' })
+        if (!N.GIAM) trRay.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: ms, fill: 'forwards' })
+        this.hen = setTimeout(() => this.toi(i + 1), ms)
+      },
+      phatLoi(id) { const i = ds.findIndex((c) => c.id === id); if (this.che === 'doc') return this.docXong(i); trNhan.textContent = `Thầy giảng · ${i + 1}/${ds.length}`; dk[id].giang(dongHo, () => { this.hen = setTimeout(() => this.toi(i + 1), 900) }, tienDo(ds[i])) },
       chayDung() { if (!this.canh) return; this.dangDung = !this.dangDung; this.dangDung ? dk[this.canh].tamDung() : dk[this.canh].tiep(); veNut() },
       thoat(xong) { clearTimeout(this.hen); if (this.canh) { dk[this.canh].dungGiang(); the[this.canh].sec.classList.remove('dang-giang') } this.bat = false; this.canh = null; trinh.hidden = true; document.documentElement.classList.remove('che-giang'); if (xong) bao('Thầy giảng xong bài. Em xem lại cảnh nào cũng được.') },
       // Tự đọc: nghe riêng một cảnh
@@ -303,7 +312,10 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
     document.getElementById('tr-truoc').addEventListener('click', () => Giang.toi(Math.max(0, ds.findIndex((c) => c.id === Giang.canh) - 1)))
     document.getElementById('tr-thoat').addEventListener('click', () => Giang.thoat(false))
     nutGiang.addEventListener('click', () => Giang.batDau(0))
-    nutDoc.addEventListener('click', () => cuonToi(ds[0].id, true))
+    nutDoc.addEventListener('click', () => Giang.batDau(0, 'doc'))
+    // em tự cuộn / chạm trang ⇒ thôi tự cuộn (đọc tay như thường)
+    const thoiTuCuon = (e) => { if (Giang.bat && Giang.che === 'doc' && !(e.target && e.target.closest && e.target.closest('.trinh, .dn-pa, .bp'))) Giang.thoat(false) }
+    for (const ev of ['wheel', 'touchstart', 'keydown']) window.addEventListener(ev, thoiTuCuon, { passive: true })
 
     // ── TỰ ĐỌC: mỗi cảnh chạy (tự nhiên) khi cuộn tới ──
     if (TUA || DUNG || GIAY) {
@@ -330,7 +342,7 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
     }
     if (CHON && dk[CHON[0]] && dk[CHON[0]].dieuKhien.traLoi) dk[CHON[0]].dieuKhien.traLoi(+CHON[1] || 0, true)
     if (ZOOM && dk[ZOOM[0]] && dk[ZOOM[0]].phan) dk[ZOOM[0]].phan.doiZoom(+ZOOM[1] || 2)
-    window.NK_TRANG = { dk, dkBia, ds: ds.map((c) => c.id), capNhat, Giang, cong }
+    window.NK_TRANG = { dk, dkBia, ds: ds.map((c) => c.id), capNhat, Giang, cong, dongHo }
     if (q.get('cuon')) { const e = document.getElementById(q.get('cuon')); if (e) { window.scrollTo(0, e.getBoundingClientRect().top + scrollY - (+q.get('le') || 72)); capNhat(q.get('cuon')) } }
     else if (TUA) capNhat(ds[0].id)
     if (q.get('giang') === '1') Giang.batDau(+q.get('tu') || 0)
