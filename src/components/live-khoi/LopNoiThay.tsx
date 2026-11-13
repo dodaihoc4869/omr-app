@@ -68,7 +68,8 @@ export default function LopNoiThay() {
   const xTo = useSyncExternalStore(ngheToRieng, mepTraiTo)
   const hinh = hinhCot(man.w, man.h, xTo)
   const chat = chatMuon ?? !!hinh
-  const setChat = (f: boolean | ((c: boolean) => boolean)): void => setChatMuon(typeof f === 'function' ? f(chat) : f)
+  // bật / tắt tính trên giá trị MỚI NHẤT (các trình nghe phím đăng ký một lần, không được giữ `chat` cũ): chưa từng bật / tắt ⇒ lấy mặc định theo cỡ cửa sổ lúc bấm
+  const setChat = (f: boolean | ((c: boolean) => boolean)): void => setChatMuon((m) => (typeof f === 'function' ? f(m ?? !!hinhCot(window.innerWidth, window.innerHeight, mepTraiTo())) : f))
   const coPhu = useSyncExternalStore(ngheToRieng, coLopPhu)
   const cot = hinh && chat && dang && !k?.giaiLao && !sanh && !chon && !(hdMo && hdTren) && coPhu ? hinh : null
   const cotC = cot?.c ?? 0, cotS = cot?.s ?? 1, cotD = cot?.d ?? 0

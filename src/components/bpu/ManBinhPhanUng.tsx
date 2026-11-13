@@ -661,7 +661,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !lv?.khoi && !!l && l.pha === 'tra-loi' && !che && !hetGio })
   const hl = useHuongLive(cheLive, liveBat, lv?.khoi?.gd === 'dang')
-  useVaoLai(!!v?.em?.luat?.ra, setVuaRoi)
+  useVaoLai(!!v?.em?.luat?.ra || lv?.khoi?.gd === 'cho' || !!lv?.khoi?.giaiLao, setVuaRoi) // hết bị mời ra / hết phòng chờ / hết nghỉ giải lao ⇒ vào thẳng live
   const thanNgang = useThanNgang(gocRef, laCau ? q : null, !!l?.tuLuan, `${khoaLuot}|${LC ? 1 : 0}|${hl.the.style?.width}x${hl.the.style?.height}`)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null
