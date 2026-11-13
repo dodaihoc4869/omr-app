@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1244,
+    "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+    "fileNguon": "anh/e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38.png",
+    "svg": "cyano1244-native-ddh-b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7.svg",
+    "hashSvg": "b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7",
+    "byteSvg": 17360,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-II-2",
+        "de": "Keo siêu dính 502 là một loại keo được ứng dụng phổ biến trong đời sống để kết dính các bề mặt vật liệu như gỗ, nhựa, da,... Thành phần của keo 502 có chứa methyl cyanoacrylate. Sau khi dán, hơi ẩm ($\\ce{H2O}$) của không khí giúp cho methyl cyanoacrylate chuyển thành polymer dạng màng mỏng kết dính các vật liệu lại với nhau theo phương trình phản ứng (1) ở hình.",
+        "refs": [
+          {
+            "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+            "where": "VIP27-C4-B14-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "51ed9eff0285b4df398ecf6bf1ac4e69a4f5a594e1e51e6f5a5f2a86197c9e17"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10drawnC4O2N-EXCLwater-UNKNOWNpolymerTotal/LEFTnBASELINE-H2C=C(CN)-COO-CH3/RIGHTHO-CH2-C(CN)-bareCO-O-bareMethyl-H/1ROUNDpair+nSUB/CO2offsetraysUPPERfootFREEwhitegap-LOWERfootCONTACTverticalstem/1FULLFILLEDrighthead/+H2O/(1)farRIGHT/ALLregularUPRIGHTSUB23/4TOPcroppedUNKNOWNfragmentsretain/NOaddedn-methyltext-condition-answer-alias/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

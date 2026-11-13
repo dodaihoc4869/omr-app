@@ -1,0 +1,525 @@
+{
+  "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+  "native": [
+    963,
+    162
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B14-D2-II-2",
+      "de": "Keo siêu dính 502 là một loại keo được ứng dụng phổ biến trong đời sống để kết dính các bề mặt vật liệu như gỗ, nhựa, da,... Thành phần của keo 502 có chứa methyl cyanoacrylate. Sau khi dán, hơi ẩm ($\\ce{H2O}$) của không khí giúp cho methyl cyanoacrylate chuyển thành polymer dạng màng mỏng kết dính các vật liệu lại với nhau theo phương trình phản ứng (1) ở hình.",
+      "refs": [
+        {
+          "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+          "where": "VIP27-C4-B14-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "51ed9eff0285b4df398ecf6bf1ac4e69a4f5a594e1e51e6f5a5f2a86197c9e17"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "10drawnC4O2N-EXCLwater-UNKNOWNpolymerTotal/LEFTnBASELINE-H2C=C(CN)-COO-CH3/RIGHTHO-CH2-C(CN)-bareCO-O-bareMethyl-H/1ROUNDpair+nSUB/CO2offsetraysUPPERfootFREEwhitegap-LOWERfootCONTACTverticalstem/1FULLFILLEDrighthead/+H2O/(1)farRIGHT/ALLregularUPRIGHTSUB23/4TOPcroppedUNKNOWNfragmentsretain/NOaddedn-methyltext-condition-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/CO8x/TOPcrop5x. UpperCOfoot whitegap; lowercontact. NativeapproxNOTsubpixel, no automaticpixelgate.",
+  "independentSourceAudit": {
+    "i": 1244,
+    "assetIndexProvided": 1366,
+    "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38.png",
+    "size": [
+      963,
+      162
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B14-D2-II-2",
+        "de": "Keo siêu dính 502 là một loại keo được ứng dụng phổ biến trong đời sống để kết dính các bề mặt vật liệu như gỗ, nhựa, da,... Thành phần của keo 502 có chứa methyl cyanoacrylate. Sau khi dán, hơi ẩm ($\\ce{H2O}$) của không khí giúp cho methyl cyanoacrylate chuyển thành polymer dạng màng mỏng kết dính các vật liệu lại với nhau theo phương trình phản ứng (1) ở hình.",
+        "allHinh": [
+          {
+            "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+            "where": "VIP27-C4-B14-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "51ed9eff0285b4df398ecf6bf1ac4e69a4f5a594e1e51e6f5a5f2a86197c9e17"
+          }
+        ],
+        "missingHashes": [
+          "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/408-full3x.png",
+        "/workspace/scratch/408-product4x.png",
+        "/workspace/scratch/408-left4x.png",
+        "/workspace/scratch/408-top4x.png",
+        "/workspace/scratch/408-head4x.png",
+        "/workspace/scratch/408-co12x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": "Allregularuprightserif, ordinarycoefficientnBASELINE, H2/H3SUB, productnSUB. No actualbold/caption.",
+      "counts": {
+        "reactantPrintedUnitC": 5,
+        "reactantO": 2,
+        "reactantN": 1,
+        "productPrintedUnitC": 5,
+        "productOIncludingTerminalHO": 3,
+        "productN": 1,
+        "waterO": 1,
+        "polymerTotal": "Unknownn, printedunitnotwholeformula",
+        "filledRightHeads": 1,
+        "roundParenthesisPairs": 1,
+        "squarePairs": 0
+      },
+      "reactant": {
+        "literal": "n H₂C=C–COO–CH₃ withdownCN",
+        "n": {
+          "bbox": [
+            0,
+            84,
+            15,
+            100
+          ],
+          "baselineApprox": 98
+        },
+        "H2C": {
+          "bbox": [
+            22,
+            80,
+            73,
+            105
+          ]
+        },
+        "C": {
+          "bbox": [
+            102,
+            80,
+            120,
+            100
+          ]
+        },
+        "COO": {
+          "bbox": [
+            148,
+            80,
+            209,
+            100
+          ]
+        },
+        "CH3": {
+          "bbox": [
+            236,
+            80,
+            282,
+            105
+          ]
+        },
+        "doubleRays": [
+          [
+            [
+              78,
+              86
+            ],
+            [
+              98,
+              86
+            ]
+          ],
+          [
+            [
+              78,
+              93
+            ],
+            [
+              98,
+              93
+            ]
+          ]
+        ],
+        "horizontalSingles": [
+          [
+            [
+              125,
+              91
+            ],
+            [
+              145,
+              91
+            ]
+          ],
+          [
+            [
+              212,
+              91
+            ],
+            [
+              232,
+              91
+            ]
+          ]
+        ],
+        "CNbranch": {
+          "bond": [
+            [
+              111,
+              105
+            ],
+            [
+              111,
+              123
+            ]
+          ],
+          "literal": "CN",
+          "bbox": [
+            102,
+            128,
+            140,
+            146
+          ],
+          "anchor": "FIRST C"
+        }
+      },
+      "arrow": {
+        "shaft": [
+          [
+            299,
+            93
+          ],
+          [
+            392,
+            93
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            375,
+            87
+          ],
+          [
+            392,
+            93
+          ],
+          [
+            375,
+            99
+          ],
+          [
+            378,
+            93
+          ]
+        ],
+        "condition": {
+          "literal": "+ H₂O",
+          "bbox": [
+            308,
+            54,
+            381,
+            78
+          ]
+        }
+      },
+      "product": {
+        "leftHO": {
+          "literal": "HO",
+          "bbox": [
+            413,
+            81,
+            455,
+            101
+          ],
+          "anchor": "LAST O"
+        },
+        "leftEndBond": [
+          [
+            458,
+            93
+          ],
+          [
+            477,
+            93
+          ]
+        ],
+        "CH2": {
+          "literal": "CH₂",
+          "bbox": [
+            482,
+            81,
+            531,
+            105
+          ]
+        },
+        "CH2ToC": [
+          [
+            534,
+            93
+          ],
+          [
+            559,
+            93
+          ]
+        ],
+        "centralC": {
+          "literal": "C",
+          "bbox": [
+            563,
+            81,
+            582,
+            101
+          ]
+        },
+        "upStem": [
+          [
+            571.5,
+            78
+          ],
+          [
+            571.5,
+            46
+          ]
+        ],
+        "downCN": {
+          "stem": [
+            [
+              571.5,
+              107
+            ],
+            [
+              571.5,
+              124
+            ]
+          ],
+          "literal": "CN",
+          "bbox": [
+            563,
+            130,
+            602,
+            149
+          ],
+          "anchor": "FIRST C"
+        },
+        "rightEndBond": [
+          [
+            583,
+            93
+          ],
+          [
+            684,
+            93
+          ]
+        ],
+        "rightH": {
+          "literal": "H",
+          "bbox": [
+            690,
+            81,
+            710,
+            101
+          ]
+        },
+        "ester": {
+          "bareCO": [
+            571.5,
+            46
+          ],
+          "COupperRay": [
+            [
+              547,
+              26.5
+            ],
+            [
+              573,
+              42
+            ]
+          ],
+          "COlowerRay": [
+            [
+              543.5,
+              33
+            ],
+            [
+              570.5,
+              48
+            ]
+          ],
+          "Ocarbonyl": {
+            "literal": "O",
+            "bbox": [
+              521,
+              11,
+              540,
+              31
+            ]
+          },
+          "Oester": {
+            "literal": "O",
+            "bbox": [
+              602,
+              11,
+              622,
+              31
+            ]
+          },
+          "rightArm": [
+            [
+              572.5,
+              44.5
+            ],
+            [
+              598,
+              30.5
+            ]
+          ],
+          "methylArm": [
+            [
+              627,
+              30.5
+            ],
+            [
+              654,
+              45
+            ]
+          ],
+          "terminalBareMethyl": [
+            654,
+            45
+          ],
+          "footClassification": {
+            "upper": "FREE endpoint upperparallelray near573,42 has visiblewhitegap fromrightascendingarm. OwnCO12x confirms. Do not forcecontact/syntheticcrossbar.",
+            "lower": "Lowerparallelray contactsverticalcentralCstem throughnativefootnear570.5,48.",
+            "glyphGaps": "BothO labelsseparatedfromrays/arms bywhitegap."
+          }
+        },
+        "parentheses": {
+          "type": "ROUND",
+          "leftGuide": [
+            [
+              483,
+              31
+            ],
+            [
+              477,
+              51
+            ],
+            [
+              474,
+              69
+            ],
+            [
+              474,
+              91
+            ],
+            [
+              475,
+              113
+            ],
+            [
+              479,
+              133
+            ],
+            [
+              483,
+              139
+            ]
+          ],
+          "rightGuide": [
+            [
+              665,
+              31
+            ],
+            [
+              670,
+              51
+            ],
+            [
+              673,
+              69
+            ],
+            [
+              674,
+              92
+            ],
+            [
+              672,
+              114
+            ],
+            [
+              668,
+              132
+            ],
+            [
+              665,
+              139
+            ]
+          ],
+          "nsub": {
+            "literal": "n",
+            "bbox": [
+              678,
+              112,
+              693,
+              128
+            ]
+          },
+          "warning": "Do not use squarebrackets; straightmiddleandcurvedslantedends arenativeroundparentheses."
+        }
+      },
+      "equationNumber": {
+        "literal": "(1)",
+        "bbox": [
+          900,
+          77,
+          939,
+          102
+        ]
+      },
+      "topFragments": {
+        "nativeBboxesApprox": [
+          [
+            104,
+            0,
+            112,
+            3
+          ],
+          [
+            191,
+            0,
+            205,
+            3
+          ],
+          [
+            285,
+            0,
+            293,
+            3
+          ],
+          [
+            396,
+            0,
+            412,
+            3
+          ]
+        ],
+        "classification": "Fourcroppedserifglyphbottomfragments separatefromchemicaldrawing, no completeletterread and no restoration. Publicstemonlycallsreaction(1), no labelsatthesepositions. Intentuncertainretaininkunlessparent/reviewerindependentlyprovesnondataomission.",
+        "noInferredText": true
+      },
+      "noAdded": [
+        "No H2Oproduct",
+        "No polymerarrowconditionsotherthan+H2O",
+        "No namecaption",
+        "No extracharge",
+        "No syntheticCOupperfootcontact",
+        "No squarebrackets"
+      ]
+    },
+    "measurementLimits": "Nativeapproxcenterlines/bboxes±1–2px. COown12x visuallydistinguishesFREEupperparallel/contactlower. Topfragmentsunreadable andexplicitlyuncertain, notsilentlydiscarded. NoSVGreview.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": "Root fresh actualFULL3x + CO/left/right macros OPEN; 1publicde-ref/alllabels/subscripts/ROUNDnSUB/UPPERCOwhitegapLOWERcontact/4TOPcropUNKNOWN retained. NativeapproxNOTsubpixel; noautomaticgate."
+}

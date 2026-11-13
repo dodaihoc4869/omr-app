@@ -1,0 +1,23 @@
+[
+  {
+    "i": 1244,
+    "hashSvg": "b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất và fresh Chromium3x FULL, macro monomer/product/CO/head/topcrop. 10drawnC4O2N không tính nước, tổng polymer phụ thuộc n; giữ H₂C=C(CN)-COO-CH₃, nreact baseline, HO-CH₂-C(CN) và nhánh ester bare, H cuối literal. Carbonyl tia UPPER có khe trắng chân tự do như native, tia LOWER tiếp xúc stem; không thêm bridge. ROUNDpair/nSUB, 1filledhead/+H₂O/(1), bốn fragment topcrop đúng; mọi chữ regular upright, neo HO-lastO/CH₂-firstC/CN-firstC và các khe glyph sạch không chạm/cắt thêm. Runtime SHA trước/sau khớp.",
+    "render": "/workspace/scratch/soat408-1244-fresh.png",
+    "macro": [
+      "/workspace/scratch/cyano1244-left.png",
+      "/workspace/scratch/cyano1244-product.png",
+      "/workspace/scratch/cyano1244-head.png",
+      "/workspace/scratch/cyano1244-CO.png",
+      "/workspace/scratch/cyano1244-crop.png",
+      "/workspace/scratch/cyano1244-nativeCO.png"
+    ],
+    "hash": "e1d77276d17b8df04bf033c3382f6784041154c75ee93a2841ebd95164059b38",
+    "hashSvgDaSoat": "b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7",
+    "runtimeProof": {
+      "sha256": "5a6c6086790e059077dfe98f86a05f8d7b46624f514491cb3ceff3161c1a7479",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/cyano1244-native-ddh-b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7.svg b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7\n1244 { x: 0, y: 0, width: 963, height: 162 }\n\nPOSTSHOT_SHA b30701492ae582244d5e20dae5f1de9edd731b20431fe6e4f87027086038ffd7\nCOMMAND node /workspace/scratch/agent-render408.cjs\nCONTEXT VIP27-C4-B14-D2-II-2.hinh.0.du_lieu; one public de/ref, no answers.\n"
+    }
+  }
+]
