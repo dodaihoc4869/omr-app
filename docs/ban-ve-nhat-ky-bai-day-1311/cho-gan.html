@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bản vẽ: chỗ gắn «Nhật ký bài dạy» trên màn Xem lại Live của học sinh</title>
+<!-- BẢN VẼ. Màn Xem lại Live dựng lại bằng đúng luật CSS của src/screens/live-xem-lai/hs/xem-lai.css + phat.css (chép), dữ liệu giả.
+     THỨ MỚI DUY NHẤT: thẻ «Nhật ký bài dạy» (#the-nk, lớp .nkt). Tham số: ?vt=duoi (phương án đặt thẻ dưới Dòng thời gian) · ?dung=0..1 (đứng hình) · ?cuon=<id>&le=<px>. -->
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+/* biến màu: chép từ src/styles/trong-hs-mau.css, src/styles/tokens.css, src/lib/bpu/mau-chieu.ts */
+:root { color-scheme: light dark;
+  --tr-nen: #ffffff; --tr-mat: #ffffff; --tr-mat-2: #f7f7f7; --tr-mat-3: #e5e5e5; --tr-vien: #e5e5e5; --tr-vien-2: #c6c6d4; --tr-chu: #1b1938; --tr-chu-2: #3a385e; --tr-chu-3: #47456d; --tr-trang: #ffffff;
+  --tr-dung: #00d396; --tr-dung-nhat: #c2ffdd; --tr-dung-chu: #007c58; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-tin-chu: #007889;
+  --tr-hs: #6c71ff; --tr-hs-nut: #584dff; --tr-hs-go: #3f00dc; --tr-hs-nhat: #e6eaff; --tr-hs-chu: #565bbd; --tr-bong: #e2e2f0;
+  --p-tim-2: #8b5cf6; --p-do: #ef4444; --p-cam: #f59e0b; --p-xanh: #10b981; --p-muc: #1a2332; --p-trang: #ffffff;
+  --tr-chieu-bang: #131f24; --tr-chieu-giay: #f4efe4; --tr-chieu-chu: #22262b; --tr-chieu-phu: #5b6168; --tr-chieu-the: #e7e1d3; --tr-chieu-mat: #23282d; --tr-chieu-mat-2: #2f353b; --tr-chieu-mat-3: #3b4148; }
+@media (prefers-color-scheme: dark) { :root {
+  --tr-nen: #131f24; --tr-mat: #202f36; --tr-mat-2: #263840; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #4d5f6a; --tr-chu: #f1f7fb; --tr-chu-2: #dce6ec; --tr-chu-3: #c4d0d6; --tr-trang: #131f24;
+  --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-sao-nhat: #3b2f14; --tr-sao-chu: #ecb400; --tr-tin-chu: #00d5ed;
+  --tr-hs: #7772ff; --tr-hs-nut: #7772ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-bong: #0b1418; } }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--tr-nen); color: var(--tr-chu); font: 500 15px/1.4 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, p { margin: 0; }
+button { font: inherit; color: inherit; border: 0; margin: 0; padding: 0; background: none; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; text-align: inherit; }
+button:focus-visible { outline: 3px solid var(--tr-hs-nut); outline-offset: 2px; }
+.so { font-variant-numeric: tabular-nums; }
+canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ── luật có sẵn của màn Xem lại Live (chép gọn) ── */
+.xl-kinh { background: var(--tr-mat); border-radius: 26px; box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.xl-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; background: var(--tr-mat-2); color: var(--tr-chu-2); }
+.xl-chip.dung { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.xl-nut { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 6px 20px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; }
+.xl-trang { max-width: 560px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+.xl-dau { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; min-height: 48px; }
+.xl-lui { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--tr-mat); box-shadow: inset 0 0 0 1px var(--tr-vien), 0 4px 0 var(--tr-bong); color: var(--tr-chu); }
+.xl-dau p { font-size: 14px; color: var(--tr-chu-3); font-weight: 600; }
+.xl-bia-buoi { position: relative; border-radius: 30px; padding: 22px 20px 20px; color: var(--p-trang); overflow: hidden; margin-bottom: 14px; background: var(--tr-hs-go); }
+.xl-bia-buoi::before, .xl-bia-buoi::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.8; }
+.xl-bia-buoi::before { right: -22%; top: -46%; width: 76%; padding-top: 76%; background: var(--p-tim-2); }
+.xl-bia-buoi::after { left: -24%; bottom: -58%; width: 70%; padding-top: 70%; background: var(--p-do); opacity: 0.5; }
+.xl-bia-buoi > * { position: relative; z-index: 1; }
+.xl-bia-buoi .tren { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.xl-bia-buoi .tren i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--p-trang); }
+.xl-bia-buoi h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; margin: 10px 0 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.xl-bia-buoi p { font-size: 15px; font-weight: 600; }
+.xl-so { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0 16px; }
+.xl-so div { border-radius: 18px; padding: 10px 6px; text-align: center; background: #584dff; box-shadow: inset 0 0 0 1px #6c71ff; }
+.xl-so b { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; }
+.xl-so span { white-space: nowrap; font-size: 12.5px; font-weight: 600; }
+.xl-bia-buoi .xl-nut { width: 100%; min-height: 52px; font-size: 16.5px; background: var(--p-trang); color: var(--tr-hs-go); }
+.xl-the { padding: 16px; margin-bottom: 14px; }
+.xl-the > h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.xl-the > h2 small { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--tr-chu-3); }
+.xl-tg { position: relative; display: flex; gap: 3px; height: 44px; margin-top: 14px; }
+.xl-tg > span { display: block; height: 100%; min-width: 3px; background: var(--tr-mat-3); position: relative; }
+.xl-tg > span.chua { background: var(--p-tim-2); min-width: 32px; }
+.xl-tg > span.chua b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13.5px; font-weight: 800; color: var(--p-muc); }
+.xl-tg > span:first-child { border-radius: 14px 0 0 14px; }
+.xl-tg > span:last-child { border-radius: 0 14px 14px 0; }
+.xl-tg-chu { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--tr-chu-3); font-weight: 600; margin-top: 6px; }
+.xl-chu-giai { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 13px; color: var(--tr-chu-2); font-weight: 600; }
+.xl-chu-giai span { display: inline-flex; align-items: center; gap: 6px; }
+.xl-chu-giai i { display: block; width: 14px; height: 14px; border-radius: 5px; background: var(--tr-mat-3); }
+.xl-chu-giai svg { color: var(--tr-sao-chu); }
+.xl-doan { min-height: 60px; padding: 6px; display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; border-radius: 18px; }
+.xl-doan[aria-current='true'] { background: var(--tr-hs-nhat); }
+.xl-doan .o { width: 44px; height: 44px; border-radius: 14px; flex: none; display: grid; place-items: center; font-size: 17px; font-weight: 800; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.xl-doan[aria-current='true'] .o { background: var(--tr-hs-nut); color: var(--tr-trang); }
+.xl-doan .giua { flex: 1; min-width: 0; }
+.xl-doan .giua b { display: block; font-size: 14.5px; font-weight: 700; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xl-doan .giua span { display: block; font-size: 13px; color: var(--tr-chu-3); font-weight: 600; margin-top: 2px; }
+.xl-cau-dau { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.xl-cau-dau .so-cau { min-height: 30px; padding: 2px 12px; border-radius: 999px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 800; background: var(--tr-hs-nut); color: var(--tr-trang); }
+.xl-cau-dau .em { margin-left: auto; }
+.xl-de { font-size: 16.5px; line-height: 1.45; margin-bottom: 10px; }
+.xl-de b { color: var(--tr-tin-chu); font-weight: 700; display: block; }
+.xl-pa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
+.xl-pa div { min-height: 44px; padding: 8px 12px; border-radius: 14px; background: var(--tr-mat-2); font-size: 15px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.xl-pa div > b { font-weight: 800; color: var(--tr-chu-3); flex: none; }
+.xl-pa div.dung { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); box-shadow: inset 0 0 0 2px var(--tr-dung); }
+.xl-pa div.dung > b { color: var(--tr-dung-chu); }
+.xl-pa sub { font-size: 0.72em; }
+.xl-lop { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.xl-lop .thanh { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: var(--tr-mat-3); overflow: hidden; }
+.xl-lop .thanh i { display: block; height: 100%; border-radius: 5px; background: var(--tr-dung); }
+.xl-lop span { color: var(--tr-chu-3); font-weight: 600; }
+.xl-chan { text-align: center; font-size: 13px; color: var(--tr-chu-3); font-weight: 600; padding: 6px 0 0; }
+.xl-phat-nhung { border-radius: 22px; overflow: hidden; background: var(--tr-chieu-bang); margin-bottom: 12px; display: none; }
+/* trình phát nhúng (phat.css, chép gọn) */
+.xp { position: relative; color: var(--tr-chieu-giay); font-size: 15px; }
+.xp-nen { position: relative; aspect-ratio: 16 / 9; }
+.xp-bang { position: absolute; inset: 6px; border-radius: 12px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px var(--tr-chieu-mat-3); overflow: hidden; }
+.xp-day { position: relative; background: var(--tr-chieu-chu); padding: 12px 16px 10px; }
+.xp-ten { display: flex; align-items: center; gap: 8px; font-size: 14.5px; margin-bottom: 4px; min-width: 0; }
+.xp-ten b { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xp-ten > span { margin-left: auto; font-weight: 700; color: var(--tr-chieu-the); white-space: nowrap; }
+.xp-cham { display: block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--p-tim-2); }
+.xp-tua { height: 44px; padding-bottom: 9px; display: flex; flex-direction: column; justify-content: flex-end; }
+.xp-tua small { font-size: 11.5px; font-weight: 700; margin-bottom: 5px; }
+.xp-ray { position: relative; height: 8px; border-radius: 4px; background: var(--tr-chieu-mat-3); }
+.xp-ray i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--p-tim-2); }
+.xp-ray u { position: absolute; top: -5px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--tr-chieu-giay); box-shadow: 0 0 0 4px var(--tr-chieu-mat-3); }
+.xp-nut { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; margin-top: 2px; }
+.xp-n { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--tr-chieu-giay); }
+.xp-n.chinh { background: var(--tr-chieu-giay); color: var(--tr-chieu-bang); }
+.xp-gio { font-size: 14.5px; font-weight: 700; margin: 0 8px; white-space: nowrap; }
+.xp-gio span { color: var(--tr-chieu-the); }
+.xp-td { margin-left: auto; display: flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: var(--tr-chieu-mat-2); }
+.xp-td span { min-width: 50px; height: 42px; padding: 0 8px; border-radius: 999px; display: grid; place-items: center; font-size: 14.5px; font-weight: 800; color: var(--tr-chieu-the); }
+.xp-td span.bat { background: var(--tr-chieu-giay); color: var(--tr-chieu-bang); }
+.xp-lang { min-height: 48px; padding: 4px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; background: var(--tr-chieu-mat-2); color: var(--tr-chieu-giay); white-space: nowrap; }
+.xp-lang i { display: block; width: 30px; height: 18px; border-radius: 9px; background: var(--p-xanh); position: relative; flex: none; }
+.xp-lang i::after { content: ""; position: absolute; left: 14px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--p-muc); }
+
+/* ══ THỨ MỚI: thẻ «Nhật ký bài dạy» ══ hình thu nhỏ = bảng đang tự vẽ lại từng trang; dải dưới hình = màu phấn Thầy dùng trong buổi (theo tỉ lệ thật) */
+.nkt { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: center; gap: 14px; width: 100%; min-height: 108px; margin-bottom: 14px; padding: 12px; border-radius: 26px; text-align: left;
+  background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); transition: transform 0.1s; }
+.nkt:active { transform: scale(0.99); }
+.nkt-bang { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3); }
+.nkt-bang canvas { height: calc(100% - 5px); }
+.nkt-bang .dai { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; display: flex; gap: 1px; }
+.nkt-bang .dai i { display: block; height: 100%; }
+.nkt-chu { min-width: 0; }
+.nkt-chu .ten { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; }
+.nkt-chu .dem span { white-space: nowrap; }
+.nkt-chu .dem { display: block; font-size: 13.5px; font-weight: 600; color: var(--tr-chu-3); margin-top: 3px; }
+.nkt-chu .mo { display: inline-flex; align-items: center; gap: 2px; margin-top: 8px; min-height: 30px; padding: 2px 8px 2px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 700; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.nkt[hidden] { display: none; }
+
+.chi-dt { display: block; }
+/* ngang thấp (điện thoại xoay ngang): hai cột */
+@media (orientation: landscape) and (max-height: 520px) {
+  .xl-trang { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 14px; align-items: start; }
+  .xl-trang > .xl-dau { grid-column: 1 / -1; }
+}
+/* máy tính: hai cột, trình phát nhúng */
+@media (min-width: 900px) {
+  .xl-trang { max-width: 1240px; padding: 28px 32px 60px; display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 0 24px; align-items: start; }
+  .xl-trang > .xl-dau { grid-column: 1 / -1; }
+  .xl-trang .trai { position: sticky; top: 28px; }
+  .xl-bia-buoi h1 { font-size: 36px; }
+  .phai .xl-the { padding: 20px; }
+  .xl-phat-nhung { display: block; }
+  .xl-hai-phat { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+  .xl-hai-phat > .ds { order: 2; }
+}
+@media (prefers-reduced-motion: reduce) { .nkt { transition: none; } }
+</style></head>
+<body>
+<main class="xl-trang">
+  <header class="xl-dau">
+    <button type="button" class="xl-lui" aria-label="Về danh sách buổi live"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div><p>Xem lại Live · Lớp Live Khối 10</p></div>
+  </header>
+
+  <div class="trai">
+    <section class="xl-bia-buoi">
+      <div class="tren"><i aria-hidden="true"></i>Xem lại Live</div>
+      <h1>K10-LIÊN KẾT CHT PHÂN CỰC KHÔNG PHÂN CỰC</h1>
+      <p class="so">Thứ Năm 12/11/2026 · Live Khối 10 · live từ 20:18</p>
+      <div class="xl-so so"><div><b>1</b><span>câu</span></div><div><b>39</b><span>phút live</span></div><div><b>1</b><span>đoạn xem lại</span></div></div>
+      <button type="button" class="xl-nut"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12.5-7.5a1 1 0 0 0 0-1.8L8.5 3.6A1 1 0 0 0 7 4.5z"/></svg>Phát đoạn chữa bài · 38 phút</button>
+    </section>
+
+    <!-- THẺ MỚI · phương án chính: ngay dưới bìa -->
+    <button type="button" class="nkt" id="the-nk" data-vt="tren">
+      <span class="nkt-bang"><canvas aria-hidden="true"></canvas><span class="dai" data-dai aria-hidden="true"></span></span>
+      <span class="nkt-chu"><b class="ten">Nhật ký bài dạy</b><span class="dem so" data-dem></span><span class="mo">Mở nhật ký<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></span>
+    </button>
+
+    <section class="xl-kinh xl-the">
+      <h2>Dòng thời gian<small class="so">39 phút</small></h2>
+      <div class="xl-tg" aria-hidden="true"><span style="flex: 20 1 0"></span><span class="chua" style="flex: 960 1 0"><b class="so">1</b></span><span style="flex: 20 1 0"></span></div>
+      <div class="xl-tg-chu so"><span>20:18</span><span>20:57</span></div>
+      <div class="xl-chu-giai"><span><i aria-hidden="true"></i>Lớp làm bài</span><span><i aria-hidden="true" style="background: var(--p-tim-2)"></i>Chữa trên bảng (màu đội của bạn lên bảng)</span><span><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.600 1.200 6.500L12 17.400 6.100 20.500l1.200-6.500L2.500 9.400l6.600-.9z"/></svg>Đoạn đáng xem (app tự chọn)</span></div>
+    </section>
+
+    <!-- phương án phụ (?vt=duoi): dưới Dòng thời gian, đúng chỗ đang trống trong ảnh của Thầy -->
+    <button type="button" class="nkt" data-vt="duoi" hidden>
+      <span class="nkt-bang"><canvas aria-hidden="true"></canvas><span class="dai" data-dai aria-hidden="true"></span></span>
+      <span class="nkt-chu"><b class="ten">Nhật ký bài dạy</b><span class="dem so" data-dem></span><span class="mo">Mở nhật ký<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></span>
+    </button>
+  </div>
+
+  <div class="phai">
+    <div class="xl-phat-nhung"><div class="xp">
+      <div class="xp-nen"><div class="xp-bang"><canvas id="cv-phat" aria-label="Bảng Thầy viết trong trình phát"></canvas></div></div>
+      <div class="xp-day">
+        <div class="xp-ten"><i class="xp-cham" aria-hidden="true"></i><b>Câu 1 · Liên kết cộng hoá trị · Thầy chữa</b><span class="so">Đoạn 1/1</span></div>
+        <div class="xp-tua"><small>Câu 1</small><div class="xp-ray"><i id="ray"></i><u id="num"></u></div></div>
+        <div class="xp-nut">
+          <span class="xp-n" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.600-5.900"/><path d="M4 4v5h5"/></svg></span>
+          <span class="xp-n chinh" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="5.500" y="4" width="4.500" height="16" rx="1.500"/><rect x="14" y="4" width="4.500" height="16" rx="1.500"/></svg></span>
+          <span class="xp-n" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.600-5.900"/><path d="M20 4v5h-5"/></svg></span>
+          <span class="xp-gio so"><span id="gio-nay">00:00</span> <span>/ 38:00</span></span>
+          <span class="xp-td so"><span class="bat">1×</span><span>1,5×</span><span>2×</span></span>
+          <span class="xp-lang">Bỏ khoảng lặng<i aria-hidden="true"></i></span>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="xl-hai-phat">
+      <section class="xl-kinh xl-the ds" aria-label="Danh sách đoạn chữa bài">
+        <h2>1 đoạn chữa bài<small>Chưa xem</small></h2>
+        <button type="button" class="xl-doan" aria-current="true"><span class="o so" aria-hidden="true">1</span><span class="giua"><b>Câu 1 · Liên kết cộng hoá trị</b><span class="so">Thầy chữa · 38:00</span></span></button>
+      </section>
+      <section class="xl-kinh xl-the">
+        <div class="xl-cau-dau"><span class="so-cau so">Câu 1</span><span class="xl-chip">Liên kết cộng hoá trị</span><span class="xl-chip dung em">Em làm đúng</span></div>
+        <div class="xl-de"><b>Câu 1.</b>Liên kết trong phân tử nào sau đây là liên kết cộng hoá trị không phân cực?</div>
+        <div class="xl-pa"><div><b>A.</b><span>HCl</span></div><div class="dung"><b>B.</b><span>H<sub>2</sub></span></div><div><b>C.</b><span>NaCl</span></div><div><b>D.</b><span>H<sub>2</sub>O</span></div></div>
+        <div class="xl-lop so"><b>Lớp làm đúng 82 %</b><span>37/45 em</span><div class="thanh" aria-hidden="true"><i style="width: 82%"></i></div></div>
+      </section>
+    </div>
+    <p class="xl-chan">Thầy Đỗ Đại Học · chỉ lớp Live Khối 10 xem được buổi này</p>
+  </div>
+</main>
+
+<script src="net-mau.js"></script>
+<script src="may-ve.js"></script>
+<script>
+(function () {
+  'use strict'
+  var NK = window.NK, q = new URLSearchParams(location.search), D = NK.D, S = NK.SO
+  var DUNG = q.has('dung') ? Math.max(0, Math.min(1, +q.get('dung'))) : null, VT = q.get('vt') === 'duoi' ? 'duoi' : 'tren'
+  document.querySelectorAll('.nkt').forEach(function (e) { e.hidden = e.getAttribute('data-vt') !== VT; if (e.hidden) e.removeAttribute('id'); else e.id = 'the-nk' })
+  var the = document.getElementById('the-nk')
+  // dải dưới hình thu nhỏ = màu phấn theo tỉ lệ thật của buổi
+  the.querySelector('[data-dai]').innerHTML = S.mau.map(function (m) { return '<i style="flex:' + Math.round(m.phan * 1000) + ' 1 0;background:' + m.rgb + '"></i>' }).join('')
+  the.querySelector('[data-dem]').innerHTML = '<span>' + S.trang + ' trang bảng</span> · <span>' + S.khung + ' ý đóng khung</span>'
+  the.setAttribute('aria-label', 'Mở nhật ký bài dạy: ' + S.trang + ' trang bảng, ' + S.khung + ' ý Thầy đóng khung')
+
+  // hình thu nhỏ: lần lượt tự vẽ lại từng trang (mỗi trang khoảng 4 giây, dừng 1,4 giây rồi sang trang kế)
+  var cv = the.querySelector('canvas'), so = 0, mayNho = null
+  function trang(i, f, chay) {
+    var t = NK.TRANG[i], v = NK.vung(t.hop, 30), w = v[2] - v[0], h = v[3] - v[1], can = 16 / 9
+    // nới vùng nhìn cho đúng khổ 16:9 của ô
+    if (w / h > can) { var them = (w / can - h) / 2; v[1] -= them; v[3] += them } else { var th = (h * can - w) / 2; v[0] -= th; v[2] += th }
+    if (mayNho) mayNho.huy()
+    mayNho = NK.tao(cv, { net: t.net, hop: v, ms: 4200, nghi: 200, f: f, butTo: 0.55 })
+    if (chay) mayNho.chay(0, function () { setTimeout(function () { so = (so + 1) % S.trang; trang(so, 0, true) }, 1400) })
+  }
+  if (DUNG != null || NK.GIAM) trang(0, DUNG != null ? Math.min(1, DUNG + 0.1) : 1, false); else trang(0, 0, true)
+
+  // trình phát nhúng (máy tính): bảng Thầy đang viết
+  var cvp = document.getElementById('cv-phat')
+  if (cvp.getBoundingClientRect().width > 0) {
+    var p = NK.tao(cvp, { net: NK.NET, hop: [0, 0, NK.R, NK.C], ms: 30000, nghi: 420, ke: true, theoBang: true, butTo: 1.1, f: DUNG != null ? DUNG : 0.62 })
+    var t = p.gioTai(p.f) - D.doan[0], phan = t / (D.doan[1] - D.doan[0])
+    document.getElementById('ray').style.width = (phan * 100).toFixed(2) + '%'; document.getElementById('num').style.left = (phan * 100).toFixed(2) + '%'
+    document.getElementById('gio-nay').textContent = NK.gio(t)
+  }
+  the.addEventListener('click', function () { location.href = 'nhat-ky.html' })
+  if (q.get('cuon')) { var dich = document.getElementById(q.get('cuon')); if (dich) window.scrollTo(0, dich.getBoundingClientRect().top + scrollY - (+q.get('le') || 12)) }
+  document.documentElement.setAttribute('data-san', '')
+})()
+</script>
+</body></html>
