@@ -29,7 +29,9 @@ jobs:
         run: |
           B=$(jq -r '.inputs.buoi' "$GITHUB_EVENT_PATH" | tr -cd 'A-Za-z0-9_-')
           mkdir -p ../tep
-          for t in nhat-ky.json buoi.json net.bin; do npx -y wrangler@4 r2 object get "omr-de/live/$B/$t" --remote --file "../tep/$t" > /dev/null 2>&1 && echo "có $t ($(stat -c %s ../tep/$t) B)" || echo "không có $t"; done
+          for t in nhat-ky.json buoi.json net.bin; do
+            if npx -y wrangler@4 r2 object get "omr-de/live/$B/$t" --remote --file "../tep/$t" > /tmp/r2.log 2>&1; then echo "có $t ($(stat -c %s ../tep/$t) B)"; else echo "không có $t:"; grep -iE "error|không|denied|auth|not found|code" /tmp/r2.log | head -4 | cut -c1-200; fi
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: tep-nhat-ky
