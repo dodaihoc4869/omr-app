@@ -1,0 +1,798 @@
+{
+  "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+  "native": [
+    973,
+    265
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-BDT-L4-0401-II-4",
+      "de": "Geraniol là một alcohol có trong tinh dầu hoa hồng, tinh dầu sả và nhiều loại tinh dầu thảo mộc khác. Từ geraniol (dùng dư) và acetic acid nguyên chất có thể điều chế được geranyl acetate theo sơ đồ (hình).\nToàn bộ lượng geranyl acetate thu được dùng để sản xuất nước hoa loại S. Mỗi chai loại S có thể tích 50,0 mL và chứa 80% geranyl acetate theo thể tích ($d_{\\text{geranyl acetate}}$ = 0,916 g∙mL$^{-1}$).",
+      "refs": [
+        {
+          "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+          "where": "VIP27-BDT-L4-0401-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "4acc4989c4b6ef95dc004b983779e1bbdb1da2c0fcc4b5052472e6613e6703ba"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "24C6OinclwaterEXCLH2SO4condition/acid2C-geraniol10C-ester12C/2CCdoubleEACH4total/2COdouble2splitfeetCONTACTrespectivearms/2OPENHALFharpoons-upperRIGHTABOVE-lowerLEFTBELOW/ALLregularUPRIGHT-2captionsEXACTGeraniol-Geranyl acetate/H2SO4dac-tSUPsmallo/7TOPcroppedUNKNOWNfragmentsretain-native265heightKEEP/NOaddedH-tempvalue-yield-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+  "rootSourceAudit": "Root OWNnativeFULL2x/eachTOPfragment10x/arrows6x/2CO6x/allpublicde; sevenUNKNOWNpiecesretain/noRestore. Provided263heightwrong ROOTPIL265beforeFIRSTbuilder; noSVGnegativeforsourcecorrection. NativeapproxNOTsubpixel/COfeetCALCULATEDfromapproxarms.",
+  "independentSourceAudit": {
+    "i": 632,
+    "assetIndexProvided": 1248,
+    "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610.png",
+    "size": [
+      973,
+      265
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-II-4",
+        "de": "Geraniol là một alcohol có trong tinh dầu hoa hồng, tinh dầu sả và nhiều loại tinh dầu thảo mộc khác. Từ geraniol (dùng dư) và acetic acid nguyên chất có thể điều chế được geranyl acetate theo sơ đồ (hình).\nToàn bộ lượng geranyl acetate thu được dùng để sản xuất nước hoa loại S. Mỗi chai loại S có thể tích 50,0 mL và chứa 80% geranyl acetate theo thể tích ($d_{\\text{geranyl acetate}}$ = 0,916 g∙mL$^{-1}$).",
+        "allHinh": [
+          {
+            "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+            "where": "VIP27-BDT-L4-0401-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "4acc4989c4b6ef95dc004b983779e1bbdb1da2c0fcc4b5052472e6613e6703ba"
+          }
+        ],
+        "missingHashes": [
+          "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/414-full2x.png",
+        "/workspace/scratch/414-heads.png",
+        "/workspace/scratch/414-left.png",
+        "/workspace/scratch/414-ger.png",
+        "/workspace/scratch/414-prod.png",
+        "/workspace/scratch/414-frag0.png",
+        "/workspace/scratch/414-frag1.png",
+        "/workspace/scratch/414-frag2.png",
+        "/workspace/scratch/414-frag3.png",
+        "/workspace/scratch/414-frag4.png",
+        "/workspace/scratch/414-frag5.png",
+        "/workspace/scratch/414-frag6.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "geraniolC": 10,
+        "geraniolO": 1,
+        "acidC": 2,
+        "acidO": 2,
+        "geranylAcetateC": 12,
+        "geranylAcetateO": 2,
+        "waterO": 1,
+        "totalC": 24,
+        "totalO": 6,
+        "CCDoublePairs": 4,
+        "CODoublePairs": 2,
+        "openHalfHarpoonHeads": 2
+      },
+      "font": "Allregularuprightserif chemical/captions/condition.3/2/4SUB, tsmalloSUP. No truebold/italic.",
+      "acid": {
+        "orderedC": [
+          [
+            14,
+            156
+          ],
+          [
+            42,
+            134
+          ]
+        ],
+        "CO": {
+          "rays": [
+            [
+              [
+                39,
+                106
+              ],
+              [
+                39,
+                135.5
+              ]
+            ],
+            [
+              [
+                45,
+                106
+              ],
+              [
+                45,
+                135.5
+              ]
+            ]
+          ],
+          "Obox": [
+            34,
+            80,
+            52,
+            98
+          ],
+          "contact": "Bothfeetcontacteachleftmethyl/rightOHarm via native shortarch, nowhitegap."
+        },
+        "OH": {
+          "literal": "OH",
+          "bbox": [
+            68,
+            146,
+            106,
+            165
+          ],
+          "arm": [
+            [
+              45,
+              135.5
+            ],
+            [
+              64,
+              146
+            ]
+          ]
+        }
+      },
+      "plus1": {
+        "bbox": [
+          140,
+          115,
+          155,
+          130
+        ]
+      },
+      "geraniol": {
+        "orderedMainPathFromOHEnd": [
+          [
+            323,
+            62
+          ],
+          [
+            283,
+            85
+          ],
+          [
+            249,
+            63
+          ],
+          [
+            211,
+            85
+          ],
+          [
+            211,
+            126
+          ],
+          [
+            249,
+            148
+          ],
+          [
+            249,
+            189
+          ],
+          [
+            211,
+            211
+          ]
+        ],
+        "branches": [
+          [
+            [
+              249,
+              63
+            ],
+            [
+              249,
+              24
+            ]
+          ],
+          [
+            [
+              249,
+              189
+            ],
+            [
+              284,
+              211
+            ]
+          ]
+        ],
+        "CCdoubleMain": [
+          [
+            [
+              283,
+              85
+            ],
+            [
+              249,
+              63
+            ]
+          ],
+          [
+            [
+              249,
+              148
+            ],
+            [
+              249,
+              189
+            ]
+          ]
+        ],
+        "CCextraRays": [
+          [
+            [
+              284,
+              78
+            ],
+            [
+              256,
+              60
+            ]
+          ],
+          [
+            [
+              242,
+              155
+            ],
+            [
+              242,
+              186
+            ]
+          ]
+        ],
+        "OH": {
+          "literal": "OH",
+          "bbox": [
+            349,
+            73,
+            389,
+            93
+          ],
+          "arm": [
+            [
+              323,
+              62
+            ],
+            [
+              347,
+              78
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        "caption": {
+          "literal": "Geraniol",
+          "bbox": [
+            204,
+            235,
+            298,
+            254
+          ]
+        }
+      },
+      "equilibrium": {
+        "upper": {
+          "shaft": [
+            [
+              430,
+              121
+            ],
+            [
+              534,
+              121
+            ]
+          ],
+          "oneHook": [
+            [
+              526,
+              113
+            ],
+            [
+              534,
+              121
+            ]
+          ],
+          "direction": "RIGHT",
+          "side": "ABOVE",
+          "fill": "NONE"
+        },
+        "lower": {
+          "shaft": [
+            [
+              430,
+              131
+            ],
+            [
+              534,
+              131
+            ]
+          ],
+          "oneHook": [
+            [
+              430,
+              131
+            ],
+            [
+              434,
+              134
+            ],
+            [
+              438,
+              139
+            ]
+          ],
+          "direction": "LEFT",
+          "side": "BELOW",
+          "fill": "NONE"
+        },
+        "conditionAbove": {
+          "literal": "H₂SO₄ đặc",
+          "bbox": [
+            432,
+            94,
+            520,
+            116
+          ]
+        },
+        "conditionBelow": {
+          "literal": "tᵒ",
+          "bbox": [
+            470,
+            137,
+            489,
+            154
+          ]
+        },
+        "evidence": "Own5x narrowmacro: singlethinbenthook perhead, no closedbase/fulltriangle/fill; upperonelegabove/right, loweronebelow/left."
+      },
+      "product": {
+        "orderedGeranylMainPathFromOEnd": [
+          [
+            702,
+            65
+          ],
+          [
+            663,
+            87
+          ],
+          [
+            628,
+            66
+          ],
+          [
+            591,
+            87
+          ],
+          [
+            591,
+            128
+          ],
+          [
+            628,
+            151
+          ],
+          [
+            628,
+            191
+          ],
+          [
+            590,
+            213
+          ]
+        ],
+        "branches": [
+          [
+            [
+              628,
+              66
+            ],
+            [
+              628,
+              27
+            ]
+          ],
+          [
+            [
+              628,
+              191
+            ],
+            [
+              664,
+              213
+            ]
+          ]
+        ],
+        "CCdoubleMain": [
+          [
+            [
+              663,
+              87
+            ],
+            [
+              628,
+              66
+            ]
+          ],
+          [
+            [
+              628,
+              151
+            ],
+            [
+              628,
+              191
+            ]
+          ]
+        ],
+        "CCextraRays": [
+          [
+            [
+              664,
+              80
+            ],
+            [
+              635,
+              62
+            ]
+          ],
+          [
+            [
+              622,
+              157
+            ],
+            [
+              622,
+              188
+            ]
+          ]
+        ],
+        "esterO": {
+          "bbox": [
+            729,
+            75,
+            748,
+            94
+          ],
+          "leftArm": [
+            [
+              702,
+              65
+            ],
+            [
+              726,
+              80
+            ]
+          ],
+          "rightArm": [
+            [
+              751,
+              82
+            ],
+            [
+              775,
+              68.5
+            ]
+          ]
+        },
+        "acetateCO": {
+          "bareC": [
+            777,
+            67
+          ],
+          "rays": [
+            [
+              [
+                774,
+                36
+              ],
+              [
+                774,
+                68
+              ]
+            ],
+            [
+              [
+                780,
+                36
+              ],
+              [
+                780,
+                68
+              ]
+            ]
+          ],
+          "Obox": [
+            768,
+            13,
+            787,
+            31
+          ],
+          "contact": "EachverticalfootcontactsownincomingesterOarm/rightmethylarm atnativejoin, nofullwhitegap.",
+          "methylArm": [
+            [
+              780,
+              68.5
+            ],
+            [
+              812,
+              89
+            ]
+          ]
+        },
+        "caption": {
+          "literal": "Geranyl acetate",
+          "bbox": [
+            617,
+            235,
+            780,
+            255
+          ]
+        }
+      },
+      "plus2": {
+        "bbox": [
+          861,
+          115,
+          878,
+          130
+        ]
+      },
+      "water": {
+        "literal": "H₂O",
+        "bbox": [
+          920,
+          113,
+          968,
+          138
+        ]
+      },
+      "topFragments": {
+        "classification": "CroppedproseinkUNKNOWN, explicitlyretainapproxshape; no textrestorationorchemicalmeaning.",
+        "items": [
+          {
+            "bbox": [
+              0,
+              0,
+              14,
+              5
+            ],
+            "shape": "ShallowUclippedleft",
+            "guide": [
+              [
+                0,
+                0
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                7,
+                4.5
+              ],
+              [
+                12,
+                3
+              ],
+              [
+                14,
+                0
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              59,
+              0,
+              65,
+              4
+            ],
+            "shape": "Shortslopinghook",
+            "guide": [
+              [
+                64,
+                0
+              ],
+              [
+                62,
+                2
+              ],
+              [
+                59,
+                4
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              285,
+              0,
+              299,
+              5
+            ],
+            "shape": "ShallowU",
+            "guide": [
+              [
+                286,
+                0
+              ],
+              [
+                288,
+                3
+              ],
+              [
+                292,
+                4.5
+              ],
+              [
+                297,
+                3
+              ],
+              [
+                299,
+                0
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              318,
+              0,
+              325,
+              5
+            ],
+            "shape": "Jhook",
+            "guide": [
+              [
+                318,
+                1
+              ],
+              [
+                318,
+                4
+              ],
+              [
+                321,
+                4.5
+              ],
+              [
+                324,
+                2
+              ],
+              [
+                325,
+                0
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              688,
+              0,
+              691,
+              3
+            ],
+            "shape": "Tinyblacknub",
+            "center": [
+              689.5,
+              1.5
+            ],
+            "radiusApprox": [
+              1.5,
+              1.5
+            ]
+          },
+          {
+            "bbox": [
+              723,
+              0,
+              737,
+              5
+            ],
+            "shape": "ShallowU",
+            "guide": [
+              [
+                723,
+                0
+              ],
+              [
+                725,
+                3
+              ],
+              [
+                730,
+                4.5
+              ],
+              [
+                735,
+                3
+              ],
+              [
+                737,
+                0
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              797,
+              0,
+              804,
+              5
+            ],
+            "shape": "Jhook",
+            "guide": [
+              [
+                797,
+                1
+              ],
+              [
+                797,
+                4
+              ],
+              [
+                800,
+                4.5
+              ],
+              [
+                803,
+                2
+              ],
+              [
+                804,
+                0
+              ]
+            ]
+          }
+        ],
+        "strokeApprox": 1.3
+      },
+      "crop": "Nativeheight265 verifiedPIL, notprovided263. Allreactionpartsinside;7prosefragmentsatTOPclippedbyy0 retained. No restoredmissingletters.",
+      "noAdded": [
+        "No coefficientsnew",
+        "No catalystyield",
+        "No fullfilledharpoontriangles",
+        "No Geraniolstyletheorynormalize",
+        "No molecularformulas"
+      ]
+    },
+    "measurementLimits": "Individualchainsnativeapprox±1–2px, no affinecopypanel. Each7topfragmentown6xopened. Captionregularupright, notbolditalicfromothersources. Source-onlygeometrynotSVGpass.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull": true,
+    "eachTopFragment10x": true,
+    "nativeArrows6xCO6x": true,
+    "allPublicDe": true,
+    "freshFinalChromiumFull3xCondition8x": true,
+    "finalHash": "6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b",
+    "initialHash": "c75c77c47ab89205d5fc79fb4469257a5fb9fef0178ad2175d1d73b9044ede2a",
+    "changedChildrenOnly": [
+      18
+    ],
+    "allOtherGlyphGeometryExact": true,
+    "noOldCarry": true,
+    "nativeHeight265BeforeFirstBuilder": true,
+    "sevenUnknownTopFragmentsRetained": true,
+    "twoOpenHalfHarpoons": true,
+    "feetCalculatedApproxNotNativeSubpixel": true,
+    "freshFinalCO6xTop6x": true,
+    "verdict": "Đạt root+readonly OWNnativeFULL-allrefs/freshFINALFULL3x/macros/exactSHA"
+  }
+}

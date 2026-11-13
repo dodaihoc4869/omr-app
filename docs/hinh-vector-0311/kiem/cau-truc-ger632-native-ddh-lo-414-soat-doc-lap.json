@@ -1,0 +1,23 @@
+[
+  {
+    "i": 632,
+    "hashSvg": "6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất, fresh Chromium3x FULL và macro acid/alcohol/ester/conditions/topcrop. 24C6O gồm nước không tính catalyst, acid2C-Geraniol10C-ester12C; 4CCdouble đúng vị trí/innerends tự do, hai COsplitfeet contact respectivearms với glyphO whitegap. Hai OPENHALFharpoons upperRIGHTABOVE/lowerLEFTBELOW, H₂SO₄ đặc/tSUPo cách chữ/nét sạch, sub4 không chạm đặc. Caption Geraniol/Geranyl acetate và hóa học allregularupright, 7unknowntopfragments/native265height giữ, không thêm tên/hệ số/điều kiện/answer. Geometry xấp xỉ/calculatedfeet không coi là nativeSubpixel; actualSHApre/post đúng.",
+    "render": "/workspace/scratch/soat414-632-fresh.png",
+    "macro": [
+      "/workspace/scratch/ger632-acid.png",
+      "/workspace/scratch/ger632-ger.png",
+      "/workspace/scratch/ger632-ester.png",
+      "/workspace/scratch/ger632-condition.png",
+      "/workspace/scratch/ger632-crop.png"
+    ],
+    "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+    "hashSvgDaSoat": "6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b",
+    "runtimeProof": {
+      "file": "/workspace/scratch/ger632-runtime.log",
+      "sha256": "6a25673cdbf6960c896106b32a0386d7d026a27b30938e3f6d05a96930f2814b",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ger632-native-ddh-6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b.svg 6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b\n632 { x: 0, y: 0, width: 973, height: 265 }\n\nPOSTSHOT_SHA 6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b\nCOMMAND node /workspace/scratch/agent-render414.cjs\nCONTEXT VIP27-BDT-L4-0401-II-4.hinh.0.du_lieu; public de/one ref only, no answers.\n"
+    }
+  }
+]

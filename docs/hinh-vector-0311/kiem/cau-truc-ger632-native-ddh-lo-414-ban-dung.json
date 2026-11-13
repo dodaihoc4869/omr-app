@@ -1,0 +1,29 @@
+[
+  {
+    "i": 632,
+    "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+    "fileNguon": "anh/74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610.png",
+    "svg": "ger632-native-ddh-6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b.svg",
+    "hashSvg": "6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b",
+    "byteSvg": 31484,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-II-4",
+        "de": "Geraniol là một alcohol có trong tinh dầu hoa hồng, tinh dầu sả và nhiều loại tinh dầu thảo mộc khác. Từ geraniol (dùng dư) và acetic acid nguyên chất có thể điều chế được geranyl acetate theo sơ đồ (hình).\nToàn bộ lượng geranyl acetate thu được dùng để sản xuất nước hoa loại S. Mỗi chai loại S có thể tích 50,0 mL và chứa 80% geranyl acetate theo thể tích ($d_{\\text{geranyl acetate}}$ = 0,916 g∙mL$^{-1}$).",
+        "refs": [
+          {
+            "hash": "74d7ec9a289e5afed5b4fccfa32f9397af73296ccf7ea296a5b17a731968e610",
+            "where": "VIP27-BDT-L4-0401-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "4acc4989c4b6ef95dc004b983779e1bbdb1da2c0fcc4b5052472e6613e6703ba"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "24C6OinclwaterEXCLH2SO4condition/acid2C-geraniol10C-ester12C/2CCdoubleEACH4total/2COdouble2splitfeetCONTACTrespectivearms/2OPENHALFharpoons-upperRIGHTABOVE-lowerLEFTBELOW/ALLregularUPRIGHT-2captionsEXACTGeraniol-Geranyl acetate/H2SO4dac-tSUPsmallo/7TOPcroppedUNKNOWNfragmentsretain-native265heightKEEP/NOaddedH-tempvalue-yield-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+    "hashSvgDaSoat": "6555406d186f092c41c27a5373b479e031f78678d4bfbb23ef198b32cff4ee3b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
