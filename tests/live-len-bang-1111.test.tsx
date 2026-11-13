@@ -76,10 +76,10 @@ describe('dữ liệu: em được gọi lên bảng lấy từ viewEm.luot.goi 
     nhanTra(st, 'S5', 'B', 2500)
     goiLenBang(st, 'S5', ['Chưa lên bảng buổi này'], 3000)
     const a = emLenBang(viewEm(st, 'S1').luot, 'S1')!
-    expect(a).toEqual({ khoa: `${st.luot!.so}:S5`, ten: 'Minh Anh', doi: 2, laEm: false, dang: true })
+    expect(a).toEqual({ khoa: `${st.luot!.so}:S5`, ten: 'Minh Anh', doi: 2, laEm: false, dang: true, tiep: [0, 0, 0, 0], emTiep: 0, doiEm: -1 }) // 13/11: thêm SỐ lượt cổ vũ theo đội + số lần của em (tinh thể cổ vũ) — vẫn không tên người bấm, không đáp án
     expect(emLenBang(viewEm(st, 'S5').luot, 'S5')!.laEm).toBe(true)
-    // chỉ năm trường ấy: không số báo danh rời, không lý do gọi, không đáp án, không kết quả chấm
-    expect(Object.keys(a).sort()).toEqual(['dang', 'doi', 'khoa', 'laEm', 'ten'])
+    // chỉ các trường ấy (13/11 thêm ba SỐ cổ vũ): không số báo danh rời, không lý do gọi, không đáp án, không kết quả chấm
+    expect(Object.keys(a).sort()).toEqual(['dang', 'doi', 'doiEm', 'emTiep', 'khoa', 'laEm', 'ten', 'tiep'])
     lamBang(st, 3500)
     expect(khoaDang(emLenBang(viewEm(st, 'S1').luot, 'S1'))).toBe(a.khoa)
     chamLenBang(st, true, 4000)
