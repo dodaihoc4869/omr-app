@@ -462,6 +462,21 @@ const dauThayA = await toHoc.locator('body').evaluate(() => { const d = document
 kiem('4o bấm Đạt (phím D) trên tờ ⇒ phòng ghi Đạt; máy em hiện con dấu «ĐẠT»; máy thầy vẫn ở màn chiếu', st()?.luot?.goi?.dat === true && dauA === 'ĐẠT' && (await trenCung(gv)) === 'to', JSON.stringify({ dat: st()?.luot?.goi?.dat, dau: dauA, tren: await trenCung(gv) }))
 kiem('4o2 (thầy 12/11, bản vẽ 27) MÁY THẦY cũng hiện con dấu «ĐẠT» giữa màn chiếu, đè sang giấy đề, có tên em', !!dauThayA && dauThayA.chu === 'ĐẠT' && dauThayA.giua && dauThayA.deGiay && /lên bảng/.test(dauThayA.ten), JSON.stringify(dauThayA))
 await chup(gv, '4-gv-con-dau-dat')
+// 13/11 thầy «chữ làm tốt lắm thu nhỏ lại cho thẳng hàng với chữ đạt để bo tròn luôn gọn gàng»: tờ nhận «đã ghi Đạt» (sự kiện mc-ghi-nhan) ⇒ thẻ tên thêm
+// «Làm tốt lắm» CÙNG HÀNG sau dấu «Đạt», nhỏ hơn tên, thẻ vẫn một hàng bo tròn.
+const theMung = await toHoc.locator('body').evaluate(async () => {
+  const the = [...document.querySelectorAll('.mc-em')].find((e) => !e.hidden && e.getBoundingClientRect().width > 0)
+  if (!the) return null
+  const cao0 = the.getBoundingClientRect().height
+  document.dispatchEvent(new CustomEvent('mc-ghi-nhan', { detail: { dat: true, vung: the } }))
+  await new Promise((r) => setTimeout(r, 400))
+  const l = the.querySelector('.mc-lam-tot'), d = the.querySelector('.mc-dau-kq'), t = the.querySelector('.mc-ten')
+  if (!l || !d || !t) return { thieu: [!l && 'lam-tot', !d && 'dau', !t && 'ten'].filter(Boolean) }
+  const b = (e) => e.getBoundingClientRect(), [rl, rd, rr] = [b(l), b(d), b(the)]
+  return { cao0: Math.round(cao0), cao: Math.round(rr.height), lechTam: Math.round(Math.abs((rl.top + rl.bottom) / 2 - (rd.top + rd.bottom) / 2)), sauDau: rl.left >= rd.right - 1, coChu: Math.round(parseFloat(getComputedStyle(l).fontSize)), coTen: Math.round(parseFloat(getComputedStyle(t).fontSize)), hien: getComputedStyle(l).display !== 'none' }
+})
+await chup(gv, '4-gv-the-lam-tot')
+kiem('4o3 (thầy 13/11) «Làm tốt lắm» CÙNG HÀNG với «Đạt» (lệch tâm ≤ 4 px, nằm sau dấu), chữ nhỏ hơn tên, thẻ không cao thêm hàng thứ hai', !!theMung && theMung.hien && theMung.lechTam <= 4 && theMung.sauDau && theMung.coChu < theMung.coTen && theMung.cao <= theMung.cao0 + 4, JSON.stringify(theMung))
 await chup(em2, '4-em-dau-dat-that')
 // (b) tờ có em XẾP SẴN (như «Chữa câu khó»): sang câu 2 (lượt mới mở theo tờ), đặt thẻ tên em S2 như tờ xếp sẵn, bấm «Lên bảng» rồi Chưa đạt
 await ngu(2400)
