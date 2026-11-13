@@ -17,12 +17,18 @@ export interface EmLenBang {
   laEm: boolean
   /** Em còn ĐANG lên bảng (thầy chưa chấm, chưa mở đáp án). */
   dang: boolean
+  /** Lượt cổ vũ theo đội người bấm (0–3) · số lần chính em cầm máy đã bấm — cho tinh thể cổ vũ (TinhTheCoVu.tsx). */
+  tiep: readonly number[]
+  emTiep: number
+  /** Đội của em cầm máy (−1 = không rõ). */
+  doiEm: number
 }
+const KHONG_TIEP: readonly number[] = [0, 0, 0, 0]
 /** Em được gọi lên bảng của lượt (từ `viewEm.luot`); không có lời gọi ⇒ null. `sbd` = số báo danh của em đang cầm máy. */
-export function emLenBang(l: ViewEm['luot'] | undefined, sbd: string | null | undefined): EmLenBang | null {
+export function emLenBang(l: ViewEm['luot'] | undefined, sbd: string | null | undefined, doiEm = -1): EmLenBang | null {
   const g = l?.goi
   if (!l || !g) return null
-  return { khoa: `${l.so}:${g.sbd}`, ten: tenNgan(g.ten), doi: g.doi, laEm: !!sbd && g.sbd === sbd, dang: l.pha !== 'mo' && g.dat == null }
+  return { khoa: `${l.so}:${g.sbd}`, ten: tenNgan(g.ten), doi: g.doi, laEm: !!sbd && g.sbd === sbd, dang: l.pha !== 'mo' && g.dat == null, tiep: g.tiepDoi ?? KHONG_TIEP, emTiep: g.emTiep ?? 0, doiEm }
 }
 /** Khoá «đang lên bảng» để so lời gọi mới (rỗng = không ai đang lên bảng). */
 export const khoaDang = (em: EmLenBang | null | undefined): string => (em && em.dang ? em.khoa : '')
@@ -40,3 +46,19 @@ export function usePhaLenBang(luc: number): 'giua' | 'thu' | '' {
   }, [pha, luc])
   return pha
 }
+
+// ── TINH THỂ CỔ VŨ: chỗ đo của MÁY EM (lớp phủ là con trực tiếp của `.lv`). Cộng dồn offset, không dùng getBoundingClientRect — hình có thể xoay 90° bằng CSS. ──
+function tamTheoOffset(lop: HTMLElement, el: HTMLElement | null): { x: number; y: number } | null {
+  const goc = lop.offsetParent
+  if (!el || !goc || !el.offsetWidth) return null
+  let x = el.offsetWidth / 2, y = el.offsetHeight / 2
+  for (let n: HTMLElement | null = el; n && n !== goc; n = n.offsetParent as HTMLElement | null) { x += n.offsetLeft; y += n.offsetTop }
+  return { x: x - lop.offsetLeft, y: y - lop.offsetTop }
+}
+/** Đích = thẻ tên CÓ SẴN trên khung bảng (`.lv-lb-the`); bảng đang phóng kín (không có dải thẻ tên) ⇒ giữa mép trên. */
+export function dichTinhTheEm(lop: HTMLDivElement): { x: number; y: number; the?: Element | null } {
+  const the = lop.parentElement?.querySelector<HTMLElement>('.lv-lb-the') ?? null, p = tamTheoOffset(lop, the)
+  return p ? { ...p, the } : { x: lop.offsetWidth / 2, y: 14 }
+}
+/** Nguồn tinh thể của chính em = nút «Tiếp sức / Cổ vũ» trên dải lượt. */
+export const nguonTinhTheEm = (lop: HTMLDivElement): { x: number; y: number } | null => tamTheoOffset(lop, lop.parentElement?.querySelector<HTMLElement>('.lv-luot button.tiep') ?? null)

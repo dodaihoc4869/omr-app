@@ -96,7 +96,7 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     expect(duDoan(st, 'S3', 1, T0)).toBe(false)
     duDoan(st, 'S1', 1, T0); duDoan(st, 'S2', 0, T0)
     for (let i = 0; i < 15; i++) tiepSuc(st, 'S1', T0)
-    expect(st.luot!.goi!.tiep.S1).toBe(10)
+    expect(st.luot!.goi!.tiep.S1).toBe(12) // 13/11: thầy nâng 10 → 12 lần mỗi em mỗi lượt lên bảng
     const doi = st.ds.find((e) => e.sbd === 'S3')!.doi, truoc = diemDoi(st, doi), thuongTruoc = st.doiThuong[doi]!
     chamLenBang(st, true, T0)
     moDapAn(st, T0 + 1000, chamSo)
