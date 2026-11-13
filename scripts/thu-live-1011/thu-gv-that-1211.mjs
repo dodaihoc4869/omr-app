@@ -164,6 +164,9 @@ await gv.evaluate(() => window.__chieuToRiengThat()); await ngu(4200)
 const toT = gv.frameLocator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu thật"] iframe')
 const soTo = () => gv.evaluate(() => [...document.querySelectorAll('.lop-xem-phieu')].map((k) => `${k.getAttribute('aria-label')}${getComputedStyle(k).visibility === 'hidden' ? ' (ẩn)' : ''}`))
 kiem('3T1 tờ riêng thật của tấm đang chiếu ở «Học»; máy em nhận đề của câu', (await toT.locator('body.mc-lk').count()) === 1 && st()?.live?.khoi?.che === 'hoc' && !(await toT.locator('body.mc-che-bang').count()), JSON.stringify(await soTo()))
+const maTo = await toT.locator('.mc-dot[data-qid]').evaluateAll((ds) => [...new Set(ds.map((d) => d.getAttribute('data-qid')))])
+const napCuoi = may.dsNap().at(-1) ?? []
+kiem('3T1b NẠP SẴN (13/11 «chuyển đề tức thì»): tờ vừa mở ⇒ app gửi máy chủ ĐỦ mã câu của tờ để phòng nạp trước', maTo.length > 0 && maTo.every((q) => napCuoi.includes(q)), JSON.stringify({ maTo, napCuoi, soLan: may.dsNap().length }))
 // Thầy kẻ MỘT NÉT NGANG từ 20 % tới 80 % bề ngang bảng, ở `fy` chiều cao bảng. Máy em: tìm mực sáng trong khung bảng ⇒ nét phải (1) DÀI ≈ 60 % bề ngang ô bảng
 // của em (không «bé xíu ở góc»), (2) bắt đầu ≈ 20 % bề ngang, (3) cao đúng tỉ lệ `fy` của ô bảng. Ô bảng máy em = ô của thầy co theo bề ngang khung (Học) /
 // co vừa khung (Bảng) ⇒ tính từ tỉ lệ ô của thầy.
