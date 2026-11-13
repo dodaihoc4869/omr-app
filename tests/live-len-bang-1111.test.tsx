@@ -110,7 +110,7 @@ describe('bố cục thuần: dải thẻ tên nằm NGOÀI khung bảng (so h�
         // khung bảng chỉ thấp đi đúng 26 px; khung giấy và vạch chia y nguyên
         expect(moi.bang.h).toBe(cu.bang.h - DAU_BANG); expect(moi.bang.y + moi.bang.h).toBe(cu.bang.y + cu.bang.h)
         expect(moi.giay).toEqual(cu.giay); expect(moi.sG).toBe(cu.sG); expect(moi.vach).toBe(cu.vach)
-        // thẻ tên hiện ra không làm nét trên bảng đổi cỡ (13/11: phép «vừa trọn» của bảng luôn trừ sẵn chỗ của dải)
+        // điện thoại / máy tính bảng: bảng co theo bề ngang ⇒ nét không nhỏ đi
         if (w <= 1180 && !phong) expect(moi.sB).toBe(cu.sB)
         expect(moi.sB).toBeGreaterThan(cu.sB * 0.95)
       }

@@ -123,10 +123,11 @@ export const CSS_MAY_YEU_TRANG_NHUNG =
   '*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation-iteration-count:1!important}' +
   '.q-card.q-card-dimmed{filter:none!important}'
 
-/** Chèn CSS máy yếu vào trang HTML nhúng — CHỈ khi app đang ở chế độ máy yếu; máy thường trả nguyên văn. */
+/** Chèn kiểu chung vào trang HTML nhúng (tờ chiếu, phiếu): LUÔN ẩn thanh cuộn (thầy 13/11 «Ẩn thanh cuộn mọi lúc mọi chỗ» — trang nhúng là tài liệu
+ *  riêng, không thấy luật ở index.css; vẫn cuộn như thường) + CSS máy yếu CHỈ khi app đang ở chế độ máy yếu. */
 export function themCssMayYeu(html: string): string {
-  if (!html || !dangCheDoMayYeu()) return html
-  const the = `<style data-may-yeu>${CSS_MAY_YEU_TRANG_NHUNG}</style>`
+  if (!html) return html
+  const the = '<style data-an-cuon>*{scrollbar-width:none!important}::-webkit-scrollbar{display:none}</style>' + (dangCheDoMayYeu() ? `<style data-may-yeu>${CSS_MAY_YEU_TRANG_NHUNG}</style>` : '')
   const i = html.search(/<\/head>/i)
   return i >= 0 ? html.slice(0, i) + the + html.slice(i) : the + html
 }

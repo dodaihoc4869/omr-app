@@ -57,8 +57,3 @@ html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt
 .lke-vao-lai p { margin: 0; font-size: 14px; font-weight: 600; color: var(--lk-chu-2); }
 .lke-vao-lai span { display: grid; place-items: center; width: 64px; height: 64px; margin: 12px auto 0; border-radius: 50%; box-shadow: inset 0 0 0 4px var(--p-xanh); font-size: 30px; font-weight: 800; }
 
-/* ẨN MỌI THANH CUỘN TRÊN LỚP NỔI LIVE THEO KHỐI CỦA EM (thầy 13/11): ngăn tin nhắn, màn bốn đội, sân trò vẫn cuộn bằng vuốt / bánh xe. */
-.lke, .lke * { scrollbar-width: none !important; }
-.lke::-webkit-scrollbar, .lke *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-html[data-lke], html[data-lke] body { scrollbar-width: none !important; }
-html[data-lke]::-webkit-scrollbar, html[data-lke] body::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }

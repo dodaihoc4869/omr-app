@@ -124,13 +124,17 @@ describe('vân tay màn thi: giờ:phút dùng lại một bộ định dạng',
 
 describe('trang nhúng (phiếu HTML) + độ phân giải canvas ở chế độ máy yếu', () => {
   const html = '<!doctype html><html><head><style>.a{}</style></head><body>x</body></html>'
-  it('máy thường: phiếu giữ nguyên văn', () => {
-    expect(themCssMayYeu(html)).toBe(html)
+  // SỬA CÓ CHỦ ĐÍCH 13/11 (thầy «Ẩn thanh cuộn mọi lúc mọi chỗ»): máy thường chỉ chèn MỘT thẻ ẩn thanh cuộn trước </head>, phần còn lại nguyên văn; không có CSS máy yếu
+  const AN_CUON = '<style data-an-cuon>*{scrollbar-width:none!important}::-webkit-scrollbar{display:none}</style>'
+  it('máy thường: chỉ thêm thẻ ẩn thanh cuộn, phiếu giữ nguyên văn', () => {
+    expect(themCssMayYeu(html)).toBe(html.replace('</head>', AN_CUON + '</head>'))
+    expect(themCssMayYeu(html)).not.toContain('data-may-yeu')
+    expect(themCssMayYeu('')).toBe('')
   })
   it('máy yếu: chèn CSS bỏ kính mờ / bộ lọc ngay trước </head>, không đổi phần thân', () => {
     document.documentElement.classList.add(LOP_MAY_YEU)
     const moi = themCssMayYeu(html)
-    expect(moi).toContain(`<style data-may-yeu>${CSS_MAY_YEU_TRANG_NHUNG}</style></head>`)
+    expect(moi).toContain(`${AN_CUON}<style data-may-yeu>${CSS_MAY_YEU_TRANG_NHUNG}</style></head>`)
     expect(moi.endsWith('<body>x</body></html>')).toBe(true)
     expect(CSS_MAY_YEU_TRANG_NHUNG).toContain('backdrop-filter:none')
     expect(CSS_MAY_YEU_TRANG_NHUNG).not.toMatch(/display:\s*none|visibility/)

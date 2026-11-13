@@ -80,13 +80,6 @@ export default function LopNoiEm() {
   const datGhim = useCallback((b: boolean): void => { setGhimMuon(b); if (!b) setChatMo(false); try { localStorage.setItem(KHOA_GHIM, b ? '1' : '0') } catch { /* máy chặn lưu */ } }, [])
   const dongChat = useCallback(() => setChatMo(false), [])
   // cột ghim ⇒ màn live (lớp `.bpu-hs` bên dưới) co sang trái đúng bề ngang cột (em-khoi.css)
-  // (thầy 13/11 «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được») đang trong buổi live theo khối ⇒ gốc trang mang cờ, thanh cuộn của TRANG cũng ẩn (em-khoi.css)
-  useEffect(() => {
-    if (!gd) return
-    const g = document.documentElement
-    g.setAttribute('data-lke', '')
-    return () => g.removeAttribute('data-lke')
-  }, [gd])
   useLayoutEffect(() => {
     if (!cotGhim) return
     const g = document.documentElement

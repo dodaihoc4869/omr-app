@@ -9,10 +9,6 @@ export const CSS_LIVE_KHOI = `
 .mc-laze{position:fixed;left:0;top:0;z-index:2147483600;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;background:var(--mc-do);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--mc-bang-chu) 85%,transparent),0 0 10px 4px color-mix(in srgb,var(--mc-do) 70%,transparent),0 0 22px 9px color-mix(in srgb,var(--mc-do) 32%,transparent);will-change:transform}
 .mc-laze[hidden]{display:none}
 body.mc-lk.mc-co-but canvas.mc-but:not(.mc-viet){cursor:none}
-/* ẨN MỌI THANH CUỘN CỦA TỜ TRONG BUỔI LIVE (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): vẫn cuộn bằng bánh xe / bàn di /
-   kéo chạm / phím như cũ; mép mờ «còn nữa ↓» của đề dài vẫn báo còn nội dung. */
-body.mc-lk,body.mc-lk *{scrollbar-width:none!important}
-body.mc-lk::-webkit-scrollbar,body.mc-lk *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 /* THẺ TÊN EM LÊN BẢNG TRONG BUỔI LIVE (thầy 13/11: «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»): một viên nhỏ ôm sát
    tên, đứng giữa đầu cột bảng; chỉ còn TÊN (+ dấu Đạt / Không đạt). Nhãn «Dự kiến làm được…», số báo danh, «Chi tiết ›», ảnh linh thú ẩn — phần chỗ trả cho
    bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng. Một ô có hơn một thẻ ⇒ chỉ hiện thẻ ĐẦU (lệnh gọi lên bảng ghi tên vào thẻ đầu,

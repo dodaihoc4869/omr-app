@@ -179,10 +179,11 @@ const tiLeHoc = oB.h / oB.w
 await veNgang(oB, 0.3); await ngu(1300)
 const n1 = await netEm(em1, tiLeHoc, false)
 kiem('3T2 «Học»: thầy kẻ nét ngang 20–80 % bề ngang ở 30 % chiều cao bảng ⇒ máy em thấy ĐÚNG nét ấy: dài 60 % ô bảng, đúng chỗ (không lệch, không bé xíu ở góc)', coNet(n1, 0.3) && n1.length === 1, JSON.stringify(n1))
-{ // (thầy 13/11 «bảng đen xanh trên màn thầy với hs phải đồng bộ tỷ lệ với nhau để viết bút hiển thị đầy đủ trên máy hs»)
-  const khungB = (p) => p.evaluate(() => { const b = document.querySelector('.lv-bang'); return b ? [b.offsetWidth, b.offsetHeight] : null })
-  const kb = [await khungB(em1), await khungB(em2), await khungB(em3)]
-  kiem('BT1 «Học»: khung bảng máy em chứa TRỌN ô bảng của thầy, cùng tỉ lệ (máy ngang, điện thoại cầm dọc hình xoay, cửa sổ dọc) — phần dưới bảng không nằm ngoài khung', kb.every((k) => !!k && k[0] * tiLeHoc <= k[1] + 2), JSON.stringify({ tiLeHoc: Number(tiLeHoc.toFixed(3)), kb }))
+{ // (thầy 13/11 lần 2 «Giữ nguyên độ nét cho hs»): ô bảng co theo BỀ NGANG khung như cũ — nét giữ cỡ; phần dưới bảng thì máy em tự trôi theo bút
+  //   (bước CD7 của thu-cuon-de-1311.mjs đo thầy viết sát đáy bảng)
+  const coNgang = (p) => p.evaluate(() => { const b = document.querySelector('.lv-bang'), c = b?.querySelector('.lv-cuon'), x = document.querySelector('.lv')?.getAttribute('data-xoay') != null; return b && c ? [Math.round(b.offsetWidth), Math.round(c.getBoundingClientRect()[x ? 'height' : 'width'])] : null })
+  const kb = [await coNgang(em1), await coNgang(em2), await coNgang(em3)]
+  kiem('BT1 «Học»: ô bảng máy em co theo bề ngang khung như trước (giữ cỡ nét cho học sinh), không thu nhỏ để vừa chiều cao', kb.every((k) => !!k && Math.abs(k[0] - k[1]) <= 3), JSON.stringify(kb))
 }
 { // (thầy 13/11 «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường»)
   await gv.mouse.move(oB.x + oB.w * 0.5, oB.y + oB.h * 0.6, { steps: 4 }); await ngu(1100)

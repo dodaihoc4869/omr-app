@@ -19,10 +19,6 @@ import KhungDocLap, { type TayKhungDL } from '../src/components/live/KhungDocLap
 const KHONG = { trai: 0, phai: 0, duoi: 0, tren: 0 }, KC = khungChieu(VUNG_MAC_DINH, 16 / 9), TL = 17.67 / 489
 const TRANG = maTrang('1', VUNG_MAC_DINH, false)
 const MOC = mocChia(844, 390, KHONG, KC, TL), W = 844 - 8 - 5
-// 13/11 (thầy «bảng đen xanh trên màn thầy với hs phải đồng bộ tỷ lệ … hiển thị đầy đủ»): ô bảng co VỪA TRỌN khung ⇒ khung bảng không rộng hơn mức ô bảng
-// cần ở chiều cao khung (`TRAN_BANG`); phần dư trả cho giấy. `rG(p)` = bề ngang khung giấy khi vạch chia đòi phần `p`.
-const TRAN_BANG = Math.ceil((KC.bang.w * (390 - 8 - 26)) / KC.bang.h) // 26 = chỗ của dải thẻ tên, luôn trừ sẵn
-const rG = (p: number, rongChia = W, tran = TRAN_BANG): number => rongChia - Math.min(rongChia - Math.round(rongChia * p), tran)
 const rong = (k: string): number => parseFloat(document.querySelector<HTMLElement>(k)!.style.width)
 beforeEach(() => {
   const g = new Proxy({}, { get: (_, k) => (k === 'canvas' ? null : () => undefined), set: () => true })
@@ -50,32 +46,32 @@ const BUT_BANG = { x: 0.8, y: 0.3, cham: true, net: 'b_1' }, BUT_GIAY = { x: 0.3
 describe('tự ưu tiên khung theo thầy', () => {
   it('vừa vào, bảng trống ⇒ ưu tiên GIẤY; thầy viết trên bảng: chưa đủ 2 giây chưa đổi, đủ 2 giây ⇒ bảng nở; quay lại giấy 2 giây ⇒ giấy nở lại', () => {
     const { tay } = dung()
-    expect(rong('.lv-giay')).toBe(rG(MOC.giay))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giay))
     expect(rong('.lv-giay') + rong('.lv-bang')).toBe(W)
     let t = chay(tay, 1000, TRE_UU_TIEN_MS - 100, BUT_BANG)
-    expect(rong('.lv-giay')).toBe(rG(MOC.giay))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giay))
     t = chay(tay, t, 300, BUT_BANG)
-    expect(rong('.lv-giay')).toBe(rG(MOC.bang))
-    expect(rong('.lv-bang')).toBeLessThanOrEqual(TRAN_BANG) // 13/11: bảng thấy TRỌN như bảng thầy (không còn nở quá mức phải trôi theo bút)
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.bang))
+    expect(rong('.lv-bang')).toBeGreaterThan(400) // bảng ≈ nửa màn điện thoại (bản một-phép-co: ô bảng của thầy chỉ 245 px)
     // thầy nhấp sang giấy 1 giây rồi về bảng ⇒ không đổi
     t = chay(tay, t, 1000, BUT_GIAY); t = chay(tay, t, 1500, BUT_BANG)
-    expect(rong('.lv-giay')).toBe(rG(MOC.bang))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.bang))
     t = chay(tay, t, TRE_UU_TIEN_MS + 100, BUT_GIAY)
-    expect(rong('.lv-giay')).toBe(rG(MOC.giay))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giay))
     // bút chỉ lơ lửng trên bảng (không chạm) ⇒ không tính là đang viết
     chay(tay, t, 3000, { x: 0.8, y: 0.3, cham: false })
-    expect(rong('.lv-giay')).toBe(rG(MOC.giay))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giay))
   })
   it('vào live lúc bảng ĐÃ có nét ⇒ ưu tiên bảng ngay (không chờ 2 giây)', () => {
     const { tay } = dung()
     act(() => { tay.ap({ loai: 'trang', trang: TRANG, tiLe: 16 / 9, net: [{ id: 'b_9', cong: 'but', mau: 'rgb(244,239,228)', co: 1.7, diem: [[0.8, 0.3, 0.4, 0], [0.82, 0.3, 0.4, 5]] }] }) })
-    expect(rong('.lv-giay')).toBe(rG(MOC.bang))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.bang))
   })
   it('máy yếu (không tự ưu tiên) ⇒ chia cố định ở mốc GIỮA, thầy viết ở đâu cũng không đổi', () => {
     const { tay } = dung({ tuUuTien: false })
-    expect(rong('.lv-giay')).toBe(rG(MOC.giua))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giua))
     chay(tay, 1000, 3000, BUT_BANG)
-    expect(rong('.lv-giay')).toBe(rG(MOC.giua))
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giua))
   })
   it('tấm giấy = ô giấy của thầy đã co theo bề ngang khung giấy; nơi dùng nhận đúng khổ tấm giấy để dựng chữ', () => {
     dung()
@@ -102,7 +98,7 @@ describe('em điều khiển', () => {
     expect(rong('.lv-giay')).toBe(844 - 8); expect(parseFloat(document.querySelector<HTMLElement>('.lv-bang')!.style.left)).toBeGreaterThan(844)
     expect(document.querySelector('.lv-vach-chia')).toBeNull()
     cham(); cham()
-    expect(khiPhong).toHaveBeenLastCalledWith(null); expect(rong('.lv-giay')).toBe(rG(MOC.giay))
+    expect(khiPhong).toHaveBeenLastCalledWith(null); expect(rong('.lv-giay')).toBe(Math.round(W * MOC.giay))
   })
   it('đang mở khay (nơi dùng trả true) ⇒ hai cú chạm không phóng khung', () => {
     const { khiPhong } = dung({ khiCham: () => true })
@@ -163,15 +159,13 @@ describe('em điều khiển', () => {
     fireEvent.pointerDown(v, { pointerId: 1, clientX: x0, clientY: 200 }); fireEvent.pointerMove(v, { pointerId: 1, clientX: x0 - 150, clientY: 200 }); fireEvent.pointerUp(v, { pointerId: 1, clientX: x0 - 150, clientY: 200 })
     expect(khiTay).toHaveBeenLastCalledWith(true)
     const giu = rong('.lv-giay')
-    // máy NHỚ phần em đòi; bề ngang thật vẫn theo luật «bảng thấy trọn» (điện thoại ngang: bảng đã ở mức rộng nhất nó cần ⇒ giấy không hẹp thêm)
-    const nho = Number(localStorage.getItem(KHOA_CHIA))
-    expect(nho).toBeCloseTo((rG(MOC.giay) - 150) / W, 1)
-    expect(giu).toBe(rG(nho))
+    expect(giu).toBeCloseTo(Math.round(W * MOC.giay) - 150, -1)
+    expect(Number(localStorage.getItem(KHOA_CHIA))).toBeCloseTo(giu / W, 2)
     chay(tay, 1000, 3000, BUT_BANG)
     expect(rong('.lv-giay')).toBe(giu)
     act(() => { tay.boTay() })
     expect(khiTay).toHaveBeenLastCalledWith(false); expect(localStorage.getItem(KHOA_CHIA)).toBeNull()
-    expect(rong('.lv-giay')).toBe(rG(MOC.bang)) // thầy đã viết trên bảng quá 2 giây
+    expect(rong('.lv-giay')).toBe(Math.round(W * MOC.bang)) // thầy đã viết trên bảng quá 2 giây
     // tắt «tự phóng» ⇒ giữ chỗ đang đứng
     act(() => { tay.giuTay() })
     expect(khiTay).toHaveBeenLastCalledWith(true); expect(Number(localStorage.getItem(KHOA_CHIA))).toBeCloseTo(MOC.bang, 2)
@@ -179,25 +173,25 @@ describe('em điều khiển', () => {
   it('máy đã nhớ vạch chia từ buổi trước ⇒ vào là dùng luôn', () => {
     localStorage.setItem(KHOA_CHIA, '0.550')
     const { khiTay } = dung()
-    expect(rong('.lv-giay')).toBe(rG(0.55)); expect(khiTay).toHaveBeenLastCalledWith(true)
+    expect(rong('.lv-giay')).toBe(Math.round(W * 0.55)); expect(khiTay).toHaveBeenLastCalledWith(true)
   })
 })
 
 describe('giấy dựng thường + trình phát', () => {
   it('giấy không soi được (câu có ảnh / bảng / sơ đồ): chữ dựng theo khung của em, nét trên giấy ẨN (canvas giấy ẩn, lớp «đang viết» cắt khỏi khung giấy); ba mốc cố định', () => {
     dung({ netGiay: false, tiLeChu: null })
-    expect(rong('.lv-giay')).toBe(rG(0.6))
+    expect(rong('.lv-giay')).toBe(Math.round(W * 0.6))
     const tam = document.querySelector<HTMLElement>('.lv-kg-tam')!
     expect(tam.style.height).toBe('100%'); expect(document.querySelector<HTMLElement>('.lv-kg-cuon')!.style.overflowY).toBe('hidden')
     expect(document.querySelector<HTMLElement>('.lv-giay canvas')!.style.display).toBe('none')
-    expect(document.querySelector<HTMLElement>('.lv-net')!.style.clipPath).toBe(`inset(0 0 0 ${4 + rG(0.6)}px)`)
-    expect(Number(document.querySelector<HTMLElement>('[data-rong]')!.dataset.rong)).toBe(rG(0.6))
+    expect(document.querySelector<HTMLElement>('.lv-net')!.style.clipPath).toBe(`inset(0 0 0 ${4 + Math.round(W * 0.6)}px)`)
+    expect(Number(document.querySelector<HTMLElement>('[data-rong]')!.dataset.rong)).toBe(Math.round(W * 0.6))
   })
   it('trình phát «Xem lại Live» (lop="xp"): cùng hai khung, lớp CSS «xp-…»; đang phát nét trên bảng 2 giây ⇒ bảng nở', () => {
     const { tay } = dung({ lop: 'xp', tiLeChu: null })
     expect(document.querySelector('.xp-giay')).not.toBeNull(); expect(document.querySelector('.xp-bang .lv-cuon')).not.toBeNull(); expect(document.querySelector('.xp-vach-chia')).not.toBeNull()
-    expect(rong('.xp-giay')).toBe(rG(0.6))
+    expect(rong('.xp-giay')).toBe(Math.round(W * 0.6))
     chay(tay, 1000, TRE_UU_TIEN_MS + 200, BUT_BANG)
-    expect(rong('.xp-giay')).toBe(rG(0.42))
+    expect(rong('.xp-giay')).toBe(Math.round(W * 0.42))
   })
 })

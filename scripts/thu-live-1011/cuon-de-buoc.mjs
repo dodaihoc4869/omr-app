@@ -169,6 +169,42 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
     await chup(em2, 'cd-5-em-doc-dai-chon-mo')
   }
 
+  // (bảng của thầy tự cuộn lên khi viết gần đáy; máy em theo độ cuộn ấy ⇒ nét sát đáy nằm trong khung máy em)
+  // ── CD7. THẦY VIẾT SÁT ĐÁY BẢNG (thầy 13/11: «khi bút di chuyển xuống cuối … trên máy hs mất một đoạn»; «giữ nguyên độ nét cho hs»): nét giữ cỡ cũ,
+  //        máy em phải TỰ TRÔI theo bút xuống tận đáy bảng — nét kẻ ở 96 % chiều cao bảng của thầy hiện TRỌN trong khung bảng của mọi máy em. ──
+  if (!soLuoc) {
+    const to = gv.frameLocator('.lop-xem-phieu iframe')
+    const s = await gv.evaluate(() => parseFloat(document.documentElement.style.getPropertyValue('--lkc-s')) || 1)
+    const k = await gv.locator('.lop-xem-phieu iframe').boundingBox()
+    // ô bảng = canvas riêng của bảng trên lớp bút (`canvas.mc-but-bang`), cắt theo phần tờ đang thấy (tờ có thể cao hơn khung)
+    const c = await to.locator('body').evaluate(() => { const e = document.querySelector('canvas.mc-but-bang'), r = (e && e.getClientRects().length ? e : window.__mcDot().querySelector('.mc-cot-lam-bai')).getBoundingClientRect(), y1 = Math.min(r.bottom, innerHeight); return { x: r.left, y: Math.max(0, r.top), w: r.width, h: y1 - Math.max(0, r.top), ten: e ? 'mc-but-bang' : 'mc-cot-lam-bai' } })
+    const o = { x: k.x + c.x * s, y: k.y + c.y * s, w: c.w * s, h: c.h * s }
+    await to.locator('body').evaluate(() => window.__mcBut.bat(true)); await ngu(300)
+    const y = o.y + o.h * 0.96
+    await gv.mouse.move(o.x + o.w * 0.1, y); await gv.mouse.down()
+    for (let i = 1; i <= 16; i++) { await gv.mouse.move(o.x + o.w * (0.1 + 0.05 * i), y); await ngu(20) }
+    await gv.mouse.up(); await gv.mouse.move(1300, 300, { steps: 2 })
+    await ngu(3200) // quá 2 giây ⇒ máy em ưu tiên bảng; bảng trôi theo bút
+    await chup(gv, 'cd-7-gv-thay-ke-sat-day')
+    /** Mực sáng trong khung bảng máy em: hàng / cột (theo trục «ngang của hình») dài nhất có mực, so với bề ngang khung. */
+    const muc = async (p) => { const anh = (await p.screenshot({ type: 'png' })).toString('base64'); return p.evaluate(async (b64) => {
+      const lv = document.querySelector('.lv'), xoay = lv?.getAttribute('data-xoay') != null, k = document.querySelector('.lv-bang').getBoundingClientRect()
+      const i = new Image(); i.src = 'data:image/png;base64,' + b64; await i.decode(); const cv = document.createElement('canvas'); cv.width = i.width; cv.height = i.height; const g = cv.getContext('2d'); g.drawImage(i, 0, 0)
+      const x0 = Math.max(0, Math.round(k.left) + 2), y0 = Math.max(0, Math.round(k.top) + 2), w = Math.round(k.width) - 4, h = Math.round(k.height) - 4, d = g.getImageData(x0, y0, w, h).data
+      const sang = (x, y) => { const q = (y * w + x) * 4; return (d[q] + d[q + 1] + d[q + 2]) / 3 > 72 && Math.abs(d[q] - d[q + 1]) < 40 } // nền bảng ≈ 33; phấn trắng co nhỏ ⇒ vạch mảnh, xám do khử răng cưa
+      let dai = 0, o = -1
+      if (!xoay) for (let y = 0; y < h; y++) { let n = 0; for (let x = 0; x < w; x++) if (sang(x, y) || (y + 1 < h && sang(x, y + 1))) n++; if (n > dai) { dai = n; o = y } }
+      else for (let x = 0; x < w; x++) { let n = 0; for (let y = 0; y < h; y++) if (sang(x, y) || (x + 1 < w && sang(x + 1, y))) n++; if (n > dai) { dai = n; o = w - x } }
+      return { dai, o, cao: xoay ? w : h, rong: xoay ? h : w, oBang: (() => { const c = document.querySelector('.lv-bang .lv-cuon'); return c ? Math.round(c.getBoundingClientRect()[xoay ? 'height' : 'width']) : null })() }
+    }, anh) }
+    const ra = []
+    for (const [ten, p] of EM) ra.push([ten.split(' ')[0], await muc(p)])
+    for (const [, p] of EM) await chup(p, 'cd-7-' + (await p.evaluate(() => (document.querySelector('.lv')?.getAttribute('data-xoay') != null ? 'xoay' : 'ngang'))) + '-' + EM.findIndex((e) => e[1] === p) + '-bang-sat-day')
+    // nét dài 80 % ô bảng của thầy ⇒ trên máy em phải thấy một dải mực ≥ 60 % bề ngang Ô BẢNG đã co (khung có thể rộng hơn ô)
+    kiem('CD7 thầy kẻ nét ở 96 % chiều cao bảng (sát đáy): máy em TỰ TRÔI theo bút, thấy TRỌN nét ấy trong khung bảng (máy tính, điện thoại dọc hình xoay, cửa sổ dọc, điện thoại ngang); cỡ nét giữ như cũ', ra.every(([, m]) => m.oBang && m.dai >= m.oBang * 0.6), JSON.stringify(ra))
+    await to.locator('body').evaluate(() => window.__mcBut.bat(false)); await ngu(300)
+  }
+
   // ── CD6. GIẤY DỰNG THƯỜNG (câu của lượt lệch chữ trên tờ ⇒ không soi được): khối đề `.lv-de` tự cuộn ──
   const loi4 = await gv.evaluate((q) => window.__chieuCauDai(q), 'Q4'); await ngu(6500)
   const thuong = await Promise.all(EM.map(([, p]) => doGiay(p)))

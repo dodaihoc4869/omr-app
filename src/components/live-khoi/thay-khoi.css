@@ -127,8 +127,3 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 .lkt-dai .lkt-tay { width: auto; min-width: 232px; max-width: 320px; align-content: start; }
 .lkt-dai .lkt-tay ul { max-height: none; }
 .lkt-dai .lr-thay { width: auto; min-width: 300px; max-width: 460px; padding: 10px 12px; }
-
-/* ẨN MỌI THANH CUỘN TRÊN MÁY THẦY SUỐT BUỔI LIVE (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): cột tin nhắn, dải chỉ thầy
-   thấy, bảng danh sách, bảng chọn bài, tấm hoạt động… vẫn cuộn bằng bánh xe / bàn di / kéo chạm. Tờ chiếu (khung riêng) tự ẩn ở live-khoi-to-chieu.ts. */
-html[data-live-khoi], html[data-live-khoi] * { scrollbar-width: none !important; }
-html[data-live-khoi]::-webkit-scrollbar, html[data-live-khoi] *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
