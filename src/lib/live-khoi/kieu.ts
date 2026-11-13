@@ -45,11 +45,13 @@ export type SinhTonHa = [ai: string, bi: string, chuoiBi?: number, chuoiAi?: num
 export interface SinhTonAnh {
   ds: Record<string, SinhTonDong>; an: SinhTonHa[]; d: [number, number, number, number]; v: number; c: number; h: [number, string]
   tk?: string; bc?: Record<string, number>; bv?: [string, number][]; hg?: number; dd?: number[]
-  /** Bản 5 (đợt 3), đều TUỲ CHỌN: `ty` = mã bé ma Thầy khi Thầy đang trong trận (dòng Thầy LUÔN có trong `ds` của mọi máy, máu thật 0..2000, «đội» 4);
+  /** Bản 5 (đợt 3), đều TUỲ CHỌN: `ty` = [mã bé ma Thầy, máu 0..2000] khi Thầy đang trong trận — CHỈ ở ảnh ĐỦ VÀNH (1 trong 4) và ảnh đủ, như `bp`: ảnh mỏng
+   *  thiếu `ty` ⇒ giữ số cũ, ảnh đủ vành thiếu `ty` ⇒ Thầy đã rời trận. Dòng Thầy (mã THAY, «đội» 4, máu thật 0..2000) nằm trong `ds` theo vùng như mọi người
+   *  (đo 78 em: luôn gửi dòng Thầy cho mọi em tốn ~+7 % byte, `ty` thưa chỉ ~+1 %);
    *  `bx` = Ma Mực đang trên sân (LUÔN có trong mọi ảnh — mọi em thấy thanh máu); `bp` = [máu tối đa, % sát thương Na, K, Cu, Ca] chỉ ở ảnh ĐỦ VÀNH (1 trong 4)
    *  và ảnh đủ — máy em giữ số cũ (gửi thưa cho nhẹ: máu tối đa không đổi, phần trăm đổi chậm); `bh` = đội vừa diệt Ma Mực (0..3, chỉ ở ảnh ngay sau lúc
    *  boss bị hạ; đội đó đã được +5 trong `d`); `hn` = hộp TRANG đã có người nhặt trong lượt hộp hiện tại {chỉ số k ≥ 1: mã} (hộp tâm vẫn ở `h`). */
-  ty?: string; bx?: SinhTonBoss; bp?: [number, number, number, number, number]; bh?: number; hn?: Record<string, string>
+  ty?: [string, number]; bx?: SinhTonBoss; bp?: [number, number, number, number, number]; bh?: number; hn?: Record<string, string>
   /** Bản 4: 1 = ẢNH MỎNG (chỉ ảnh lọc, 3 trong 4 ảnh): người ở vành ngoài (cách em 910 – 1100) và dòng của chính em không gửi ở ảnh này. */ m?: 1
 }
 // HỢP ĐỒNG CHO MÀN (TroSinhTon…) theo bản 4 — máy chủ đã làm, màn phải làm theo, và PHẢI phát hành CÙNG LÚC với máy chủ (không thì: banner «vào đội» mỗi

@@ -359,9 +359,10 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       if (hnSo !== soHopNay) hnCu = {}
       for (const k in hnMoi) if (typeof hnMoi[k] === 'string' && hnCu[k] !== hnMoi[k] && soAnh > 1) nhatHop(hnMoi[k], loaiHopO(soHopNay, Number(k)), nay, luc)
       hnCu = hnMoi; hnSo = soHopNay
-      // THẦY VÀO TRẬN: `ty` + dòng Thầy (luôn có trong mọi ảnh) ⇒ thanh máu Thầy; vừa vào ⇒ dải báo; vừa rời ⇒ dòng tin.
-      const tyMoi = typeof anh.ty === 'string' && Array.isArray(anh.ds[anh.ty]) ? anh.ty : ''
-      if (tyMoi) mauThayAnh = Number(anh.ds[tyMoi][2]) || 0
+      // THẦY VÀO TRẬN: `ty` = [mã, máu] (chỉ ảnh đủ vành; ảnh mỏng thiếu ⇒ giữ) ⇒ thanh máu Thầy; vừa vào ⇒ dải báo; vừa rời ⇒ dòng tin.
+      const coTy = Array.isArray(anh.ty) && typeof anh.ty[0] === 'string' && typeof anh.ty[1] === 'number'
+      const tyMoi = coTy ? anh.ty![0] : anh.m === 1 && !doiSan ? tyAnh : ''
+      if (coTy) mauThayAnh = anh.ty![1]
       if (tyMoi !== tyAnh) {
         if (tyMoi && soAnh > 0) { datDai('THẦY ĐÃ VÀO TRẬN!', 'Hạ được Thầy thì tên em lên bảng vàng'); themTin([{ c: 'Thầy', noi: true }, { c: ' vào trận!', noi: true }], luc) }
         else if (!tyMoi) themTin([{ c: 'Thầy' }, { c: ' rời trận' }], luc)

@@ -259,7 +259,7 @@ export class MaySinhTon {
     if (this.thay) ds[THAY] = this.thay.p
     const anh: SinhTonAnh = { ds, an: this.an, d: [...this.diem], v: this.soVan, c: this.bd.cap, h: this.hop }
     if (this.tk) anh.tk = this.tk
-    if (this.thay) anh.ty = THAY
+    if (this.thay) anh.ty = [THAY, this.thay.p[2]]
     if (this.boss) {
       const b = this.boss, bx: SinhTonBoss = [Math.round(b.x), Math.round(b.y), Math.ceil(b.mau)]
       if (b.t) bx.push(b.t)
@@ -338,8 +338,7 @@ export class GoiSinhTon {
   private ban: (number[] | undefined)[]
   private chiSo = new Map<string, number>()
   private tkI: number
-  /** Bé ma Thầy (luôn trong tập, không mở rộng — như thủ khoa) · Ma Mực [x, y, …] + chỉ số những người đang bắn boss · `bp` (chỉ ảnh đủ vành). */
-  private tyI: number
+  /** Ma Mực [x, y, …] + chỉ số những người đang bắn boss · `bp` + `ty` (chỉ ảnh đủ vành và ảnh đủ). Dòng Thầy theo vùng như mọi người. */
   private bx: SinhTonBoss | undefined
   private banBoss: number[] = []
   private bp = ''
@@ -364,10 +363,10 @@ export class GoiSinhTon {
       else if (t === MA_MUC) this.banBoss.push(i)
     }
     this.tkI = anh.tk ? this.chiSo.get(anh.tk) ?? -1 : -1
-    this.tyI = anh.ty ? this.chiSo.get(anh.ty) ?? -1 : -1
     this.bx = anh.bx
     if (anh.bp) this.bp = `,"bp":${JSON.stringify(anh.bp)}`
-    const { ds: _ds, bc: _bc, hg: _hg, bp: _bp, ...chung } = anh
+    if (anh.ty) this.bp += `,"ty":${JSON.stringify(anh.ty)}`
+    const { ds: _ds, bc: _bc, hg: _hg, bp: _bp, ty: _ty, ...chung } = anh
     // Tin trò không mang `s` / `n` / `d` của TinLop (màn trò chỉ đọc `l` và `x`; bỏ 21 byte mỗi gói × 312 gói / giây ở 78 em).
     this.dau = `{"t":"lop","k":"tro","l":${JSON.stringify(nay)},"x":{"ds":{`
     this.duoi = JSON.stringify(chung).slice(1, -1)
@@ -400,8 +399,6 @@ export class GoiSinhTon {
     }
     // (c) thủ khoa (không mở rộng); đồng đội còn ngoài tập ⇒ `dd` gọn.
     if (this.tkI >= 0) danh[this.tkI] = lan
-    // Bé ma Thầy luôn có (cả lớp thấy thanh máu Thầy).
-    if (this.tyI >= 0) danh[this.tyI] = lan
     let ds = '', dd = ''
     for (let i = 0; i < n; i++) {
       // Dòng của CHÍNH X chỉ để máy em biết đội mình (đổi đội) ⇒ ảnh mỏng không gửi (vẫn là hạt giống của luật (b) ở trên).

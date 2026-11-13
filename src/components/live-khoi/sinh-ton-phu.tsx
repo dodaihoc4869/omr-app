@@ -221,6 +221,7 @@ export function TheCuoiVan({ ketQua, vang, xem, bang, doiToi, banEm }: { ketQua:
           <span className="st-d">{h.diem}<small>lượt hạ</small></span>
         </div>
       ))}
+      {vang?.haThay?.length ? <p>Đã hạ gục Thầy: <b>{vang.haThay.join(', ')}</b></p> : null}
       <p>{hangEm ? `Đội em: ${chuXep(hangEm.xep, !!hangEm.hoa)} · ` : ''}Ván mới bắt đầu sau vài giây · mọi người về trại đội mình</p>
     </div>
   )

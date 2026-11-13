@@ -73,7 +73,7 @@ function kenhGia() {
 const cuoiAnh = (w: Ws) => (JSON.parse(w.tin.at(-1)!) as { x: SinhTonAnh }).x
 
 describe('Thầy vào trận: vai theo KẾT NỐI `gv`, chỉ phòng live', () => {
-  it('máy thầy gửi gói ⇒ dòng THAY «đội» 4, máu kẹp 2000, cấp ÉP 2, `ty`; em (kể cả em mang số báo danh «THAY») không giả làm Thầy được; `roi: 1` ⇒ rời trận', () => {
+  it('máy thầy gửi gói ⇒ dòng THAY «đội» 4, máu kẹp 2000, cấp ÉP 2, `ty` = [mã, máu]; em (kể cả em mang số báo danh «THAY») không giả làm Thầy được; `roi: 1` ⇒ rời trận', () => {
     vi.useFakeTimers()
     try {
       vi.setSystemTime(T0)
@@ -86,9 +86,9 @@ describe('Thầy vào trận: vai theo KẾT NỐI `gv`, chỉ phòng live', () 
       thay({ p: [1600, 1300, 9999, 6], t: 'S1' }, T0 + 300)
       vi.advanceTimersByTime(250)
       const du = cuoiAnh(gv)
-      expect(du.ty).toBe(THAY)
+      expect(du.ty).toEqual([THAY, MAU_THAY])
       expect(du.ds.THAY).toEqual([1600, 1300, MAU_THAY, DOI_THAY, CAP_THAY, 'S1'])
-      // Mọi em đều có dòng Thầy (cả lớp thấy thanh máu Thầy).
+      // Em ở gần ⇒ có dòng Thầy (theo vùng như mọi người).
       expect(cuoiAnh(hs).ds.THAY).toEqual(du.ds.THAY)
       // Em khai bắn Thầy ⇒ phòng nhận (Thầy khác đội với mọi em).
       em(hs, 'S1', { p: [1500, 1200, 100, 1], t: THAY }, T0 + 600)
@@ -234,14 +234,16 @@ describe('«chỉ gửi gần» vẫn bằng ảnh đủ khi có Ma Mực + Th�
         else { const k = ids.filter((b) => ds[b][3] !== row[3]); if (k.length) row[5] = k[Math.floor(r() * k.length)] }
       }
       const bx: SinhTonAnh['bx'] = [Math.round(tam.x), Math.round(tam.y), 1500, ids[Math.floor(r() * ids.length)]]
-      const anh: SinhTonAnh = { ds, an: [], d: [0, 0, 0, 0], v: 1, c: co, h: [-1, ''], ty: THAY, bx, bp: [3000, 25, 25, 25, 25] }
+      const anh: SinhTonAnh = { ds, an: [], d: [0, 0, 0, 0], v: 1, c: co, h: [-1, ''], ty: [THAY, ds[THAY][2]], bx, bp: [3000, 25, 25, 25, 25] }
       const goi = new GoiSinhTon(anh, T0, new Map(), lan % 4 >= 2)
       const du = (JSON.parse(goi.du()) as { x: SinhTonAnh }).x
-      expect(du.bx).toEqual(bx); expect(du.ty).toBe(THAY); expect(du.bp).toEqual(anh.bp)
+      expect(du.bx).toEqual(bx); expect(du.ty).toEqual(anh.ty); expect(du.bp).toEqual(anh.bp)
       for (const id of ids) {
         const loc = (JSON.parse(goi.cho(id)) as { x: SinhTonAnh }).x
-        expect(loc.bx).toEqual(bx); expect(loc.ty).toBe(THAY); expect(loc.ds.THAY).toEqual(ds.THAY)
-        expect(loc.bp === undefined).toBe(lan % 4 >= 2)
+        // `bx` mọi ảnh; `bp` + `ty` (máu Thầy cho thanh máu cả lớp) chỉ ở ảnh đủ vành.
+        expect(loc.bx).toEqual(bx)
+        expect(loc.bp === undefined).toBe(lan % 4 >= 2); expect(loc.ty === undefined).toBe(lan % 4 >= 2)
+        if (loc.ty) expect(loc.ty).toEqual(anh.ty)
         const row = ds[id], dsDu = docNhu(du, id), dsLoc = docNhu(loc, id)
         for (const truot of [0, 250]) {
           const g = r() * Math.PI * 2, d = truot * Math.sqrt(r())
