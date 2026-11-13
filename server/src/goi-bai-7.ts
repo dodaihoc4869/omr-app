@@ -11,6 +11,7 @@ import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
 import { lichBaiEm7 } from './goi-bai-7-lich-bai'
 import { apSuat7, NGAY_DE_28 } from './goi-bai-7-suat'
+import { deNhuongSuat7 } from './goi-bai-7-gop'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -829,8 +830,8 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = []
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
-  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem, lap.duPhong])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
+  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => deNhuongSuat7(lap, cauGoi, viec, xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), now), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem, lap.duPhong])]
   // Chặng theo ranh 6 câu; chặng cuối của mức chỉ phần còn lại (mức 28 = 4 × 6 + 4). Đã đủ mức ⇒ «Học thêm câu mới» luôn đủ MỘT chặng 6 câu (luật 29/10;
   // 09/11 mức cố định 28: 28 % 6 = 4 từng làm chặng học thêm chỉ còn 2 câu).
   const soCauChang = lap.daLamNgay >= lap.toiThieu ? 6 : Math.min(6 - (lap.daLamNgay % 6), lap.toiThieu - lap.daLamNgay)
@@ -896,8 +897,8 @@ export async function xayGoiNgay7(env: Env, sbd: string, now: number, soCau: num
   const done = new Set(answered.results.map(r => r.qid))
   const viec = Array.isArray(saved?.questions) ? saved.questions.filter(r => !done.has(r.qid) && !r.lamLaiCuoi && !vuaLamGoc(r.qid) && !lap.daLamTap.has(r.qid)).map(r => ({ ...r, vai: r.vai ?? 'on', huongDan: r.huongDan ?? false })) : []
   const satHan = !duo || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1)
-  const ds = [...viec, ...xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? lap.duPhong() : lap.hocThem())]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
+  const ds = [...viec, ...deNhuongSuat7(lap, cauGoi, viec, xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), now), ...(lap.daLamNgay < lap.toiThieu ? lap.duPhong() : lap.hocThem())]
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = [], da = new Set<string>()
   const ung = ds.filter((v, i) => ds.findIndex((w) => w.qid === v.qid) === i).map(v => {

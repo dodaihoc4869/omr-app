@@ -5,6 +5,21 @@ import { JS_LIVE_NOP } from './live-nop-to-chieu'
 import { CSS_LIVE_MT, JS_LIVE_MT } from './live-mt-to-chieu'
 
 export const CSS_LIVE_KHOI = `
+/* CHẤM LAZE của thầy (13/11: thầy «để lại, phím tắt bật tắt, mặc định tắt» — JS bật / tắt làm ở đợt sau; chưa có JS thì chấm không bao giờ dựng): lõi đỏ nét, viền sáng mảnh, quầng đỏ. Lúc chấm hiện thì ẩn con trỏ hệ thống trên lớp bút; đang viết (.mc-viet) ⇒ con trỏ viết cũ. */
+.mc-laze{position:fixed;left:0;top:0;z-index:2147483600;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;background:var(--mc-do);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--mc-bang-chu) 85%,transparent),0 0 10px 4px color-mix(in srgb,var(--mc-do) 70%,transparent),0 0 22px 9px color-mix(in srgb,var(--mc-do) 32%,transparent);will-change:transform}
+.mc-laze[hidden]{display:none}
+/* THẺ TÊN EM LÊN BẢNG TRONG BUỔI LIVE (thầy 13/11: «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»): một viên nhỏ ôm sát
+   tên, đứng giữa đầu cột bảng; chỉ còn TÊN (+ dấu Đạt / Không đạt). Nhãn «Dự kiến làm được…», số báo danh, «Chi tiết ›», ảnh linh thú ẩn — phần chỗ trả cho
+   bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng. Một ô có hơn một thẻ ⇒ chỉ hiện thẻ ĐẦU (lệnh gọi lên bảng ghi tên vào thẻ đầu,
+   len-bang-bpu-to-chieu.ts) — thẻ to đặc cũ che kín nhau, thẻ gọn thì lộ cả hai chồng lên nhau. */
+body.mc-lk .mc-em:not([hidden]){grid-template-columns:minmax(0,1fr)!important;justify-items:center;align-items:center;justify-self:center;align-self:start;width:fit-content!important;max-width:100%!important;min-width:0!important;min-height:0!important;box-sizing:border-box;margin:0 auto!important;padding:clamp(3px,.3vw,6px) clamp(12px,1.1vw,20px)!important;border-radius:999px!important;text-align:center;cursor:default}
+body.mc-lk .mc-em:not([hidden]) .mc-em-trai,body.mc-lk .mc-em:not([hidden]) .mc-em-hang1,body.mc-lk .mc-em:not([hidden]) .mc-ten-hang{display:flex!important;align-items:center;justify-content:center;gap:.5em;flex:0 1 auto!important;min-width:0!important;max-width:100%;width:auto!important}
+body.mc-lk .mc-em:not([hidden]) .mc-ten{display:block;flex:0 1 auto;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important;font-size:clamp(14px,1.3vw,24px)!important;font-weight:800!important;line-height:1.25!important;letter-spacing:0}
+body.mc-lk .mc-em:not([hidden])~.mc-em{display:none!important}
+/* 13/11 thầy «chữ làm tốt lắm thu nhỏ lại cho thẳng hàng với chữ đạt để bo tròn luôn gọn gàng»: «Làm tốt lắm» đứng CÙNG HÀNG sau dấu «Đạt», nhỏ hơn tên ⇒ thẻ vẫn một hàng. */
+body.mc-lk .mc-em.mc-em-dat:not([hidden]){grid-template-columns:auto auto!important;column-gap:.55em}
+body.mc-lk .mc-em.mc-em-dat:not([hidden]) .mc-lam-tot{grid-column:2!important;grid-row:1!important;align-self:center;white-space:nowrap;font-size:clamp(11px,.95vw,18px)!important;line-height:1.2!important}
+body.mc-lk .mc-em:not([hidden]) .mc-phu,body.mc-lk .mc-em:not([hidden]) .mc-xem-ct,body.mc-lk .mc-em:not([hidden]) .mc-thu,body.mc-lk .mc-em:not([hidden]) .mc-ls,body.mc-lk .mc-em:not([hidden]) .mc-em-phu,body.mc-lk .mc-em:not([hidden]) .mc-btvn{display:none!important}
 .mc-lv-dau{position:fixed;left:50%;top:47%;z-index:60;padding:.16em .55em;border:.11em solid currentColor;border-radius:.3em;outline:.04em solid currentColor;outline-offset:.12em;background:color-mix(in srgb,color-mix(in srgb,currentColor 12%,var(--mc-bang-chu)) 92%,transparent);color:var(--mc-do);font:900 clamp(48px,15vmin,150px)/1.05 var(--mc-sans);letter-spacing:.06em;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%) rotate(-10deg);animation:mc-lv-dau 3s cubic-bezier(.2,.9,.3,1) both}
 .mc-lv-dau.dat{color:var(--mc-luc)}
 .mc-lv-dau small{display:block;margin-top:.25em;font-size:.2em;font-weight:800;letter-spacing:.12em}
@@ -80,4 +95,9 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);
+  // CUỘN LIỀN (thầy 13/11 «màn giáo viên cũng cho cuộn liền mạch không phải bấm space nữa»): tờ vào buổi live theo khối (lớp mc-lk) ⇒ bật chế độ cuộn liền
+  // ngay từ đầu cho MỌI đợt (trước: chỉ bật sau lần gọi em lên bảng đầu tiên) — đề dài cuộn bằng bánh xe / bàn di / kéo chạm / phím, không còn «Trang i/n · Space».
+  function lvCuonLien() { if (typeof S !== 'undefined' && !S.bpuCuon && body.classList.contains('mc-lk')) { S.bpuCuon = true; document.dispatchEvent(new Event('mc-bo-cuc-xong')); } }
+  new MutationObserver(lvCuonLien).observe(body, { attributes: true, attributeFilter: ['class'] });
+  lvCuonLien();
 ${JS_LIVE_NOP}${JS_LIVE_MT}`

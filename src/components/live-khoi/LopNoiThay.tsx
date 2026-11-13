@@ -1,13 +1,16 @@
 // LIVE THEO KHỐI — LỚP NỔI MÁY THẦY (mặt; kho + nối phòng + tự bật tiếng ở thay-khoi.ts).
 // Luồng (thầy 12/11): PHÒNG CHỜ → «Bắt đầu live» ⇒ SẢNH danh sách bốn đội (tiếng thầy tự bật, không cần tờ, không phải bấm nút Live nào) → thầy chọn
 // «Học» (bảng chọn bài của live ⇒ tờ giảng) hoặc «Bảng» (tờ bảng trắng xanh than) ⇒ phòng báo máy em chuyển theo. Bảng Bình Phản Ứng ẩn suốt buổi.
-import { Suspense, lazy, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
 import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
-import { batTiengLai, dangKy, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
+import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
+import { SK_COT, docCotMuon, ghiCotMuon, hinhCot } from './cot-chat-hinh'
+import KeoCot from './KeoCot'
+import { DaNghi } from './da-nghi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
@@ -16,17 +19,36 @@ const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 const MayTinhThay = lazy(() => import('../may-tinh/MayTinhThay'))
 const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
+const TinhTheCoVu = lazy(() => import('../live/TinhTheCoVu'))
 const LuatRoiThay = lazy(() => import('./LuatRoiThay'))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
 /** Có tờ RIÊNG đang mở (lớp phủ tờ chiếu không phải tờ Bình Phản Ứng)? Lớp phủ là cổng gắn thẳng vào <body> ⇒ chỉ theo dõi con trực tiếp của body. */
 const coToRieng = (): boolean => !!document.querySelector('.lop-xem-phieu:not([aria-label="Tờ chiếu Bình Phản Ứng"])')
+/** Đang có lớp phủ tờ chiếu nào không (cột chat cố định chỉ dựng khi có phần chiếu để đứng cạnh). */
+const coLopPhu = (): boolean => !!document.querySelector('.lop-xem-phieu')
+/** Mép trái (px) của lớp phủ tờ trên cùng: 0 khi tờ kín cửa sổ, > 0 khi thanh bên trái của app đang chiếm chỗ. */
+const mepTraiTo = (): number => { const ds = document.querySelectorAll<HTMLElement>('.lop-xem-phieu'); return ds.length ? ds[ds.length - 1]!.offsetLeft : 0 }
+const KHONG_TIEP: readonly number[] = [0, 0, 0, 0]
+/** Tinh thể cổ vũ: tâm THẺ TÊN em lên bảng (thẻ có sẵn trong tờ chiếu trên cùng), tính theo cửa sổ — tờ có thể đang thu nhỏ nhường cột tin nhắn.
+ *  Không có thẻ đang hiện (thầy ở màn khác) ⇒ null: không bay. */
+function dichTheTo(): { x: number; y: number; the: Element } | null {
+  const ds = document.querySelectorAll<HTMLIFrameElement>('.lop-xem-phieu iframe'), kh = ds.length ? ds[ds.length - 1]! : null
+  try {
+    const the = Array.from(kh?.contentDocument?.querySelectorAll<HTMLElement>('.mc-em') ?? []).find((e) => !e.hidden && e.getClientRects().length > 0)
+    if (!kh || !the) return null
+    const o = kh.getBoundingClientRect(), r = the.getBoundingClientRect(), s = o.width / Math.max(1, kh.clientWidth)
+    return { x: o.left + (r.left + r.width / 2) * s, y: o.top + (r.top + r.height / 2) * s, the }
+  } catch { return null }
+}
 const ngheToRieng = (f: () => void): (() => void) => { const mo = new MutationObserver(f); mo.observe(document.body, { childList: true }); return () => mo.disconnect() }
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
   const k = v?.live?.khoi ?? null
   const dangMo = useSyncExternalStore(dangKy, layDangMo)
-  const [chat, setChat] = useState(false)
+  // Cửa sổ đủ rộng ⇒ cột tin nhắn LUÔN HIỆN bên phải màn chiếu (thầy 13/11, cot-chat-hinh.ts); phím M / nút «Tin nhắn» cất, hiện lại. Cửa sổ nhỏ ⇒ cột nổi như cũ.
+  // `chatMuon`: null = thầy chưa tự bật / tắt ⇒ theo cỡ cửa sổ (đủ rộng thì hiện sẵn, kể cả khi cửa sổ được kéo rộng ra sau).
+  const [chatMuon, setChatMuon] = useState<boolean | null>(null)
   /** Bảng chọn bài của live đang mở (nằm TRÊN sảnh). */
   const [chon, setChon] = useState(false)
   // Máy tính «Đỗ Đại Học FX4869» (thầy 12/11): nút máy tính trên thanh đáy của tờ bật / tắt; nổi trên màn chiếu, đồng bộ sang máy em.
@@ -38,6 +60,7 @@ export default function LopNoiThay() {
   const [sanhTay, setSanh] = useState<boolean | null>(null)
   const [loi, setLoi] = useState('')
   const dang = k?.gd === 'dang'
+  const goiBang = v?.luot?.goi ?? null
   // bảng chọn bài nạp SẴN ngay khi vào live ⇒ bấm «Học» là hiện liền (trước: lần bấm đầu còn chờ tải mảnh, thầy tưởng không ăn — «phải bấm 2 lần»)
   useEffect(() => { if (dang) void import('../bpu/ChonCauBpu').catch(() => {}) }, [dang])
   // Tấm hoạt động (đầu giờ / chữa câu / ôn tập) của «Học» đang mở. Đóng tấm mà buổi chưa có bài nào đang chiếu ⇒ quay lại bảng chọn (không để màn trống).
@@ -53,8 +76,31 @@ export default function LopNoiThay() {
   const toRieng = useSyncExternalStore(ngheToRieng, coToRieng) // tờ riêng của tấm hoạt động đang mở ⇒ ẩn nút nổi «Về màn chiếu»
   useEffect(() => { const f = (e: Event) => setHdTren((e as CustomEvent<boolean>).detail === true); window.addEventListener('bpu-hd-tren', f); return () => window.removeEventListener('bpu-hd-tren', f) }, [])
   const sanh = dang && (sanhTay ?? k.che === 'sanh')
-  const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
-  useEffect(() => { const f = () => setK1(Math.min(window.innerWidth / 1920, window.innerHeight / 1080)); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
+  const [man, setMan] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }))
+  useEffect(() => { const f = () => setMan({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
+  const k1 = Math.min(man.w / 1920, man.h / 1080)
+  // CỘT TIN NHẮN CỐ ĐỊNH: chỉ khi phần chiếu đang ở trên cùng (không ở bảng danh sách / bảng chọn bài / tấm hoạt động — các màn đó vẫn kín cửa sổ như cũ).
+  const xTo = useSyncExternalStore(ngheToRieng, mepTraiTo)
+  // thầy tự kéo cỡ cột / dải (nhớ trên máy); null = mặc định
+  const [cotMuon, setCotMuon] = useState<number | null>(docCotMuon)
+  const datCot = (c: number | null, xong: boolean): void => { setCotMuon(c); if (xong) ghiCotMuon(c == null ? null : hinhCot(window.innerWidth, window.innerHeight, mepTraiTo(), c)?.c ?? c) }
+  const hinh = hinhCot(man.w, man.h, xTo, cotMuon)
+  const chat = chatMuon ?? !!hinh
+  // bật / tắt tính trên giá trị MỚI NHẤT (các trình nghe phím đăng ký một lần, không được giữ `chat` cũ): chưa từng bật / tắt ⇒ lấy mặc định theo cỡ cửa sổ lúc bấm
+  const setChat = (f: boolean | ((c: boolean) => boolean)): void => setChatMuon((m) => (typeof f === 'function' ? f(m ?? !!hinhCot(window.innerWidth, window.innerHeight, mepTraiTo())) : f))
+  const coPhu = useSyncExternalStore(ngheToRieng, coLopPhu)
+  // Tấm hoạt động đang che tờ thì không dựng cột — TRỪ khi tấm đang chiếu tờ RIÊNG của nó (kiểm tra đầu giờ / chữa câu: «Đợt 1/2», «Lên bảng»): lúc đó thứ thầy
+  // nhìn là tờ, cột phải hiện (13/11 lần 2, thầy: «chưa thấy cột nhắn tin trên app thầy» — đúng là đang dạy bằng tờ riêng).
+  const cot = hinh && chat && dang && !k?.giaiLao && !sanh && !chon && !(hdMo && hdTren && !toRieng) && coPhu ? hinh : null
+  const cotC = cot?.c ?? 0, cotS = cot?.s ?? 1, cotD = cot?.d ?? 0
+  // Gốc trang mang cờ + ba số đo ⇒ CSS thu đều lớp phủ tờ (thay-khoi.css) và các lớp bám theo phần chiếu (hỏi hiểu, viên «Rời màn hình», máy tính) dời theo.
+  useLayoutEffect(() => {
+    if (!cotC) return
+    const g = document.documentElement
+    g.setAttribute('data-lk-cot', ''); g.style.setProperty('--lkc-w', `${cotC}px`); g.style.setProperty('--lkc-s', String(cotS)); g.style.setProperty('--lkc-h', `${cotD}px`); g.style.setProperty('--lkc-x', `${xTo}px`)
+    window.dispatchEvent(new Event(SK_COT))
+    return () => { g.removeAttribute('data-lk-cot'); for (const t of ['--lkc-w', '--lkc-s', '--lkc-h', '--lkc-x']) g.style.removeProperty(t); window.dispatchEvent(new Event(SK_COT)) }
+  }, [cotC, cotS, cotD, xTo])
   const dungBangTrang = (): void => { void chieuBangTrang().then((l) => { if (l) { setLoi(l); setSanh(true) } }) }
   dungRef.current = dungBangTrang
   // Vào lại giữa buổi (tải lại trang, Esc rồi quay lại) mà chưa có tờ: Học ⇒ mở chọn bài, Bảng ⇒ dựng lại bảng trắng. Không để lộ màn trống.
@@ -112,7 +158,7 @@ export default function LopNoiThay() {
   // Cụm điều khiển nằm trong khay nút bốn ô của TỜ (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): tờ báo bấm bằng sự kiện `ddh-lkt`
   // (qua thay-noi.ts); số tin mới báo ngược lại bằng `ddh-lkt-moi`. Cụm nổi của app chỉ còn lúc BẢNG ĐUA đang hiện (tờ bị che, không có nút bốn ô).
   const lenhTo = useRef<(v: string) => void>(() => {})
-  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'mt') setMt((c) => !c); else if (v === 'hieu') setHieu((c) => !c); else if (v.startsWith('luat:')) { const [, b, n] = v.split(':'); datLuat(b === '1', Number(n) || 3) } else if (v === 'khay' || v === 'ngoai') setChat(false) }
+  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'nghi') { const kk = layView()?.live?.khoi; if (kk?.gd === 'dang') datGiaiLao(kk, true) } else if (v === 'mt') setMt((c) => !c); else if (v === 'hieu') setHieu((c) => !c); else if (v.startsWith('luat:')) { const [, b, n] = v.split(':'); datLuat(b === '1', Number(n) || 3) } else if ((v === 'khay' || v === 'ngoai') && !hinh) setChat(false) }
   useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
   // PHÍM / ở cửa sổ app = hỏi nhanh «Hiểu chưa?» (cùng chỗ nghe với Tab). PHÍM TAB ở cửa sổ app (tấm hoạt động, lúc tiêu điểm không nằm trong tờ) = đổi Học ⇄ Bảng; trong tờ thì tờ tự nghe (live-khoi-to-chieu.ts). Bảng danh sách /
   // bảng chọn / đang gõ tin nhắn: Tab giữ nghĩa thường.
@@ -130,11 +176,11 @@ export default function LopNoiThay() {
   useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lkt-moi', { detail: { moi: moiBao, chat } })) }, [moiBao, chat])
   // BẤM RA NGOÀI ⇒ cột tin nhắn tự thu (thầy 12/11): bấm trong app (ngoài cột, ngoài cụm nút) thì thu tại đây; bấm vào tờ thì tờ báo về (`ngoai`).
   useEffect(() => {
-    if (!chat) return
+    if (!chat || hinh) return // cột cố định không tự thu
     const f = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.('.lkt-chat')) setChat(false) }
     window.addEventListener('pointerdown', f, true)
     return () => window.removeEventListener('pointerdown', f, true)
-  }, [chat])
+  }, [chat, hinh])
   // Phím M đóng / mở cột tin nhắn (không khi thầy đang gõ chữ).
   useEffect(() => {
     if (!dang) return
@@ -154,7 +200,7 @@ export default function LopNoiThay() {
   const esc = useRef<() => boolean>(() => false)
   esc.current = () => {
     if (!dang) return false
-    if (chat) { setChat(false); return true }
+    if (chat && !hinh) { setChat(false); return true }
     if (chon) { setChon(false); return true }
     // tấm hoạt động đang nằm DƯỚI tờ vừa chiếu ⇒ Esc đưa tấm lên lại (lùi một màn: về danh sách câu của hoạt động); đang ở trên ⇒ đóng tấm
     if (sanh) return false
@@ -167,8 +213,10 @@ export default function LopNoiThay() {
   if (!k && dangMo != null) return <div className="lkt" style={KIEU}><div className="lkt-dang-mo" role="status">Đang mở phòng chờ Khối {dangMo}…</div></div>
   if (!v || !k || v.ketThuc) return null
   if (k.gd === 'cho') return <div className="lkt" style={KIEU}><PhongChoThay v={v} khoi={k.k} /></div>
+  // NGHỈ GIẢI LAO: màn như phòng chờ (cả lớp chơi trò), nút «Học tiếp» đưa mọi máy về đúng chỗ đang dạy (tờ / bảng vẫn nguyên bên dưới).
+  if (k.giaiLao) return <div className="lkt" style={KIEU}><PhongChoThay v={v} khoi={k.k} nghi={{ tu: k.giaiLao, che: k.che, hocTiep: () => datGiaiLao(k, false) }} /></div>
   return (
-    <div className="lkt" style={KIEU}>
+    <div className={cot ? 'lkt co-cot' : 'lkt'} style={KIEU}>
       {!sanh && !chon && hdMo && hdTren && !toRieng && coTo() ? <button type="button" className="lkt-ve chinh lkt-ve-noi" onClick={toLenTren}>Về màn chiếu</button> : null}
       {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} coVe={coToChieu()} onChe={(c) => doiChe(c, true)} onDong={() => setSanh(false)} /> : null}
       {chon ? (
@@ -182,10 +230,24 @@ export default function LopNoiThay() {
           </Suspense>
         </div></div>
       ) : null}
-      <HangTay v={v} />
-      {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
+      {cot ? (
+        // DẢI «CHỈ THẦY THẤY» dưới phần chiếu: các thẻ của riêng thầy (giơ tay, xin vào lại) nằm ở đây, không đè lên bảng.
+        <div className="lkt-dai" role="group" aria-label="Chỉ thầy thấy">
+          <span className="lkt-dai-nhan" aria-hidden="true">Chỉ thầy thấy</span>
+          <div className="lkt-dai-the"><small>Trong lớp</small><p><b>{v.ds.filter((e) => e.vao).length}</b>em</p></div>
+          <HangTay v={v} />
+          {v.luat ? <Suspense fallback={null}><LuatRoiThay luat={v.luat} ds={v.ds} onDuyet={duyetLuat} /></Suspense> : null}
+        </div>
+      ) : (
+        <>
+          <HangTay v={v} />
+          {dang && v.luat ? <Suspense fallback={null}><LuatRoiThay luat={v.luat} ds={v.ds} onDuyet={duyetLuat} /></Suspense> : null}
+        </>
+      )}
+      {cot ? <KeoCot xTo={xTo} dat={datCot} /> : null}
+      {cot ? <aside className="lkt-cot"><Suspense fallback={null}><CotChatThay kenh={kenh} coDinh /></Suspense></aside> : chat && !hinh ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
       {mtHien ? <Suspense fallback={null}><MayTinhThay kenh={kenh} /></Suspense> : null}
-      {dang && v.luat ? <Suspense fallback={null}><LuatRoiThay luat={v.luat} ds={v.ds} onDuyet={duyetLuat} /></Suspense> : null}
+      {dang && !sanh && !chon && goiBang && goiBang.dat == null && v.luot?.pha !== 'mo' ? <Suspense fallback={null}><TinhTheCoVu coDinh khoa={`${v.luot?.so}:${goiBang.sbd}`} dem={goiBang.tiepDoi ?? KHONG_TIEP} dich={dichTheTo} /></Suspense> : null}
       {hieu && dang && !sanh && !chon ? <Suspense fallback={null}><HoiHieuThay kenh={kenh} tong={v.live?.xem || v.ds.filter((e) => e.vao).length} /></Suspense> : null}
     </div>
   )
@@ -259,7 +321,8 @@ function SanhLive({ v, khoi, che, loi, coVe, onChe, onDong }: { v: ViewBang; kho
   )
 }
 
-function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
+const TEN_CHE = { hoc: 'chế độ Học', bang: 'chế độ Bảng', sanh: 'bảng danh sách lớp' } as const
+function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang NGHỈ GIẢI LAO giữa buổi (13/11): đổi chữ + nút «Học tiếp» */ nghi?: { tu: number; che: 'hoc' | 'bang' | 'sanh'; hocTiep: () => void } }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
   const vao = useMemo(() => v.ds.filter((e) => e.vao), [v.ds])
@@ -281,12 +344,13 @@ function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
     if (chu) { setLoi(chu); setDang(false) }
   }
   return (
-    <div className="lkt-cho" role="dialog" aria-modal="true" aria-label={`Phòng chờ Khối ${khoi}`}>
+    <div className="lkt-cho" role="dialog" aria-modal="true" aria-label={nghi ? `Đang nghỉ giải lao · Khối ${khoi}` : `Phòng chờ Khối ${khoi}`} data-nghi={nghi ? '' : undefined}>
       <header>
-        <span className="lkt-the cho"><i aria-hidden="true" />Phòng chờ · Khối {khoi}</span>
-        <span className="lkt-the">Đã vào {vao.length} em</span>
+        <span className="lkt-the cho"><i aria-hidden="true" />{nghi ? 'Đang nghỉ' : 'Phòng chờ'} · Khối {khoi}</span>
+        {nghi ? <span className="lkt-the">Nghỉ được <DaNghi tu={nghi.tu} /></span> : null}
+        <span className="lkt-the">{nghi ? `${vao.length} em trong lớp` : `Đã vào ${vao.length} em`}</span>
         <span className="gian" />
-        <button type="button" className="lkt-dong" onClick={() => void dong()} disabled={dang}>Đóng phòng</button>
+        <button type="button" className="lkt-dong" onClick={() => void dong()} disabled={dang}>{nghi ? 'Kết thúc buổi' : 'Đóng phòng'}</button>
       </header>
       <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi /></Suspense></div>
       <div className="lkt-doi">
@@ -303,8 +367,12 @@ function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
         })}
       </div>
       <footer>
-        <p>Các em đang chơi Sinh Tồn trong lúc chờ. Đội thiếu người có máy bù cho đủ 4; em vào sau tự thay máy.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
-        <button type="button" className="lkt-bat-dau" onClick={() => void batDau()} disabled={dang}>{dang ? 'Đang bắt đầu…' : 'Bắt đầu live'}</button>
+        {nghi
+          ? <p>Các em đang chơi Sinh Tồn trong lúc nghỉ, mic của thầy đang tắt. Bấm Học tiếp, cả lớp vào lại đúng chỗ đang dạy: {TEN_CHE[nghi.che]}.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
+          : <p>Các em đang chơi Sinh Tồn trong lúc chờ. Đội thiếu người có máy bù cho đủ 4; em vào sau tự thay máy.{loi ? <strong role="alert"> {loi}</strong> : null}</p>}
+        {nghi
+          ? <button type="button" className="lkt-bat-dau" onClick={nghi.hocTiep}>Học tiếp</button>
+          : <button type="button" className="lkt-bat-dau" onClick={() => void batDau()} disabled={dang}>{dang ? 'Đang bắt đầu…' : 'Bắt đầu live'}</button>}
       </footer>
     </div>
   )

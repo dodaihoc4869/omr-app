@@ -35,6 +35,9 @@ html, body, #root {
   max-width: 100%;
 }
 
+/* Thầy 13/11: «Ẩn thanh cuộn mọi lúc mọi chỗ» — mọi màn của ba app; vẫn cuộn bằng vuốt / lăn chuột / phím. Trang nhúng (tờ chiếu, phiếu): may-yeu.ts `themCssMayYeu`. */
+*{scrollbar-width:none!important}::-webkit-scrollbar{display:none}
+
 body {
   margin: 0;
   font-family: var(--sans);

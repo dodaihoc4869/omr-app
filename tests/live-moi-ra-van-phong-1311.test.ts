@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
-import { ghiMoiRa, gvLiveMoiRa, gvLiveThongKe } from '../server/src/live-moi-ra'
+import { ghiMoiRa, gvLiveMoiRa, gvLiveThongKe, tenGoiTheoBuoi } from '../server/src/live-moi-ra'
 import { liveBat, liveDat } from '../src/lib/bpu/phong-live'
 import { datLuat, layChoGhiLuat, luatDuyet } from '../src/lib/bpu/phong-luat'
 import { roiMan, taoPhong, vaoLop, veMan, type TrangThaiPhong } from '../src/lib/bpu/phong'
@@ -31,6 +31,8 @@ describe('luật rời màn — việc chờ ghi sổ', () => {
   it('mời ra, từ chối, cho vào lại, tắt luật lúc còn em chờ ⇒ mỗi việc một dòng; lấy ra là hết', () => {
     const st = phong()
     datLuat(st, { bat: true, n: 2 }, NAY)
+    expect(layChoGhiLuat(st)).toEqual([{ loai: 'bat', sbd: '', luc: NAY, n: 2 }]) // thầy vừa bật luật ⇒ văn phòng biết buổi này có luật
+    datLuat(st, { bat: true, n: 2 }, NAY + 1); expect(layChoGhiLuat(st)).toEqual([]) // bật lại y nguyên: không ghi thêm
     roiVe(st, 'S1', 1, NAY + 1000)
     expect(layChoGhiLuat(st)).toEqual([]) // mới bị nhắc: chưa có gì để báo phụ huynh
     roiVe(st, 'S1', 1, NAY + 2000)
@@ -40,7 +42,7 @@ describe('luật rời màn — việc chờ ghi sổ', () => {
     expect(layChoGhiLuat(st)).toEqual([{ loai: 'tu', sbd: 'S1', luc: NAY + 3000 }, { loai: 'vao', sbd: 'S1', luc: NAY + 4000 }])
     roiVe(st, 'S2', 2, NAY + 5000); layChoGhiLuat(st)
     datLuat(st, { bat: false }, NAY + 6000) // tắt luật: em đang chờ được vào lại ⇒ văn phòng cũng biết
-    expect(layChoGhiLuat(st)).toEqual([{ loai: 'vao', sbd: 'S2', luc: NAY + 6000 }])
+    expect(layChoGhiLuat(st)).toEqual([{ loai: 'vao', sbd: 'S2', luc: NAY + 6000 }, { loai: 'tat', sbd: '', luc: NAY + 6000, n: 2 }])
   })
 })
 
@@ -84,19 +86,35 @@ describe('/gv/bpu/live-thong-ke — số liệu cho tin kết thúc buổi của
     themBuoi(d, 'b1', 'Live Khối 10', '2026-11-13T12:00:00.000Z')
     await ghiMoiRa(env, BUOI, [{ loai: 'ra', sbd: 'S1', luc: NAY, lan: 3, n: 3 }, { loai: 'tu', sbd: 'S1', luc: NAY + 60_000 }])
     const r = await gvLiveThongKe(env, { buoiId: 'b1' }, phongGia) as Record<string, any>
-    expect(r).toMatchObject({ ok: true, buoiId: 'b1', khoi: 10, coPhong: true, ketThuc: true, siSo: 3, soCoMat: 2, soVang: 1 })
-    expect(r.coMat).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', roi: 3 }, { sbd: 'S2', ten: 'Lê Minh Khôi', lop: '10', roi: 0 }])
-    expect(r.roiMan).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', lan: 3 }])
-    expect(r.vang).toEqual([{ sbd: 'S3', ten: 'Phạm Thu Hà', lop: '10' }]) // em khối 11 không tính; S7 chưa bấm tham gia không có hồ sơ khối 10 ⇒ không tính
-    expect(r.moiRa).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', soLan: 1, lan: 3, gio: '19:30', trangThai: 'tu-choi' }])
+    expect(r).toMatchObject({ ok: true, buoiId: 'b1', khoi: 10, coPhong: true, ketThuc: true, siSo: 3, soCoMat: 2, soVang: 1, luat: { daBat: true } })
+    expect(r.coMat).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', tenGoi: 'Bảo', lop: '10', roi: 3 }, { sbd: 'S2', ten: 'Lê Minh Khôi', tenGoi: 'Khôi', lop: '10', roi: 0 }])
+    expect(r.roiMan).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', tenGoi: 'Bảo', lop: '10', lan: 3 }])
+    expect(r.vang).toEqual([{ sbd: 'S3', ten: 'Phạm Thu Hà', lop: '10', tenGoi: 'Hà' }]) // em khối 11 không tính; S7 chưa bấm tham gia không có hồ sơ khối 10 ⇒ không tính
+    expect(r.moiRa).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', soLan: 1, lan: 3, gio: '19:30', trangThai: 'tu-choi', tenGoi: 'Bảo' }])
   })
   it('bỏ buoiId ⇒ buổi live mở gần nhất; phòng không trả lời ⇒ vẫn trả sĩ số và sổ mời ra; chưa có buổi ⇒ báo rõ; cần mã GV', async () => {
     const { d, env } = moi()
     expect(await gvLiveThongKe(env, {}, phongGia)).toMatchObject({ ok: false, lyDo: 'khong-co-buoi' })
     themBuoi(d, 'cu', 'Live Khối 12', '2026-11-10T12:00:00.000Z'); themBuoi(d, 'moi', 'Live Khối 10', '2026-11-13T12:00:00.000Z'); themBuoi(d, 'lop-thuong', '12A', '2026-11-14T12:00:00.000Z')
     const r = await gvLiveThongKe(env, {}, async () => ({ ok: false })) as Record<string, any>
-    expect(r).toMatchObject({ ok: true, buoiId: 'moi', khoi: 10, coPhong: false, soCoMat: 0, soVang: 1, moiRa: [] })
+    expect(r).toMatchObject({ ok: true, buoiId: 'moi', khoi: 10, coPhong: false, soCoMat: 0, soVang: 1, moiRa: [], luat: { daBat: false, dangBat: false } }) // buổi không bật luật ⇒ văn phòng không nhắn nhóm về rời màn
+    await ghiMoiRa(env, { ...BUOI, buoiId: 'moi' }, [{ loai: 'bat', sbd: '', luc: NAY, n: 3 }])
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toEqual({ bat: true, daBat: true, dangBat: true, n: 3, batLuc: '19:30' })
+    await ghiMoiRa(env, { ...BUOI, buoiId: 'moi' }, [{ loai: 'tat', sbd: '', luc: NAY + 60_000, n: 3 }])
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: false })) as Record<string, any>).luat).toMatchObject({ bat: false, daBat: true, dangBat: false })
+    // (Javis 13/11 «chỉ cần thêm một trường: luat: { bat, n }») phòng đang mở trả lời ⇒ nút luật theo PHÒNG: đang bật 5 lần ⇒ bat true, n 5; phòng báo 0 ⇒ bat false
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: true, dangLive: true, luat: 5, em: [] })) as Record<string, any>).luat).toMatchObject({ bat: true, dangBat: true, daBat: true, n: 5 })
+    expect((await gvLiveThongKe(env, { buoiId: 'moi' }, async () => ({ ok: true, dangLive: true, luat: 0, em: [] })) as Record<string, any>).luat).toMatchObject({ bat: false, dangBat: false, daBat: true })
     expect((await goiWorker(worker, env, '/gv/bpu/live-thong-ke', {}, false)).ok).toBe(false)
     expect(await goiWorker(worker, env, '/gv/bpu/live-thong-ke', { buoiId: 'moi' }, true)).toMatchObject({ ok: true, buoiId: 'moi', coPhong: false })
+  })
+})
+
+describe('tên gọi trong tin của văn phòng', () => {
+  it('chữ cuối của họ tên; trùng tên gọi ⇒ thêm tên đệm; vẫn trùng ⇒ cả họ tên', () => {
+    const m = tenGoiTheoBuoi(['Nguyễn Thị Hà', 'Trần Quang', 'Lê Lan Anh', 'Phạm Minh Anh', 'Đỗ Minh Anh', '  Vũ   Ngọc  ', ''])
+    expect(m.get('Nguyễn Thị Hà')).toBe('Hà'); expect(m.get('Trần Quang')).toBe('Quang'); expect(m.get('Vũ   Ngọc')).toBe('Ngọc')
+    expect(m.get('Lê Lan Anh')).toBe('Lan Anh')
+    expect(m.get('Phạm Minh Anh')).toBe('Phạm Minh Anh'); expect(m.get('Đỗ Minh Anh')).toBe('Đỗ Minh Anh')
   })
 })

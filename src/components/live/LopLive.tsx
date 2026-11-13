@@ -35,7 +35,7 @@
 //   cuộn; máy tự ưu tiên khung thầy đang viết (trễ 2 giây), em kéo vạch chia được, chạm hai lần vào khung nào thì khung đó phủ kín. Lớp này chỉ còn đo khổ
 //   hình + vòng khung hình + các thứ nổi (khay, dải báo, dải lượt).
 // AN TOÀN: lớp này không nhận gì về đáp án; đề do màn Bình Phản Ứng dựng từ `viewEm.luot.cau` (đã lọc) rồi truyền vào.
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MutableRefObject, type ReactNode } from 'react'
+import { Suspense, lazy, memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MutableRefObject, type ReactNode } from 'react'
 import type { SuKienBut } from '../../lib/but-bang-loi'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, kyHieu, tenNgan } from '../../lib/bpu/phong'
@@ -43,7 +43,8 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
-import { laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
+import { cotEmGhim, laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
+import { tranGiay } from './cuon-giay'
 import { DauDat, TamTra, type DuLieuTra } from './TamTra'
 import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
@@ -54,8 +55,10 @@ import GiayThay, { type BoChu, type CauGiay } from './GiayThay'
 import { soiDuoc } from './giay-thay-do'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from './KhungDocLap'
 import { TamLenBang, TheLenBang } from './LenBang'
-import { emLenBang, khoaDang, usePhaLenBang, type EmLenBang } from './len-bang-tinh'
+import { dichTinhTheEm, emLenBang, khoaDang, nguonTinhTheEm, usePhaLenBang, type EmLenBang } from './len-bang-tinh'
 import './live-em.css'
+
+const TinhTheCoVu = lazy(() => import('./TinhTheCoVu'))
 
 export interface CauNoiPhongEm { tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }
 export interface PropsLopLive {
@@ -366,7 +369,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   if (dangBat !== batTruoc) { setBatTruoc(dangBat); lucBat.current = dangBat ? Date.now() : 0 }
   // EM LÊN BẢNG: mốc phát tấm giữa màn = lúc lời gọi MỚI tới khi lớp này đang chạy. Lớp vừa dựng mà đã có em đang lên bảng (em vào muộn / nối lại) ⇒
   // mốc 0: không phát lại, chỉ thẻ tên + dấu. Gọi em khác ⇒ mốc mới (tấm mới thay tấm cũ); hết lượt gọi ⇒ mốc 0.
-  const emBang = emLenBang(lenBang ?? undefined, luot?.sbd), khoaBang = khoaDang(emBang)
+  const emBang = emLenBang(lenBang ?? undefined, luot?.sbd, luot?.doi), khoaBang = khoaDang(emBang)
   const [bangTruoc, setBangTruoc] = useState(khoaBang)
   const [lucBang, setLucBang] = useState(0)
   if (khoaBang !== bangTruoc) { setBangTruoc(khoaBang); setLucBang(khoaBang ? Date.now() : 0) }
@@ -530,7 +533,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
 
   /** Đo khổ hình + vùng an toàn của máy (đọc thước `env(safe-area-inset-*)`). */
   const doHinh = useCallback((): HinhDL => {
-    const W = window.innerWidth, H = window.innerHeight
+    const W = window.innerWidth - cotEmGhim(), H = window.innerHeight // máy tính đang ghim cột tin nhắn ⇒ bố cục theo phần còn lại
     const xoay = canXoayCss(W, H, khoaNgang.current) && laDienThoai() // máy tính / máy tính bảng không bao giờ bị xoay hình (chieu-xoay.ts)
     const cs = thuoc.current ? getComputedStyle(thuoc.current) : null
     const px = (v: string | undefined) => parseFloat(v || '0') || 0
@@ -625,13 +628,14 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
-        <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
+        <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h, ...tranGiay(giay.o, giay.h) } : null} khoaGiay={khoaDe}
           coTra={!!bangTra} duoiGiay={bangTra} bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
       {dauDat}
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
       {lenBang && phaBang ? <TamLenBang key={lenBang.khoa} em={lenBang} pha={phaBang} rong={bc?.w ?? 0} dau={dauBang} dong={!giamDong()} /> : null}
+      {lenBang?.dang ? <Suspense fallback={null}><TinhTheCoVu khoa={lenBang.khoa} dem={lenBang.tiep} cuaEm={lenBang.emTiep} doiEm={lenBang.doiEm} dich={dichTinhTheEm} nguon={nguonTinhTheEm} yeu={mayYeu()} /></Suspense> : null}
       {matMang ? <BaoMatMang layLuc={layLuc} />
         : tt.nghi ? <div className="lv-bao nho" role="status">Thầy tạm dừng live</div>
         : tt.tieng === 'loi' ? <BaoTam ms={6000}>Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</BaoTam>

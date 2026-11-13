@@ -8,6 +8,7 @@ import { extname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { build } from 'esbuild'
 import { WebSocketServer } from 'ws'
+import { CAU_DAI } from './cau-dai.mjs'
 
 const GOC = resolve(import.meta.dirname, '../..')
 const LOAI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.webp': 'image/webp' }
@@ -43,7 +44,10 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
   const CAU_GV = [
     { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] },
     { qid: 'Q2', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', choices: ['NaCl', 'NaOH', 'HCl', 'NaHCO₃'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+    // 13/11 «cuộn đề»: hai câu đề dài (cau-dai.mjs) — câu công khai của lượt lấy `textEm` nếu có (giấy lệch tờ của thầy ⇒ máy em dựng giấy thường)
+    ...CAU_DAI.map((c) => ({ qid: c.qid, maDe: 'm', version: '1', group: 'g', phan: 'I', text: c.textEm ?? c.text, choices: c.choices, ideas: [], hinhAnh: [], dang: null, tenDang: 'Alcohol – Phenol', mucDo: 'van-dung', sao: 3, kienThuc: [] })),
   ]
+  const TRE_D1 = Number(process.env.TRE_D1) || 0, DA_NAP = new Set(), NAP_GOI = []
   const PUB = join(GOC, 'public')
   const http = createServer(async (req, res) => {
     const u = new URL(req.url, 'http://x'), d = decodeURIComponent(u.pathname)
@@ -58,6 +62,10 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
       if (d.endsWith('/hs/bpu/ve') || d.endsWith('/hs/bpu/cua-em')) return tra({ ok: true, ve: `hs.${String(b.token ?? '').replace(/^tk-/, '') || 'S1'}`, buoiId: 'b1' })
       // 12/11 Live theo khối — vai app thầy THẬT (?vai=gv): bảng gọi /gv/bpu/mo (dựng lại phòng như máy chủ thật), kết thúc buổi, lệnh lịch.
       if (d.endsWith('/gv/bpu/mo')) { await post('/khoi', { buoiId: 'b1', lop: 'Live Khối 12', ds: EM.map(([sbd, ten], i) => ({ sbd, ten, coMat: true, luc: Date.now() + i })), live: { cho: true, sfu } }); return tra({ ok: true, buoiId: 'b1', ve: 'gv', soEm: EM.length }) }
+      // 13/11 NẠP SẴN (server/src/bpu-nap-san.ts): mô phỏng đợt đọc D1 chậm giờ cao điểm (`TRE_D1` ms). Đã nạp sẵn câu ⇒ sang câu không chờ D1;
+      // `KHONG_NAP=1` ⇒ bỏ qua nạp (đo bản trước). Thứ thật nằm ở phòng + Worker (vitest tests/bpu-nap-san-1311.test.ts); đây thử đường máy thầy → tờ → app.
+      if (d.endsWith('/gv/bpu/nap')) { NAP_GOI.push((b.qids ?? []).map(String)); await new Promise((r) => setTimeout(r, TRE_D1)); if (!process.env.KHONG_NAP) for (const q of b.qids ?? []) DA_NAP.add(String(q)); return tra({ ok: true, so: (b.qids ?? []).length }) }
+      if (d.endsWith('/gv/bpu/luot') && !DA_NAP.has(String(b.qid))) await new Promise((r) => setTimeout(r, TRE_D1))
       if (d.endsWith('/gv/bpu/luot')) { const c = CAU_GV.find((x) => x.qid === b.qid); if (!c) return tra({ ok: false, lyDo: 'khong-co', error: 'Câu này không có trong kho của app nên chưa gửi xuống máy em được.' }); const r = await post('/luot', { qid: c.qid, phan: 'I', tuLuan: false, cau: c, dung: 'B', hanGiay: 0, giai: null, bo: b.bo === true }); return tra({ ok: r.ok !== false, so: r.so, tuLuan: false, daBao: EM.length }) }
       if (d.endsWith('/gv/buoi-hoc')) { if (b.action === 'dong') await post('/dong', {}); return tra({ ok: true, buoi: b.action === 'dang-mo' ? [] : { id: 'b1', ten: 'Live', lop: 'Live Khối 12' } }) }
       if (d.includes('/gv/bpu/khoi-')) return tra({ ok: true, lich: [], soEm: { 10: 0, 11: 0, 12: 8 } })
@@ -92,6 +100,8 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
     /** Cắt kết nối của một em từ phía phòng (thử mất mạng). */
     cat: (sbd) => { for (const w of dsWs) if (w.att?.s === sbd) w.that?.terminate() },
     trangThai: () => kho.get('st'),
+    /** Các lần app thầy gửi nạp sẵn câu (mỗi lần một danh sách mã câu). */
+    dsNap: () => NAP_GOI,
     dong: () => new Promise((r) => { for (const w of dsWs) w.that?.terminate(); wss.close(); http.close(() => r()) }),
   }
 }

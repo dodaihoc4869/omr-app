@@ -1047,11 +1047,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
-    scrollbar-width: none;
     overscroll-behavior-x: contain;
-  }
-  .bt3-luot::-webkit-scrollbar {
-    display: none;
   }
   .bt3-trang {
     flex: 0 0 100%;

@@ -16,6 +16,8 @@
 .lv-chieu { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 .lv-giay { position: absolute; border-radius: 12px; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; }
 .lv-de { position: absolute; inset: 0; padding: 14px 18px; overflow-x: hidden; overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+/* Hình xoay 90° (điện thoại cầm dọc): trình duyệt không cuộn hộ khung nằm trong khối xoay ⇒ khung giấy tự cuộn theo ngón tay (KhungDocLap.tsx, cuon-giay.ts) */
+.lv[data-xoay] .lv-de { touch-action: none; }
 .lv-de-trong { transform-origin: 0 0; pointer-events: none; }
 .lv-de-trong .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex-direction: column; gap: 10px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .lv-giay-trong { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; text-align: center; font-size: 34px; font-weight: 700; color: var(--tr-chu-2); }
@@ -433,4 +435,3 @@ html.may-yeu .lv-song i { transition: none; }
 @keyframes lv-cham-nhay { 50% { opacity: 0.2; } }
 .lv-nam[aria-expanded="true"] .lv-nam-cham { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .lv-tra, .lv-nam-cham.mic, .lv-tra-so output i { animation: none; } }
-

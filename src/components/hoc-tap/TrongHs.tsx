@@ -155,6 +155,7 @@ const ngayKiemChu = (ngay: string, now: number) => {
 /** Chữ phụ của dòng Kiểm tra ôn tập — chỉ số có trong TomTatKiemTra (như thẻ TheKiemTraCaNhan). */
 function chuKiem(k: TomTatKiemTra): string {
   if (k.trangThai === 'cho_nguon') return 'Đang chuẩn bị'
+  if (k.lamLai?.length) return `Thầy cho em làm lại chặng ${k.lamLai.map((n) => n + 1).join(', ')} · bài ngày ${k.ngay.slice(8, 10)}/${k.ngay.slice(5, 7)}`
   if (k.nopLuc !== null || k.trangThai === 'het_han') return `${k.trangThai === 'het_han' ? (k.nopLuc === null ? 'Đã lỡ' : 'Đã hết hạn') : 'Đã nộp'} · ${k.diem !== null ? `điểm ${diemChu(k.diem)}/10` : 'đang chấm'}`
   if (!k.homNay) return ngayKiemChu(k.ngay, k.serverNow)
   return `${k.tong} câu · khoảng ${k.phut} phút · hạn nộp ${gioHan(k.hanLuc, k.ngay)}`
@@ -964,7 +965,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     // vòng = chặng ĐÃ CHỐT / tổng chặng (cùng nguồn với màn bài «3/5 chặng đã chốt»); máy chủ cũ chưa gửi số chặng ⇒ theo số câu đã trả lời
     ...(kiemLam && kiem.soChang > 0 ? { soDoan: kiem.soChang, vong: kiem.changChot !== undefined ? (100 * kiem.changChot) / kiem.soChang : kiem.tong > 0 ? (100 * kiem.daTra) / kiem.tong : 0 } : {}),
     ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, pop: { tieu: 'Kiểm tra ôn tập', phu: chuKiem(kiem),
-      nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } }
+      nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiem.lamLai?.length ? `Làm lại chặng ${kiem.lamLai[0]! + 1}` : kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } }
   if (nutKiem) nut.push(nutKiem) // Kiểm tra ôn tập LUÔN đứng đầu hành trình (thầy 27/10)
   let nutSua: Nut | null = null
   if (coSuaChang && !p.ngayKiem && khoaKt) nutSua = { k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } }

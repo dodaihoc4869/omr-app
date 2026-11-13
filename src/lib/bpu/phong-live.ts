@@ -23,13 +23,18 @@ export type ViThoi = 'thay' | 'em' | 'moi-khac' | 'roi' | 'mat' | 'luot' | 'tat'
  *  Loại: 0 số câu · 1 tên phần · 2 đề · 3 chữ phương án · 4 ký hiệu phương án · 5 khung phương án · 6 dòng trả lời ngắn · 7 ảnh. Chỉ là SỐ ĐO — không chữ, không đáp án. */
 export interface GiayThay { k: string; w: number; h: number; la: boolean; o: number[][] }
 /** `che = 'sanh'` (thầy 12/11): thầy vừa bấm Bắt đầu, CHƯA chọn chế độ ⇒ máy em ở bảng danh sách bốn đội, đã nghe được thầy. */
-export interface KhoiPhong { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }
+/** `giaiLao` (13/11, nút «Nghỉ»): giờ phòng lúc thầy cho NGHỈ GIẢI LAO giữa buổi — cả lớp về màn chờ chơi trò, `gd` / `che` giữ nguyên để «Học tiếp» vào lại
+ *  đúng chỗ đang dạy. Vắng / 0 = không nghỉ. Chỉ có nghĩa khi `gd = dang`. */
+export interface KhoiPhong { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh'; giaiLao?: number }
+/** Lớp đang ở MÀN CHỜ CHƠI TRÒ (phòng chờ trước giờ, hoặc đang nghỉ giải lao): không tính rời màn, trò Sinh Tồn chạy. */
+export const khoiDangChoi = (k?: KhoiPhong | null): boolean => !!k && (k.gd === 'cho' || !!k.giaiLao)
 /** Chuẩn hoá `khoi` máy thầy gửi; sai dạng ⇒ undefined (giữ cái đang có), null ⇒ gỡ. */
 export function chuanKhoi(v: unknown): KhoiPhong | null | undefined {
   if (v === null) return null
   const x = (v ?? null) as Record<string, unknown> | null, k = Number(x?.k)
   if (!x || typeof x !== 'object' || ![10, 11, 12].includes(k)) return undefined
-  return { k, gd: x.gd === 'dang' ? 'dang' : 'cho', che: x.che === 'bang' ? 'bang' : x.che === 'sanh' ? 'sanh' : 'hoc' }
+  const gl = Math.floor(Number(x.giaiLao))
+  return { k, gd: x.gd === 'dang' ? 'dang' : 'cho', che: x.che === 'bang' ? 'bang' : x.che === 'sanh' ? 'sanh' : 'hoc', ...(x.gd === 'dang' && gl > 0 ? { giaiLao: gl } : {}) }
 }
 export interface LivePhong {
   /** Công tắc `cau_hinh.live_bang` (máy chủ nạp mỗi lần thầy mở phòng). Tắt ⇒ view không có khối `live`, mọi tin `live-*` bị bỏ. */

@@ -58,6 +58,9 @@ html[data-bpu-an] [data-live-khoi-thay] { display: none; }
 [data-live-khoi-nen] { position: fixed; inset: 0; z-index: 99980; background: var(--tr-chieu-bang); }
 html[data-bpu-an] [data-live-khoi-nen] { display: none; }
 html[data-live-khoi] .lop-xem-phieu { left: 0 !important; }
+/* 13/11 thầy «thanh màu trắng này cho cùng màu với thanh của tin nhắn lớp»: dải đầu 48 px (chỗ nút đóng) của tờ riêng do tấm hoạt động mở ⇒ cùng nền
+   với đầu cột «Tin nhắn lớp» (`--lc-nen-2` của chat.css, máy thầy: slate-950 pha slate-900); viền mỏng quanh khung tờ cũng theo nền ấy. */
+html[data-live-khoi] .lop-xem-phieu { background: color-mix(in srgb, var(--slate-950) 55%, var(--slate-900)); }
 html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] { padding-top: 0 !important; }
 /* chỉ tờ CỦA BẢNG (gan-gv, nhãn «Tờ chiếu Bình Phản Ứng») bỏ dải đầu + nút đóng; tờ do tấm hoạt động tự mở (Chữa câu khó, Kiểm tra đầu giờ…) giữ nút đóng để thầy quay lại tấm */
 html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] .khung-phieu-thanh, html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] .nut-dong-phieu { display: none !important; }
@@ -99,3 +102,43 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 .lkt-ve-noi { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); pointer-events: auto; }
 .lkt-chon-dau .lkt-ve { font-size: 17px; margin-left: 10px; pointer-events: auto; }
 /* tờ riêng của tấm hoạt động đang chiếu (nằm trên tấm) ⇒ nút nổi «Về màn chiếu» không hiện (LopNoiThay `toRieng`; trước là luật html:has() — bắt tính lại kiểu cả trang). */
+
+/* ── CỘT TIN NHẮN CỐ ĐỊNH + DẢI «CHỈ THẦY THẤY» (thầy duyệt bản vẽ 55–59 ngày 13/11; hình học ở cot-chat-hinh.ts) ──
+   Gốc trang mang `data-lk-cot` + --lkc-w (bề ngang cột) · --lkc-s (hệ số thu) · --lkc-h (bề cao dải). Lớp phủ tờ thu ĐỀU về góc trên-trái ⇒ tỉ lệ bảng
+   không đổi ⇒ máy em thấy y như không có cột. */
+:root[data-lk-cot] .lop-xem-phieu { transform: scale(var(--lkc-s)); transform-origin: 0 0; }
+:root[data-lk-cot] .hh-lop, :root[data-lk-cot] .bpu-bao-chay.nhe { right: var(--lkc-w); bottom: var(--lkc-h); }
+:root[data-lk-cot] .hh-lop { --k: calc(var(--lkc-s) * min(100vw / 1366, 100vh / 768)); }
+:root[data-lk-cot] .bpu-bao-chay.nhe .bpu-roi-gon { margin-bottom: calc(var(--lkc-s) * max(74px, 10.5vh)); }
+.lkt-cot { position: fixed; right: 0; top: 0; bottom: 0; width: var(--lkc-w); pointer-events: auto; background: var(--tr-chieu-bang); box-shadow: inset 1.5px 0 0 var(--tr-chieu-mat-3); }
+.lkt-dai { position: fixed; left: var(--lkc-x, 0px); right: var(--lkc-w); bottom: 0; height: var(--lkc-h); box-sizing: border-box; display: flex; align-items: stretch; gap: 10px; padding: 10px 12px; overflow: hidden; pointer-events: auto; background: var(--tr-chieu-bang); box-shadow: inset 0 1.5px 0 var(--tr-chieu-mat-3); }
+/* TAY KÉO đổi cỡ dải / cột (KeoCot.tsx): vùng bắt 10 px vắt qua mép, một vạch mảnh ở giữa chỉ rõ lên khi rê chuột / đang kéo. */
+.lkt-keo { position: fixed; z-index: 3; pointer-events: auto; touch-action: none; display: grid; place-items: center; }
+.lkt-keo.ngang { left: var(--lkc-x, 0px); right: var(--lkc-w); bottom: calc(var(--lkc-h) - 7px); height: 10px; cursor: ns-resize; }
+.lkt-keo.doc { right: calc(var(--lkc-w) - 7px); top: 0; bottom: 0; width: 10px; cursor: ew-resize; }
+.lkt-keo i { display: block; border-radius: 99px; background: color-mix(in srgb, var(--tr-chieu-giay) 26%, transparent); transition: background 0.15s; }
+.lkt-keo.ngang i { width: 44px; height: 4px; }
+.lkt-keo.doc i { width: 4px; height: 44px; }
+.lkt-keo:hover i, .lkt-keo:active i { background: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); }
+.lkt-dai-nhan { flex: none; align-self: center; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-chieu-giay) 42%, transparent); }
+.lkt-dai-the { flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 104px; padding: 8px 14px; border-radius: 14px; background: var(--tr-chieu-mat); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3); }
+.lkt-dai-the small { font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-chieu-giay) 60%, transparent); }
+.lkt-dai-the p { display: flex; align-items: baseline; gap: 6px; margin: 0; font-size: 13px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 60%, transparent); }
+.lkt-dai-the b { font-size: 26px; line-height: 1; font-weight: 800; color: var(--tr-chieu-giay); }
+/* thẻ giơ tay + thẻ luật: trong dải thì nằm thành hàng, tự cuộn bên trong, không còn nổi trên bảng */
+.lkt-dai .lkt-tay, .lkt-dai .lr-thay { position: static; flex: 0 1 auto; align-self: stretch; box-sizing: border-box; max-height: 100%; overflow: auto; animation: none; }
+.lkt-dai .lkt-tay { width: auto; min-width: 232px; max-width: 320px; align-content: start; }
+.lkt-dai .lkt-tay ul { max-height: none; }
+.lkt-dai .lr-thay { width: auto; min-width: 300px; max-width: 460px; padding: 10px 12px; }
+
+/* ĐỒNG BỘ NỀN TỐI CHUẨN DUOLINGO quanh bảng viết (thầy 13/11 «đồng bộ màu chuẩn màu nền tối của doligo … cho phần bảng viết của tất cả các chỗ»): bảng viết đã
+   là xanh than Duolingo (--tr-chieu-bang / --mc-bang); cột «Tin nhắn lớp», dải đầu tờ riêng, dải «Chỉ thầy thấy» và các đường viền quanh bảng trước
+   dùng tông xám than (slate / mặt chiếu xám) ⇒ nay CÙNG bảng xanh than (--lk-*: nền = nền bảng · mặt thẻ · viền), gắn ở gốc trang suốt buổi (thay-khoi.ts). */
+html[data-live-khoi] .lop-xem-phieu { background: var(--lk-nen); }
+/* 13/11 thầy «dòng kẻ 2 phần không khớp nhau bỏ luôn dòng kẻ trên đi»: khung tờ thu theo cột tin nhắn ⇒ mép trên iframe rơi vào nửa điểm ảnh, nền GIẤY sáng mặc
+   định của iframe lộ thành vạch xám 1 px ⇒ nền iframe = nền bảng (vạch biến mất, tờ vẫn tự vẽ nền của nó). */
+html[data-live-khoi] .lop-xem-phieu iframe { background: var(--lk-nen) !important; }
+html[data-live-khoi] .lc-goc { --lc-nen: var(--lk-nen); --lc-mat: var(--lk-mat); --lc-mat-2: var(--lk-mat-2); --lc-vien: var(--lk-vien); --lc-nen-2: var(--lk-nen); }
+html[data-live-khoi] .lkt-cot { background: var(--lk-nen); box-shadow: inset 1.5px 0 0 var(--lk-vien); }
+html[data-live-khoi] .lkt-dai { background: var(--lk-nen); box-shadow: inset 0 1.5px 0 var(--lk-vien); }
+html[data-live-khoi] .lkt-dai-the { background: var(--lk-mat); box-shadow: inset 0 0 0 1.5px var(--lk-vien); }

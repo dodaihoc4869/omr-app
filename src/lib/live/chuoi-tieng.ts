@@ -16,9 +16,8 @@ export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
 /** Chặn đỉnh của kiểu 'nen': hạ mức trước bộ chặn + ngưỡng chặn (dB). */
 export const CHAN_DINH = { ha: 0.55, nguong: -7 }
 /** Kiểu 'nhanh': mức giọng nhắm tới (RMS lúc có tiếng, biên độ), trần đỉnh, khoảng hệ số nâng, tốc độ trôi (dB / giây). */
-// 12/11 21:15 (thầy giữa giờ dạy: «hs kêu tiếng của thầy hơi bé», đã bấm «Làm rõ» vẫn nhỏ ⇒ phát hành gấp): mức đích 0,12 → 0,2 (−18,4 → −14 dBFS,
-// to hơn 4,4 dB); trần chặn đỉnh giữ 0,78 (≈ −2,2 dBFS, chừa chỗ cho Opus) ⇒ to hơn mà không vỡ.
-export const LAM_RO = { dich: 0.2, tran: 0.78, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
+// 13/11 sáng (thầy: «Tiếng bị vỡ giảm quay về hôm qua đi») ⇒ trả mức đích về 0,12 như trước 12/11 21:15.
+export const LAM_RO = { dich: 0.12, tran: 0.78, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
 
 export type KieuChuoi = 'khung' | 'nhanh' | 'nen'
 /** LỌC ỒN RIÊNG (thầy 11/11 «lọc ồn chưa ngon … để giọng thầy và hs trong sáng nhất»): RNNoise (mạng nơ-ron nhỏ, BSD-3; bản wasm của gói
@@ -59,7 +58,16 @@ export interface ChuoiTieng {
   /** «Chỉ giọng thầy»: tình trạng + tin (bản mô hình, ngày luyện, hệ số thời gian thực đo NGAY trên máy này, lý do tự tắt). */
   tg?: TinhChiThay
   tgTin?: TinChiThay | null
+  /** «TĂNG TIẾNG» (thầy 13/11): đặt hệ số KHUẾCH ĐẠI CỐ ĐỊNH `kd` (= 10^(N/20)) nhân TRƯỚC khâu chặn đỉnh; `chiKd` = đường «Chuẩn trình duyệt» (chỉ khuếch đại +
+   *  chặn đỉnh: không lọc 80 Hz, không nâng mức, không lọc ồn). Chỉ kiểu 'khung' có. Chưa gọi lần nào ⇒ Worker y như bản trước (hệ số 1 nhân đúng từng bit). */
+  datTang?: (kd: number, chiKd: boolean) => void
+  /** Đã từng gửi hệ số tăng tiếng cho Worker của chuỗi này (để về Gốc thì báo lại hệ số 1). */
+  daTang?: boolean
 }
+/** «Tăng tiếng»: các bậc dB thầy chọn (0 = Gốc — đường tiếng y như trước). */
+export const BAC_TANG = [0, 3, 6, 9] as const
+/** dB ⇒ hệ số biên độ (+6 dB ≈ ×2). */
+export const heSoTang = (db: number): number => Math.pow(10, db / 20)
 
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
  *  · sàn ồn = mức thấp nhất gần đây (bám xuống nhanh, trôi lên ≈ 1 dB / giây);
@@ -150,6 +158,18 @@ function locOn(x) {
   lk = k1; lc = c1;
 }
 var tgChi = false, tgMoc = null; /* «Chỉ giọng thầy»: chú thích ở trên MA_KHUNG */
+var kd = 1, kdCu = 1, chiKd = false; /* «Tăng tiếng» 13/11: chú thích ở ChuoiTieng.datTang */
+function chiKhuech(x, n, kenh, s, moc) {
+  var i, v, a, k = kenh > 1 ? 1 / kenh : 1, nha = 1 - Math.exp(-1 / (0.08 * s)), k0 = kdCu;
+  kdCu = kd;
+  for (i = 0; i < n; i++) {
+    v = x[i] * k * (k0 + (kd - k0) * (i + 1) / n); a = v < 0 ? -v : v;
+    if (a * gl > c.tran) gl = c.tran / a; else gl += (1 - gl) * nha;
+    x[i] = v * gl;
+  }
+  if (++bao >= 100) { postMessage({ v: Math.sqrt(vt / bao) }); bao = 0; vt = 0; }
+  return new AudioData({ format: 'f32-planar', sampleRate: s, numberOfFrames: n, numberOfChannels: 1, timestamp: moc, data: x });
+}
 function xuLy(f) {
   var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, e = 0, r, g0 = g, can, buoc, v, a, w, al, nha;
   if (!tam || tam.length !== n) tam = new Float32Array(n);
@@ -157,6 +177,7 @@ function xuLy(f) {
   f.close();
   for (i = 0, e = 0; i < n; i++) e += x[i] * x[i];
   vt += e / n; e = 0;
+  if (chiKd) return chiKhuech(x, n, kenh, s, moc);
   if (tgChi) {
     if (tgMoc) tgMoc(x, n, s);
     if (++bao >= 100) { postMessage({ v: Math.sqrt(vt / bao) }); bao = 0; vt = 0; }
@@ -177,9 +198,9 @@ function xuLy(f) {
     buoc = Math.pow(10, ((can > g0 ? (dem * 128 < 3 * s ? c.lenDau : c.len) : c.xuong) / 20) * (n / s));
     g = can > g0 ? Math.min(can, g0 * buoc) : Math.max(can, g0 / buoc);
   } else im += n;
-  nha = 1 - Math.exp(-1 / (0.08 * s));
+  nha = 1 - Math.exp(-1 / (0.08 * s)); w = kdCu; kdCu = kd;
   for (i = 0; i < n; i++) {
-    v = x[i] * (g0 + (g - g0) * (i + 1) / n); a = v < 0 ? -v : v;
+    v = x[i] * (g0 + (g - g0) * (i + 1) / n) * (w + (kd - w) * (i + 1) / n); a = v < 0 ? -v : v;
     if (a * gl > c.tran) gl = c.tran / a; else gl += (1 - gl) * nha;
     x[i] = v * gl;
   }
@@ -193,6 +214,7 @@ onmessage = function (ev) {
   if (d && d.tachMa) { try { importScripts(d.tachMa); tgMoc = tgKhung; } catch (e) { postMessage({ tg: 'loi', ly: 'nạp lõi: ' + (e && e.message || e) }); return; } }
   if (tgMoc) tgTin(d);
   if (d && 'chiTach' in d) tgChi = !!d.chiTach;
+  if (d && typeof d.kd === 'number' && d.kd > 0) { kd = d.kd; chiKd = !!d.chiKd; }
   if (!d || !d.vao) return;
   c = d.c; if (c.g0 > 0) g = c.g0;
   doc = d.vao.getReader(); ghi = d.ra.getWriter();
@@ -286,6 +308,7 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chi
       daGui = true; k.locOn = 'tai'; rn = 'tai'
       void taiLoc().then((b) => { if (!b) { rn = 'loi'; if (muc !== 'thay') k.locOn = 'loi'; daGui = false; return } try { const ban = b.slice(0); wk.postMessage({ loc: ban, muc: THAM_LOC_ON[muc] }, [ban]) } catch { rn = 'loi'; if (muc !== 'thay') k.locOn = 'loi' } })
     }
+    k.datTang = (h, chi) => { k.daTang = true; try { wk.postMessage({ kd: h, chiKd: chi }) } catch { /* Worker đã dừng */ } }
     /** «Chuẩn trình duyệt» ⇄ «Làm rõ» sau khi đã từng bật «Chỉ giọng thầy» trên chuỗi này (chưa bật bao giờ: không gửi gì — Worker y như trước). */
     k.datChiTach = (b) => { if (daTungThay) { try { wk.postMessage({ chiTach: b }) } catch { /* Worker đã dừng */ } } }
     wk.onerror = () => khiHong?.()

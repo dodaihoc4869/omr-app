@@ -79,7 +79,7 @@ export class KenhLopMay {
       return true
     }
     if (j.k === 'tro') {
-      if (thay || st.live.khoi.gd !== 'cho') return true
+      if (thay || !(st.live.khoi.gd === 'cho' || st.live.khoi.giaiLao)) return true
       this.tro.nhan(a.s, e!.doi, x, nay)
       if (!this.hen && this.tro.soEm) this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)
       return true
@@ -89,7 +89,7 @@ export class KenhLopMay {
   private nhipTro(): void {
     this.hen = null
     const st = this.nho(), nay = Date.now()
-    if (!st || st.ketThuc || st.live?.khoi?.gd !== 'cho') { this.tro.dung(); return }
+    if (!st || st.ketThuc || !(st.live?.khoi?.gd === 'cho' || st.live?.khoi?.giaiLao)) { this.tro.dung(); return } // trò chạy ở phòng chờ và lúc nghỉ giải lao
     const anh = this.tro.nhip(nay)
     if (!anh) return
     this.moiMay(JSON.stringify({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: nay, x: anh }))

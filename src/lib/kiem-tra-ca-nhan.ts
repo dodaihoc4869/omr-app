@@ -3,6 +3,8 @@ export interface TomTatKiemTra {
  tong:number;daTra:number;con:number;soChang:number;phut:number;soBai:number;tongKienThuc:number;phuDe:number;nguonDayDu:boolean;lyDo:string;thieuNguon:number;diem:number|null;nopLuc:number|null
  /** Số chặng đã chốt (28/10, chỉ-thêm — bản tóm tắt của Sảnh): vòng nút Kiểm tra ôn tập trên Lộ trình. */
  changChot?:number
+ /** 13/11 (thầy cho làm lại chặng, chỉ-thêm): các chặng (số thứ tự từ 0) của bài ĐÃ NỘP em còn quyền làm lại. */
+ lamLai?:number[]
 }
 export function docKiemTra(x:unknown):TomTatKiemTra|undefined {
  if(!x||typeof x!=='object'||Array.isArray(x))return
@@ -15,6 +17,8 @@ export function docKiemTra(x:unknown):TomTatKiemTra|undefined {
  if(![undefined,12].includes(o.baiNgayToiThieu as number|undefined))return
  // số chặng đã chốt sai dạng ⇒ bỏ riêng trường này (vòng theo số câu), không bỏ cả bài kiểm tra
  if(o.changChot!==undefined&&(typeof o.changChot!=='number'||!Number.isInteger(o.changChot)||o.changChot<0||o.changChot>Number(o.soChang))){const {changChot:_,...con}=o;return con as unknown as TomTatKiemTra}
+ // quyền làm lại sai dạng ⇒ bỏ riêng trường này
+ if(o.lamLai!==undefined&&(!Array.isArray(o.lamLai)||!o.lamLai.every(n=>Number.isInteger(n)&&n>=0&&n<Number(o.soChang)))){const {lamLai:_,...con}=o;return con as unknown as TomTatKiemTra}
  return o as unknown as TomTatKiemTra
 }
 export const gioKiemTra=(ms:number)=>new Date(ms).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',hour12:false})

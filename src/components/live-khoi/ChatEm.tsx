@@ -4,6 +4,8 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { chuCongThuc, chuanGui, docKhoa, docTin, duocGui, gioHien, nhanTin, tenTat, type TinChat } from '../../lib/live-khoi/chat-loi'
 import { CHAT_DAI, CHAT_NHIP_MS, type ChatGui, type KenhLop } from '../../lib/live-khoi/kieu'
+import { goTelex, xoaLui } from '../../lib/telex'
+import BanPhimNgang from './BanPhimNgang'
 import './chat.css'
 
 type KetQuaGui = 'ok' | 'nhanh-qua' | 'rong' | 'khoa'
@@ -74,6 +76,7 @@ const DUONG_BT = {
   chat: 'M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z',
   x: 'M6 6l12 12M18 6L6 18',
   gui: 'M5 12h14M13 6l6 6-6 6',
+  ghim: 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7',
 } as const
 export function BieuTuongChat({ ten, co = 20 }: { ten: keyof typeof DUONG_BT; co?: number }) {
   return <svg className="lc-bt" width={co} height={co} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DUONG_BT[ten]} /></svg>
@@ -103,7 +106,17 @@ const DongTin = memo(function DongTin({ tin, toi = false }: { tin: TinChat; toi?
 })
 
 /** Danh sách tin tự cuộn xuống tin mới; người xem đang kéo lên đọc thì giữ nguyên vị trí. `rong` hiện khi chưa có tin. */
-export function DanhSachTin({ ds, toiSbd, rong, veCuoi }: { ds: TinChat[]; toiSbd?: string; rong: string; /** Đổi số này ⇒ ép cuộn về cuối (vừa gửi tin). */ veCuoi?: number }) {
+/** DÒNG TIN GỌN của cột cố định máy thầy (bản vẽ 59): dòng trên HỌ TÊN ĐẦY ĐỦ in đậm màu theo đội (+ nhãn «Câu hỏi», giờ); dòng dưới nội dung chữ nhỏ hơn.
+ *  Vạch màu đội ở mép trái, nền ám nhẹ màu đội. Tin của thầy: màu trung tính. */
+const DongTinGon = memo(function DongTinGon({ tin, toi = false }: { tin: TinChat; /** tin của chính em (máy em): nhãn «Em» + viền nhẹ */ toi?: boolean }) {
+  return (
+    <div className="lc-g" style={mauDoi(tin.doi)} data-thay={tin.thay || undefined} data-hoi={tin.hoi || undefined} data-toi={toi || undefined}>
+      <div className="lc-g-ten"><span>{tin.thay ? 'Thầy' : tin.ten}</span>{toi ? <em className="toi">Em</em> : tin.hoi ? <em>Câu hỏi</em> : null}<time>{gioHien(tin.luc)}</time></div>
+      <div className="lc-g-chu"><ChuTin chu={tin.chu} /></div>
+    </div>
+  )
+})
+export function DanhSachTin({ ds, toiSbd, rong, veCuoi, gon }: { ds: TinChat[]; toiSbd?: string; rong: string; /** Đổi số này ⇒ ép cuộn về cuối (vừa gửi tin). */ veCuoi?: number; /** dòng tin gọn hai dòng (cột cố định máy thầy) */ gon?: boolean }) {
   const khung = useRef<HTMLDivElement>(null), oDay = useRef(true)
   useLayoutEffect(() => { oDay.current = true }, [veCuoi])
   useLayoutEffect(() => { const el = khung.current; if (el && oDay.current) el.scrollTop = el.scrollHeight }, [ds, veCuoi])
@@ -117,8 +130,8 @@ export function DanhSachTin({ ds, toiSbd, rong, veCuoi }: { ds: TinChat[]; toiSb
   }, [])
   const khiCuon = () => { const el = khung.current; if (el) oDay.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48 }
   return (
-    <div className="lc-ds" ref={khung} onScroll={khiCuon} role="log" aria-label="Tin nhắn lớp" tabIndex={0}>
-      {ds.length ? ds.map((t) => <DongTin key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} />) : <p className="lc-rong">{rong}</p>}
+    <div className={gon ? 'lc-ds lc-ds-gon' : 'lc-ds'} ref={khung} onScroll={khiCuon} role="log" aria-label="Tin nhắn lớp" tabIndex={0}>
+      {ds.length ? ds.map((t) => (gon ? <DongTinGon key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} /> : <DongTin key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} />)) : <p className="lc-rong">{rong}</p>}
     </div>
   )
 }
@@ -206,6 +219,87 @@ export function CuaChatEm({ chat, toiSbd, onDong }: { chat: ChatLop; toiSbd: str
         <input value={chu} onChange={(e) => setChu(e.target.value)} maxLength={CHAT_DAI} disabled={khoa} placeholder="Nhắn thầy và cả lớp…" aria-label="Nhắn thầy và cả lớp" enterKeyHint="send" autoComplete="off" />
         <button type="submit" className="lc-gui" disabled={khoa || !chu.trim()} aria-label="Gửi tin"><BieuTuongChat ten="gui" co={18} /></button>
       </form>
+    </div>
+  )
+}
+
+// ── NGĂN «TIN NHẮN LỚP» MÁY EM (thầy duyệt bản vẽ 60–66 ngày 13/11: «hs vuốt từ mép bên phải vào thì hiện luôn khung chat … giống như thiết kế của gv») ──
+// Điện thoại xoay ngang: em bấm thanh vàng ⇒ «Nhắn cả lớp» thì ngăn trượt ra từ mép phải (13/11 lần 2: thầy bỏ vuốt vì khó vuốt); ✕ / chạm ra ngoài ⇒ đóng;
+// bàn phím bật ⇒ ngăn co lên trên bàn phím, chỉ còn tin mới + ô nhập. Máy tính: ngăn GHIM thành cột bên phải (màn live co sang trái), Enter gõ ngay, Esc về bài.
+const NHAN_NHANH_NGAN = ['Em hiểu rồi ạ', 'Thầy giảng lại ạ', 'Em chưa rõ ạ'] as const
+/** Bề cao đáy cửa sổ đang bị bàn phím ảo che (px); 0 = không có bàn phím / trình duyệt không báo. */
+function useBanPhim(): number {
+  const [px, setPx] = useState(0)
+  useEffect(() => {
+    const v = window.visualViewport
+    if (!v) return
+    const f = () => setPx(Math.max(0, Math.round(window.innerHeight - v.height - v.offsetTop)))
+    v.addEventListener('resize', f); v.addEventListener('scroll', f)
+    return () => { v.removeEventListener('resize', f); v.removeEventListener('scroll', f) }
+  }, [])
+  return px
+}
+export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong, onGhim, banPhimRieng = false }: {
+  chat: ChatLop; toiSbd: string; soEm: number
+  /** đang ghim thành cột (máy tính) */ ghim: boolean; /** máy này ghim được (máy tính màn rộng) */ coGhim: boolean
+  /** đổi số ⇒ đưa con trỏ vào ô nhập (phím Enter) */ tieuDiem: number
+  onDong: () => void; onGhim: (b: boolean) => void
+  /** BÀN PHÍM TRONG APP (thầy 13/11 «ép bàn phím xoay ngang»): hình đang xoay 90° trên điện thoại ⇒ bàn phím hệ thống nằm ngang chữ, không gõ được ⇒
+   *  ô nhập không gọi bàn phím hệ thống, ngăn tự vẽ bàn phím (nằm ngang theo hình), chữ gõ đi qua bộ gõ Telex. */
+  banPhimRieng?: boolean
+}) {
+  const [chu, setChu] = useState('')
+  const [nhanhQua, setNhanhQua] = useState(false)
+  const [veCuoi, setVeCuoi] = useState(0)
+  const o = useRef<HTMLInputElement>(null)
+  const banPhim = useBanPhim()
+  const { ds, khoa, danhDauDoc } = chat
+  useEffect(() => { danhDauDoc() }, [ds, danhDauDoc])
+  useEffect(() => { if (tieuDiem) o.current?.focus({ preventScroll: true }) }, [tieuDiem])
+  // Esc: đang gõ ⇒ rời ô nhập (về bài); ngăn trượt ⇒ đóng. Cột ghim không gõ ⇒ để Esc cho màn bên dưới.
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      const dangGo = document.activeElement === o.current
+      if (!dangGo && ghim) return
+      e.stopPropagation()
+      if (dangGo) o.current?.blur()
+      if (!ghim) onDong()
+    }
+    window.addEventListener('keydown', f, true)
+    return () => window.removeEventListener('keydown', f, true)
+  }, [ghim, onDong])
+  useEffect(() => {
+    if (!nhanhQua) return
+    const hen = window.setTimeout(() => setNhanhQua(false), CHAT_NHIP_MS)
+    return () => window.clearTimeout(hen)
+  }, [nhanhQua])
+  const gui = (c: string) => { const kq = chat.gui(c); setNhanhQua(kq === 'nhanh-qua'); if (kq === 'ok') setVeCuoi((n) => n + 1); return kq === 'ok' }
+  const khiGui = (e: FormEvent) => { e.preventDefault(); if (gui(chu)) setChu('') }
+  const goPhim = useCallback((p: string) => setChu((c) => { const m = goTelex(c, p); return m.length > CHAT_DAI ? c : m }), [])
+  const xoaPhim = useCallback(() => setChu(xoaLui), [])
+  const go = banPhim > 80
+  return (
+    <div className={`lc-goc lc-khung lc-ngan${ghim ? ' lc-ghim' : ''}${go ? ' go' : ''}${banPhimRieng ? ' lc-bpr' : ''}`} role="dialog" aria-label="Tin nhắn lớp" style={banPhim > 0 ? { bottom: banPhim } : undefined}>
+      <div className="lc-dau">
+        <span className="lc-dau-ten">Tin nhắn lớp<small>{soEm} em</small></span>
+        {coGhim && !ghim ? <button type="button" className="lc-o44" onClick={() => onGhim(true)} aria-label="Ghim tin nhắn thành cột bên phải" title="Ghim thành cột"><BieuTuongChat ten="ghim" co={18} /></button> : null}
+        <button type="button" className="lc-o44" onClick={() => (ghim ? onGhim(false) : onDong())} aria-label={ghim ? 'Cất cột tin nhắn' : 'Đóng tin nhắn'} title={ghim ? 'Cất cột' : 'Đóng'}><BieuTuongChat ten="x" co={18} /></button>
+      </div>
+      <DanhSachTin ds={ds} toiSbd={toiSbd} rong="Chưa có tin nhắn nào" veCuoi={veCuoi} gon />
+      <div className="lc-nhanh">
+        {NHAN_NHANH_NGAN.map((c) => <button key={c} type="button" className="lc-vien-bam" disabled={khoa} onClick={() => gui(c)}><span>{c}</span></button>)}
+      </div>
+      <p className="lc-bao" role="status" data-loai={khoa ? 'khoa' : 'nhanh'}>{khoa ? 'Thầy đang tắt nhắn tin' : nhanhQua ? 'Chờ 2 giây rồi gửi tiếp' : ''}</p>
+      <form className={banPhimRieng ? 'lc-nhap lc-bp-o' : 'lc-nhap'} onSubmit={khiGui}>
+        {/* ô chỉ-đọc không có con trỏ của hệ thống ⇒ vẽ lại chữ + con trỏ nháy ở cuối (chữ dài thì thấy phần đuôi đang gõ) */}
+        {banPhimRieng ? <div className="lc-bp-hien" aria-hidden="true"><span>{chu}{khoa ? null : <i />}</span></div> : null}
+        <input ref={o} value={chu} onChange={(e) => setChu(e.target.value)} maxLength={CHAT_DAI} disabled={khoa} placeholder="Nhắn thầy và cả lớp…" aria-label="Nhắn thầy và cả lớp" enterKeyHint="send" autoComplete="off"
+          readOnly={banPhimRieng} inputMode={banPhimRieng ? 'none' : undefined} />
+        <button type="submit" className="lc-gui" disabled={khoa || !chu.trim()} aria-label="Gửi tin"><BieuTuongChat ten="gui" co={18} /></button>
+      </form>
+      {banPhimRieng ? <BanPhimNgang onPhim={goPhim} onXoa={xoaPhim} onGui={() => { if (gui(chu)) setChu('') }} khoa={khoa} /> : null}
+      {coGhim ? <p className="lc-phim" aria-hidden="true"><kbd>Enter</kbd> gõ ngay · <kbd>Esc</kbd> về bài</p> : null}
     </div>
   )
 }

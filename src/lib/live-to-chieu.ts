@@ -7,6 +7,7 @@
 // (tự bật lúc gọi em lên bảng, tự tắt lúc mở lượt mới) — công tắc «Bảng → máy em» trong cụm Live để thầy bật / tắt tay. Em lên bảng mở mic ⇒ thẻ «Đang nói» + «Thu mic».
 // Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · bang · thu-mic · nghe-em · but · anh · vung
 //             · mic 11/11: loc { v: 'tu' | 'bat' | 'tat' } («Lọc tiếng ồn + khử vọng»: tự động / luôn bật / luôn tắt); `live-muc` kèm `cd` = dòng chẩn đoán mic
+//             · 13/11: tang { v: '0' | '3' | '6' | '9' } («Tăng tiếng» dB)
 //             · đợt 2 (11/11, đặc tả 4.8): moi { sbd } · ha-tay { sbd? } · thu-mic { sbd? } (không sbd = «Tắt mic tất cả») · xa { v } · giay { giay }
 // App → tờ:  { nguon:'bpu-bang', lenh:'live-tt', tt }  (toàn bộ trạng thái để vẽ)   ·   { nguon:'bpu-bang', lenh:'live-muc', v, em }  (mức âm mic thầy / em đang nói 0..1, ~11 lần / giây)
 // ĐỢT 2: thẻ gọn «N em giơ tay» (bấm ⇒ hàng chờ, mỗi em «Mời nói», dưới cùng «Hạ hết tay») · thẻ «Đang nói» có sóng âm + «Thu mic» + «Tắt mic tất cả» ·
@@ -354,6 +355,8 @@ export const JS_LIVE_TO_CHIEU = `
         ly = mi.locOn === 'thay' && mi.tg && mi.tg.indexOf('Đã tự tắt') === 0 ? mi.tg.slice(mi.tg.indexOf('(') + 1, mi.tg.lastIndexOf(')')) : '';
         if (ly) h += lvCanh('Chỉ giọng thầy đã tự tắt: ' + lvSach(ly));
         h += lvCai('Tiếng', lvChon('kieu-tieng', 'c', 'lam-ro', 'Làm rõ', mi.kieuTieng !== 'chuan') + lvChon('kieu-tieng', 'c', 'chuan', 'Chuẩn trình duyệt', mi.kieuTieng === 'chuan'));
+        // TĂNG TIẾNG (thầy 13/11: «chỉ thêm tăng tiếng thôi»): Gốc (y như trước) · +3 · +6 · +9 dB — khuếch đại cố định trước khâu chặn đỉnh, dùng ở cả Làm rõ lẫn Chuẩn
+        h += lvCai('Tăng tiếng', lvChon('tang', 'c', '0', 'Gốc', !mi.tang) + lvChon('tang', 'c', '3', '+3', mi.tang === 3) + lvChon('tang', 'c', '6', '+6', mi.tang === 6) + lvChon('tang', 'c', '9', '+9', mi.tang === 9));
         h += lvCai('Khử vọng', lvChon('loc', 'c', 'tu', 'Tự động', mi.cheDo === 'tu') + lvChon('loc', 'c', 'bat', 'Bật', mi.cheDo === 'bat') + lvChon('loc', 'c', 'tat', 'Tắt', mi.cheDo === 'tat'));
       }
       // LOA: ô chọn + «Thử loa» cùng một hàng. Trình duyệt không chọn được đầu ra ⇒ t.loa rỗng ⇒ không hiện.
@@ -396,7 +399,7 @@ export const JS_LIVE_TO_CHIEU = `
   /** Xem lại Live: ngăn ghi của viên Live. ghi vắng = công tắc tắt ⇒ không vẽ. Máy ghi chưa báo trong 15 giây đầu ⇒ chưa vẽ gì (đang khởi động). */
   function lvNganGhi(t) {
     if (!t.ghi) return '';
-    if (t.ghi === 'dang-ghi') return '<span class="ghi" role="status">' + LV_BT.mic + 'Đang ghi<b>&nbsp;để xem lại</b></span>';
+    if (t.ghi === 'dang-ghi') return '<span class="ghi" role="status" title="Đang ghi để xem lại"><i class="cham"></i>Ghi</span>';
     if (t.ghi === 'loi' || Date.now() - (t.tu || Date.now()) > 15000) return '<span class="ghi-loi" role="status">Chưa ghi được · live vẫn chạy</span>';
     return '';
   }
@@ -424,8 +427,8 @@ export const JS_LIVE_TO_CHIEU = `
         h = '';
         for (i = 0; i < 7; i++) h += '<i style="height:' + [36, 59, 82, 100, 73, 45, 27][i] + '%"></i>';
         lvCum.innerHTML = '<span><i class="cham"></i>' + (t.nghi ? 'TẠM DỪNG' : 'LIVE') + ' <b id="mc-lv-dh">' + lvDongHo(t.tu || Date.now()) + '</b></span>'
-          + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + ' em xem</small></span>'
-          + (t.coTieng && !t.khongTieng && !t.nghi ? '<span class="' + (t.xem && !t.nghe ? 'im' : '') + '" aria-label="Số em đang nghe tiếng thầy qua máy"><b>' + (t.nghe || 0) + '</b><small> em nghe</small></span>' : '')
+          + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + '</small></span>'
+          + (t.coTieng && !t.khongTieng && !t.nghi ? '<span class="' + (t.xem && !t.nghe ? 'im' : '') + '" title="Số em đang nghe tiếng thầy qua máy">' + LV_BT.loa + '<b>' + (t.nghe || 0) + '</b></span>' : '')
           + (t.nghi ? '' : t.coTieng && !t.khongTieng && !t.lyDoKT ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>' + lvSach(t.lyDoKT || 'Không tiếng') + '</span>')
           + lvNganGhi(t);
         LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); lvBaoGiay(); if (LV.tt && LV.tt.ghi === 'tat' && !lvCum.querySelector('.ghi-loi') && Date.now() - (LV.tt.tu || Date.now()) > 15000) lvVe(); }, 1000);
@@ -530,7 +533,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (!g) {
       g = LV.lk = document.createElement('div'); g.className = 'mc-khay-nhom mc-khay-lk'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Buổi live');
       g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Buổi live · phím Tab đổi Học ⇄ Bảng</span>';
-      ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
+      ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['nghi', 'Nghỉ'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
       for (i = 0; i < ds.length; i++) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-nut-phim'; b.setAttribute('data-lk', ds[i][0]); b.innerHTML = '<span class="mc-nut-chu">' + ds[i][1] + '</span>'; g.appendChild(b); }
       g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null, v = n ? n.getAttribute('data-lk') : ''; if (v === 'hoc' || v === 'bang') lvDoiChe(v); else if (n) lvGui('lk', { v: v }); });
       k.insertBefore(g, k.firstChild);

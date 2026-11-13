@@ -23,9 +23,8 @@
 .tvc-muc-luc {
   position: sticky; top: 0; z-index: 20; display: flex; gap: 8px; overflow-x: auto; padding: 8px 16px;
   background: color-mix(in oklch, var(--tvc-nen) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  scrollbar-width: none; overscroll-behavior-x: contain;
+  overscroll-behavior-x: contain;
 }
-.tvc-muc-luc::-webkit-scrollbar { display: none; }
 .tvc-muc-luc a { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: var(--r-vien); background: var(--ph3-mat); box-shadow: var(--ph3-bong); font-size: var(--t-phu); font-weight: 700; color: var(--ph3-chu-2); white-space: nowrap; }
 .tvc-muc-luc a[aria-current] { background: var(--ph3-chu); color: var(--ph3-mat); }
 

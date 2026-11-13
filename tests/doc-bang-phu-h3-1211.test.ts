@@ -120,7 +120,9 @@ describe('Q4 lịch kiểm tra cá nhân: chọn dòng trước, tính cột n�
       const now = NOW + lech * NGAY
       for (const sbd of ['S1', 'S2', 'S3', 'S4', 'S5', 'S9']) {
         const cu = d.sql.prepare(sqlDocKtCnMetaCu()).get(sbd, ngayKt(now), now)
-        const moi = d.sql.prepare(sqlDocKtCnMeta()).get(sbd, ngayKt(now), now)
+        const moi = d.sql.prepare(sqlDocKtCnMeta()).get(sbd, ngayKt(now), now) as Record<string, unknown> | undefined
+        // 13/11 (thầy cho làm lại chặng): câu mới thêm cột `lam_lai` ('[]' khi không có quyền) — mọi cột cũ y hệt (SỬA CÓ CHỦ Ý).
+        if (moi) { expect(moi.lam_lai).toBe('[]'); delete moi.lam_lai }
         expect(moi).toEqual(cu)
         if (cu) coDong++
       }
@@ -152,7 +154,9 @@ describe('Q4 lịch kiểm tra cá nhân: chọn dòng trước, tính cột n�
   it('đầu-cuối: docKtCn / gvKtCn chạy câu mới, ra đúng như câu cũ', async () => {
     const d = taoD1That(); napKt(d.sql, NOW)
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('kiem_tra_ca_nhan_v1','{\"bat\":true}','x')").run()
-    expect(await docKtCn(d.env, 'S1', NOW, true)).toEqual(d.sql.prepare(sqlDocKtCnMetaCu()).get('S1', ngayKt(NOW), NOW))
+    const moi = (await docKtCn(d.env, 'S1', NOW, true)) as Record<string, unknown> | null
+    if (moi) { expect(moi.lam_lai).toBe('[]'); delete moi.lam_lai } // SỬA CÓ CHỦ Ý 13/11: thêm cột lam_lai
+    expect(moi).toEqual(d.sql.prepare(sqlDocKtCnMetaCu()).get('S1', ngayKt(NOW), NOW))
     const g = await gvKtCn(d.env, {}, NOW)
     expect(g.em.length).toBeGreaterThan(1)
   })

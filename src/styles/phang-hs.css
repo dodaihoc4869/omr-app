@@ -281,8 +281,6 @@ html[data-trong='hs']:not(#_) :is(.duo-lenh > h2, .kb-viec h2) { line-height: 1.
    — khớp bề rộng làm chữ dính). Kết quả: nhãn IN HOA + nút +0,06em (≈ 0,9px ở 15px, ngang Duolingo); chữ thân, tiêu đề 0; giãn dòng thân 1,5. */
 html[data-trong='hs']:not(#_) :is(.kb-nhan, .duo-nhan, .duo-3 p, .da-bai small, .da-ban-go, .da-bang .nut-to) { letter-spacing: .02em !important; }
 /* 07/11 thầy «bỏ thanh dọc cuộn này đi»: dải kết quả (đúng / sai) vẫn cuộn được khi lời dài nhưng KHÔNG hiện thanh cuộn hệ thống (máy tính hiện thanh xám thô) */
-html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu) { scrollbar-width: none !important; }
-html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu)::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
 /* 07/11 đo độ rõ chữ trên app thật: chữ cái đáp án trên vòng tô màu ĐÚNG ở tối chỉ 1,9:1 (trắng trên lục) ⇒ chữ trên vòng tô màu dùng --tr-trang
    (sáng: trắng như cũ · tối: chữ sẫm như nút Duolingo); vòng đang chọn ở tối cũng chữ sẫm (cũ trắng trên chàm 3,7:1) */
 html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa:is([data-ket=dung], [data-ket=sai]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
@@ -379,9 +377,8 @@ html[data-trong='hs']:not(#_):not(#_) .lgk-kq-nhan { display: block; font-size: 
 html[data-trong='hs']:not(#_):not(#_) .lgk-kq-so { display: block; font-size: 26px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; color: var(--tr-dung-chu); }
 html[data-trong='hs']:not(#_):not(#_) .lgk-kq-em { display: block; margin-top: 2px; font-size: 14px; color: var(--tr-chu-2); }
 html[data-trong='hs']:not(#_):not(#_) .lgk-kq-em s { color: var(--tr-sai-chu); text-decoration-thickness: 1.5px; }
-html[data-trong='hs']:not(#_):not(#_) .lgk-muc { position: sticky; top: 0; z-index: 3; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 8px 0; background: var(--tr-nen); }
+html[data-trong='hs']:not(#_):not(#_) .lgk-muc { position: sticky; top: 0; z-index: 3; display: flex; gap: 6px; overflow-x: auto; padding: 8px 0; background: var(--tr-nen); }
 html[data-trong='hs']:not(#_):not(#_) .lgk-muc:empty { display: none; }
-html[data-trong='hs']:not(#_):not(#_) .lgk-muc::-webkit-scrollbar { display: none; }
 html[data-trong='hs']:not(#_):not(#_) .lgk-muc > button { flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 12px; background: transparent; border: 2px solid var(--tr-vien); color: var(--tr-chu-2); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
 html[data-trong='hs']:not(#_):not(#_) .lgk-the { background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; box-shadow: none !important; scroll-margin-top: 60px; }
 html[data-trong='hs']:not(#_):not(#_) .lgk-ct-chu { font-size: 17px !important; }

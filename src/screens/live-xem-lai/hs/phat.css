@@ -67,7 +67,8 @@ html:not(#_):not(#_):not(#_) .xp .lv-gd section.ht2-lam-de, html:not(#_):not(#_)
 .xp-tro::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--p-cam); }
 
 /* lớp điều khiển (theo điểm ảnh màn, không co theo bảng) */
-.xp button { font: inherit; color: inherit; border: 0; margin: 0; background: none; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+/* (13/11) trừ phím của máy tính FX4869 chỉ-xem (`.mtx`, may-tinh.css) hiện lại trong bản xem lại — phím máy tính giữ cỡ chữ + nền riêng; `:where` giữ nguyên độ ưu tiên của luật */
+.xp button:where(:not(.mtx *)) { font: inherit; color: inherit; border: 0; margin: 0; background: none; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .xp button:focus-visible { outline: 3px solid var(--tr-chieu-giay); outline-offset: 2px; }
 .xp .so { font-variant-numeric: tabular-nums; }
 .xp-tren { position: absolute; left: max(12px, var(--xp-at-trai, 0px)); top: 10px; right: max(12px, var(--xp-at-phai, 0px)); display: flex; align-items: center; gap: 8px; pointer-events: none; transition: opacity 0.2s; }

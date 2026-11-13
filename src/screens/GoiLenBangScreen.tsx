@@ -766,7 +766,7 @@ function GoiLenBangCu() {
     const thoat = (t: string) => t.replace(/[&<>]/g, (c) => (c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;'))
     w.document.write(
       `<!doctype html><meta charset="utf-8"><title>Giáo án chữa</title>` +
-        `<style>@page{size:A4 portrait;margin:14mm}body{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap}</style>` +
+        `<style>@page{size:A4 portrait;margin:14mm}body{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap}*{scrollbar-width:none}*::-webkit-scrollbar{display:none}</style>` +
         `<body>${thoat(chuGiaoAn)}</body>`,
     )
     w.document.close()

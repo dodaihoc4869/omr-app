@@ -8,7 +8,7 @@ import { gvBuoiHoc, hsDiemDanh } from './buoi-hoc'
 import { gameIdentity } from './game-v2-auth'
 import { DUONG_LIVE, cuaLive } from './live-sfu'
 import { cuaXemLai } from './live-xem-lai-lenh'
-import { DUONG_PHONG_BPU, baoPhongVaoLop, dongPhongBpu, gvBpuLuot, gvBpuMo, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
+import { DUONG_PHONG_BPU, baoPhongVaoLop, dongPhongBpu, gvBpuLuot, gvBpuMo, gvBpuNap, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
 
 type Row = Record<string, unknown>
 
@@ -56,7 +56,8 @@ export async function bpuHs(env: Env, p: string, b: Row, ctx?: ExecutionContext)
 /** `/gv/bpu/*` (sau chốt mã bí mật của thầy). */
 export async function bpuGv(env: Env, p: string, b: Row, ctx?: ExecutionContext): Promise<Row> {
   if (p === '/gv/bpu/mo') return gvBpuMo(env, b)
-  if (p === '/gv/bpu/luot') return gvBpuLuot(env, b)
+  if (p === '/gv/bpu/luot') return gvBpuLuot(env, b, ctx)
+  if (p === '/gv/bpu/nap') return gvBpuNap(env, b)
   if (p.startsWith('/gv/bpu/khoi-')) return (await import('./live-khoi')).gvLiveKhoi(env, p, b, Date.now(), ctx)
   // Sổ «mời ra khỏi lớp» của buổi live (luật rời màn 13/11): văn phòng trực live đọc để nhắn Zalo phụ huynh. ĐỌC-CHỈ, một lệnh D1.
   if (p === '/gv/bpu/moi-ra') return (await import('./live-moi-ra')).gvLiveMoiRa(env, b)

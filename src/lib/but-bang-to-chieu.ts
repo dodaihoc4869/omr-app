@@ -25,7 +25,7 @@
 //     chữ của cột bảng (trước: trên). «Vẽ ngay khi mẫu tới» vẫn mặc định tắt (xem `datBang`).
 //   · BẢNG ĐEN CUỘN (11/11, thầy: «bảng đen khi live có cuộn vô hạn để viết được nhiều phần»): nét bắt đầu trong cột bảng đen là NÉT BẢNG (mã «b_…»),
 //     y = y màn + độ cuộn ⇒ vẽ trong ô bảng, dời theo độ cuộn; nét trên giấy đề dời theo giấy (but-cuon-giay-to-chieu.ts). Cuộn: lăn chuột / hai ngón trên bảng, kéo vạch mép phải bảng,
-//     viết sát đáy rồi ngừng 0,9 giây thì bảng tự trôi lên. Đang viết thì không cuộn. Độ cuộn nhớ theo đợt.
+//     (13/11 BỎ «viết sát đáy rồi ngừng 0,9 giây thì bảng tự trôi lên» — thầy không muốn bảng tự nảy). Đang viết thì không cuộn. Độ cuộn nhớ theo đợt.
 //   · Alt + B: ô ĐO BÚT (thiết bị, số mẫu mỗi giây, lực, mẫu gộp, thời gian xử lý) để thầy chụp gửi lại.
 //   · nét giữ theo ĐỢT (khoá = chỉ số đợt): chuyển câu rồi quay lại vẫn còn, câu mới bảng sạch.
 // API cho việc phát LIVE: window.__mcBut = { xuat, nhap, nghe, hoanTac, lamLai, xoaHet, bat, trang, loi, mau, co, vung, + doBut, veNgay } — sự kiện xem `SuKienBut`
@@ -59,7 +59,7 @@ canvas.mc-but-bang{position:absolute;z-index:-1;pointer-events:none;border-radiu
 .mc-but-do small{display:block;margin-top:.35em;font-size:.86em;opacity:.6}
 /* vạch cuộn của bảng đen (11/11): mảnh, mép phải cột bảng, chỉ hiện khi bút bật; kéo dải này = cuộn bảng */
 .mc-but-ray{position:fixed;z-index:31;display:none;width:calc(var(--u)*.26);min-width:3px;border-radius:9em;background:color-mix(in srgb,var(--mc-b) 10%,transparent);pointer-events:none}
-.mc-but-ray.mc-co{display:block}
+.mc-but-ray.mc-co{display:none} /* 13/11 thầy «ẩn cả thanh cuộn ở đây mà vẫn cuộn bình thường»: thanh báo độ cuộn của bảng chỉ để nhìn (pointer-events:none) ⇒ ẩn; lăn chuột / hai ngón / phím vẫn cuộn */
 .mc-but-ray i{position:absolute;left:0;right:0;min-height:8px;border-radius:9em;background:color-mix(in srgb,var(--mc-b) 42%,transparent)}
 @media print{.mc-but-do,.mc-but-ray,canvas.mc-but-bang{display:none!important}}
 ${CSS_THANH_HUT}`
@@ -366,11 +366,9 @@ ${JS_LOI_BUT}
     }
     y = so.ketThuc(); if (y && y.nan) veLai(); capNut();
     tx0 = n.tx; ty0 = n.ty;
-` + /* viết sát đáy bảng rồi ngừng 0,9 giây ⇒ bảng tự trôi lên, dòng vừa viết về khoảng 2/5 bảng (chạm bút lại thì thôi) */ `
-    if (n.bang && B) {
-      if (n.net.diem[n.net.diem.length - 1][1] > daiBang) { daiBang = n.net.diem[n.net.diem.length - 1][1]; veRay(); }
-      if (n.yLon > (B[1] + (B[3] - B[1]) * 0.86) * KH.H) { y = n.yLon; hCuon = setTimeout(function () { hCuon = 0; if (!N && B) cuonToi(cuon + y / KH.H - B[1] - (B[3] - B[1]) * 0.42); }, 900); }
-    }
+` + /* 13/11 (thầy «không muốn viết gần cuối nó tự nảy như thế»): BỎ luật «viết sát đáy rồi ngừng 0,9 giây ⇒ bảng tự trôi lên». Bảng chỉ cuộn khi THẦY cuộn
+     (lăn chuột / hai ngón / kéo vạch mép phải); máy em theo đúng độ cuộn ấy. */ `
+    if (n.bang && B && n.net.diem[n.net.diem.length - 1][1] > daiBang) { daiBang = n.net.diem[n.net.diem.length - 1][1]; veRay(); }
     if (DO) { if (DO.nNet > 2) { DO.dong += DO.g1 - DO.g0; DO.nDong += DO.nNet - 1; } veDo(); }
   }
 

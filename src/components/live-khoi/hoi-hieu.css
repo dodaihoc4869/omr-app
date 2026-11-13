@@ -70,3 +70,13 @@
 @keyframes hh-da { 0% { opacity: 0; transform: scale(0.8); } 18%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
 @media (prefers-reduced-motion: reduce) { .hh-troi, .hh-troi::before, .hh-sao, .hh-so, .hh-dom, .hh-dom::after, .hh-the { animation: none; } }
 html.may-yeu .hh-the { animation: none; }
+/* 13/11 — KHÔNG LỚP NỀN (thầy: «không cần phải một lớp nữa đâu, hoà luôn vào nền của bảng đen xanh ấy»): bảng «Hiểu chưa?» của máy thầy trong suốt, số và
+   chấm sáng hiện thẳng trên nền bảng, vừa khít ô 1/3 phải (vị trí do HoiHieuThay đo lớp phủ tờ). Không nền, không viền, không bóng, không quầng màu xoay.
+   (Luật `.hh-troi` ở trên giữ nguyên khai báo cũ theo luật giữ màu; lớp `.phang` ghi đè.) */
+.hh-lop .hh-troi.phang { border-radius: 0; box-shadow: none; background: transparent; animation: hh-hien 0.3s ease-out both; }
+.hh-lop .hh-troi.phang::before { display: none; }
+/* Thầy 13/11 «ẩn chữ hiểu chưa và các em đang trả lời đi, dịch 1 0 xuống phía dưới một chút»: bảng đã hoà vào nền nên dòng tựa đè lên thẻ tên ⇒ ẩn
+   (nhãn cho trình đọc màn vẫn nằm ở aria-label của khung); hai số lùi xuống dưới thẻ tên. */
+.hh-lop .hh-troi.phang h3 { display: none; }
+.hh-lop .hh-troi.phang .hh-cot { top: calc(112 * var(--k)); }
+@keyframes hh-hien { from { opacity: 0; } }

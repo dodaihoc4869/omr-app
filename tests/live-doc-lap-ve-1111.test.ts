@@ -157,7 +157,9 @@ describe('bảng phóng to: tầm nhìn của máy em thấp hơn của thầy',
     m.v.datBut({ x: 0.8, y: B1 + caoThay * 0.9, cham: false }, 0)
     chay(m.v, 90)
     const c = m.v.cuon()
-    expect(c.dich).toBeCloseTo(caoThay - nhin, 2) // kẹp ở đáy tầm nhìn của thầy (ô bảng đi theo khoá trang, tròn phần nghìn)
+    // 13/11: trôi VỪA ĐỦ để bút nằm ở 85 % khung của em (không nhảy cả khúc), vẫn trong tầm nhìn của thầy
+    expect(c.dich).toBeCloseTo(caoThay * 0.9 - nhin * 0.85, 2)
+    expect(c.dich).toBeLessThanOrEqual(caoThay - nhin + 1e-6)
     expect(c.y).toBeCloseTo(c.dich, 3)
     // bút lên đầu bảng ⇒ về đầu
     m.v.datBut({ x: 0.8, y: B1 + 0.01, cham: false }, 0)

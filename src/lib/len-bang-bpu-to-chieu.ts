@@ -134,6 +134,19 @@ export const JS_LEN_BANG_BPU = `
     });
   }
   document.addEventListener('mc-bo-cuc-xong', function () { if (S.bpuCuon) cuonBpu(dot()); });
+  // 13/11 NẠP SẴN (thầy «chuyển đề trên máy học sinh … làm cho tức thì»): báo app danh sách mã câu của CẢ tờ (một lần, đổi thì báo lại) ⇒ app nạp sẵn vào
+  // phòng; thầy sang câu thì phòng mở lượt từ bộ nhớ, không chờ máy chủ đọc dữ liệu (server/src/bpu-nap-san.ts). Chỉ mã câu, không nội dung.
+  var dsDaBao = '';
+  function baoDsCau() {
+    var ds = [], app = dichApp(), k;
+    Array.prototype.forEach.call(document.querySelectorAll('.mc-dot[data-qid]'), function (e) { var q = e.getAttribute('data-qid'); if (q && ds.indexOf(q) < 0 && ds.length < 80) ds.push(q); });
+    k = ds.join('|');
+    if (!k || k === dsDaBao || !app) return;
+    dsDaBao = k;
+    try { app.postMessage({ nguon: 'to-chieu', loai: 'bpu-ds', qids: ds }, '*'); } catch (x) { /* app đã đóng */ }
+  }
+  document.addEventListener('mc-vao-dot', baoDsCau);
+  if (typeof Promise !== 'undefined') Promise.resolve().then(baoDsCau); // sau khi mã tờ chạy xong (không thêm hẹn giờ: bộ đo bố cục đếm hẹn giờ của tờ)
   function luaDoi(d, em) {
     xoaLua();
     var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\\s-]+$/i.test(mau)) return;

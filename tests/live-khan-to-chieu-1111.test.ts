@@ -181,7 +181,7 @@ describe('B2 + đợt 2 trên màn chiếu', () => {
   // SỬA CÓ CHỦ ĐÍCH 12/11 — thầy: bỏ chữ giải thích («làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): cửa sổ không còn câu
   // «Máy em TRONG LỚP đang tắt tiếng…» / «N em đang nghe qua máy» — nút «Em ở xa» / «Tất cả» được nhấn nói chế độ, số em nghe đứng cạnh nhãn «Máy em».
   it('viên Live đếm cả số em ĐANG NGHE cạnh số em xem; cửa sổ ghi số em nghe cạnh nhãn «Máy em», nút đang nhấn nói chế độ tiếng máy em', () => {
-    expect(JS_LIVE_TO_CHIEU).toContain("'</b><small> em nghe</small></span>'")
+    expect(JS_LIVE_TO_CHIEU).toContain("LV_BT.loa + '<b>' + (t.nghe || 0) + '</b></span>'") // 13/11 viên Live gọn: biểu tượng loa + số (không còn chữ «em nghe» trong viên)
     expect(JS_LIVE_TO_CHIEU).toContain("(t.xem && !t.nghe ? 'im' : '')") // có em xem mà 0 em nghe ⇒ tô cảnh báo
     expect(JS_LIVE_TO_CHIEU).not.toContain('Máy em TRONG LỚP đang tắt tiếng')
     expect(JS_LIVE_TO_CHIEU).not.toContain('em đang nghe qua máy')
@@ -305,14 +305,15 @@ describe('bảng mic gọn (12/11 trưa)', () => {
     const t = dungTo()
     t.bom(LIVE)
     const hang = [...t.the().querySelectorAll<HTMLElement>('.mc-lv-cai')]
-    expect(hang.map((h) => h.querySelector('b')!.firstChild!.textContent)).toEqual(['Mức âm', 'Lọc ồn', 'Tiếng', 'Khử vọng', 'Máy em', 'Bảng → máy em'])
+    // SỬA CÓ CHỦ ĐÍCH 13/11 — thầy: «chỉ thêm tăng tiếng thôi» ⇒ thêm đúng MỘT hàng «Tăng tiếng» ngay dưới «Tiếng»
+    expect(hang.map((h) => h.querySelector('b')!.firstChild!.textContent)).toEqual(['Mức âm', 'Lọc ồn', 'Tiếng', 'Tăng tiếng', 'Khử vọng', 'Máy em', 'Bảng → máy em'])
     for (const h of hang.slice(1)) {
       const seg = h.querySelectorAll('.mc-lv-seg')
       expect(seg.length).toBe(1)
       expect(h.querySelectorAll('button').length).toBe(seg[0]!.querySelectorAll('button').length)
       expect(seg[0]!.getAttribute('role')).toBe('group')
     }
-    expect(hang.map((h) => h.querySelectorAll('button').length)).toEqual([0, 3, 2, 3, 2, 1])
+    expect(hang.map((h) => h.querySelectorAll('button').length)).toEqual([0, 3, 2, 4, 3, 2, 1]) // SỬA CÓ CHỦ ĐÍCH 13/11: + hàng «Tăng tiếng» (4 nút)
     expect(hang.some((h) => h.classList.contains('doc'))).toBe(false)
     const loa = t.the().querySelector('.mc-lv-loa')!
     expect(loa.querySelector('select[data-c="loa"]')).toBeTruthy()
@@ -375,7 +376,8 @@ describe('bảng mic gọn (12/11 trưa)', () => {
     const t = dungTo()
     t.bom({ ...LIVE, mic: { ...MIC, coThay: true, locOn: 'manh', cheDo: 'bat', kieuTieng: 'chuan' } })
     const ds = [...t.the().querySelectorAll<HTMLElement>('[data-lv]')].map((b) => b.getAttribute('data-lv') + ':' + (b.getAttribute('data-c') ?? b.getAttribute('data-v') ?? '') + (b.getAttribute('aria-pressed') === 'true' ? '*' : ''))
-    expect(ds).toEqual(['loc-on:manh*', 'loc-on:vua', 'loc-on:tat', 'loc-on:thay', 'kieu-tieng:lam-ro', 'kieu-tieng:chuan*', 'loc:tu', 'loc:bat*', 'loc:tat', 'thu-loa:', 'tieng-lop:0', 'tieng-lop:1*',
+    // SỬA CÓ CHỦ ĐÍCH 13/11 — thầy: «chỉ thêm tăng tiếng thôi» ⇒ thêm bốn nút «Tăng tiếng» (mic không báo bậc ⇒ Gốc được nhấn); mọi nút cũ giữ nguyên
+    expect(ds).toEqual(['loc-on:manh*', 'loc-on:vua', 'loc-on:tat', 'loc-on:thay', 'kieu-tieng:lam-ro', 'kieu-tieng:chuan*', 'tang:0*', 'tang:3', 'tang:6', 'tang:9', 'loc:tu', 'loc:bat*', 'loc:tat', 'thu-loa:', 'tieng-lop:0', 'tieng-lop:1*',
       'bang:0*', 'tam-dung:1', 'tat:', 'the-dong:'])
     bam(t.the(), 'Bật')
     bam(t.the(), 'Chuẩn trình duyệt')
@@ -406,5 +408,22 @@ describe('bảng mic gọn (12/11 trưa)', () => {
     expect(t.the().querySelector('details')).toBeNull()
     bam(t.the(), /Bắt đầu live/)
     expect(t.viec('khong-tieng').length).toBe(1)
+  })
+})
+
+describe('«Tăng tiếng» trên bảng mic (13/11, thầy: «chỉ thêm tăng tiếng thôi»)', () => {
+  const NEN = { co: true, pha: 'live', tu: 1, xem: 3, nghe: 2, tong: 4, lop: '12A1', coTieng: true, khongTieng: false, micIm: false, noiLai: false, mayKhac: false, bang: false, noi: [], ngheEm: true, emKet: false, chuaGui: 0, doTieng: [], roi: [], tay: [], moi: null, micLoi: '', nghi: false, dot2: false, lyDoKT: '' }
+  const THE = { ds: [{ id: 'by', ten: 'Microphone (BOYALINK)' }], chon: 'by', loi: '', tiengLop: true, xa: false, loa: null }
+  const MIC = { tinh: 'tot', ten: 'Microphone (BOYALINK)', loc: false, cheDo: 'tu', locOn: 'vua', locOnChay: 'chay', khac: '', kieuTieng: 'lam-ro' }
+  it('một hàng «Tăng tiếng» bốn nút Gốc · +3 · +6 · +9 (thanh phân đoạn); nút đúng bậc được nhấn; bấm ⇒ gửi app `tang` kèm bậc', () => {
+    const t = dungTo()
+    t.bom({ ...NEN, the: THE, mic: { ...MIC, tang: 6 } })
+    const hang = [...t.the().querySelectorAll<HTMLElement>('.mc-lv-cai')].find((h) => h.querySelector('b')!.firstChild!.textContent === 'Tăng tiếng')!
+    expect(hang).toBeTruthy()
+    const nut = [...hang.querySelectorAll<HTMLElement>('.mc-lv-seg [data-lv="tang"]')]
+    expect(nut.map((b) => (b.textContent ?? '').trim())).toEqual(['Gốc', '+3', '+6', '+9'])
+    expect(nut.map((b) => b.getAttribute('aria-pressed'))).toEqual(['false', 'false', 'true', 'false'])
+    bam(t.the(), '+9'); bam(t.the(), 'Gốc')
+    expect(t.gui.filter((m) => m.viec === 'tang').map((m) => m.v)).toEqual(['9', '0'])
   })
 })

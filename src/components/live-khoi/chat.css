@@ -105,3 +105,81 @@ html.may-yeu .lc-cua { animation: none; }
 .lc-the-nho button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--lc-chu); font: inherit; font-size: 13.5px; font-weight: 700; text-align: left; white-space: nowrap; cursor: pointer; }
 .lc-the-nho button[aria-checked='true'] { background: color-mix(in srgb, var(--lc-nhan) 26%, transparent); }
 .lc-the-nho button[data-canh] { color: var(--lc-chu-y); }
+
+/* ── CỘT CỐ ĐỊNH MÁY THẦY (13/11, bản vẽ 55–59): luôn hiện bên phải màn live; mỗi tin HAI DÒNG — họ tên đầy đủ in đậm màu đội, nội dung chữ nhỏ hơn ── */
+.lc-co-dinh { font-size: 14px; }
+.lc-co-dinh .lc-dau { min-height: 46px; padding: 0 10px 0 14px; border-bottom-width: 1.5px; font-size: 14.5px; }
+.lc-co-dinh .lc-dau .lc-dau-hoi { flex: none; min-height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; background: color-mix(in srgb, var(--lc-chu-y) 15%, transparent); color: var(--lc-chu-y); }
+.lc-co-dinh .lc-dau .lc-dau-hoi[aria-pressed="true"] { background: var(--lc-chu-y); color: var(--lc-nen); }
+.lc-ds-gon { gap: 5px; padding: 8px; }
+.lc-g { position: relative; flex: none; padding: 6px 10px 7px 13px; border-radius: 10px; background: color-mix(in srgb, var(--lc-doi) 9%, var(--lc-mat)); }
+.lc-g::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 999px; background: var(--lc-doi); }
+.lc-g-ten { display: flex; align-items: baseline; gap: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.25; color: color-mix(in srgb, var(--lc-doi) 78%, var(--lc-chu)); }
+.lc-g-ten > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-g-ten > em { flex: none; padding: 1px 7px; border-radius: 999px; font-style: normal; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; background: color-mix(in srgb, var(--lc-chu-y) 16%, transparent); color: var(--lc-chu-y); }
+.lc-g-ten > time { flex: none; margin-left: auto; font-size: 11px; font-weight: 700; color: var(--lc-chu-3); font-variant-numeric: tabular-nums; }
+.lc-g-chu { margin-top: 2px; font-size: 13px; font-weight: 500; line-height: 1.38; color: var(--lc-chu-2); overflow-wrap: anywhere; }
+.lc-g[data-hoi] { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lc-chu-y) 50%, transparent); }
+.lc-g[data-thay] { --lc-doi: var(--lc-chu-2); background: var(--lc-mat-2); }
+.lc-g[data-thay] .lc-g-ten { color: var(--lc-chu); }
+
+/* ── NGĂN «TIN NHẮN LỚP» MÁY EM (13/11, bản vẽ 60–66): trượt từ mép phải theo ngón tay; máy tính ghim thành cột. Dòng tin dùng chung kiểu gọn `.lc-g` ── */
+.lc-ngan { position: absolute; right: 0; top: 0; bottom: 0; z-index: 37; width: min(380px, 44%); font-size: 14px; border-radius: 18px 0 0 18px; box-shadow: inset 1.5px 0 0 var(--lc-vien), var(--lc-bong); transition: transform 0.22s cubic-bezier(0.05, 0.7, 0.1, 1); animation: lc-ngan-vao 0.22s cubic-bezier(0.05, 0.7, 0.1, 1) both; }
+.lc-ngan[data-keo] { transition: none; animation: none; }
+@keyframes lc-ngan-vao { from { transform: translateX(100%); } }
+.lc-ngan-tay { position: absolute; left: -22px; top: 0; bottom: 0; width: 28px; touch-action: none; cursor: grab; }
+.lc-ngan-tay::after { content: ''; position: absolute; left: 9px; top: 50%; width: 6px; height: 56px; margin-top: -28px; border-radius: 999px; background: var(--lc-chu-y); }
+.lc-ngan .lc-dau { min-height: 44px; padding: 0 2px 0 14px; border-bottom-width: 1.5px; font-size: 14.5px; }
+.lc-ngan .lc-dau-ten small { margin-left: 8px; font-size: 12px; font-weight: 700; color: var(--lc-chu-3); }
+.lc-ngan .lc-nhanh { flex: none; display: flex; gap: 6px; padding: 0 8px 6px; overflow-x: auto; scrollbar-width: none; }
+.lc-ngan .lc-nhap { margin: 0 8px 8px; }
+.lc-ngan .lc-bao:empty { display: none; }
+.lc-g[data-toi] { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lc-doi) 45%, transparent); }
+.lc-g-ten > em.toi { background: color-mix(in srgb, var(--lc-chu) 14%, transparent); color: var(--lc-chu); }
+/* bàn phím ảo đang bật: chỉ còn tin mới + ô nhập (bản vẽ 63) */
+.lc-ngan.go { border-radius: 18px 0 0 0; }
+.lc-ngan.go .lc-dau, .lc-ngan.go .lc-nhanh, .lc-ngan.go .lc-phim { display: none; }
+/* máy tính: cột ghim, không bo góc, không trượt */
+.lc-ngan.lc-ghim { border-radius: 0; box-shadow: inset 1.5px 0 0 var(--lc-vien); animation: none; transition: none; }
+.lc-phim { flex: none; margin: 0; padding: 0 10px 8px; font-size: 11.5px; font-weight: 700; color: var(--lc-chu-3); }
+.lc-phim kbd { font: inherit; padding: 1px 6px; border-radius: 6px; background: var(--lc-mat-2); box-shadow: inset 0 0 0 1px var(--lc-vien); color: var(--lc-chu-2); }
+@media (prefers-reduced-motion: reduce) { .lc-ngan { transition: none; animation: none; } }
+
+/* ── BÀN PHÍM TRONG APP của ngăn máy em (thầy 13/11 «ép bàn phím xoay ngang»): hình đang xoay 90° thì bàn phím hệ thống nằm ngang chữ ⇒ ngăn tự vẽ bàn phím
+   (BanPhimNgang.tsx), ô nhập không gọi bàn phím hệ thống. Ngăn nới rộng cho phím đủ to (≈ 36 × 36 px ở màn 667 px). Ưu tiên chỗ: ô nhập + bàn phím + hai tin
+   gần nhất; đầu ngăn chỉ hiện khi ngăn cao từ 386 px, câu nhắn nhanh từ 436 px (đo theo NGĂN nên đúng cả khi hình xoay). Máy chưa có @container ⇒ ẩn cả hai. ── */
+.lc-ngan.lc-bpr { width: min(430px, 62%); container-type: size; }
+.lc-ngan.lc-bpr .lc-dau, .lc-ngan.lc-bpr .lc-nhanh { display: none; }
+@container (min-height: 386px) { .lc-ngan.lc-bpr .lc-dau { display: flex; } }
+@container (min-height: 436px) { .lc-ngan.lc-bpr .lc-nhanh { display: flex; } }
+.lc-ngan.lc-bpr .lc-ds-gon { padding: 6px 8px; }
+.lc-ngan.lc-bpr .lc-nhap { height: 40px; margin: 0 8px 4px; border-color: var(--lc-nhan); }
+.lc-ngan.lc-bpr .lc-gui { display: none; } /* đã có phím «Gửi» của bàn phím */
+.lc-bp-o { position: relative; }
+.lc-bp-o input { color: transparent; caret-color: transparent; -webkit-user-select: none; user-select: none; }
+.lc-bp-hien { position: absolute; left: 12px; right: 12px; top: 0; bottom: 0; display: flex; align-items: center; justify-content: flex-end; overflow: hidden; pointer-events: none; font-size: 16px; }
+.lc-bp-hien > span { flex: none; min-width: 100%; white-space: pre; }
+.lc-bp-hien i { display: inline-block; width: 2px; height: 1.2em; margin-left: 1px; vertical-align: -0.22em; border-radius: 1px; background: var(--lc-nhan); animation: lc-bp-nhay 1.06s steps(1, end) infinite; }
+@keyframes lc-bp-nhay { 50% { opacity: 0; } }
+.lc-bp { flex: none; padding: 0 4px 4px; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* hình xoay 90°: mép phải của hình là đáy máy (vạch Home), xoay ngược thì là đỉnh máy (tai thỏ) ⇒ ô nhập và phím ngoài cùng lùi vào */
+[data-xoay] .lc-ngan.lc-bpr { padding-right: env(safe-area-inset-bottom, 0px); }
+[data-xoay='nguoc'] .lc-ngan.lc-bpr { padding-right: env(safe-area-inset-top, 0px); }
+.lc-bp-meo { margin: 0; padding: 0 6px 1px; font-size: 11px; line-height: 14px; font-weight: 700; color: var(--lc-chu-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-bp-h { display: flex; }
+.lc-bp-h2 { padding: 0 5%; }
+/* Ô chạm kín hàng (không khe chết, không chồng nhau); phần nhìn thấy là viên cao 36 px bên trong. */
+.lc-goc .lc-bp-p { flex: 1 1 0; min-width: 0; height: 38px; padding: 1px 2px; display: flex; touch-action: manipulation; }
+.lc-bp-p > span { flex: 1; min-width: 0; display: grid; place-items: center; border-radius: 8px; background: var(--lc-mat-2); box-shadow: inset 0 -2px 0 var(--lc-vien); color: var(--lc-chu); font-size: 17px; font-weight: 700; line-height: 1; }
+.lc-goc .lc-bp-p.rong { flex-grow: 1.5; }
+.lc-bp-p.phu > span { background: var(--lc-mat); box-shadow: inset 0 0 0 1.5px var(--lc-vien); color: var(--lc-chu-2); font-size: 13px; font-weight: 800; }
+.lc-bp-p.bat > span { background: color-mix(in srgb, var(--lc-nhan) 30%, var(--lc-mat)); box-shadow: inset 0 0 0 1.5px var(--lc-nhan); color: var(--lc-chu); }
+.lc-bp-p.khoa > span { background: var(--lc-nhan); box-shadow: none; color: var(--lc-tren); }
+.lc-goc .lc-bp-p.cach { flex-grow: 5; }
+.lc-bp-p.cach > span { font-size: 12px; color: var(--lc-chu-3); }
+.lc-bp-p[data-nhan] > span { background: var(--lc-vien); box-shadow: none; transform: translateY(1px); }
+.lc-goc .lc-bp-p.gui { flex-grow: 2; }
+.lc-bp-p.gui > span { background: var(--lc-nhan); box-shadow: inset 0 -2px 0 var(--lc-nhan-go); color: var(--lc-tren); font-size: 14px; font-weight: 800; }
+.lc-bp-p.gui[data-nhan] > span { background: var(--lc-nhan-go); }
+@media (prefers-reduced-motion: reduce) { .lc-bp-hien i { animation: none; } .lc-bp-p[data-nhan] > span { transform: none; } }
+html.may-yeu .lc-bp-hien i { animation: none; }

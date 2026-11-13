@@ -1,7 +1,7 @@
 // HỎI NHANH «Hiểu chưa?» — MÁY THẦY (phím /, bản vẽ 40–41): «bầu trời» ở phần bảng 1/3 bên phải; mỗi em trả lời là một đốm sáng bay vào cụm xanh
 // (hiểu) hoặc cam (chưa hiểu), hai con số to phát sáng đếm lên, thanh «đã trả lời», tên các em CHƯA HIỂU (chỉ máy thầy có). Dựng = mở câu hỏi cho cả
 // lớp; gỡ (bấm / lần nữa) = đóng. Không bắt chạm ⇒ thầy vẫn viết bảng bình thường.
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import type { KenhLop } from '../../lib/live-khoi/kieu'
@@ -32,9 +32,25 @@ export default function HoiHieuThay({ kenh, tong }: { kenh: KenhLop; /** số em
     return { a: dem.a, b: dem.b, dom: dom.slice(-DOM_TOI_DA), chua: ds.filter(([, t]) => t.v === 2).map(([, t]) => t.ten) }
   }, [tl])
   const da = a + b, mau = Math.max(tong, da, 1), xong = tong > 0 && da >= tong
+  // VỪA KHÍT 1/3 PHẢI CỦA BẢNG, hoà vào nền xanh than (thầy 13/11: «bảng này cho nó hoà vào nền xanh than luôn, vừa luôn … hiện nổi lên thế này hơi xấu»):
+  // đo lớp phủ tờ đang chiếu (kể cả khi tờ đã thu vì cột tin nhắn / lệch vì thanh bên trái) rồi đặt bảng đúng ô: dưới dải đầu tờ, trên thanh đáy, sau vạch 2/3.
+  const troi = useRef<HTMLElement>(null)
+  useLayoutEffect(() => {
+    const dat = (): void => {
+      const e = troi.current, ds = document.querySelectorAll<HTMLElement>('.lop-xem-phieu'), to = ds[ds.length - 1]
+      if (!e || !to) return
+      const r = to.getBoundingClientRect(), s = r.width / Math.max(1, to.offsetWidth), k = Math.min(window.innerWidth / 1366, window.innerHeight / 768) * s
+      const tren = parseFloat(getComputedStyle(to).paddingTop) * s || 0
+      e.style.left = `${r.left + (r.width * 2) / 3 + 1}px`; e.style.top = `${r.top + tren}px`; e.style.width = `${r.width / 3 - 1}px`; e.style.height = `${Math.max(120, r.height - tren - 62 * k)}px`
+      e.style.right = 'auto'; e.style.bottom = 'auto'; e.style.setProperty('--k', `${k}px`)
+    }
+    dat()
+    window.addEventListener('resize', dat); window.addEventListener('ddh-lk-cot', dat)
+    return () => { window.removeEventListener('resize', dat); window.removeEventListener('ddh-lk-cot', dat) }
+  }, [])
   return createPortal(
     <div className="hh-lop" data-hoi-hieu="thay" style={MAU_CHIEU as CSSProperties}>
-      <section className="hh-troi" role="status" aria-label={`Hiểu chưa: ${a} em hiểu, ${b} em chưa hiểu, ${da} trên ${mau} em đã trả lời`}>
+      <section ref={troi} className="hh-troi phang" role="status" aria-label={`Hiểu chưa: ${a} em hiểu, ${b} em chưa hiểu, ${da} trên ${mau} em đã trả lời`}>
         <h3>Hiểu chưa?<small>{xong ? 'Cả lớp đã trả lời' : da ? 'Các em đang trả lời…' : 'Đang chờ các em bấm 1 hoặc 2…'}</small></h3>
         {SAO.map(([x, y], i) => <i key={i} className="hh-sao" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${(i % 5) * 0.45}s` }} />)}
         <div className="hh-cot a"><span key={a} className="hh-so">{a}</span><div className="hh-nh"><kbd>1</kbd>Hiểu</div></div>

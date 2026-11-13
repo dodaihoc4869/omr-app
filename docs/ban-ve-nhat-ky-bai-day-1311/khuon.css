@@ -1,0 +1,196 @@
+/* BẢN VẼ «Nhật ký bài dạy» · giao diện của thư viện khuôn (khuon.js). Bảng luôn tối như bảng live, ở cả nền sáng và nền tối.
+   Màu chép đúng giá trị có sẵn: bảng / giấy / mặt từ src/lib/bpu/mau-chieu.ts, bốn màu phấn từ src/lib/but-bang-to-chieu.ts (MAU_BUT). */
+@font-face { font-family: 'DDH'; font-weight: 100 549; font-display: swap; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; font-display: swap; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; font-display: swap; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; font-display: swap; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+
+:root {
+  --bang: #131f24; --bang-mat: #23282d; --bang-mat-2: #2f353b; --bang-vien: #3b4148; --bang-the: #e7e1d3;
+  --phan-trang: #f4efe4; --phan-vang: #ffd27a; --phan-ngoc: #6ee7b7; --phan-hong: #fda4af;
+  --phong: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+/* ── bảng đen ── */
+.bang { position: relative; isolation: isolate; border-radius: 22px; color: var(--phan-trang); font-family: var(--phong); overflow: hidden;
+  background: radial-gradient(70% 60% at 18% 8%, rgba(244, 239, 228, 0.055), transparent 70%), radial-gradient(50% 50% at 88% 96%, rgba(244, 239, 228, 0.04), transparent 70%), var(--bang);
+  box-shadow: inset 0 0 0 2px var(--bang-vien); }
+.bang svg { display: block; overflow: visible; }
+.bang .so, .bang-so { font-variant-numeric: tabular-nums; }
+.mau-ngoc { --m: var(--phan-ngoc); } .mau-vang { --m: var(--phan-vang); } .mau-hong { --m: var(--phan-hong); } .mau-trang { --m: var(--phan-trang); }
+
+/* ── keo-co ── */
+.kc { width: 100%; height: auto; }
+.kc text { font-family: var(--phong); text-anchor: middle; }
+.kc-day { stroke: var(--phan-trang); stroke-width: 5; stroke-linecap: round; opacity: 0.85; }
+.kc-luc { stroke: var(--m); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.kc-vo { stroke: var(--m); stroke-width: 4; }
+.kc-nhan { fill: var(--m); }
+.kc-ky { fill: var(--phan-trang); font-size: 50px; font-weight: 800; }
+.kc-ten { fill: var(--m); font-size: 28px; font-weight: 800; }
+.kc-chi { fill: var(--bang-the); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kc-dau { font-size: 52px; font-weight: 800; fill: var(--m); text-anchor: start !important; }
+.kc-e { fill: var(--phan-vang); }
+.kc-ex { stroke: var(--phan-vang); stroke-width: 4.5; stroke-linecap: round; fill: none; }
+.kc-pha { fill: var(--phan-trang); font-size: 30px; font-weight: 800; }
+.kc-kl { fill: var(--m); font-size: 31px; font-weight: 800; }
+.kc-khung { fill: color-mix(in srgb, var(--m) 10%, transparent); stroke: var(--m); stroke-width: 3.5; stroke-linejoin: round; stroke-dasharray: 1 1; }
+.kc-hat { fill: var(--phan-trang); }
+.kc-dai { fill: var(--phan-trang); font-size: 26px; font-weight: 800; }
+.kc-dai-cham { fill: var(--m); }
+.kc.hep .kc-ten { font-size: 31px; } .kc.hep .kc-chi { font-size: 29px; } .kc.hep .kc-pha { font-size: 31px; } .kc.hep .kc-kl { font-size: 29px; } .kc.hep .kc-dai { font-size: 27px; }
+html.may-yeu .kc-quang { display: none; }
+.kc.nho text, .kc.nho .kc-khung, .kc.nho .kc-hat { display: none; }
+
+/* ── thang-delta ── */
+.td { --hang-cao: 40px; padding: 26px 24px 22px; }
+.td-khung { position: relative; padding-top: calc(var(--hang) * var(--hang-cao) + 6px); }
+.td-tren { position: absolute; inset: 0 0 0 0; pointer-events: none; }
+.td-kd { position: absolute; inset: 0; }
+.td-kim { position: absolute; left: 0; bottom: -6px; width: 0; border-left: 3px solid var(--phan-trang); }
+.td-kim::after { content: ""; position: absolute; left: -9px; bottom: -4px; width: 15px; height: 15px; border-radius: 50%; background: var(--phan-trang); }
+.td-nhan { position: absolute; left: -2px; top: -2px; white-space: nowrap; font-size: 15.5px; font-weight: 700; line-height: 1; padding: 6px 10px; border-radius: 10px; background: var(--bang-mat); box-shadow: inset 0 0 0 1.5px var(--bang-vien); color: var(--phan-trang); }
+.td-nhan.phai { left: auto; right: -2px; }
+.td-nhan b { color: var(--phan-vang); font-weight: 800; }
+.td-ray { position: relative; height: 46px; border-radius: 12px; background: var(--bang-mat); box-shadow: inset 0 0 0 1.5px var(--bang-vien); }
+.td-vung { position: absolute; top: 0; bottom: 0; transform-origin: bottom; border-top: 5px solid var(--m); background: color-mix(in srgb, var(--m) 16%, transparent); }
+.td-vung:first-child { border-radius: 12px 0 0 12px; } .td-vung:last-child { border-radius: 0 12px 12px 0; }
+.td-vung + .td-vung { box-shadow: inset 2px 0 0 var(--bang); }
+.td-sang { position: absolute; inset: 0; border-radius: inherit; background: color-mix(in srgb, var(--m) 48%, transparent); opacity: 0; }
+.td-moc { position: relative; height: 26px; margin-top: 6px; font-size: 15px; font-weight: 700; color: var(--bang-the); }
+.td-moc span { position: absolute; top: 0; transform: translateX(-50%); }
+.td-moc span:first-child { transform: none; }
+.td-ten { display: grid; gap: 8px; margin-top: 8px; }
+.td-o { position: relative; padding: 10px 12px; border-radius: 14px; background: var(--bang-mat); min-width: 0; }
+.td-o::before { content: ""; display: block; width: 26px; height: 6px; border-radius: 3px; background: var(--m); margin-bottom: 8px; }
+.td-o b { display: block; font-size: 15.5px; font-weight: 800; line-height: 1.2; color: var(--phan-trang); }
+.td-o span { display: block; font-size: 14.5px; font-weight: 700; color: var(--m); margin-top: 4px; }
+.td-o-sang { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2.5px var(--m); background: color-mix(in srgb, var(--m) 14%, transparent); opacity: 0; }
+
+/* ── lewis ── */
+.lw { display: block; width: 100%; height: auto; max-height: 360px; margin: 0 auto; }
+.lw text { font-family: var(--phong); text-anchor: middle; }
+.lw-ky { fill: var(--phan-trang); font-size: 66px; font-weight: 800; }
+.lw-e { fill: var(--phan-trang); }
+.lw-ex { stroke: var(--phan-trang); stroke-width: 4; stroke-linecap: round; fill: none; }
+.lw-e.chung { fill: var(--phan-vang); }
+.lw-ex.chung { stroke: var(--phan-vang); }
+.lw-vung { fill: rgba(255, 210, 122, 0.1); stroke: var(--phan-vang); stroke-width: 2.5; stroke-dasharray: 1 1; }
+.lw-dem { fill: var(--phan-ngoc); font-size: 26px; font-weight: 800; }
+.lw-nhan { fill: var(--phan-vang); font-size: 26px; font-weight: 700; }
+.k-lewis { padding: 6px 12px 0; }
+
+/* ── quy-tac ── */
+.qt-boc { padding: 30px 22px 26px; display: grid; place-items: center; min-height: 260px; }
+.qt { position: relative; width: min(100%, 620px); padding: 34px 26px 24px; border-radius: 22px; }
+.qt-khung { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.qt-rect { x: 2px; y: 2px; width: calc(100% - 4px); height: calc(100% - 4px); fill: none; stroke: var(--m); stroke-width: 3.5; stroke-dasharray: 1 1; }
+.qt-sang { position: absolute; inset: -6px; border-radius: 26px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--m) 30%, transparent), 0 0 34px color-mix(in srgb, var(--m) 30%, transparent); opacity: 0; pointer-events: none; }
+html.may-yeu .qt-sang { box-shadow: 0 0 0 4px color-mix(in srgb, var(--m) 30%, transparent); }
+.qt-nhan { position: absolute; left: 22px; top: -15px; padding: 3px 12px; border-radius: 999px; background: var(--bang); box-shadow: inset 0 0 0 2px var(--m); color: var(--m); font-size: 15px; font-weight: 800; }
+.qt-dong { margin: 0; font-size: clamp(19px, 2.3vw + 10px, 28px); font-weight: 700; line-height: 1.38; position: relative; }
+.qt-dong + .qt-dong { margin-top: 8px; }
+.qt-tu { display: inline-block; }
+.qt-dong b.qt-tu { color: var(--m); font-weight: 800; }
+.qt-vd { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; position: relative; }
+.qt-vd-nhan { font-size: 14.5px; font-weight: 700; color: var(--bang-the); }
+.qt-vd-o { min-height: 34px; padding: 4px 14px; border-radius: 10px; background: var(--bang-mat-2); font-size: 18px; font-weight: 800; display: inline-flex; align-items: center; }
+
+/* ── vi-du-cot-doc ── */
+.vd { padding: 22px 22px 24px; }
+.vd-de { margin: 0 0 16px; font-size: 16px; font-weight: 600; line-height: 1.45; color: var(--bang-the); }
+.vd-de b { color: var(--phan-trang); }
+.vd-sd { display: flex; align-items: flex-start; justify-content: center; gap: 8px; }
+.vd-chat { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.vd-ct { font-size: clamp(26px, 2.4vw + 14px, 38px); font-weight: 800; line-height: 1.1; padding-bottom: 6px; border-bottom: 3px solid var(--phan-trang); display: inline-flex; align-items: baseline; }
+.vd-hs { color: var(--phan-vang); display: none; margin-right: 1px; }
+.vd-cot { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; justify-items: center; }
+.vd-cot li { position: relative; padding: 4px 10px; border-radius: 10px; font-size: clamp(15px, 0.6vw + 12px, 18px); font-weight: 700; color: var(--phan-ngoc); white-space: nowrap; }
+.vd-sang { position: absolute; inset: 0; border-radius: inherit; background: rgba(255, 210, 122, 0.2); box-shadow: inset 0 0 0 2px var(--phan-vang); opacity: 0; }
+.vd-cot li > span, .vd-mt-tren > span { position: relative; }
+.vd-mt { display: flex; flex-direction: column; align-items: center; padding-top: 2px; flex: none; width: clamp(78px, 9vw, 110px); }
+.vd-mt-tren { position: relative; font-size: clamp(14.5px, 0.5vw + 12px, 17px); font-weight: 800; color: var(--phan-hong); white-space: nowrap; padding: 2px 8px; border-radius: 9px; }
+.vd-mt svg { width: 100%; height: 22px; }
+.vd-mt-net { fill: none; stroke: var(--phan-trang); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 1; }
+.vd-cach { width: 34px; flex: none; }
+.vd-pt { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 6px; margin-top: 22px; padding: 14px 12px; border-radius: 16px; background: var(--bang-mat); font-size: clamp(20px, 1.4vw + 13px, 27px); font-weight: 800; }
+.vd-ten { color: var(--phan-trang); margin-right: 4px; white-space: nowrap; }
+.vd-ts, .vd-kq { display: inline-flex; align-items: center; gap: 6px; }
+.vd-dau { font-style: normal; color: var(--bang-the); font-weight: 700; }
+.vd-ps { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: 0.82em; }
+.vd-ps b { padding: 0 3px 2px; border-bottom: 2.5px solid currentColor; font-weight: 800; }
+.vd-ps i { font-style: normal; padding-top: 2px; }
+.vd-kq { position: relative; color: var(--phan-vang); padding-bottom: 6px; }
+.vd-kq small { font-size: 0.75em; font-weight: 700; }
+.vd-gach-svg { position: absolute; left: 22px; right: 0; bottom: 0; width: calc(100% - 22px); height: 6px; }
+.vd-gach { stroke: var(--phan-vang); stroke-width: 4; stroke-dasharray: 1 1; vector-effect: non-scaling-stroke; }
+
+/* ── doan-nhanh ── */
+.dn { padding: 24px 22px 22px; }
+.dn-hoi { margin: 0; font-size: clamp(19px, 1.2vw + 14px, 25px); font-weight: 800; line-height: 1.35; }
+.dn-hoi b { color: var(--phan-vang); }
+.dn-nhac { margin: 10px 0 0; font-size: 15px; font-weight: 600; color: var(--bang-the); }
+.dn-chon { display: grid; gap: 10px; margin-top: 16px; }
+.dn-pa { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 8px 14px 8px 8px; border-radius: 16px; border: 0; background: var(--bang-mat); box-shadow: inset 0 0 0 2px var(--bang-vien); color: var(--phan-trang); font: 700 16.5px/1.3 var(--phong); text-align: left; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform 0.12s; }
+.dn-pa:active { transform: scale(0.98); }
+.dn-pa:focus-visible { outline: 3px solid var(--phan-vang); outline-offset: 2px; }
+.dn-chu { flex: none; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--bang-mat-2); font-weight: 800; color: var(--phan-vang); }
+.dn-pa[disabled] { cursor: default; }
+.dn-pa.dung { box-shadow: inset 0 0 0 2.5px var(--phan-ngoc); background: rgba(110, 231, 183, 0.14); }
+.dn-pa.dung .dn-chu { background: var(--phan-ngoc); color: var(--bang); }
+.dn-pa.sai { box-shadow: inset 0 0 0 2.5px var(--phan-hong); }
+.dn-pa.sai .dn-chu { background: var(--phan-hong); color: var(--bang); }
+.dn-pa[disabled]:not(.dung):not(.sai) { opacity: 0.6; }
+.dn-phan { margin-top: 14px; font-size: 16px; font-weight: 600; line-height: 1.45; }
+.dn-phan:empty { display: none; }
+.dn-phan b.mau-ngoc, .dn-phan b.mau-hong { color: var(--m); font-weight: 800; }
+.dn-mo { margin-top: 14px; border-radius: 16px; background: rgba(35, 40, 45, 0.6); box-shadow: inset 0 0 0 1.5px var(--bang-vien); overflow: hidden; }
+.dn-mo[hidden] { display: none; }
+.dn-mo .qt-boc { min-height: 0; padding: 26px 14px 16px; }
+.dn-mo .td { padding: 18px 14px 14px; }
+
+/* ── tong-ket ── */
+.tk { list-style: none; margin: 0; padding: 22px 20px; display: grid; gap: 14px; }
+.tk-y { display: flex; gap: 12px; align-items: flex-start; }
+.tk-dau { flex: none; width: 30px; height: 30px; margin-top: 2px; border-radius: 9px; background: var(--bang-mat-2); }
+.tk-dau path { fill: none; stroke: var(--phan-ngoc); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 1; }
+.tk-than { min-width: 0; flex: 1; }
+.tk-than p { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.42; }
+.tk-than p b { color: var(--phan-vang); }
+.tk-nghe { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; padding: 6px 14px 6px 10px; border-radius: 999px; border: 0; background: var(--bang-mat); box-shadow: inset 0 0 0 1.5px var(--bang-vien); color: var(--phan-trang); font: 700 14.5px/1.2 var(--phong); cursor: pointer; touch-action: manipulation; }
+.tk-nghe svg { color: var(--phan-vang); }
+.tk-nghe b { color: var(--phan-vang); font-weight: 800; }
+.tk-nghe:focus-visible { outline: 3px solid var(--phan-vang); outline-offset: 2px; }
+
+@media (max-width: 600px) {
+  .td { padding: 22px 14px 18px; --hang-cao: 38px; }
+  .td-ten { gap: 6px; }
+  .td-o { padding: 8px 8px; }
+  .td-o b { font-size: 14px; }
+  .td-o span { font-size: 13px; }
+  .vd { padding: 18px 12px 20px; }
+  .vd-sd { gap: 2px; }
+  .dn { padding: 20px 14px 16px; }
+  .tk { padding: 18px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .dn-pa { transition: none; } }
+
+/* ── thêm (bản vẽ lại theo giọng Thầy) ── */
+.td-quang { position: absolute; left: -16px; bottom: -14px; width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 210, 122, 0.75), rgba(255, 210, 122, 0) 70%); opacity: 0; pointer-events: none; }
+html.may-yeu .td-quang { display: none; }
+.td-kl { margin: 14px 0 0; padding: 10px 14px; border-radius: 14px; box-shadow: inset 0 0 0 2px var(--phan-ngoc); background: rgba(110, 231, 183, 0.1); font-size: clamp(15.5px, 0.6vw + 12px, 18px); font-weight: 700; line-height: 1.4; }
+.td-kl b { color: var(--phan-ngoc); font-weight: 800; }
+.lw-quang { fill: rgba(255, 210, 122, 0.22); }
+html.may-yeu .lw-quang { display: none; }
+
+/* ── bảng phấn của Thầy (nét thật, phóng to / thu nhỏ / kéo) ── */
+.bp { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--bang); box-shadow: inset 0 0 0 1.5px var(--bang-vien); touch-action: pan-y; cursor: zoom-in; outline-offset: 2px; }
+.bp:focus-visible { outline: 3px solid var(--phan-vang); }
+.bp.dang-to { cursor: grab; }
+.bp canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bp-dk { position: absolute; right: 6px; bottom: 6px; display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: rgba(35, 40, 45, 0.9); box-shadow: inset 0 0 0 1px var(--bang-vien); }
+.bp-nut { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--phan-trang); border: 0; background: none; cursor: pointer; touch-action: manipulation; }
+.bp-nut:disabled { opacity: 0.35; cursor: default; }
+.bp-nut:focus-visible { outline: 3px solid var(--phan-vang); outline-offset: -2px; }
+.bp-dk.tren { position: static; margin-left: auto; }
+.bp-muc { min-width: 32px; text-align: center; font: 800 13px var(--phong); color: var(--phan-vang); }

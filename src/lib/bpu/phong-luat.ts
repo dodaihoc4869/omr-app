@@ -13,7 +13,9 @@ export interface LuatPhong {
   so: { sbd: string; luc: number; lan: number }[]
 }
 /** Một việc của luật cần GHI SỔ cho văn phòng trực live đọc (`/gv/bpu/moi-ra`): 'ra' = em bị mời ra · 'tu' = thầy từ chối (cấm tới hết buổi) · 'vao' = em được vào lại. */
-export interface SuKienLuat { loai: 'ra' | 'tu' | 'vao'; sbd: string; luc: number; /** số lần em đã rời */ lan?: number; /** ngưỡng của luật lúc đó */ n?: number }
+/** 'bat' / 'tat' (13/11 lần 2, thầy: «chỉ khi nào vào live tôi bật nút luật thì văn phòng mới gửi tin thông báo cho nhóm trên zalo»): thầy vừa bật / tắt luật
+ *  (sbd rỗng, `n` = số lần của luật) ⇒ văn phòng biết buổi này luật có bật hay không. */
+export interface SuKienLuat { loai: 'ra' | 'tu' | 'vao' | 'bat' | 'tat'; sbd: string; luc: number; /** số lần em đã rời */ lan?: number; /** ngưỡng của luật lúc đó */ n?: number }
 const ghiSo = (st: TrangThaiPhong, sk: SuKienLuat): void => { const l = st.live; if (l) l.choGhi = [...(l.choGhi ?? []), sk].slice(-200) }
 /** Máy chủ (phòng) lấy các việc chờ ghi sổ rồi xoá khỏi trạng thái. */
 export function layChoGhiLuat(st: TrangThaiPhong): SuKienLuat[] { const l = st.live, ds = l?.choGhi ?? []; if (l && ds.length) l.choGhi = []; return ds }
@@ -26,10 +28,11 @@ export function datLuat(st: TrangThaiPhong, o: unknown, nay: number): boolean {
   const l = st.live, x = (o ?? null) as { bat?: unknown; n?: unknown } | null
   if (!l || !x || typeof x !== 'object' || typeof x.bat !== 'boolean') return false
   const cu = l.luat ?? null
-  if (!x.bat) { if (!cu) return false; for (const sbd of Object.keys(cu.ra)) ghiSo(st, { loai: 'vao', sbd, luc: nay }); l.luat = null; st.capNhat = nay; return true }
+  if (!x.bat) { if (!cu) return false; for (const sbd of Object.keys(cu.ra)) ghiSo(st, { loai: 'vao', sbd, luc: nay }); ghiSo(st, { loai: 'tat', sbd: '', luc: nay, n: cu.n }); l.luat = null; st.capNhat = nay; return true }
   const n = kepN(x.n ?? cu?.n)
   if (cu && cu.n === n) return false
   l.luat = cu ? { ...cu, n } : { n, tu: nay, dem: {}, ra: {}, so: [] }
+  if (!cu) ghiSo(st, { loai: 'bat', sbd: '', luc: nay, n })
   st.capNhat = nay
   return true
 }
@@ -40,7 +43,7 @@ export const biMoiRa = (st: TrangThaiPhong, sbd: string): boolean => !!luatCua(s
 /** Gọi khi phòng vừa ghi MỘT LẦN RỜI MỚI của em lúc đang live. Đủ số lần ⇒ mời ra. Trả true nếu em vừa bị mời ra. */
 export function luatKhiRoi(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   const l = st.live, u = l?.luat
-  if (!l || !u || !l.bat || l.khoi?.gd === 'cho' || u.ra[sbd] || biCam(st, sbd)) return false
+  if (!l || !u || !l.bat || l.khoi?.gd === 'cho' || l.khoi?.giaiLao || u.ra[sbd] || biCam(st, sbd)) return false // phòng chờ / đang nghỉ giải lao: không đếm
   const lan = (u.dem[sbd] ?? 0) + 1
   u.dem[sbd] = lan
   if (lan < u.n) return false
@@ -91,12 +94,3 @@ export function viewLuatBang(st: TrangThaiPhong) {
 export type LuatBang = NonNullable<ReturnType<typeof viewLuatBang>>
 /** Giờ Việt Nam «HH:MM» của một mốc giờ phòng. */
 export const gioVnLuat = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(11, 16)
-/** Tin thầy dán cho Javis DDH (nội bộ) để văn phòng trực live nhắn Zalo cho phụ huynh: ai bị mời ra, lúc nào, rời mấy lần, ai thầy không cho vào lại. Không có ai ⇒ ''. */
-export function tinBaoVanPhong(luat: Pick<LuatBang, 'so'> & { cam?: LuatBang['cam'] }, ten: (sbd: string) => string): string {
-  const so = luat.so, cam = luat.cam ?? [], moc = so[0]?.luc ?? cam[0]?.luc
-  if (moc == null) return ''
-  const d = new Date(moc + 7 * 3_600_000).toISOString(), ds = so.map((x) => `${ten(x.sbd)} (${gioVnLuat(x.luc)}, rời ${x.lan} lần)`).join('; ')
-  const dau = so.length ? `có ${so.length} lượt em bị mời ra khỏi lớp vì rời màn hình: ${ds}.` : 'có em bị mời ra khỏi lớp vì rời màn hình.'
-  const tu = cam.length ? ` Thầy không cho vào lại tới hết buổi: ${cam.map((x) => ten(x.sbd)).join(', ')}.` : ''
-  return `Javis, buổi live Hoá ${d.slice(8, 10)}/${d.slice(5, 7)} ${dau}${tu} Văn phòng nhắn Zalo cho phụ huynh các em theo mẫu đã thống nhất, nhắn xong báo lại Thầy.`
-}
