@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1354,
+    "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+    "fileNguon": "anh/f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca.png",
+    "svg": "fat1354-native-ddh-84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8.svg",
+    "hashSvg": "84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8",
+    "byteSvg": 25085,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-6",
+        "de": "Dầu cá chứa 2 loại acid béo chủ yếu là Docosahexaenoic (DHA) và Eicosa pentaenoic (EPA) (công thức cấu tạo như hình dưới đây) được các bác sĩ dùng để điều trị các bệnh: xơ vữa động mạch, rối loại nhịp tim, bổ mắt, tăng cường thị lực…",
+        "refs": [
+          {
+            "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+            "where": "VIP27-CDK-ESTER-TN-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "ffb23aa8b9e99700806712a0cb4e817a6ee1c0f51112cbb05c68647cfc46cab3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "LEFT22C6CCdouble-RIGHT20C5CCdouble-total42C4O/2individualOPENchains2COdouble2splitfeetCONTACTrespectivearms/LEFTBLACKbondsPINKHO-O-RIGHTALLTEAL/ALL4OtrueDAMUPRIGHT-2captions5literalblocksregularUPRIGHT/EXACTDOCOSAHEXAENOIC-ACID-(DHA)-EICOSA PENTAENOIC-ACID (EPA)/LEFTfirst2captionlinesCONDENSEDnative-rightBLUE/1outerrect1divider/0stereo-arrows-extraH/NOaddedomega-formula-temp-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+    "hashSvgDaSoat": "84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

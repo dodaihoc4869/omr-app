@@ -1,0 +1,23 @@
+[
+  {
+    "i": 1354,
+    "hashSvg": "84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và fresh Chromium3x FULL, macro từng panel/CO/CC/captions. Trái22C6CCdouble/phải20C5CCdouble/tổng42C4O; hai openchains giữ vị trí các nhánh gấp, hai COsplitrays contact arms, EPA junction liên tục không detachedray. BlackDHA/pinkHO-O và captions, tealEPA/bluecaptions đúng; 4OtrueDAMupright. Năm literal blocks DOCOSAHEXAENOIC/ACID/(DHA)/EICOSA PENTAENOIC/ACID (EPA) regular upright, hai dòng đầu trái condensed như native, uppercase/space đúng. Outerframe+divider đủ, không glyph/bondcontact/crop mới; không thêm omega/theorydata/answer. ActualSHApre/post đúng, feetcalculatedapprox không nativeSubpixel.",
+    "render": "/workspace/scratch/soat418-1354-fresh.png",
+    "macro": [
+      "/workspace/scratch/fat1354-left.png",
+      "/workspace/scratch/fat1354-right.png",
+      "/workspace/scratch/fat1354-COleft.png",
+      "/workspace/scratch/fat1354-COright.png",
+      "/workspace/scratch/fat1354-caption.png"
+    ],
+    "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+    "hashSvgDaSoat": "84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8",
+    "runtimeProof": {
+      "file": "/workspace/scratch/fat1354-runtime.log",
+      "sha256": "54bda0a2ebd18aa95a024ad20e81f5bb05cdf6bbf57fec31ebb76cc338bee496",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/fat1354-native-ddh-84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8.svg 84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8\n1354 { x: 0, y: 0, width: 732, height: 359 }\n\nPOSTSHOT_SHA 84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8\nCOMMAND node /workspace/scratch/agent-render418.cjs\nCONTEXT VIP27-CDK-ESTER-TN-II-6.hinh.0.du_lieu; public de/one ref only, no answers.\n"
+    }
+  }
+]

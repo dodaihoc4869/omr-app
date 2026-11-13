@@ -1,0 +1,742 @@
+{
+  "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+  "native": [
+    732,
+    359
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-6",
+      "de": "Dầu cá chứa 2 loại acid béo chủ yếu là Docosahexaenoic (DHA) và Eicosa pentaenoic (EPA) (công thức cấu tạo như hình dưới đây) được các bác sĩ dùng để điều trị các bệnh: xơ vữa động mạch, rối loại nhịp tim, bổ mắt, tăng cường thị lực…",
+      "refs": [
+        {
+          "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+          "where": "VIP27-CDK-ESTER-TN-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "ffb23aa8b9e99700806712a0cb4e817a6ee1c0f51112cbb05c68647cfc46cab3"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "LEFT22C6CCdouble-RIGHT20C5CCdouble-total42C4O/2individualOPENchains2COdouble2splitfeetCONTACTrespectivearms/LEFTBLACKbondsPINKHO-O-RIGHTALLTEAL/ALL4OtrueDAMUPRIGHT-2captions5literalblocksregularUPRIGHT/EXACTDOCOSAHEXAENOIC-ACID-(DHA)-EICOSA PENTAENOIC-ACID (EPA)/LEFTfirst2captionlinesCONDENSEDnative-rightBLUE/1outerrect1divider/0stereo-arrows-extraH/NOaddedomega-formula-temp-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+  "rootSourceAudit": "Root OWNnativeFULL2x/EACHpanelCO3x/captions3x/allpublicde. 22C6CCvs20C5CC individualvertexcount. HOlastOleft/OHfirstOright/ALL4Otruebold. Captionsregularupright, leftfirst2tallcondensed, rightBLUEserifnative→DDHpath. NativeapproxNOTsubpixel;COfeetCALCULATEDfromapproxarms,notmeasurednativeSubpixel.",
+  "independentSourceAudit": {
+    "i": 1354,
+    "assetIndexProvided": 1383,
+    "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca.png",
+    "size": [
+      732,
+      359
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-6",
+        "de": "Dầu cá chứa 2 loại acid béo chủ yếu là Docosahexaenoic (DHA) và Eicosa pentaenoic (EPA) (công thức cấu tạo như hình dưới đây) được các bác sĩ dùng để điều trị các bệnh: xơ vữa động mạch, rối loại nhịp tim, bổ mắt, tăng cường thị lực…",
+        "allHinh": [
+          {
+            "hash": "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca",
+            "where": "VIP27-CDK-ESTER-TN-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "ffb23aa8b9e99700806712a0cb4e817a6ee1c0f51112cbb05c68647cfc46cab3"
+          }
+        ],
+        "missingHashes": [
+          "f532ae1c222f306e0c118c7b723a4647e7c4b650469d1ee8ebcc35f21f170dca"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/418-full3x.png",
+        "/workspace/scratch/418-DHAco3x.png",
+        "/workspace/scratch/418-EPAco3x.png",
+        "/workspace/scratch/418-captions3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "leftC": 22,
+        "leftO": 2,
+        "leftCCdouble": 6,
+        "rightC": 20,
+        "rightO": 2,
+        "rightCCdouble": 5,
+        "totalC": 42,
+        "totalO": 4,
+        "rings": 0,
+        "COdoublePairs": 2,
+        "gridCells": 2
+      },
+      "grid": {
+        "outerRect": [
+          3,
+          5,
+          728,
+          356
+        ],
+        "divider": [
+          [
+            392,
+            5
+          ],
+          [
+            392,
+            356
+          ]
+        ],
+        "strokeApprox": 1,
+        "colorApprox": "#555555"
+      },
+      "leftDHA": {
+        "orderedVerticesFromCO": [
+          [
+            129,
+            47
+          ],
+          [
+            163,
+            28
+          ],
+          [
+            197,
+            47
+          ],
+          [
+            231,
+            28
+          ],
+          [
+            265,
+            47
+          ],
+          [
+            265,
+            86
+          ],
+          [
+            298,
+            106
+          ],
+          [
+            298,
+            145
+          ],
+          [
+            265,
+            164
+          ],
+          [
+            265,
+            203
+          ],
+          [
+            231,
+            222
+          ],
+          [
+            197,
+            203
+          ],
+          [
+            163,
+            222
+          ],
+          [
+            129,
+            203
+          ],
+          [
+            129,
+            164
+          ],
+          [
+            96,
+            145
+          ],
+          [
+            62,
+            164
+          ],
+          [
+            62,
+            203
+          ],
+          [
+            28,
+            222
+          ],
+          [
+            28,
+            261
+          ],
+          [
+            62,
+            280
+          ],
+          [
+            62,
+            321
+          ]
+        ],
+        "mainStroke": {
+          "color": "#000000",
+          "widthApprox": 3.5,
+          "linecap": "rounded"
+        },
+        "CCMainPairs": [
+          [
+            [
+              231,
+              28
+            ],
+            [
+              265,
+              47
+            ]
+          ],
+          [
+            [
+              298,
+              106
+            ],
+            [
+              298,
+              145
+            ]
+          ],
+          [
+            [
+              265,
+              203
+            ],
+            [
+              231,
+              222
+            ]
+          ],
+          [
+            [
+              163,
+              222
+            ],
+            [
+              129,
+              203
+            ]
+          ],
+          [
+            [
+              96,
+              145
+            ],
+            [
+              62,
+              164
+            ]
+          ],
+          [
+            [
+              28,
+              222
+            ],
+            [
+              28,
+              261
+            ]
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              230,
+              37
+            ],
+            [
+              257,
+              52
+            ]
+          ],
+          [
+            [
+              290,
+              111
+            ],
+            [
+              290,
+              141
+            ]
+          ],
+          [
+            [
+              260,
+              198
+            ],
+            [
+              230,
+              213
+            ]
+          ],
+          [
+            [
+              164,
+              213
+            ],
+            [
+              136,
+              198
+            ]
+          ],
+          [
+            [
+              96,
+              154
+            ],
+            [
+              68,
+              169
+            ]
+          ],
+          [
+            [
+              35,
+              227
+            ],
+            [
+              35,
+              257
+            ]
+          ]
+        ],
+        "acid": {
+          "HO": {
+            "literal": "HO",
+            "bbox": [
+              70,
+              18,
+              102,
+              36
+            ],
+            "font": "BOLDuprightsans",
+            "colorApprox": "#fa0056",
+            "anchor": "LAST O",
+            "arm": [
+              [
+                105,
+                34
+              ],
+              [
+                127,
+                47
+              ]
+            ]
+          },
+          "COrays": [
+            [
+              [
+                124.5,
+                47
+              ],
+              [
+                124.5,
+                76
+              ]
+            ],
+            [
+              [
+                133,
+                47
+              ],
+              [
+                133,
+                76
+              ]
+            ]
+          ],
+          "O": {
+            "literal": "O",
+            "bbox": [
+              121,
+              83,
+              137,
+              101
+            ],
+            "font": "BOLDuprightsans",
+            "colorApprox": "#fa0056"
+          },
+          "footContact": "Native2upperfeetcontactincomingHOarm/outgoingfirstchainslope throughsmallnativejoin; no fullwhitegap. Olabelwhitegapbelowrayends."
+        },
+        "captions": [
+          {
+            "literal": "DOCOSAHEXAENOIC",
+            "bbox": [
+              88,
+              274,
+              298,
+              303
+            ],
+            "font": "Tallcondenseduprightsans, regularweight",
+            "colorApprox": "#fa0056"
+          },
+          {
+            "literal": "ACID",
+            "bbox": [
+              88,
+              311,
+              138,
+              339
+            ],
+            "font": "Tallcondenseduprightsans, regularweight",
+            "colorApprox": "#fa0056"
+          },
+          {
+            "literal": "(DHA)",
+            "bbox": [
+              168,
+              313,
+              255,
+              344
+            ],
+            "font": "Widerregularuprightsans",
+            "colorApprox": "#fa0056"
+          }
+        ]
+      },
+      "rightEPA": {
+        "orderedVerticesFromCO": [
+          [
+            503,
+            67
+          ],
+          [
+            529,
+            82
+          ],
+          [
+            529,
+            107
+          ],
+          [
+            504,
+            122
+          ],
+          [
+            477,
+            107
+          ],
+          [
+            452,
+            121
+          ],
+          [
+            452,
+            151
+          ],
+          [
+            428,
+            165
+          ],
+          [
+            428,
+            194
+          ],
+          [
+            452,
+            208
+          ],
+          [
+            452,
+            236
+          ],
+          [
+            475,
+            251
+          ],
+          [
+            503,
+            236
+          ],
+          [
+            531,
+            251
+          ],
+          [
+            555,
+            236
+          ],
+          [
+            555,
+            207
+          ],
+          [
+            579,
+            193
+          ],
+          [
+            579,
+            163
+          ],
+          [
+            555,
+            148
+          ],
+          [
+            555,
+            124
+          ]
+        ],
+        "mainStroke": {
+          "colorApprox": "#109599",
+          "widthApprox": 5.5,
+          "linejoin": "nativeangular/softAA"
+        },
+        "CCMainPairs": [
+          [
+            [
+              477,
+              107
+            ],
+            [
+              452,
+              121
+            ]
+          ],
+          [
+            [
+              428,
+              165
+            ],
+            [
+              428,
+              194
+            ]
+          ],
+          [
+            [
+              452,
+              236
+            ],
+            [
+              475,
+              251
+            ]
+          ],
+          [
+            [
+              531,
+              251
+            ],
+            [
+              555,
+              236
+            ]
+          ],
+          [
+            [
+              579,
+              193
+            ],
+            [
+              579,
+              163
+            ]
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              479,
+              116
+            ],
+            [
+              460,
+              128
+            ]
+          ],
+          [
+            [
+              437,
+              168
+            ],
+            [
+              437,
+              191
+            ]
+          ],
+          [
+            [
+              459,
+              231
+            ],
+            [
+              478,
+              242
+            ]
+          ],
+          [
+            [
+              529,
+              242
+            ],
+            [
+              548,
+              231
+            ]
+          ],
+          [
+            [
+              570,
+              189
+            ],
+            [
+              570,
+              168
+            ]
+          ]
+        ],
+        "acid": {
+          "OH": {
+            "literal": "OH",
+            "bbox": [
+              490,
+              12,
+              540,
+              39
+            ],
+            "font": "BOLDuprightsans",
+            "colorApprox": "#109599",
+            "anchor": "FIRST O",
+            "stem": [
+              [
+                503,
+                43
+              ],
+              [
+                503,
+                67
+              ]
+            ]
+          },
+          "COrays": [
+            [
+              [
+                486,
+                78
+              ],
+              [
+                500,
+                64
+              ]
+            ],
+            [
+              [
+                489,
+                85
+              ],
+              [
+                507,
+                71
+              ]
+            ]
+          ],
+          "O": {
+            "literal": "O",
+            "bbox": [
+              461,
+              76,
+              480,
+              103
+            ],
+            "font": "BOLDuprightsans",
+            "colorApprox": "#109599"
+          },
+          "footContact": "Upper-rightfootofupper-leftparallelray contactsverticalOHstemnear50064; lower-rightfoot contactsoutgoingrightarmnear50771. Native shortjoin, no fullwhitegap; do not force bothrayssameapex."
+        },
+        "captions": [
+          {
+            "literal": "EICOSA PENTAENOIC",
+            "bbox": [
+              400,
+              270,
+              714,
+              295
+            ],
+            "font": "RegularUPRIGHTserifuppercase",
+            "color": "#0000ff"
+          },
+          {
+            "literal": "ACID (EPA)",
+            "bbox": [
+              400,
+              311,
+              565,
+              338
+            ],
+            "font": "RegularUPRIGHTserifuppercase",
+            "color": "#0000ff"
+          }
+        ]
+      },
+      "colors": "IntentionalPINKDHAOandcaptions/BLACKDHAchain/TEALwholeEPAstructure/BLUEEPAcaption; notAAfringeconfusion. NativeJPEG-likecolorvaries, approximatepink/tealpalette notscientificvalues.",
+      "noAdded": [
+        "No aliasnormalizationfromotherDHA",
+        "NoOHoverHOswap",
+        "No molecularformulas",
+        "No omegaindexnumbers",
+        "No captioncasechange",
+        "No ringclosingbondsdespitecoiledlayout"
+      ]
+    },
+    "measurementLimits": "Eachindividualorderedchaincountfromnative, notDHA/EPAname. Approxvertex/rays±1–2px, thickstrokeendcapsnative. TwoCOmacrosandcaptionmacroindependentlyopened. Colorsapproxexceptbluecore255verified, parentmayindependentlysample.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "sourceFull2xEachCOCaption3xCO12x": true,
+    "allPublicDe": true,
+    "freshFinalChromiumFull3xEachCO_CC_Captions3x": true,
+    "exactHash": "84f2927cf5c9eee0b9aa35caf824334c3ee93b6104e7bd322d3a4d5d0e2fdae8",
+    "verdict": "Đạt root; cần readonly riêng",
+    "left22C6CCRight20C5CCfourO": true,
+    "twoCOSplitFeetContact": true,
+    "blackPinkTealBlueLiteralCaptions": true,
+    "allOTrueDamChemicalCaptionsRegularUpright": true,
+    "negativeInitialKept": true,
+    "finalOnlyIndividualVerticesRaysCOAndOHStemEndpointAllGlyphsExact": true,
+    "nativeApproxNotSubpixel": true,
+    "feetCalculatedFromApproxArms": true,
+    "pixelBandsOnlySupportVisualNotGate": {
+      "EPArow67x498_509": true,
+      "peakrow107x472_482": true,
+      "freeUpperArmBend148x553_558": true
+    },
+    "xmlAudit": {
+      "children": 29,
+      "changedDirectChildren": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        10,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        21
+      ],
+      "otherChildrenExact": true
+    }
+  }
+}
