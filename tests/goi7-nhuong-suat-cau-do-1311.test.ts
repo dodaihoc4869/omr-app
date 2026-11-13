@@ -2,7 +2,7 @@
 // 13/11: soi ngày Sửa 11/11 — 5 em được giao 30 câu (câu dở của phiên chặng đầu + đề 28 lập lại không tính câu dở) ⇒ câu trả lời ngắn (xếp cuối) bị đẩy quá
 // câu 28. Nay câu dở không có trong đề mới chiếm chỗ câu CÙNG Ô (rồi cùng phần) của đề mới ⇒ tổng vẫn 28, phần III giữ nguyên số suất.
 import { describe, expect, it } from 'vitest'
-import { nhuongSuatChoCauDo } from '../server/src/goi-bai-7-gop'
+import { nhuongSuatChoCauDo, deNhuongSuat7, NGAY_NHUONG_SUAT } from '../server/src/goi-bai-7-gop'
 import { readFileSync } from 'node:fs'
 
 const O: Record<string, string> = {}
@@ -45,5 +45,15 @@ describe('nhường suất cho câu dở', () => {
   it('nối dây: cả gói cả ngày (xayGoiNgay7) lẫn lượt mở chặng đều nhường suất trước khi ghép đề 28', () => {
     const src = readFileSync('server/src/goi-bai-7.ts', 'utf8')
     expect(src.match(/deNhuongSuat7\(lap, cauGoi, viec, xepBai6\(lap\.plan\.viec/g)?.length).toBe(2)
+  })
+  it('áp từ đề NGÀY KẾ (14/11): trước mốc giữ nguyên đề; từ mốc nhường suất', () => {
+    expect(NGAY_NHUONG_SUAT).toBe('2026-11-14')
+    const lap = { hs: { meta: new Map(Object.entries(O).map(([k, o]) => [k, { phan: o.split('|')[0], mucDo: o.split('|')[1] === 'biet' ? 'NB' : o.split('|')[1] === 'van_dung' ? 'VD' : 'TH' }])) } }
+    const do_ = [cau('X-I2', 'I|biet')]
+    lap.hs.meta.set('X-I2', { phan: 'I', mucDo: 'NB' })
+    const truoc = deNhuongSuat7(lap, new Map(), do_, de, Date.parse('2026-11-13T15:00:00Z')) // 22:00 VN 13/11
+    expect(truoc).toEqual(de)
+    const sau = deNhuongSuat7(lap, new Map(), do_, de, Date.parse('2026-11-13T17:30:00Z')) // 00:30 VN 14/11
+    expect(sau.length).toBe(27)
   })
 })

@@ -27,10 +27,12 @@ export function nhuongSuatChoCauDo<T extends { qid: string }>(cauDo: readonly { 
   return deMoi.filter((_, i) => !bo.has(i))
 }
 
+/** Luật áp từ đề của ngày này (phát hành 13/11 giữa ngày; đổi giữa ngày làm đổi phần đề còn lại của em đang làm dở ⇒ bắt đầu từ ngày kế, như NGAY_DE_28). */
+export const NGAY_NHUONG_SUAT = '2026-11-14'
 /** Nối dây cho goi-bai-7.ts (gói cả ngày + lượt mở chặng): câu ĐÃ GIAO CHƯA LÀM của phiên đang mở (`cauDo`, giao trước) chiếm suất đề 28 ⇒ đề mới bỏ câu
- *  cùng ô / cùng phần, tổng ngày vẫn 28. Trước NGAY_DE_28 giữ nguyên. */
+ *  cùng ô / cùng phần, tổng ngày vẫn 28. Trước NGAY_NHUONG_SUAT giữ nguyên. */
 export function deNhuongSuat7<T extends { qid: string }>(lap: { hs: { meta: ReadonlyMap<string, { phan?: string | null; mucDo?: string | null }> } }, cauGoi: ReadonlyMap<string, { phan?: string | null; mucDo?: string | null }>, cauDo: readonly { qid: string }[], deMoi: readonly T[], now: number): T[] {
-  if (ngayVn7(now) < NGAY_DE_28 || !cauDo.length) return [...deMoi]
+  if (ngayVn7(now) < NGAY_NHUONG_SUAT || ngayVn7(now) < NGAY_DE_28 || !cauDo.length) return [...deMoi]
   const meta = (q: string) => lap.hs.meta.get(q) ?? cauGoi.get(q)
   const oCua = (q: string) => { const m = meta(q) ?? meta(tachSongSinh(q).goc); return oMaTran(m?.phan, m?.mucDo) }
   return nhuongSuatChoCauDo(cauDo, deMoi, oCua)
