@@ -1,0 +1,29 @@
+[
+  {
+    "i": 982,
+    "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+    "fileNguon": "anh/af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a.png",
+    "svg": "dep982-native-ddh-5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5.svg",
+    "hashSvg": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5",
+    "byteSvg": 36422,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-III-4",
+        "de": "Thuốc chữa ghẻ Diethyl phthalate (DEP) được sản xuất từ nguồn nguyên liệu đầu là naphthalene và ethanol theo sơ đồ các quá trình chuyển hoá (hình): naphthalene + 4$\\ce{O2}$ →($\\ce{V2O5}$, t°, $H_1$ = 75%) phthalic anhydride + 2$\\ce{CO2}$ + $\\ce{H2O}$; phthalic anhydride + 2$\\ce{C2H5OH}$ →($H_2$ = 85%) DEP + $\\ce{H2O}$.\nĐể sản xuất được 1 tấn DEP cần lượng tối thiểu các chất là x tấn naphthalene với y tấn ethanol. Tổng giá trị x + y bằng bao nhiêu? (không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng tới hàng phần trăm).",
+        "refs": [
+          {
+            "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+            "where": "VIP27-BDT-L4-0401-III-4.hinh.0.du_lieu",
+            "hashDataUrl": "acf37c76ba2786e58e738a02cd05d1694860c5263af37c502ec25724709ecf9b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2literalreactions2FILLEDrightheads/BOTHV2O5,tSUPo-BOTHH1=75%85%/ALLregularUPRIGHT-onlypercentITALIC/2anhydrides4COsplitfeet-upperLEFTFREEgap-upperRIGHTcontact-lowerBOTHcontact/2condensedCOOC2H5FIRSTC/2TOPcroppedUNKNOWNretain/noaddedH-theoryfix-answer-alias729/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

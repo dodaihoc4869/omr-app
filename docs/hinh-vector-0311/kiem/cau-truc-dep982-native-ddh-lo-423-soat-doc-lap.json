@@ -1,0 +1,27 @@
+[
+  {
+    "i": 982,
+    "hashSvg": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và riêng hai nativeupperCOmacros xác nhận LEFTfreegap; fresh current Chromium3x FULL/macro toàn2rows/4CO/conditions/rightedge. Bốn CO giữ upperLEFTfreewhitegap cả2anhydride, upperRIGHTcontact/lowerBOTHcontact; 5sixringmotifs14innerCCdouble cùng2anhydride5rings/2COOC₂H₅firstCcondensed đúng source. Hai FULLfilledheads/BOTHV₂O₅,tSUPo/BOTHH₁=75%85% giữ literal hình dù stemH₂second; ONLY75/85italic restregularupright. Hệ số4O₂/2CO₂/H₂O/2C₂H₅OH/H₂O và 2topunknowncrop giữ; t-o/Oglyph/captions/rightwater không chạm/cắt/tràn mới. RuntimeSHApre/post đúng final, không carry0a575.",
+    "render": "/workspace/scratch/soat423-982-fresh.png",
+    "macro": [
+      "/workspace/scratch/dep982-top.png",
+      "/workspace/scratch/dep982-bottom.png",
+      "/workspace/scratch/dep982-COtop.png",
+      "/workspace/scratch/dep982-CObottom.png",
+      "/workspace/scratch/dep982-lowerCOtop.png",
+      "/workspace/scratch/dep982-lowerCObottom.png",
+      "/workspace/scratch/dep982-conditions.png",
+      "/workspace/scratch/dep982-rightedge.png",
+      "/workspace/scratch/dep982-native-top.png",
+      "/workspace/scratch/dep982-native-bottom.png"
+    ],
+    "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+    "hashSvgDaSoat": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5",
+    "runtimeAudit": {
+      "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/dep982-native-ddh-5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5.svg 5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5\n982 { x: 0, y: 0, width: 897, height: 339 }\n\nPOSTSHOT_SHA 5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5\nCOMMAND node /workspace/scratch/agent-render423.cjs\nCONTEXT VIP27-BDT-L4-0401-III-4.hinh.0.du_lieu public de/one ref only; no answers.\n",
+      "sha256": "34a80f261a69ddef026080b78c646335804dabc98d1bbabaf5940e38fdb454bd"
+    }
+  }
+]

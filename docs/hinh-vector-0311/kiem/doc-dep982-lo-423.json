@@ -1,0 +1,935 @@
+{
+  "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+  "native": [
+    897,
+    339
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-BDT-L4-0401-III-4",
+      "de": "Thuốc chữa ghẻ Diethyl phthalate (DEP) được sản xuất từ nguồn nguyên liệu đầu là naphthalene và ethanol theo sơ đồ các quá trình chuyển hoá (hình): naphthalene + 4$\\ce{O2}$ →($\\ce{V2O5}$, t°, $H_1$ = 75%) phthalic anhydride + 2$\\ce{CO2}$ + $\\ce{H2O}$; phthalic anhydride + 2$\\ce{C2H5OH}$ →($H_2$ = 85%) DEP + $\\ce{H2O}$.\nĐể sản xuất được 1 tấn DEP cần lượng tối thiểu các chất là x tấn naphthalene với y tấn ethanol. Tổng giá trị x + y bằng bao nhiêu? (không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng tới hàng phần trăm).",
+      "refs": [
+        {
+          "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+          "where": "VIP27-BDT-L4-0401-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "acf37c76ba2786e58e738a02cd05d1694860c5263af37c502ec25724709ecf9b"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "2literalreactions2FILLEDrightheads/BOTHV2O5,tSUPo-BOTHH1=75%85%/ALLregularUPRIGHT-onlypercentITALIC/2anhydrides4COsplitfeet-upperLEFTFREEgap-upperRIGHTcontact-lowerBOTHcontact/2condensedCOOC2H5FIRSTC/2TOPcroppedUNKNOWNretain/noaddedH-theoryfix-answer-alias729/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL1x2x/all1publicde. BothH1 retained despite stem H2 second. TwoTOPcroppedUNKNOWN retain. Noalias729.",
+  "independentSourceAudit": {
+    "i": 982,
+    "assetIndexProvided": 1251,
+    "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a.png",
+    "size": [
+      897,
+      339
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-III-4",
+        "de": "Thuốc chữa ghẻ Diethyl phthalate (DEP) được sản xuất từ nguồn nguyên liệu đầu là naphthalene và ethanol theo sơ đồ các quá trình chuyển hoá (hình): naphthalene + 4$\\ce{O2}$ →($\\ce{V2O5}$, t°, $H_1$ = 75%) phthalic anhydride + 2$\\ce{CO2}$ + $\\ce{H2O}$; phthalic anhydride + 2$\\ce{C2H5OH}$ →($H_2$ = 85%) DEP + $\\ce{H2O}$.\nĐể sản xuất được 1 tấn DEP cần lượng tối thiểu các chất là x tấn naphthalene với y tấn ethanol. Tổng giá trị x + y bằng bao nhiêu? (không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng tới hàng phần trăm).",
+        "allHinh": [
+          {
+            "hash": "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a",
+            "where": "VIP27-BDT-L4-0401-III-4.hinh.0.du_lieu",
+            "hashDataUrl": "acf37c76ba2786e58e738a02cd05d1694860c5263af37c502ec25724709ecf9b"
+          }
+        ],
+        "missingHashes": [
+          "af863fc8bdccb12ee9d1cf1c12b7256f1a4322e7a3de0523a156e2cebe16fd8a"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/423-full2x.png",
+        "/workspace/scratch/423-nap.png",
+        "/workspace/scratch/423-topanh.png",
+        "/workspace/scratch/423-botanh.png",
+        "/workspace/scratch/423-prod.png",
+        "/workspace/scratch/423-topCO.png",
+        "/workspace/scratch/423-bottomCO.png",
+        "/workspace/scratch/423-botupperCO.png",
+        "/workspace/scratch/423-botlowerCO.png",
+        "/workspace/scratch/423-yield4x.png",
+        "/workspace/scratch/423-top6x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": {
+        "chemical": "Regularuprightserif,2/5SUB/tosuperscript",
+        "yields": "H₁ uprightserif, 75% and85%ITALICnumerals; equalsordinary",
+        "captions": "NONE"
+      },
+      "literalAudit": "NativeBOTH H₁=75% and H₁=85%, BOTH V₂O₅,tᵒ. PublicstemsecondH₂ but preserveimageH₁, do nottheorycorrect.",
+      "countsStructuresOnly": {
+        "naphC": 10,
+        "topAnhydrideC": 8,
+        "topAnhydrideO": 3,
+        "bottomAnhydrideC": 8,
+        "bottomAnhydrideO": 3,
+        "DEP_C": 12,
+        "DEP_O": 4,
+        "totalStructuresC": 38,
+        "totalStructuresO": 10,
+        "expandedCOdouble": 4,
+        "aromaticInnerRays": 14,
+        "filledRightHeads": 2
+      },
+      "naphthalene": {
+        "outerVertices": [
+          [
+            13,
+            71
+          ],
+          [
+            50,
+            48.5
+          ],
+          [
+            88,
+            71
+          ],
+          [
+            125.5,
+            48.5
+          ],
+          [
+            163,
+            71
+          ],
+          [
+            163,
+            115
+          ],
+          [
+            125.5,
+            136.5
+          ],
+          [
+            88,
+            115
+          ],
+          [
+            50,
+            136.5
+          ],
+          [
+            13,
+            115
+          ]
+        ],
+        "sharedVertical": [
+          [
+            88,
+            71
+          ],
+          [
+            88,
+            115
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              22,
+              73
+            ],
+            [
+              48,
+              59
+            ]
+          ],
+          [
+            [
+              80,
+              78
+            ],
+            [
+              80,
+              108
+            ]
+          ],
+          [
+            [
+              22,
+              112
+            ],
+            [
+              48,
+              126
+            ]
+          ],
+          [
+            [
+              130,
+              59
+            ],
+            [
+              154,
+              73
+            ]
+          ],
+          [
+            [
+              130,
+              126
+            ],
+            [
+              154,
+              112
+            ]
+          ]
+        ]
+      },
+      "topArrow": {
+        "reagentLiteral": "+ 4O₂",
+        "reagentBox": [
+          209,
+          87,
+          285,
+          111
+        ],
+        "shaft": [
+          [
+            300,
+            95
+          ],
+          [
+            483,
+            95
+          ]
+        ],
+        "filledHead": [
+          [
+            467,
+            90
+          ],
+          [
+            483,
+            95
+          ],
+          [
+            467,
+            100
+          ],
+          [
+            470,
+            95
+          ]
+        ],
+        "above": {
+          "literal": "V₂O₅, tᵒ",
+          "bbox": [
+            341,
+            63,
+            432,
+            87
+          ]
+        },
+        "below": {
+          "literal": "H₁ = 75%",
+          "bbox": [
+            331,
+            108,
+            439,
+            128
+          ]
+        }
+      },
+      "topAnhydride": {
+        "ringVertices": [
+          [
+            506,
+            71
+          ],
+          [
+            543,
+            49.5
+          ],
+          [
+            581,
+            71
+          ],
+          [
+            581,
+            115
+          ],
+          [
+            543,
+            136.5
+          ],
+          [
+            506,
+            115
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              512,
+              77
+            ],
+            [
+              512,
+              107
+            ]
+          ],
+          [
+            [
+              547,
+              59
+            ],
+            [
+              573,
+              73
+            ]
+          ],
+          [
+            [
+              547,
+              126
+            ],
+            [
+              573,
+              112
+            ]
+          ]
+        ],
+        "upperBareCO": [
+          623,
+          59
+        ],
+        "lowerBareCO": [
+          623,
+          128
+        ],
+        "ringToUpperCO": [
+          [
+            581,
+            71
+          ],
+          [
+            619,
+            59
+          ],
+          [
+            623,
+            59
+          ]
+        ],
+        "ringToLowerCO": [
+          [
+            581,
+            115
+          ],
+          [
+            620,
+            129
+          ],
+          [
+            623,
+            128
+          ]
+        ],
+        "OBridge": {
+          "bbox": [
+            638,
+            82,
+            656,
+            100
+          ],
+          "upperArm": [
+            [
+              623,
+              59
+            ],
+            [
+              637,
+              79
+            ]
+          ],
+          "lowerArm": [
+            [
+              637,
+              106
+            ],
+            [
+              623,
+              128
+            ]
+          ]
+        },
+        "upperCORays": [
+          [
+            [
+              633,
+              31
+            ],
+            [
+              619,
+              55
+            ]
+          ],
+          [
+            [
+              639,
+              35
+            ],
+            [
+              623,
+              61
+            ]
+          ]
+        ],
+        "upperOBox": [
+          634,
+          10,
+          653,
+          29
+        ],
+        "upperFoot": "LEFTparallelend61955 FREEwhitegapaboveincomingringarm~61959; RIGHTparallelend62361contactrightOarm. Do notforceleftcontact.",
+        "lowerCORays": [
+          [
+            [
+              620,
+              129
+            ],
+            [
+              626,
+              156
+            ]
+          ],
+          [
+            [
+              626,
+              126
+            ],
+            [
+              633,
+              154
+            ]
+          ]
+        ],
+        "lowerOBox": [
+          625,
+          161,
+          644,
+          179
+        ],
+        "lowerFoot": "Bothupperfeetcontactsourcedifferentarms/nativejoin."
+      },
+      "topByproducts": {
+        "literal": "+ 2CO₂ + H₂O",
+        "bbox": [
+          709,
+          90,
+          893,
+          114
+        ]
+      },
+      "bottomAnhydride": {
+        "ringVertices": [
+          [
+            7,
+            226
+          ],
+          [
+            45,
+            203.5
+          ],
+          [
+            83,
+            226
+          ],
+          [
+            83,
+            271
+          ],
+          [
+            45,
+            292
+          ],
+          [
+            7,
+            271
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              15,
+              232
+            ],
+            [
+              15,
+              264
+            ]
+          ],
+          [
+            [
+              49,
+              214
+            ],
+            [
+              75,
+              228
+            ]
+          ],
+          [
+            [
+              49,
+              282
+            ],
+            [
+              75,
+              268
+            ]
+          ]
+        ],
+        "upperBareCO": [
+          124,
+          213
+        ],
+        "lowerBareCO": [
+          124,
+          282
+        ],
+        "ringToUpperCO": [
+          [
+            83,
+            226
+          ],
+          [
+            122,
+            213
+          ],
+          [
+            124,
+            213
+          ]
+        ],
+        "ringToLowerCO": [
+          [
+            83,
+            271
+          ],
+          [
+            121,
+            282
+          ],
+          [
+            124,
+            282
+          ]
+        ],
+        "OBridge": {
+          "bbox": [
+            140,
+            237,
+            159,
+            255
+          ],
+          "upperArm": [
+            [
+              124,
+              213
+            ],
+            [
+              141,
+              234
+            ]
+          ],
+          "lowerArm": [
+            [
+              141,
+              262
+            ],
+            [
+              124,
+              282
+            ]
+          ]
+        },
+        "upperCORays": [
+          [
+            [
+              137,
+              186
+            ],
+            [
+              122,
+              210
+            ]
+          ],
+          [
+            [
+              142,
+              190
+            ],
+            [
+              126,
+              215
+            ]
+          ]
+        ],
+        "upperOBox": [
+          138,
+          167,
+          156,
+          185
+        ],
+        "upperFoot": "LEFTparallelend122210 FREEwhitegapaboveringarm122213; RIGHTparallelend126215contactsOarm. Ownmacroindependentlyread, nottranslatedtop.",
+        "lowerCORays": [
+          [
+            [
+              121,
+              282
+            ],
+            [
+              129,
+              310
+            ]
+          ],
+          [
+            [
+              127,
+              280
+            ],
+            [
+              136,
+              307
+            ]
+          ]
+        ],
+        "lowerOBox": [
+          127,
+          316,
+          145,
+          335
+        ],
+        "lowerFoot": "Bothfeetcontactnativearms; no whitegap."
+      },
+      "bottomArrow": {
+        "reagentLiteral": "+ 2C₂H₅OH",
+        "reagentBox": [
+          193,
+          240,
+          336,
+          264
+        ],
+        "shaft": [
+          [
+            352,
+            253
+          ],
+          [
+            534,
+            253
+          ]
+        ],
+        "filledHead": [
+          [
+            518,
+            248
+          ],
+          [
+            534,
+            253
+          ],
+          [
+            518,
+            258
+          ],
+          [
+            521,
+            253
+          ]
+        ],
+        "above": {
+          "literal": "V₂O₅, tᵒ",
+          "bbox": [
+            392,
+            221,
+            482,
+            245
+          ]
+        },
+        "below": {
+          "literal": "H₁ = 85%",
+          "bbox": [
+            382,
+            265,
+            490,
+            285
+          ]
+        }
+      },
+      "product": {
+        "ringVertices": [
+          [
+            553,
+            231
+          ],
+          [
+            591,
+            208.5
+          ],
+          [
+            628,
+            231
+          ],
+          [
+            628,
+            275
+          ],
+          [
+            591,
+            297
+          ],
+          [
+            553,
+            275
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              560,
+              237
+            ],
+            [
+              560,
+              267
+            ]
+          ],
+          [
+            [
+              595,
+              218
+            ],
+            [
+              620,
+              233
+            ]
+          ],
+          [
+            [
+              595,
+              286
+            ],
+            [
+              620,
+              272
+            ]
+          ]
+        ],
+        "upperEsterText": {
+          "literal": "COOC₂H₅",
+          "bbox": [
+            661,
+            199,
+            772,
+            222
+          ],
+          "arm": [
+            [
+              628,
+              231
+            ],
+            [
+              657,
+              216
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "lowerEsterText": {
+          "literal": "COOC₂H₅",
+          "bbox": [
+            661,
+            282,
+            772,
+            306
+          ],
+          "arm": [
+            [
+              628,
+              275
+            ],
+            [
+              657,
+              286
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "noExpandedCO": true
+      },
+      "bottomWater": {
+        "literal": "+ H₂O",
+        "bbox": [
+          789,
+          249,
+          875,
+          272
+        ]
+      },
+      "topCroppedFragments": [
+        {
+          "bboxInclusive": [
+            53,
+            0,
+            59,
+            4
+          ],
+          "shape": "Clippedserifverticalstemwithhorizontalfoot",
+          "guide": [
+            [
+              55,
+              0
+            ],
+            [
+              55,
+              3.5
+            ]
+          ],
+          "footGuide": [
+            [
+              53,
+              4
+            ],
+            [
+              59,
+              4
+            ]
+          ],
+          "strokeApprox": 1.5
+        },
+        {
+          "bboxInclusive": [
+            220,
+            0,
+            227,
+            5
+          ],
+          "shape": "ClippedJhook",
+          "guide": [
+            [
+              220,
+              1
+            ],
+            [
+              220,
+              4
+            ],
+            [
+              223,
+              4.5
+            ],
+            [
+              226,
+              2
+            ],
+            [
+              227,
+              0
+            ]
+          ],
+          "strokeApprox": 1.2
+        }
+      ],
+      "cropInstructions": "Retain2TOPUNKNOWNprosefragmentswithoutletterrestoration. Allchemicalringsinside897339; no extra outsideC.",
+      "apexIndependentPixelAudit": {
+        "nap": "y48 x48..52=>50,48.5",
+        "topAnh": "y49 x541..545=>543,49.5",
+        "bottomAnh": "y203 x43..47=>45,203.5",
+        "product": "y208 x589..593=>591,208.5",
+        "purpose": "ReadEACHnativeapexseparately, notaffinecopy/translation."
+      },
+      "noAdded": [
+        "No alias729",
+        "No H2yieldcorrection",
+        "No catalystremovalinsecondstep",
+        "No answerx+y",
+        "No restoredTOPletters",
+        "No carbonylupperleftgapfilled"
+      ],
+      "countsIncludingPrintedReagentsAndByproductsExcludingConditions": {
+        "C": 44,
+        "O": 26,
+        "explicitHFromCondensedLabelsOnly": 26,
+        "implicitSkeletalH": "Notcounted/notclaimed",
+        "conditionsExcluded": [
+          "V2O5",
+          "temperature",
+          "H1yieldlabels"
+        ],
+        "basis": {
+          "structures": {
+            "C": 38,
+            "O": 10
+          },
+          "top4O2": {
+            "O": 8
+          },
+          "top2CO2": {
+            "C": 2,
+            "O": 4
+          },
+          "topWater": {
+            "H": 2,
+            "O": 1
+          },
+          "bottom2C2H5OH": {
+            "C": 4,
+            "H": 12,
+            "O": 2
+          },
+          "bottomWater": {
+            "H": 2,
+            "O": 1
+          },
+          "DEPtwoC2H5groups": {
+            "explicitHAlreadyInStructure": 10
+          }
+        },
+        "note": "Numericcoefficients4/2 applied toatomcounts. No wholemolecularHformulainferredfromskeletalvalence. ExplicitH26 includesDEP2×H5 and2ethanolH6 plus2watersH2."
+      }
+    },
+    "measurementLimits": "Nativeapproxcoord±1–2px; explicitapexpixelrowsguidetracebutnotthresholdapproval. FourCOmacrosindividuallyseen. Top/bottomringverticesnotcopiedbytranslation. Source-onlynoSVGreview.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "hashSvg": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5",
+    "ketQua": "Đạt root own actual",
+    "source": "Root native FULL1x2x/upperCO10x/all1publicde.",
+    "actual": "FreshChromiumFULL3x/root423-982.png; opened FULL and separate top/bottom macros. BothsupOwhitegaps, BOTHH1, bothupperLEFTfree andlowercontact, allrings andlabels andTOPcrop reviewed. NativeapproxNOTsubpixel.",
+    "counts": "38C10Ostructures; 44C26OincludingreagentsbyproductsEXCLconditions; noimplicitHclaim."
+  },
+  "rootOldNewXmlAudit": {
+    "children": 46,
+    "changed": [
+      8,
+      14,
+      26,
+      36
+    ],
+    "reason": "ONLY2supOoutertranslate+8 and2upperLEFTrayfeetcontact→freegap. ALLotherchildrenEXACT; ALLglyphpathdataEXACT.",
+    "oldHash": "564faa79c6bdbdc6a43a25e05cb0427665ca053936a75b9fdc210e3a53b3be81",
+    "newHash": "5cf7f63cc7453a626536497e786bf7283f487406fce4ce32b69661cf7f0f51b5"
+  }
+}
