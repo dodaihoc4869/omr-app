@@ -1,0 +1,23 @@
+[
+  {
+    "i": 1191,
+    "hashSvg": "a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref, fresh Chromium3x FULL và macro riêng5Ph/NN/charges/conditions/caption. Năm Phmotifs/15innerCCdouble, 28fullyinsideC+1partialdiazoapex=29visibleC, firstPhbottomunknown không restore30; 7N1Cl exclHNO₂reagent. Ba NH₂-firstN, N₂ trong square/+outsideRIGHT/ClminusSUP, NN hai tia nghiêng riêng và các arm đúng. Hai fullfilledheads, +HNO₂+HCl/(1)0 - 5SUPoC/(2) giữ nguyên, ONLY(màu vàng) regularitalic restregularupright. Bottomcrop native173 giữ, glyphgaps/nhãn không chạm/cắt thêm; không yield/H/water/answer. ActualSHApre/post khớp final, không carry initial.",
+    "render": "/workspace/scratch/soat420-1191-fresh.png",
+    "macro": [
+      "/workspace/scratch/azo1191-first.png",
+      "/workspace/scratch/azo1191-diazo.png",
+      "/workspace/scratch/azo1191-aniline.png",
+      "/workspace/scratch/azo1191-product.png",
+      "/workspace/scratch/azo1191-NN.png",
+      "/workspace/scratch/azo1191-condition.png"
+    ],
+    "hash": "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878",
+    "hashSvgDaSoat": "a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec",
+    "runtimeExactHashProof": {
+      "sha256": "0e2a162d248ddd027cc1b8327fd5df3213104d0854d198fc1cf5367a5d5498ab",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/azo1191-native-ddh-a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec.svg a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec\n1191 { x: 0, y: 0, width: 964, height: 173 }\n\nPOSTSHOT_SHA a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec\nCOMMAND node /workspace/scratch/agent-render420.cjs\nCONTEXT VIP27-C3-B11-D2-III-5.hinh.0.du_lieu public de/one ref only; no answers.\n"
+    }
+  }
+]

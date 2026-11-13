@@ -1,0 +1,820 @@
+{
+  "hash": "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878",
+  "native": [
+    964,
+    173
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C3-B11-D2-III-5",
+      "de": "Một số hợp chất azo chứa nhóm chức azo (-N=N-) có màu sắc đa dạng và thường được ứng dụng rộng rãi trong công nghiệp để nhuộm vải. Một nhà máy dệt may cần sản xuất hợp chất azo màu vàng với lượng lớn để nhuộm vải may 50 000 chiếc áo thun đồng phục và 5 000 chiếc khăn trải bàn. Nguyên liệu chính được sử dụng là aniline và toàn bộ quá trình sản xuất được thực hiện theo sơ đồ chuyển hóa (hình).\nBiết rằng:\n- Mỗi chiếc áo thun đồng phục cần 1,2 m² vải với khối lượng 200 g/m².\n- Mỗi chiếc khăn trải bàn cần 3,0 m² vải với khối lượng 250 g/m².\n- Để nhuộm đạt tiêu chuẩn màu vàng cho 100 kg vải cần sử dụng 350 gam hợp chất azo trên.\n- Hiệu suất quá trình (1) đạt 85% và hiệu suất quá trình (2) tính theo các chất phản ứng đều đạt 92%.\nTổng khối lượng aniline tối thiểu mà nhà máy cần sử dụng trong quá trình sản xuất trên là bao nhiêu kg? (Làm tròn kết quả cuối cùng đến hàng phần mười).",
+      "refs": [
+        {
+          "hash": "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878",
+          "where": "VIP27-C3-B11-D2-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "b38ba3824d5fff1ff19165cf404e2deab3765da02e0d68cc2b66886aa36eab8a"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "5PhMOTIFS-28FULLinsidebareC1BOTTOMpartialC-2LEFTBOTTOMcutcontinuationsUNKNOWNtotalC-NOrestore30/7N1ClEXCLreagentconditions/15CCinnerdouble1NNdouble2SEPARATEslopingrays/3NH2-FIRSTN-N2INSIDESQUAREplusSUPoutsideRIGHT-ClminusSUP/ALLregularUPRIGHT-ONLY(màu vàng)regularITALIC/2FULLFILLEDrightheads/+HNO2+HCl/(1) 0 - 5smallSUPoC/(2)/nativeBOTTOMcrop173KEEP/NOaddedwater-yield-H-charge-answer-alias1082/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL4x/left-cond-mid-prod4x/coupler5x/NN20x/allpublicde. FivePh motifs notinitialmental4; source-only count correctedBEFOREfirstbuilder. 28fullinsideC+1bottompartialvisibleC, firstbottomvertexoutsideUNKNOWN notrestored. Allregular; captiononlyitalic. NativeapproxnotSubpixel.",
+  "independentSourceAudit": {
+    "i": 1191,
+    "assetIndexProvided": 1327,
+    "hash": "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878.png",
+    "size": [
+      964,
+      173
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C3-B11-D2-III-5",
+        "de": "Một số hợp chất azo chứa nhóm chức azo (-N=N-) có màu sắc đa dạng và thường được ứng dụng rộng rãi trong công nghiệp để nhuộm vải. Một nhà máy dệt may cần sản xuất hợp chất azo màu vàng với lượng lớn để nhuộm vải may 50 000 chiếc áo thun đồng phục và 5 000 chiếc khăn trải bàn. Nguyên liệu chính được sử dụng là aniline và toàn bộ quá trình sản xuất được thực hiện theo sơ đồ chuyển hóa (hình).\nBiết rằng:\n- Mỗi chiếc áo thun đồng phục cần 1,2 m² vải với khối lượng 200 g/m².\n- Mỗi chiếc khăn trải bàn cần 3,0 m² vải với khối lượng 250 g/m².\n- Để nhuộm đạt tiêu chuẩn màu vàng cho 100 kg vải cần sử dụng 350 gam hợp chất azo trên.\n- Hiệu suất quá trình (1) đạt 85% và hiệu suất quá trình (2) tính theo các chất phản ứng đều đạt 92%.\nTổng khối lượng aniline tối thiểu mà nhà máy cần sử dụng trong quá trình sản xuất trên là bao nhiêu kg? (Làm tròn kết quả cuối cùng đến hàng phần mười).",
+        "allHinh": [
+          {
+            "hash": "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878",
+            "where": "VIP27-C3-B11-D2-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "b38ba3824d5fff1ff19165cf404e2deab3765da02e0d68cc2b66886aa36eab8a"
+          }
+        ],
+        "missingHashes": [
+          "d7688cd9ab036cd559e84ff75d95ca6ca643f607381d8f751992f6fb49924878"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/420-full3x.png",
+        "/workspace/scratch/420-left4x.png",
+        "/workspace/scratch/420-diazo4x.png",
+        "/workspace/scratch/420-product4x.png",
+        "/workspace/scratch/420-coupler4x.png",
+        "/workspace/scratch/420-head4x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "phenylMotifs": 5,
+        "completeRingsInsideFrame": 3,
+        "croppedRingMotifs": 2,
+        "fullyInsideBareC": 28,
+        "partialVisibleDiazoApexC": 1,
+        "totalVisibleCIncludingPartial": 29,
+        "missingFirstRingBottomC": "UNKNOWN outsideframe, do notrestore/count30",
+        "visibleN": 7,
+        "Cl": 1,
+        "NNdoublePairs": 1,
+        "filledRightHeads": 2,
+        "visibleNBasisExcludingCondition": {
+          "firstNH2": 1,
+          "diazoN2": 2,
+          "couplerNH2": 1,
+          "productAzoNPlusNH2": 3
+        }
+      },
+      "font": {
+        "firstAnilineNH2": "Regularuprightserif",
+        "diazoniumN2ClAndConditions": "Regularuprightserif,2SUB,+SUPoutsidesquare,minusSUPafterCl",
+        "couplerAndProductNH2AzoN": "Regularuprightsans",
+        "caption": "RegularITALICserif exact(màu vàng)",
+        "steps": "Regularuprightserif"
+      },
+      "firstAniline": {
+        "visibleVertices": [
+          [
+            44,
+            94
+          ],
+          [
+            81,
+            115
+          ],
+          [
+            81,
+            156
+          ],
+          [
+            7,
+            156
+          ],
+          [
+            7,
+            115
+          ]
+        ],
+        "outerPathsToCrop": [
+          [
+            [
+              7,
+              156
+            ],
+            [
+              35,
+              172
+            ]
+          ],
+          [
+            [
+              81,
+              156
+            ],
+            [
+              53,
+              172
+            ]
+          ]
+        ],
+        "topEdges": [
+          [
+            [
+              7,
+              115
+            ],
+            [
+              44,
+              94
+            ],
+            [
+              81,
+              115
+            ],
+            [
+              81,
+              156
+            ]
+          ],
+          [
+            [
+              7,
+              115
+            ],
+            [
+              7,
+              156
+            ]
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              12,
+              120
+            ],
+            [
+              12,
+              151
+            ]
+          ],
+          [
+            [
+              45,
+              100
+            ],
+            [
+              74,
+              118
+            ]
+          ],
+          [
+            [
+              74,
+              152
+            ],
+            [
+              46,
+              169
+            ]
+          ]
+        ],
+        "NH2": {
+          "literal": "NH₂",
+          "bbox": [
+            34,
+            40,
+            82,
+            66
+          ],
+          "stem": [
+            [
+              44,
+              94
+            ],
+            [
+              44,
+              63
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "crop": "BottomouterarmsremainDISCONNECTEDatnativeedge, no newbottomvertex orclosingbondoutsideframe."
+      },
+      "arrow1": {
+        "shaft": [
+          [
+            95,
+            143
+          ],
+          [
+            327,
+            143
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            313,
+            138
+          ],
+          [
+            327,
+            143
+          ],
+          [
+            313,
+            148
+          ],
+          [
+            316,
+            143
+          ]
+        ],
+        "above": {
+          "literal": "+ HNO₂ + HCl",
+          "bbox": [
+            130,
+            113,
+            297,
+            137
+          ]
+        },
+        "below": {
+          "literal": "(1) 0 - 5 °C",
+          "bbox": [
+            147,
+            151,
+            272,
+            172
+          ],
+          "straightHyphen": true
+        }
+      },
+      "diazo": {
+        "visibleVertices": [
+          [
+            378,
+            88
+          ],
+          [
+            414,
+            109
+          ],
+          [
+            414,
+            151
+          ],
+          [
+            378,
+            172
+          ],
+          [
+            343,
+            151
+          ],
+          [
+            343,
+            109
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              348,
+              113
+            ],
+            [
+              348,
+              148
+            ]
+          ],
+          [
+            [
+              379,
+              94
+            ],
+            [
+              407,
+              111
+            ]
+          ],
+          [
+            [
+              407,
+              148
+            ],
+            [
+              379,
+              165
+            ]
+          ]
+        ],
+        "N2": {
+          "literal": "N₂",
+          "bbox": [
+            367,
+            35,
+            398,
+            60
+          ],
+          "stem": [
+            [
+              378,
+              88
+            ],
+            [
+              378,
+              61
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "brackets": {
+          "left": [
+            [
+              342,
+              38
+            ],
+            [
+              333,
+              38
+            ],
+            [
+              333,
+              172
+            ]
+          ],
+          "right": [
+            [
+              414,
+              38
+            ],
+            [
+              423,
+              38
+            ],
+            [
+              423,
+              172
+            ]
+          ],
+          "bottom": "BothsquarebottomendsCROPPED, do notdrawbottomhorizontalcaps."
+        },
+        "charge": {
+          "literal": "+",
+          "bbox": [
+            426,
+            26,
+            438,
+            40
+          ],
+          "outsideSquare": true
+        },
+        "Cl": {
+          "literal": "Cl",
+          "bbox": [
+            440,
+            39,
+            466,
+            61
+          ],
+          "minus": [
+            [
+              462,
+              32
+            ],
+            [
+              477,
+              32
+            ]
+          ],
+          "chargeRaised": true
+        },
+        "cropEvidence": "Nativey171darkx375..381,y172x376..379:diazoapexcorepartlyvisible, notentirelymissing. CountpartialvisibleCbutkeepclipping."
+      },
+      "coupler": {
+        "vertices": [
+          [
+            575,
+            54
+          ],
+          [
+            607,
+            71
+          ],
+          [
+            607,
+            109
+          ],
+          [
+            575,
+            127
+          ],
+          [
+            546,
+            109
+          ],
+          [
+            546,
+            71
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              551,
+              75
+            ],
+            [
+              551,
+              105
+            ]
+          ],
+          [
+            [
+              575,
+              61
+            ],
+            [
+              601,
+              76
+            ]
+          ],
+          [
+            [
+              601,
+              105
+            ],
+            [
+              576,
+              120
+            ]
+          ]
+        ],
+        "NH2": {
+          "literal": "NH₂",
+          "bbox": [
+            565,
+            5,
+            613,
+            29
+          ],
+          "stem": [
+            [
+              575,
+              54
+            ],
+            [
+              575,
+              29
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "plus": {
+          "bbox": [
+            514,
+            88,
+            529,
+            103
+          ]
+        }
+      },
+      "arrow2": {
+        "shaft": [
+          [
+            463,
+            139
+          ],
+          [
+            658,
+            139
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            642,
+            134
+          ],
+          [
+            658,
+            139
+          ],
+          [
+            642,
+            144
+          ],
+          [
+            645,
+            139
+          ]
+        ],
+        "step": {
+          "literal": "(2)",
+          "bbox": [
+            548,
+            147,
+            582,
+            169
+          ]
+        }
+      },
+      "product": {
+        "leftRing": {
+          "vertices": [
+            [
+              709,
+              86
+            ],
+            [
+              739,
+              104
+            ],
+            [
+              739,
+              140
+            ],
+            [
+              709,
+              158
+            ],
+            [
+              678,
+              140
+            ],
+            [
+              678,
+              104
+            ]
+          ],
+          "innerRays": [
+            [
+              [
+                683,
+                108
+              ],
+              [
+                683,
+                136
+              ]
+            ],
+            [
+              [
+                710,
+                93
+              ],
+              [
+                733,
+                107
+              ]
+            ],
+            [
+              [
+                733,
+                136
+              ],
+              [
+                710,
+                151
+              ]
+            ]
+          ]
+        },
+        "rightRing": {
+          "vertices": [
+            [
+              860,
+              34
+            ],
+            [
+              891,
+              52
+            ],
+            [
+              891,
+              88
+            ],
+            [
+              860,
+              104
+            ],
+            [
+              829,
+              88
+            ],
+            [
+              829,
+              52
+            ]
+          ],
+          "innerRays": [
+            [
+              [
+                835,
+                54
+              ],
+              [
+                859,
+                41
+              ]
+            ],
+            [
+              [
+                885,
+                56
+              ],
+              [
+                885,
+                83
+              ]
+            ],
+            [
+              [
+                835,
+                84
+              ],
+              [
+                859,
+                98
+              ]
+            ]
+          ]
+        },
+        "azo": {
+          "leftNbox": [
+            757,
+            77,
+            778,
+            98
+          ],
+          "rightNbox": [
+            789,
+            95,
+            810,
+            115
+          ],
+          "leftArm": [
+            [
+              739,
+              104
+            ],
+            [
+              755,
+              94
+            ]
+          ],
+          "rightArm": [
+            [
+              812,
+              98
+            ],
+            [
+              829,
+              88
+            ]
+          ],
+          "NNrays": [
+            [
+              [
+                780,
+                93
+              ],
+              [
+                788,
+                97
+              ]
+            ],
+            [
+              [
+                779,
+                99
+              ],
+              [
+                787,
+                103
+              ]
+            ]
+          ],
+          "glyphGaps": "ExplicitNlabels separatedfrombondends, nobarejunctionCadded."
+        },
+        "NH2": {
+          "literal": "NH₂",
+          "bbox": [
+            913,
+            24,
+            961,
+            49
+          ],
+          "arm": [
+            [
+              891,
+              52
+            ],
+            [
+              911,
+              40
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "caption": {
+          "literal": "(màu vàng)",
+          "bbox": [
+            755,
+            140,
+            878,
+            166
+          ],
+          "style": "regularITALICserif"
+        }
+      },
+      "noAdded": [
+        "No missingfirstbottomCrestoration",
+        "No squarebottomcaprestore",
+        "No extraH2O/NaClbyproduct",
+        "No conditions85/92fromstem",
+        "No answerforanilinemass",
+        "No ringcirclesinstead3double"
+      ]
+    },
+    "measurementLimits": "Nativeapproxcenterlines/glyphboxes±1–2px. EachfivePhmotifs ownmacros inspected; croppedcarboncountstrictlyvisible vsoutsideunknown. Nativewidth964height173 retained.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount",
+    "correctionAudit": [
+      {
+        "oldVisibleN": 6,
+        "newVisibleN": 7,
+        "reason": "Rechecked each source literal NH2/N2/N=N/NH2: atomcount must include2N in diazoN2, notone printedN glyph. Sum1+2+1+3=7 excludingHNO2condition. No literal orcoordinate changes.",
+        "reportedToParent": true
+      }
+    ]
+  },
+  "rootActualReview": {
+    "nativeFull4xLeftCondMidProduct4xCoupler5xNN20x": true,
+    "allPublicDeRead": true,
+    "freshFinalChromiumFull3xEachFivePhChargesNNConditionsCaptionBottom3xOpened": true,
+    "allRegularOnlyCaptionItalic": true,
+    "visibleC28fullPlus1partialNotRestored30": true,
+    "N7IncludingDiazoN2ExcludeReagentHNO2": true,
+    "fivePh15CC1NN2SeparatedRays": true,
+    "threeNH2TwoHeadsSquarePlusOutsideClMinus": true,
+    "sourceOnlyInitialFourPhMiscountCorrectedBeforeFirstBuilder": true,
+    "initialNegativeKept": true
+  },
+  "rootOldNewXmlAudit": {
+    "initialHash": "e51cdd844daa9bbce2013533350891fbc106d24659b0dec63d443bdd63bae982",
+    "finalHash": "a5bfda657622b01237f2497d007a87365f2e5483a6ebdb074de1b71cc3facfec",
+    "children": 51,
+    "changedChildren": [
+      3,
+      4,
+      5,
+      9,
+      10,
+      11,
+      12,
+      18,
+      19,
+      20,
+      21,
+      22,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      41,
+      42,
+      43,
+      44
+    ],
+    "onlyBondAndArrowGeometryChanged": true,
+    "allGlyphGeometryExact": true,
+    "nativeApproxNotSubpixel": true
+  }
+}
