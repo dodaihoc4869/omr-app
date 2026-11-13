@@ -5,21 +5,21 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MAC_TRONG } from '../src/lib/live-khoi/tu-do'
 import type { DuLieuTuDo } from '../src/components/phong-cho/tu-do-api'
 
-const api = vi.hoisted(() => ({ tai: 0, mac: [] as unknown[] }))
+const api = vi.hoisted(() => ({ tai: 0, mac: [] as unknown[], sanh: [] as boolean[] }))
 const DU: DuLieuTuDo = {
-  cap: 14, chuoi: 12, mo: ['mu-tot-nghiep', 'tai-nghe', 'ao-ke-o-li'], mac: { ...MAC_TRONG, mu: 'mu-tot-nghiep' },
+  day: true, cap: 14, chuoi: 12, mo: ['mu-tot-nghiep', 'tai-nghe', 'ao-ke-o-li'], mac: { ...MAC_TRONG, mu: 'mu-tot-nghiep' },
   thanhTich: { ha: 52, chuoiMax: 4, thuKhoa: 1, haThay: 0, van: 30 }, huyHieu: ['ha-10', 'ha-50', 'lien-3', 'tk-1'], doiKy: 1, danhHieu: ['tho-san'],
   thiDua: { chuTuan: '09/11 – 15/11', doi: [388, 412, 301, 276] },
 }
 vi.mock('../src/components/phong-cho/tu-do-api', () => ({
-  taiTuDo: async () => { api.tai++; return DU },
+  taiTuDo: async (_xt: unknown, sanh = false) => { api.tai++; api.sanh.push(sanh); return sanh ? { ...DU, day: false, cap: 0, chuoi: 0, mo: [] } : DU },
   macDo: async (_xt: unknown, mac: unknown) => { api.mac.push(mac); return { ok: true, mac } },
 }))
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ BAT: true, URL: 'https://may-chu.test' }) }))
 import SanhSinhTon from '../src/components/phong-cho/SanhSinhTon'
 import TuDoBeMa from '../src/components/phong-cho/TuDoBeMa'
 
-afterEach(() => { cleanup(); vi.useRealTimers(); api.tai = 0; api.mac = [] })
+afterEach(() => { cleanup(); vi.useRealTimers(); api.tai = 0; api.mac = []; api.sanh = [] })
 
 describe('thẻ sảnh + tủ đồ (đợt 4)', () => {
   it('lượt vẽ đầu: một nút «Chơi», chưa đọc; sau khi hiện ⇒ đội cả kỳ, danh hiệu, 4 vạch xếp cao → thấp, nút «Tủ đồ»', async () => {
@@ -36,6 +36,11 @@ describe('thẻ sảnh + tủ đồ (đợt 4)', () => {
     const vach = [...document.querySelectorAll('.sst-td li')].map((li) => li.textContent)
     expect(vach).toEqual(['Kali412', 'Natri388', 'Đồng301', 'Canxi276'])
     expect(screen.getByRole('button', { name: 'Chơi' })).toBeTruthy()
+    expect(api.sanh).toEqual([true]) // thẻ: bản nhẹ, máy chủ không tính chuỗi ngày
+    fireEvent.click(screen.getByRole('button', { name: 'Tủ đồ' }))
+    await screen.findByRole('dialog', { name: 'Tủ đồ bé ma' })
+    expect(api.sanh).toEqual([true, false]) // bấm «Tủ đồ» mới tải bản đầy đủ
+    expect(screen.getByText('Cấp 20 · em đang cấp 14')).toBeTruthy()
   })
   it('thầy đã bắt đầu ⇒ không đọc dữ liệu thẻ', async () => {
     vi.useFakeTimers()

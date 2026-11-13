@@ -15,6 +15,7 @@ import { kiemVeDau, tenGoi } from './dau-ion-ve'
 import { chuoiBaiNeuBat } from './chuoi-ngay-bai-d1'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import { khoiTuLop } from './live-khoi'
+import { DemTTL } from './dem-chung'
 import {
   DANH_HIEU, chuTuan, chuanMac, dsDaMo, huyHieuDat, kiemMac, maHocKy, maTuan, tuanTruoc, xetDanhHieu,
   type BoMac, type DongTuan, type ThanhTich, type TienDoEm,
@@ -32,6 +33,8 @@ export const SQL_SINH_TON_DU_LIEU = [
 ] as const
 /** Tạo bảng (một lần mỗi isolate) — chỉ đường GHI gọi. */
 export const taoBang = (env: Env) => chayDdlMotLan(env, 'sinh_ton_du_lieu', SQL_SINH_TON_DU_LIEU)
+/** Đệm hai tuần thi đua (xem `docHaiTuan`). */
+const demTuan = new DemTTL<Row[]>(60_000, 8)
 
 const so0 = (v: unknown): number => { const n = Math.floor(Number(v)); return Number.isFinite(n) && n > 0 ? n : 0 }
 const RE_SBD = /^[A-Za-z0-9_-]{1,40}$/
@@ -84,6 +87,7 @@ export async function ghiCuoiVanSinhTon(env: Env, phong: { ma: string; luc?: num
       ON CONFLICT (sbd) DO UPDATE SET ha = ha + excluded.ha, chuoi_max = MAX(chuoi_max, excluded.chuoi_max), thu_khoa = thu_khoa + excluded.thu_khoa,
         ha_thay = ha_thay + excluded.ha_thay, van = van + excluded.van, luc = excluded.luc`).bind(ds, luc),
   ])
+  demTuan.xoaKhoa(tuan)
   return { ghi: gop.size }
 }
 
@@ -97,7 +101,6 @@ async function emSom(env: Env, b: Dong): Promise<{ sbd: string; xong: Promise<st
   return gameIdentityHaiBuoc(env, b)
 }
 const rongNeuLoi = <T>(p: Promise<T>, rong: T): Promise<T> => p.catch(() => rong)
-const tatCa = (env: Env, sql: string, ...v: unknown[]) => rongNeuLoi(env.DB.prepare(sql).bind(...v).all<Row>().then((r) => r.results ?? []), [] as Row[])
 const mot = (env: Env, sql: string, ...v: unknown[]) => rongNeuLoi(env.DB.prepare(sql).bind(...v).first<Row>(), null)
 
 /** Cấp EXP (thần thú) + chuỗi ngày (chuỗi theo chặng nếu bật cho em, không thì chuỗi ngày cũ) — hai nguồn đọc song song. */
@@ -112,19 +115,30 @@ const lopCuaDong = (r: Row | null): string => String((r?.ten_lop as string) || (
 const dongTuan = (r: Row): DongTuan => ({ sbd: String(r.sbd), ha: so0(r.ha), dietTk: so0(r.diet_tk), haThay: so0(r.ha_thay) })
 const vachDoi = (ds: readonly Row[]): number[] => { const v = [0, 0, 0, 0]; for (const r of ds) { const d = Number(r.doi); if (d >= 0 && d < 4) v[d]! += so0(r.ha) } return v }
 const SQL_TUAN_HAI = `SELECT t.tuan, t.sbd, t.doi, t.ha, t.diet_tk, t.ha_thay, h.lop, h.ten_lop, h.ho_ten FROM st_tuan t LEFT JOIN hoc_sinh h ON h.sbd = t.sbd WHERE t.tuan IN (?, ?)`
+/** Hai tuần thi đua của CẢ trung tâm (một lệnh) — đệm 60 giây mỗi isolate theo tuần: vạch thi đua không cần sống từng giây, 78 em vào phòng chờ cùng lúc chỉ tốn một lượt đọc.
+ *  Đọc lỗi / bảng chưa có ⇒ rỗng, KHÔNG đệm. Ghi cuối ván trong cùng isolate ⇒ bỏ đệm tuần ấy. */
+async function docHaiTuan(envDoc: Env, tuan: string, truoc: string, nay: number): Promise<Row[]> {
+  const co = demTuan.doc(tuan, nay)
+  if (co) return co
+  const r = await envDoc.DB.prepare(SQL_TUAN_HAI).bind(tuan, truoc).all<Row>().then((x) => x.results ?? [], () => null)
+  if (r) demTuan.ghi(tuan, nay, r)
+  return r ?? []
+}
 
-/** Tủ đồ + thành tích + thẻ sảnh của em (một đợt đọc song song). */
+/** Tủ đồ + thành tích + thẻ sảnh của em (một đợt đọc song song). `b.sanh === true` (thẻ sảnh tự nạp khi em vào phòng chờ): BỎ cấp + chuỗi ngày + đồ đã mở —
+ *  chuỗi ngày (đọc ~400 ngày sổ học) chỉ tính lúc em MỞ tủ đồ, không ở đường vào phòng. */
 export async function hsTuDo(env: Env, b: Dong, envDoc: Env = env, nay = Date.now()): Promise<Dong> {
   let em: { sbd: string; xong: Promise<string> }
   try { em = await emSom(env, b) } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
   const sbd = em.sbd, ky = maHocKy(nay), tuan = maTuan(nay), truoc = tuanTruoc(tuan)
-  const pTien = docTienDo(env, envDoc, sbd, nay)
+  const sanh = b.sanh === true
+  const pTien: Promise<TienDoEm | null> = sanh ? Promise.resolve(null) : docTienDo(env, envDoc, sbd, nay)
   const pDoc = Promise.all([
     mot(envDoc, 'SELECT mu, ao, dan, ha FROM st_mac WHERE sbd = ?', sbd),
     mot(envDoc, 'SELECT ha, chuoi_max, thu_khoa, ha_thay, van FROM st_thanh_tich WHERE sbd = ?', sbd),
     mot(envDoc, 'SELECT doi FROM st_doi_ky WHERE sbd = ? AND ky = ?', sbd, ky),
     mot(envDoc, "SELECT h.lop, h.ten_lop, (SELECT lop FROM danh_sach WHERE sbd = x.s LIMIT 1) AS lop_ds FROM (SELECT ? AS s) x LEFT JOIN hoc_sinh h ON h.sbd = x.s", sbd),
-    tatCa(envDoc, SQL_TUAN_HAI, tuan, truoc),
+    docHaiTuan(envDoc, tuan, truoc, nay),
   ])
   pDoc.catch(() => 0); pTien.catch(() => 0)
   try { await em.xong } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
@@ -146,7 +160,7 @@ export async function hsTuDo(env: Env, b: Dong, envDoc: Env = env, nay = Date.no
   const thanhTich: ThanhTich = { ha: so0(tt?.ha), chuoiMax: so0(tt?.chuoi_max), thuKhoa: so0(tt?.thu_khoa), haThay: so0(tt?.ha_thay), van: so0(tt?.van) }
   const boMac: BoMac = chuanMac(mac)
   return {
-    ok: true, cap: tien.cap, chuoi: tien.chuoi, mo: dsDaMo(tien), mac: boMac,
+    ok: true, ...(tien ? { cap: tien.cap, chuoi: tien.chuoi, mo: dsDaMo(tien) } : {}), mac: boMac,
     thanhTich, huyHieu: huyHieuDat(thanhTich), doiKy: doi, hocKy: ky,
     danhHieu: xetDanhHieu(truocKhoi.map(dongTuan)).filter((d) => d.sbd.includes(sbd)).map((d) => d.loai),
     thiDua: { tuan, chuTuan: chuTuan(tuan), doi: vachDoi(nayLop) },
@@ -174,7 +188,7 @@ export async function gvThiDua(envDoc: Env, b: Dong, nay = Date.now()): Promise<
   const khoi = [10, 11, 12].includes(Number(b.khoi)) ? Number(b.khoi) : null, lop = typeof b.lop === 'string' ? b.lop.trim() : ''
   if (!khoi && !lop) return { ok: false, error: 'Thiếu khối hoặc lớp.' }
   const tuan = maTuan(nay), truoc = tuanTruoc(tuan)
-  const ds = await tatCa(envDoc, SQL_TUAN_HAI, tuan, truoc)
+  const ds = await docHaiTuan(envDoc, tuan, truoc, nay)
   const trong = (r: Row) => { const l = String((r.ten_lop as string) || (r.lop as string) || ''); return khoi ? (khoiTuLop(l) ?? khoiTuLop(r.lop)) === khoi : l === lop }
   const ten = new Map(ds.map((r) => [String(r.sbd), tenGoi(r.ho_ten) || 'Một bạn']))
   const nayDs = ds.filter((r) => r.tuan === tuan && trong(r)), truocDs = ds.filter((r) => r.tuan === truoc && trong(r))

@@ -7,9 +7,9 @@
 //  · mặc đồ chưa mở ⇒ từ chối, không ghi; đã mở ⇒ lưu; danh hiệu tuần trước đúng người; thầy mới xem được tên.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const chuoi = vi.hoisted(() => ({ so: 0 }))
-vi.mock('../server/src/chuoi-ngay-bai-d1', () => ({ chuoiBaiNeuBat: async () => null }))
-vi.mock('../server/src/chuoi-ngay-hoc', () => ({ docChuoiNgayHoc: async () => chuoi.so }))
+const chuoi = vi.hoisted(() => ({ so: 0, doc: 0 }))
+vi.mock('../server/src/chuoi-ngay-bai-d1', () => ({ chuoiBaiNeuBat: async () => { chuoi.doc++; return null } }))
+vi.mock('../server/src/chuoi-ngay-hoc', () => ({ docChuoiNgayHoc: async () => { chuoi.doc++; return chuoi.so } }))
 
 import { taoD1That, type D1That } from './_d1-that'
 import { kyVeDau } from '../server/src/dau-ion-ve'
@@ -82,7 +82,7 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
     if (cap) d.sql.prepare('INSERT INTO game_v2_profile (sbd, revision, json, created_at) VALUES (?, 0, ?, ?)').run(sbd, JSON.stringify({ cap }), '2026-11-01')
   }
   beforeEach(() => {
-    d = taoD1That(); chuoi.so = 0
+    d = taoD1That(); chuoi.so = 0; chuoi.doc = 0
     vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(nay)
     for (let i = 1; i <= 8; i++) themEm(`A${i}`, `Nguyễn Văn An ${i}`, '11A2', i === 1 ? 14 : 0)
     themEm('B1', 'Trần Thị Gia Bảo', '11A3'); themEm('C1', 'Lê Minh Châu', '12A1')
@@ -132,6 +132,19 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
     const batch = vi.spyOn(d.env.DB, 'batch')
     expect(await ghiCuoiVanSinhTon(d.env, { ma: 'x', luc: nay }, [{ id: '~a', ha: 3 }])).toEqual({ ghi: 0 })
     expect(batch).not.toHaveBeenCalled()
+  })
+
+  it('thẻ sảnh (bản nhẹ `sanh`) KHÔNG đọc chuỗi ngày / cấp; mở tủ đồ (bản đầy đủ) mới đọc', async () => {
+    chuoi.so = 12
+    const ve = await veCua('A1')
+    const nhe = await goi('/hs/bpu/st-tu-do', { ve, sanh: true })
+    expect(chuoi.doc).toBe(0)
+    expect(nhe).toMatchObject({ ok: true, hocKy: '2026-HK1' })
+    expect(nhe).not.toHaveProperty('chuoi'); expect(nhe).not.toHaveProperty('cap'); expect(nhe).not.toHaveProperty('mo')
+    expect([0, 1, 2, 3]).toContain(nhe.doiKy)
+    const day = await goi('/hs/bpu/st-tu-do', { ve })
+    expect(chuoi.doc).toBeGreaterThan(0)
+    expect(day).toMatchObject({ cap: 14, chuoi: 12, mo: ['mu-tot-nghiep', 'tai-nghe', 'ao-ke-o-li'] })
   })
 
   it('mặc đồ: chưa mở ⇒ từ chối, KHÔNG ghi; đã mở ⇒ lưu, tủ đồ trả đúng bộ đang mặc', async () => {

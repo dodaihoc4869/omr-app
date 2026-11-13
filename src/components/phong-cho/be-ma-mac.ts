@@ -1,5 +1,5 @@
 // VẼ BÉ MA MẶC ĐỒ cho tủ đồ + thẻ sảnh (đợt 4). Thân bé ma nướng bằng ĐÚNG hàm của trò (src/components/live-khoi/sinh-ton-hinh.ts — CHỈ nhập, không sửa);
-// trang phục vẽ CHỒNG lên trong tệp này (hàm nướng của trò chưa có tham số đồ). Bước ghép có thể dời `veDo` vào bộ nướng của trò (cùng toạ độ hộp 70 × 84).
+// trang phục vẽ CHỒNG lên trong tệp này (hàm nướng của trò chưa có tham số đồ). Bước ghép gọi `veDoTrenMa` ngay sau khi nướng thân (cùng toạ độ hộp 70 × 84).
 // Màu chỉ đọc biến CSS (--st-* nền luôn tối, token đội / trạng thái) — không mã màu thô.
 import { BoHinh, HINH_MA, MA_OX, MA_OY, PHONG_TAY, dat, mau, pha, taoBangMau, type BangMau, type Rgb } from '../live-khoi/sinh-ton-hinh'
 import type { BoMac } from '../../lib/live-khoi/tu-do'
@@ -87,6 +87,14 @@ function veHieuUng(g: G, b: BangMau, ma: string): void {
   }
 }
 
+/** BƯỚC GHÉP dùng: vẽ áo rồi mũ của bộ đồ lên bé ma, trong HỆ HỘP 70 × 84 của sinh-ton-hinh (gọi trong hàm nướng, sau khi vẽ thân, trước khi lật hướng nếu có). */
+export function veDoTrenMa(g: G, b: BangMau, mac: Partial<BoMac>): void {
+  if (mac.ao) veAo(g, b, mac.ao)
+  if (mac.mu) veMu(g, b, mac.mu)
+}
+/** Vệt đạn / hiệu ứng khi hạ của bộ đồ (hệ khung 90 × 100) — bước ghép thay bằng hiệu ứng trên sân. */
+export { veHieuUng }
+
 export interface VeBeMa { doi: number; mac: Partial<BoMac>; /** Ô của ngăn vệt đạn / khi hạ: chỉ vẽ hiệu ứng này. */ hieuUng?: string | null; /** Ô đang khoá ⇒ mờ. */ mo?: boolean }
 /** Vẽ vào canvas (cỡ CSS `w × h` px, đã gắn trong DOM để đọc màu). Trả false nếu máy không có canvas 2D. */
 export function veBeMaMac(c: HTMLCanvasElement, o: VeBeMa): boolean {
@@ -101,8 +109,7 @@ export function veBeMaMac(c: HTMLCanvasElement, o: VeBeMa): boolean {
     g.beginPath(); g.ellipse(NEO_X, NEO_Y + 6, 20, 4.6, 0, 0, Math.PI * 2); g.fillStyle = mau(b.bong, 0.35); g.fill()
     dat(g, new BoHinh(b, k, false).ma(Math.max(0, Math.min(3, o.doi | 0)), false, 0), NEO_X, NEO_Y)
     g.save(); g.translate(NEO_X - MA_OX, NEO_Y - MA_OY)
-    if (o.mac.ao) veAo(g, b, o.mac.ao)
-    if (o.mac.mu) veMu(g, b, o.mac.mu)
+    veDoTrenMa(g, b, o.mac)
     g.restore()
   }
   if (o.mo) { g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-atop'; g.fillStyle = mau(b.giay, 0.55); g.fillRect(0, 0, c.width, c.height); g.globalCompositeOperation = 'source-over' }

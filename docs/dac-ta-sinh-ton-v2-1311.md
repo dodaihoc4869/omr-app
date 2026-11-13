@@ -159,3 +159,11 @@ Vào trận (đầu ván) · đang chơi · trốn trong bụi · khiên · bấ
   3. truy nã + hộp 4 loại + biểu cảm + bảng vàng;
   4. Thầy vào trận + Ma Mực;
   5. tủ đồ + đội cả kỳ + thi đua tuần + danh hiệu (D1 chỉ-thêm).
+
+## Đợt 4 đã build (13/11) — dữ liệu ngoài trận + quy ước cố định
+- **Bảng D1 CHỈ-THÊM** (tạo tại chỗ bằng `chayDdlMotLan`, chỉ ở đường ghi): `st_mac (sbd, mu, ao, dan, ha, luc)` · `st_tuan (tuan, sbd, doi, ha, bi_ha, ha_thay, diet_tk, van)` · `st_thanh_tich (sbd, ha, chuoi_max, thu_khoa, ha_thay, van, luc)` · `st_doi_ky (sbd, ky, doi, luc)`.
+- **Tuần** = thứ Hai 00:00 giờ VN; mã tuần = ngày thứ Hai (`2026-11-09`). **Học kỳ**: HK1 tháng 8 → 1, HK2 tháng 2 → 7; mã theo năm bắt đầu năm học (`2026-HK1` = 8/2026 … 1/2027).
+- **Đội cả học kỳ**: đội BPU ở phòng live KHÔNG cố định theo em (chia lại theo năng lực mỗi buổi) ⇒ bảng riêng `st_doi_ky`, gán lần đầu vào đội ít em nhất trong cùng lớp. Phòng live giữ cách xếp đội cũ.
+- **Thi đua tuần** luôn cộng theo ĐỘI CẢ KỲ (không theo đội trong trận). Vạch ở thẻ sảnh theo **lớp** của em; máy thầy theo **khối**. **Danh hiệu tuần** xét theo **khối**, trao từ số tuần trước, chỉ em thật.
+- **Đường** (POST, qua bộ chuyển sẵn có ở `server/src/ws-thang.ts`, index.ts không thêm byte): `/hs/bpu/st-tu-do` (`sanh: true` = bản nhẹ của thẻ sảnh, không đọc chuỗi ngày) · `/hs/bpu/st-mac` · `/gv/bpu/st-thi-dua`. Em xác thực bằng vé phòng chờ ca (`ve`) hoặc token game.
+- **Ghi cuối ván** (bước ghép gọi): `ghiCuoiVanSinhTon(env, { ma, luc?, idThay? }, dsKetQua)` — một `batch` cả phòng, bỏ máy bù `~…` và bé ma Thầy.

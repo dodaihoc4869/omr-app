@@ -5,6 +5,7 @@ import { DO_BE_MA, chuanMac, chuanThanhTich, type BoMac, type LoaiDanhHieu, type
 
 export type XacThucEm = { ve: string } | { token: string }
 export interface DuLieuTuDo {
+  /** Đủ cấp + chuỗi + đồ đã mở (lệnh đầy đủ, lúc mở tủ đồ); false = bản nhẹ của thẻ sảnh. */ day: boolean
   cap: number; chuoi: number; mo: string[]; mac: BoMac; thanhTich: ThanhTich; huyHieu: string[]
   /** Đội cả học kỳ (0 Natri · 1 Kali · 2 Đồng · 3 Canxi) — null khi chưa gán được. */ doiKy: number | null
   danhHieu: LoaiDanhHieu[]
@@ -30,6 +31,7 @@ export function docDuLieuTuDo(j: Record<string, unknown> | null): DuLieuTuDo | n
   const td = (j.thiDua ?? {}) as Record<string, unknown>, doi = Number(j.doiKy)
   const vach = Array.isArray(td.doi) ? td.doi.slice(0, 4).map((x) => Math.max(0, Math.floor(Number(x)) || 0)) : []
   return {
+    day: Array.isArray(j.mo),
     cap: Math.max(0, Math.floor(Number(j.cap)) || 0), chuoi: Math.max(0, Math.floor(Number(j.chuoi)) || 0),
     mo: Array.isArray(j.mo) ? j.mo.filter((m): m is string => typeof m === 'string' && MA_DO.has(m)) : [],
     mac: chuanMac(j.mac), thanhTich: chuanThanhTich(j.thanhTich),
@@ -40,7 +42,8 @@ export function docDuLieuTuDo(j: Record<string, unknown> | null): DuLieuTuDo | n
   }
 }
 
-export const taiTuDo = async (xt: XacThucEm): Promise<DuLieuTuDo | null> => docDuLieuTuDo(await goi('/hs/bpu/st-tu-do', xt))
+/** `sanh`: bản nhẹ cho thẻ sảnh (không cấp / chuỗi / đồ đã mở — máy chủ không đọc sổ học). */
+export const taiTuDo = async (xt: XacThucEm, sanh = false): Promise<DuLieuTuDo | null> => docDuLieuTuDo(await goi('/hs/bpu/st-tu-do', sanh ? { ...xt, sanh: true } : xt))
 /** Mặc đồ: máy chủ kiểm quyền. Trả bộ đồ đã lưu, hoặc câu báo vì sao không mặc được. */
 export async function macDo(xt: XacThucEm, mac: BoMac): Promise<{ ok: true; mac: BoMac } | { ok: false; chu: string }> {
   const j = await goi('/hs/bpu/st-mac', { ...xt, mac })
