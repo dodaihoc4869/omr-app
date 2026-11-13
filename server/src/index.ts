@@ -3953,7 +3953,6 @@ const boXuLy = {
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
       if (p === '/hs/diem-danh') return ra(await hsDiemDanhBao(env, b, ctx))
       if (p.startsWith('/hs/bpu/')) return ra(await bpuHs(env, p, b, ctx))
-      if (p.startsWith('/sinh-ton/')) return ra(await import('./sinh-ton-du-lieu').then((m) => m.sinhTonDuLieu(env, p, b, laThay(req, env, b), envDoc))) // Sinh Tồn đợt 4: tủ đồ · mặc đồ (em) · thi đua tuần (thầy, tự kiểm mã)
       // Vé kênh đẩy hai thiết bị (kenh-day.ts): kiểm chữ ký token, 0 lệnh D1.
       if (p === DUONG_VE_KENH) return ra(await kenhVe(env, b))
 

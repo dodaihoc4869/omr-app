@@ -51,6 +51,8 @@ export async function bpuHs(env: Env, p: string, b: Row, ctx?: ExecutionContext)
   if (p === '/hs/bpu/ve') return hsBpuVe(env, b)
   if (p === '/hs/bpu/cua-em') return hsBpuCuaEm(env, b)
   if (p.startsWith('/hs/bpu/khoi-')) return (await import('./live-khoi')).hsLiveKhoi(env, p, b, Date.now(), ctx)
+  // Sinh Tồn đợt 4 (sinh-ton-du-lieu.ts): tủ đồ + thẻ sảnh, mặc đồ — token em hoặc vé phòng chờ ca.
+  if (p.startsWith('/hs/bpu/st-')) return (await import('./sinh-ton-du-lieu')).sinhTonDuLieu(env, p, b, false)
   return { ok: false, error: 'Không có lệnh này.' }
 }
 /** `/gv/bpu/*` (sau chốt mã bí mật của thầy). */
@@ -59,6 +61,8 @@ export async function bpuGv(env: Env, p: string, b: Row, ctx?: ExecutionContext)
   if (p === '/gv/bpu/luot') return gvBpuLuot(env, b, ctx)
   if (p === '/gv/bpu/nap') return gvBpuNap(env, b)
   if (p.startsWith('/gv/bpu/khoi-')) return (await import('./live-khoi')).gvLiveKhoi(env, p, b, Date.now(), ctx)
+  // Sinh Tồn đợt 4: thi đua đội tuần + danh hiệu theo khối / lớp (máy thầy).
+  if (p.startsWith('/gv/bpu/st-')) return (await import('./sinh-ton-du-lieu')).sinhTonDuLieu(env, p, b, true)
   // Sổ «mời ra khỏi lớp» của buổi live (luật rời màn 13/11): văn phòng trực live đọc để nhắn Zalo phụ huynh. ĐỌC-CHỈ, một lệnh D1.
   if (p === '/gv/bpu/moi-ra') return (await import('./live-moi-ra')).gvLiveMoiRa(env, b)
   if (p === '/gv/bpu/live-thong-ke') return (await import('./live-moi-ra')).gvLiveThongKe(env, b, (id) => import('./phong-binh-phan-ung').then((m) => m.bpuThongKe(env, id)))

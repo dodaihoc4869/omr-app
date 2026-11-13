@@ -1,11 +1,11 @@
 // DỮ LIỆU NGOÀI TRẬN của trò «Sinh Tồn · Trang vở» (đợt 4 — đặc tả docs/dac-ta-sinh-ton-v2-1311.md mục 8–10 + mục 4): tủ đồ bé ma, thành tích, đội cả học kỳ,
 // thi đua đội tuần, danh hiệu tuần. Lõi thuần (danh mục đồ, quyền mặc, huy hiệu, tuần / học kỳ, xét danh hiệu) ở src/lib/live-khoi/tu-do.ts — dùng chung máy em.
 //
-// ĐƯỜNG (Worker chỉ nhận POST — thân JSON; index.ts chuyển MỘT dòng mọi `/sinh-ton/*` vào đây, trước cổng mã bí mật):
-//  · `/sinh-ton/tu-do`  (em: `token` game HOẶC `ve` = vé phòng chờ ca): cấp EXP, chuỗi ngày, đồ đã mở + đang mặc, thành tích + huy hiệu, đội cả kỳ,
+// ĐƯỜNG (Worker chỉ nhận POST — thân JSON; đi qua bộ chuyển `/hs/bpu/*` · `/gv/bpu/*` sẵn có ở ws-thang.ts ⇒ index.ts KHÔNG thêm byte nào — tệp sát trần cỡ):
+//  · `/hs/bpu/st-tu-do`  (em: `token` game HOẶC `ve` = vé phòng chờ ca): cấp EXP, chuỗi ngày, đồ đã mở + đang mặc, thành tích + huy hiệu, đội cả kỳ,
 //    danh hiệu tuần của em (trao từ tuần trước), thi đua tuần của LỚP em (4 vạch, không tên bạn). Đọc SONG SONG một đợt; em chưa có đội cả kỳ ⇒ gán (một lô, một lần / học kỳ).
-//  · `/sinh-ton/mac`    (em): mặc đồ — máy chủ KIỂM quyền mở theo cấp + chuỗi đọc lại tại chỗ, lưu `st_mac`.
-//  · `/sinh-ton/thi-dua` (thầy, mã bí mật; `khoi` 10/11/12 hoặc `lop`): 4 vạch tuần này + người đang dẫn danh hiệu tuần này + danh hiệu tuần trước (có tên).
+//  · `/hs/bpu/st-mac`    (em): mặc đồ — máy chủ KIỂM quyền mở theo cấp + chuỗi đọc lại tại chỗ, lưu `st_mac`.
+//  · `/gv/bpu/st-thi-dua` (thầy, sau cổng mã bí mật; `khoi` 10/11/12 hoặc `lop`): 4 vạch tuần này + người đang dẫn danh hiệu tuần này + danh hiệu tuần trước (có tên).
 // GHI CUỐI VÁN: `ghiCuoiVanSinhTon` (bước ghép gọi khi đóng phòng / mỗi 5 ván) — MỘT `batch` cho cả phòng, bỏ máy bù (`~…`) và bé ma Thầy.
 // Bảng CHỈ-THÊM, tạo tại chỗ bằng `chayDdlMotLan` CHỈ ở đường ghi; đường đọc bảng chưa có ⇒ coi như rỗng.
 import type { Env } from './kieu'
@@ -185,10 +185,10 @@ export async function gvThiDua(envDoc: Env, b: Dong, nay = Date.now()): Promise<
   }
 }
 
-/** Cửa vào từ index.ts (MỘT dòng): `/sinh-ton/tu-do` · `/sinh-ton/mac` (em) · `/sinh-ton/thi-dua` (thầy). */
+/** Cửa vào từ ws-thang.ts: `/hs/bpu/st-tu-do` · `/hs/bpu/st-mac` (em) · `/gv/bpu/st-thi-dua` (thầy — `thay` chỉ đúng khi đi qua `bpuGv`, sau cổng mã bí mật). */
 export async function sinhTonDuLieu(env: Env, p: string, b: Dong, thay: boolean, envDoc: Env = env): Promise<Dong> {
-  if (p === '/sinh-ton/tu-do') return hsTuDo(env, b, envDoc)
-  if (p === '/sinh-ton/mac') return hsMacDo(env, b, envDoc)
-  if (p === '/sinh-ton/thi-dua') return thay ? gvThiDua(envDoc, b) : { ok: false, error: 'Sai mã bí mật' }
+  if (p === '/hs/bpu/st-tu-do') return hsTuDo(env, b, envDoc)
+  if (p === '/hs/bpu/st-mac') return hsMacDo(env, b, envDoc)
+  if (p === '/gv/bpu/st-thi-dua') return thay ? gvThiDua(envDoc, b) : { ok: false, error: 'Sai mã bí mật' }
   return { ok: false, error: 'Không có lệnh này.' }
 }

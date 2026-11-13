@@ -13,6 +13,7 @@ vi.mock('../server/src/chuoi-ngay-hoc', () => ({ docChuoiNgayHoc: async () => ch
 
 import { taoD1That, type D1That } from './_d1-that'
 import { kyVeDau } from '../server/src/dau-ion-ve'
+import { bpuGv, bpuHs } from '../server/src/ws-thang'
 import { ghiCuoiVanSinhTon, sinhTonDuLieu, taoBang, SQL_SINH_TON_DU_LIEU } from '../server/src/sinh-ton-du-lieu'
 import {
   DO_BE_MA, NGAN_DO, chuTuan, dieuKienChu, dongDieuKien, huyHieuDat, kiemMac, maHocKy, maTuan, tuanTruoc, xetDanhHieu, THANH_TICH_TRONG,
@@ -89,12 +90,15 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
   afterEach(() => { vi.useRealTimers() })
 
   it('đường đọc khi bảng CHƯA có (chưa ván nào) ⇒ vẫn trả tủ đồ, tự gán đội cả kỳ', async () => {
-    const r = await goi('/sinh-ton/tu-do', { ve: await veCua('A1') })
+    const r = await goi('/hs/bpu/st-tu-do', { ve: await veCua('A1') })
     expect(r).toMatchObject({ ok: true, cap: 14, chuoi: 0, mac: { mu: null, ao: null, dan: null, ha: null }, hocKy: '2026-HK1', thiDua: { tuan: '2026-11-09', doi: [0, 0, 0, 0] } })
     expect(r.mo).toEqual(['ao-ke-o-li'])
     expect([0, 1, 2, 3]).toContain(r.doiKy)
-    expect((await goi('/sinh-ton/tu-do', { ve: await veCua('A1') })).doiKy).toBe(r.doiKy) // cố định
-    expect((await goi('/sinh-ton/tu-do', { ve: 'gia.mao' })).ok).toBe(false)
+    expect((await goi('/hs/bpu/st-tu-do', { ve: await veCua('A1') })).doiKy).toBe(r.doiKy) // cố định
+    expect((await goi('/hs/bpu/st-tu-do', { ve: 'gia.mao' })).ok).toBe(false)
+    // Đi qua bộ chuyển sẵn có (ws-thang.ts): em ⇒ /hs/bpu/st-*, thầy ⇒ /gv/bpu/st-* (index.ts không thêm byte).
+    expect((await bpuHs(d.env, '/hs/bpu/st-tu-do', { ve: await veCua('A2') })).ok).toBe(true)
+    expect((await bpuGv(d.env, '/gv/bpu/st-thi-dua', { khoi: 11 })).ok).toBe(true)
   })
 
   it('ghi cuối ván: MỘT batch, bỏ máy bù + bé ma Thầy, cộng dồn, hạ liền lấy MAX, đội chia đều theo lớp, thi đua theo đội cả kỳ', async () => {
@@ -117,7 +121,7 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
     const doiA1 = (d.sql.prepare("SELECT doi FROM st_doi_ky WHERE sbd = 'A1'").get() as { doi: number }).doi
     expect(t1.doi).toBe(doiA1)
     // Thẻ sảnh: vạch lớp 11A2 = tổng lượt hạ theo đội cả kỳ (1+..+8 = 36, + 4 của ván sau).
-    const r2 = await goi('/sinh-ton/tu-do', { ve: await veCua('A1') })
+    const r2 = await goi('/hs/bpu/st-tu-do', { ve: await veCua('A1') })
     expect((r2.thiDua as { doi: number[] }).doi.reduce((a, b) => a + b, 0)).toBe(40)
     expect(r2.doiKy).toBe(doiA1)
     expect(r2.thanhTich).toEqual({ ha: 5, chuoiMax: 5, thuKhoa: 1, haThay: 0, van: 3 })
@@ -133,12 +137,12 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
   it('mặc đồ: chưa mở ⇒ từ chối, KHÔNG ghi; đã mở ⇒ lưu, tủ đồ trả đúng bộ đang mặc', async () => {
     chuoi.so = 12
     const ve = await veCua('A1')
-    const tu = await goi('/sinh-ton/mac', { ve, mac: { mu: 'mu-phu-thuy' } })
+    const tu = await goi('/hs/bpu/st-mac', { ve, mac: { mu: 'mu-phu-thuy' } })
     expect(tu).toMatchObject({ ok: false, ma: 'chua_mo' })
     const coBang = d.sql.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name = 'st_mac'").get() as { n: number }
     if (coBang.n) expect(d.dem('st_mac')).toBe(0)
-    expect(await goi('/sinh-ton/mac', { ve, mac: { mu: 'mu-tot-nghiep', ao: 'ao-ke-o-li', dan: null, ha: null } })).toMatchObject({ ok: true })
-    const r = await goi('/sinh-ton/tu-do', { ve })
+    expect(await goi('/hs/bpu/st-mac', { ve, mac: { mu: 'mu-tot-nghiep', ao: 'ao-ke-o-li', dan: null, ha: null } })).toMatchObject({ ok: true })
+    const r = await goi('/hs/bpu/st-tu-do', { ve })
     expect(r.mac).toEqual({ mu: 'mu-tot-nghiep', ao: 'ao-ke-o-li', dan: null, ha: null })
     expect(r.mo).toEqual(['mu-tot-nghiep', 'tai-nghe', 'ao-ke-o-li'])
   })
@@ -148,13 +152,13 @@ describe('máy chủ (D1 giả chạy SQL thật)', () => {
     await ghiCuoiVanSinhTon(d.env, { ma: 'p', luc: tuanTr, idThay: 'T' }, [
       { id: 'A2', ha: 9, dietTk: 1 }, { id: 'B1', ha: 12, dietTk: 0, haThay: 1 }, { id: 'A3', ha: 2, dietTk: 3 }, { id: 'C1', ha: 40 }, { id: '~b', ha: 99 },
     ])
-    const b1 = await goi('/sinh-ton/tu-do', { ve: await veCua('B1') })
+    const b1 = await goi('/hs/bpu/st-tu-do', { ve: await veCua('B1') })
     expect(b1.danhHieu).toEqual(['tho-san', 'ha-thay']) // C1 khối 12 không tính vào khối 11; máy bù không bao giờ
-    expect((await goi('/sinh-ton/tu-do', { ve: await veCua('A3') })).danhHieu).toEqual(['pha-tk'])
-    expect((await goi('/sinh-ton/tu-do', { ve: await veCua('A2') })).danhHieu).toEqual([])
-    expect(await goi('/sinh-ton/thi-dua', { khoi: 11 })).toMatchObject({ ok: false })
+    expect((await goi('/hs/bpu/st-tu-do', { ve: await veCua('A3') })).danhHieu).toEqual(['pha-tk'])
+    expect((await goi('/hs/bpu/st-tu-do', { ve: await veCua('A2') })).danhHieu).toEqual([])
+    expect(await goi('/gv/bpu/st-thi-dua', { khoi: 11 })).toMatchObject({ ok: false })
     await ghiCuoiVanSinhTon(d.env, { ma: 'p', luc: nay }, [{ id: 'A4', ha: 6 }])
-    const gv = await goi('/sinh-ton/thi-dua', { khoi: 11 }, true)
+    const gv = await goi('/gv/bpu/st-thi-dua', { khoi: 11 }, true)
     expect(gv).toMatchObject({ ok: true, tuan: '2026-11-09', chuTuan: '09/11 – 15/11', soEm: 1 })
     expect(gv.danhHieuTuanNay).toEqual([{ loai: 'tho-san', ten: 'Thợ săn tuần', nguoi: ['An 4'], so: 6 }])
     expect((gv.danhHieuTuanTruoc as { ten: string; nguoi: string[] }[]).map((x) => `${x.ten}: ${x.nguoi.join(', ')}`)).toEqual(['Thợ săn tuần: Gia Bảo', 'Kẻ phá thủ khoa: An 3', 'Hạ gục Thầy: Gia Bảo'])
