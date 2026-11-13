@@ -58,6 +58,9 @@ html[data-bpu-an] [data-live-khoi-thay] { display: none; }
 [data-live-khoi-nen] { position: fixed; inset: 0; z-index: 99980; background: var(--tr-chieu-bang); }
 html[data-bpu-an] [data-live-khoi-nen] { display: none; }
 html[data-live-khoi] .lop-xem-phieu { left: 0 !important; }
+/* 13/11 thầy «thanh màu trắng này cho cùng màu với thanh của tin nhắn lớp»: dải đầu 48 px (chỗ nút đóng) của tờ riêng do tấm hoạt động mở ⇒ cùng nền
+   với đầu cột «Tin nhắn lớp» (`--lc-nen-2` của chat.css, máy thầy: slate-950 pha slate-900); viền mỏng quanh khung tờ cũng theo nền ấy. */
+html[data-live-khoi] .lop-xem-phieu { background: color-mix(in srgb, var(--slate-950) 55%, var(--slate-900)); }
 html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] { padding-top: 0 !important; }
 /* chỉ tờ CỦA BẢNG (gan-gv, nhãn «Tờ chiếu Bình Phản Ứng») bỏ dải đầu + nút đóng; tờ do tấm hoạt động tự mở (Chữa câu khó, Kiểm tra đầu giờ…) giữ nút đóng để thầy quay lại tấm */
 html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] .khung-phieu-thanh, html[data-live-khoi] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"] .nut-dong-phieu { display: none !important; }
