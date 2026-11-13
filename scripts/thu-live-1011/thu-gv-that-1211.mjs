@@ -225,6 +225,34 @@ const nBang3 = await netEm(em1, tiLeBang, true)
 kiem('3T7b bấm Tab 6 lần liên tiếp: tờ và phòng dừng ở cùng một chế độ («bang»), nét trên máy em vẫn nguyên, đúng chỗ', st()?.live?.khoi?.che === 'bang' && (await toT.locator('body.mc-che-bang').count()) === 1 && netGiong(nBang3, nBang1), JSON.stringify({ che: st()?.live?.khoi?.che, sau: nBang3 }))
 kiem('3T7c tờ riêng đang chiếu: nút nổi «Về màn chiếu» của tấm KHÔNG đè lên thanh đáy của tờ', await gv.evaluate(() => { const n = document.querySelector('.lkt-ve-noi'); return !n || getComputedStyle(n).display === 'none' }))
 
+// ── LZ. CHẤM LAZE (thầy 13/11: «nút laze để lại nhưng cho tôi một phím tắt để bật tắt và nó phải soi được mọi chỗ trên màn chiếu nhé, mặc định tắt nhé»):
+//        phím P trên tờ ⇒ app giữ trạng thái ⇒ chấm đỏ bám chuột ở MỌI chỗ trên tờ; máy em vẽ chấm đỏ đúng chỗ (gói con trỏ mang cờ laze, không ghi xem lại).
+{
+  const doLaze = () => toT.locator('body').evaluate(() => { const c = document.querySelector('.mc-laze'); return { hien: !!c && !c.hidden, an: document.documentElement.classList.contains('mc-lz-hien') } })
+  const doDo = async (p) => { const anh = (await p.screenshot({ type: 'png' })).toString('base64'); return p.evaluate(async (b64) => { const i = new Image(); i.src = 'data:image/png;base64,' + b64; await i.decode(); const c = document.createElement('canvas'); c.width = i.width; c.height = i.height; const g = c.getContext('2d'); g.drawImage(i, 0, 0); const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let k = 0; k < d.length; k += 4) if (d[k] > 200 && d[k + 1] < 90 && d[k + 2] < 90) n++; return n }, anh) }
+  const giua = { x: oB.x + oB.w * 0.5, y: oB.y + oB.h * 0.5 }
+  await gv.mouse.move(giua.x, giua.y, { steps: 3 }); await ngu(500)
+  const lz0 = await doLaze(), do0 = await doDo(em1)
+  kiem('LZ0 MẶC ĐỊNH TẮT: rê chuột trên tờ không có chấm laze, con trỏ thường', !lz0.hien && !lz0.an, JSON.stringify({ lz0, do0 }))
+  await toT.locator('body').press('p'); await ngu(400)
+  for (let i = 0; i < 8; i++) { await gv.mouse.move(giua.x + i * 6, giua.y); await ngu(40) }
+  await ngu(900)
+  const lz1 = await doLaze(), do1 = await doDo(em1)
+  await chup(gv, 'lz-1-gv'); await chup(em1, 'lz-1-em')
+  kiem('LZ1 phím P: chấm laze bám chuột trên tờ của thầy (con trỏ hệ thống ẩn); máy em hiện chấm ĐỎ', lz1.hien && lz1.an && do1 > do0 + 20, JSON.stringify({ lz1, do0, do1 }))
+  const kt = await gv.locator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu thật"] iframe').boundingBox()
+  await gv.mouse.move(kt.x + kt.width * 0.5, kt.y + kt.height - 6, { steps: 3 }); await ngu(300)
+  const lz2 = await doLaze()
+  kiem('LZ2 chấm soi MỌI chỗ: chuột xuống thanh đáy của tờ (ngoài bảng) chấm vẫn hiện', lz2.hien, JSON.stringify(lz2))
+  await gv.mouse.move(giua.x, giua.y, { steps: 3 }); await ngu(2600)
+  const do3 = await doDo(em1)
+  kiem('LZ3 thầy giữ yên chuột 2,6 giây để chỉ bài: máy em VẪN còn chấm đỏ (tờ nhắc vị trí)', do3 > do0 + 20, JSON.stringify({ do0, do3 }))
+  await toT.locator('body').press('p'); await gv.mouse.move(giua.x + 10, giua.y, { steps: 2 }); await ngu(2300)
+  const lz4 = await doLaze(), do4 = await doDo(em1)
+  kiem('LZ4 phím P lần nữa: TẮT — tờ thầy hết chấm, máy em hết chấm đỏ', !lz4.hien && !lz4.an && do4 <= do0 + 20, JSON.stringify({ lz4, do0, do4 }))
+  await gv.mouse.move(1300, 300, { steps: 2 })
+}
+
 // ── MT. MÁY TÍNH «Đỗ Đại Học FX4869» (thầy 12/11, bản vẽ 31–34): nút trên thanh đáy của tờ ⇒ máy tính nổi, bấm được, kéo được, máy em thấy y hệt ──
 const mtGv = gv.locator('.mtx-lop .mtx'), mtEm = (p) => p.locator('.mtx-lop-em .mtx')
 const bamMt = async (...ds) => { for (const d of ds) { await gv.locator(`.mtx-lop .mtx-p[aria-label="${d}"]`).click(); await ngu(40) } }

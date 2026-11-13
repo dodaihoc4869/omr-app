@@ -107,6 +107,8 @@ const KHOA_TANG = 'ddh.live.tang-tieng'
 const docTang = (v: unknown): number => { const n = Number(v); return n === 3 || n === 6 || n === 9 ? n : 0 }
 
 let to: Window | null = null
+/** 13/11 CHẤM LAZE (phím P): app giữ trạng thái, MẶC ĐỊNH TẮT, không nhớ qua lần mở; báo tờ đang chiếu bằng lệnh `live-lz` (live-laze-to-chieu.ts). */
+let lzBat = false
 let lt: LiveThay | null = null
 let dangNap: Promise<void> | null = null
 let ttLt: TrangThaiLiveThay | null = null
@@ -461,12 +463,13 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   const m = (d ?? {}) as TinTo
   nghe()
   if (view?.live?.khoi && nguon) { const tr = toTren(); if (tr && tr !== nguon) return } // tờ đang bị che: không cho chen vào gương bảng
-  if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false; if (view?.live?.khoi && m.viec !== 'chao') guiTo({ lenh: 'live-anh' }) }
+  if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false; if (view?.live?.khoi && m.viec !== 'chao') guiTo({ lenh: 'live-anh' }); guiTo({ lenh: 'live-lz', bat: lzBat }) }
   switch (m.viec) {
-    case 'chao': bangSan = false; nopCu = ''; luatCu = ''; bao(); guiNop(); guiLuat(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); if (mtMo) guiTo({ lenh: 'live-mt', mo: true }); break
+    case 'chao': bangSan = false; nopCu = ''; luatCu = ''; bao(); guiNop(); guiLuat(); if (lzBat) guiTo({ lenh: 'live-lz', bat: true }); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); if (mtMo) guiTo({ lenh: 'live-mt', mo: true }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break
+    case 'lz': doiLaze(); break
     // Tờ trong buổi live theo khối báo «Lên bảng» / chấm (thầy 12/11 «lên bảng máy hs chưa hiện thông báo, bấm đạt không đạt cũng chưa hiện») ⇒ lệnh vào phòng:
     // máy em hiện «… lên bảng» + con dấu. Không sbd = tờ chưa có em ⇒ bảng (đang ẩn) chọn em như phím L. Em chưa vào phòng ⇒ nói rõ cho thầy trên tờ.
     case 'len': {
@@ -547,6 +550,8 @@ export function batLiveKhoi(): 'cho' | 'dang' {
   if (!l.bat && !dangBat) void bat(l.tieng === 'chua-cau-hinh')
   return 'dang'
 }
+/** Phím P (trên tờ hoặc ở cửa sổ app): bật / tắt chấm laze. */
+export function doiLaze(): void { lzBat = !lzBat; guiTo({ lenh: 'live-lz', bat: lzBat }) }
 export function bamTuBang(): boolean {
   nghe()
   const l = view?.live
@@ -559,6 +564,6 @@ export function bamTuBang(): boolean {
 /** Cho test: xoá trạng thái mô-đun. */
 export function _datLaiLiveThay(): void {
   clearTimeout(henHuy); clearInterval(henMuc); henMuc = undefined
-  lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; ttCu = ''; ghiNap = false; ghiMoc = null; nhacGhiDen = 0
+  lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; lzBat = false; ttCu = ''; ghiNap = false; ghiMoc = null; nhacGhiDen = 0
   guong.khoa = ''; guong.net = []; bangLuu = null; bangSan = false; maCua.clear(); lucRoi.clear(); lucTay.clear(); micLoiThay = null; clearTimeout(henMicLoi); giayCuoi = giayDaGui = ''; liveTruoc = false; coEmNoi = false; loiMic = ''; demMuc = 0
 }

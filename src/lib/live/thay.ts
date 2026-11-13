@@ -50,7 +50,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   let dangNoi: Promise<void> | null = null, huyRoi = false
   let t0Live = 0, tuBat = false, daThayBat = false
   const net = new Map<string, NetGui>()
-  let henXa: unknown = null, lucWs = -1e9, lucDc = -1e9, troCho: { x: number; y: number; dc?: boolean } | null = null, cuonCho: { x: number; y: number; dc?: boolean } | null = null
+  let henXa: unknown = null, lucWs = -1e9, lucDc = -1e9, troCho: { x: number; y: number; lz?: boolean; dc?: boolean } | null = null, cuonCho: { x: number; y: number; dc?: boolean } | null = null
   let henNhip: unknown = null, lucTieng = 0, lucNet = 0, lucNhip = 0
   let doEm: Record<string, unknown> | null = null, rtt: number | null = null, duong: string | null = null
   // Tiếng của em đang phát mic trên bảng.
@@ -544,8 +544,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     }
     // Con trỏ lơ lửng + (11/11) độ cuộn của bảng đen (`tro` có x > 1,5): hai ô chờ riêng để cái này không đè cái kia.
     // Đường DataChannel gửi ngay, mỗi vị trí một lần (kể cả khi đường WebSocket còn phải chờ lượt). Trả true = đã gửi xong mọi đường cần gửi.
-    const guiTro = (o: { x: number; y: number; dc?: boolean }): boolean => {
-      const k = maTro({ phien, tGui, x: o.x, y: o.y })
+    const guiTro = (o: { x: number; y: number; lz?: boolean; dc?: boolean }): boolean => {
+      const k = maTro({ phien, tGui, x: o.x, y: o.y, lz: o.lz })
       if (coDc && !o.dc) { if (dcDuoc) { try { dc!.send(k); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } o.dc = true; daDc = true } else conDc = true }
       if (canWs) { if (nghen) return !coDc || !!o.dc; if (!wsDuoc) { conWs = true; return false } tuy.kenh.guiNhiPhan(k); dem.goiWs += 1; lucWs = nay; wsDuoc = false }
       return !coDc || !!o.dc
@@ -609,7 +609,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     } else if (sk.loai === 'tro') {
       if (!dangLive()) return
       if (sk.x > 1.5) cuonCho = { x: sk.x, y: sk.y }
-      else troCho = { x: sk.x, y: sk.y }
+      else troCho = sk.lz ? { x: sk.x, y: sk.y, lz: true } : { x: sk.x, y: sk.y } // 13/11 chấm laze (phím P trên tờ)
       henXaSau(XA_MS)
     }
   }

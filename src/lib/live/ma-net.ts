@@ -23,7 +23,8 @@ export type GoiDiem = { phien: number; tGui: number } & (
   /** `tu` = chỉ số (trong nét) của điểm đầu gói; `diem[i][3]` = ms kể từ đầu nét (như bộ máy bút); `tGoc` = giờ live của thầy lúc nét bắt đầu
    *  ⇒ giờ live của một điểm = `tGoc + diem[i][3]`. */
   | { k: 'diem'; dau: DauNet; tGoc: number; tu: number; diem: DiemBut[] }
-  | { k: 'tro'; x: number; y: number }
+  /** (13/11) `lz` = thầy đang bật CHẤM LAZE (phím P): máy em vẽ chấm đỏ thay cây bút. Gói 14 byte (thêm 1 byte cờ cuối); máy em bản cũ đọc x, y và bỏ qua byte thừa. */
+  | { k: 'tro'; x: number; y: number; lz?: boolean }
   /** `tong` = tổng số điểm của nét (máy em biết mình đã đủ chưa). */
   | { k: 'nhac'; id: string; tong: number })
 
@@ -155,8 +156,8 @@ export function maGoiDiem(o: { phien: number; tGui: number; dau: DauNet; tGoc: n
   ghiDau(g, o.dau); g.i32(o.tGoc); g.u16(o.tu + bo); g.u32(ds.length ? so(ds[0]![3]) : 0); g.u8(ds.length); ghiDiem(g, ds)
   return g.xong()
 }
-export function maTro(o: { phien: number; tGui: number; x: number; y: number }): Uint8Array<ArrayBuffer> {
-  const g = dauGoi(MA_DIEM.tro, o.phien, o.tGui, 13); g.u24(so(o.x) * CHIA); g.u24(so(o.y) * CHIA); return g.xong()
+export function maTro(o: { phien: number; tGui: number; x: number; y: number; lz?: boolean }): Uint8Array<ArrayBuffer> {
+  const g = dauGoi(MA_DIEM.tro, o.phien, o.tGui, o.lz ? 14 : 13); g.u24(so(o.x) * CHIA); g.u24(so(o.y) * CHIA); if (o.lz) g.u8(1); return g.xong()
 }
 export function maNhac(o: { phien: number; tGui: number; id: string; tong: number }): Uint8Array<ArrayBuffer> {
   const g = dauGoi(MA_DIEM.nhac, o.phien, o.tGui, 7 + ID_TOI_DA + 1 + 2); g.chu(o.id, ID_TOI_DA); g.u16(o.tong); return g.xong()
@@ -169,7 +170,7 @@ export function giaiGoi(goi: ArrayBuffer | Uint8Array, phien?: number): GoiDiem 
     const d = new Doc(b), ma = d.u8(), ph = d.u16(), tGui = d.u32()
     if (phien != null && ph !== (phien & 65535)) return null
     if (ma === MA_DIEM.diem) { const dau = docDau(d), tGoc = d.i32(), tu = d.u16(), tDau = d.u32(), n = d.u8(); return { phien: ph, tGui, k: 'diem', dau, tGoc, tu, diem: docDiem(d, n, tDau) } }
-    if (ma === MA_DIEM.tro) return { phien: ph, tGui, k: 'tro', x: d.u24() / CHIA, y: d.u24() / CHIA }
+    if (ma === MA_DIEM.tro) { const x = d.u24() / CHIA, y = d.u24() / CHIA; return b.length >= 14 && d.u8() === 1 ? { phien: ph, tGui, k: 'tro', x, y, lz: true } : { phien: ph, tGui, k: 'tro', x, y } }
     if (ma === MA_DIEM.nhac) return { phien: ph, tGui, k: 'nhac', id: d.chu(), tong: d.u16() }
     return null
   } catch { return null }

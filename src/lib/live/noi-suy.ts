@@ -51,9 +51,10 @@ export interface NetDangViet {
 }
 /** Cây bút của thầy trên máy em: `cham` = đang chạm bảng (đang viết) · false = lơ lửng. `mau` = màu nét gần nhất ('' = chưa biết);
  *  `net` = mã nét đang viết ('' khi lơ lửng) — lớp vẽ dùng để biết điểm này tính theo bảng cuộn hay theo giấy. */
-export interface ButThay { x: number; y: number; cham: boolean; mau: string; net: string }
+/** `lz` (13/11) = con trỏ lơ lửng của thầy đang ở chế độ CHẤM LAZE (phím P) ⇒ lớp vẽ vẽ chấm đỏ thay cây bút. */
+export interface ButThay { x: number; y: number; cham: boolean; mau: string; net: string; lz?: boolean }
 export interface KhungPhat {
-  net: NetDangViet[]; tro: { x: number; y: number } | null; but: ButThay | null; d: number
+  net: NetDangViet[]; tro: { x: number; y: number; lz?: boolean } | null; but: ButThay | null; d: number
   /** (11/11) ĐỘ CUỘN bảng đen của thầy tại mốc phát (số lần bề dọc cửa sổ thầy); null = chưa nhận được (lớp vẽ tự trôi theo bút). */
   cuon: number | null
 }
@@ -125,7 +126,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
   // Nét vừa phát XONG / vừa có bản chốt: gói điểm của nó còn tới muộn (gói lặp, mạng rung, đường phụ chậm) thì bỏ — không dựng lại thành một nét «ma».
   const daXong = new Map<string, number>()
   const ghiXong = (id: string, luc: number): void => { daXong.set(id, luc); if (daXong.size > 80) for (const [k, t] of daXong) { if (luc - t > 15_000 || daXong.size > 60) daXong.delete(k); else break } }
-  let troHang: { t: number; x: number; y: number }[] = []
+  let troHang: { t: number; x: number; y: number; lz?: boolean }[] = []
   // Độ cuộn bảng đen của thầy (gói `tro` có x > 1,5): hàng chờ theo giờ gửi + giá trị đã tới mốc phát.
   let cuonHang: { t: number; v: number }[] = [], cuonNay: number | null = null
   // Lệch đồng hồ: min theo hai xô 5 giây (xô hiện tại + xô trước) ⇒ bám được trôi đồng hồ mà không giữ mẫu.
@@ -179,7 +180,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
       if (phu) return
       if (g.x <= 1.5) butDaRoi(g.tGui - 30)
       if (g.tGui <= tp) return
-      const h: { t: number }[] = g.x > 1.5 ? cuonHang : troHang, m = g.x > 1.5 ? { t: g.tGui, v: g.y } : { t: g.tGui, x: g.x, y: g.y }
+      const h: { t: number }[] = g.x > 1.5 ? cuonHang : troHang, m = g.x > 1.5 ? { t: g.tGui, v: g.y } : g.lz ? { t: g.tGui, x: g.x, y: g.y, lz: true } : { t: g.tGui, x: g.x, y: g.y }
       let i = h.length
       while (i > 0 && h[i - 1]!.t > g.tGui) i--
       h.splice(i, 0, m)
@@ -338,9 +339,10 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     const a = troHang[0], b = troHang[1]
     if (a && a.t <= moc) {
       if (b && b.t > a.t) { const k = kep((moc - a.t) / (b.t - a.t), 0, 1); tro = { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k } }
-      else if (moc - a.t < 1500) tro = { x: a.x, y: a.y } // con trỏ đứng yên quá 1,5 giây không có gói mới ⇒ ẩn
+      else if (moc - a.t < 1500) tro = { x: a.x, y: a.y } // con trỏ đứng yên quá 1,5 giây không có gói mới ⇒ ẩn (laze: tờ nhắc lại vị trí 0,7 giây một lần)
+      if (tro && a.lz) tro.lz = true
     }
-    const but: ButThay | null = dauBut ? { x: dauBut.x, y: dauBut.y, cham: true, mau: mauBut, net: netBut } : tro ? { x: tro.x, y: tro.y, cham: false, mau: mauBut, net: '' } : null
+    const but: ButThay | null = dauBut ? { x: dauBut.x, y: dauBut.y, cham: true, mau: mauBut, net: netBut } : tro ? { x: tro.x, y: tro.y, cham: false, mau: mauBut, net: '', ...(tro.lz ? { lz: true } : {}) } : null
     // độ cuộn của thầy: áp đúng lúc mốc phát đi qua (cùng nhịp với nét)
     while (cuonHang.length && cuonHang[0]!.t <= moc) cuonNay = cuonHang.shift()!.v
     return { net: ra, tro, but, d, cuon: cuonNay }
