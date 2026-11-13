@@ -1,0 +1,23 @@
+[
+  {
+    "i": 244,
+    "hashSvg": "15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref, fresh Chromium3x FULL/macro từngring/frontfeet/wave/bridge. 12C11O gồm6freeOH2CH₂OH/2ringO1bridgeO, 12nums1..6each đúng. Bốn taper/hai boldfront6px, chân vertical liền front không spike/notch; hướng OH/CH₂OH giữ nguồn, không thêm OHrightC4/H. Wave phải4crests4troughs bắt từ anomericC, đầu free có whitegap trước OH. BridgeO/firstC-firstO/sub2 và tất cả nums/chemical regularupright, glyphgaps sạch không chạm/crop/tràn; noanswer/alias. ActualruntimeSHApre/post đúng.",
+    "render": "/workspace/scratch/soat421-244-fresh.png",
+    "macro": [
+      "/workspace/scratch/malt244-left.png",
+      "/workspace/scratch/malt244-right.png",
+      "/workspace/scratch/malt244-frontL.png",
+      "/workspace/scratch/malt244-frontR.png",
+      "/workspace/scratch/malt244-wave.png",
+      "/workspace/scratch/malt244-bridge.png"
+    ],
+    "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+    "hashSvgDaSoat": "15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b",
+    "runtimeExactHashProof": {
+      "sha256": "c2a0f4e9ee7339d48b4260261f4260972ed0612f79bf0d19abd66d2e7703d101",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/malt244-native-ddh-15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b.svg 15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b\n244 { x: 0, y: 0, width: 574, height: 185 }\n\nPOSTSHOT_SHA 15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b\nCOMMAND node /workspace/scratch/agent-render421.cjs\nCONTEXT VIP27-C2-B7-D1-II-3.hinh.0.du_lieu public de/one ref only; no answers.\n"
+    }
+  }
+]

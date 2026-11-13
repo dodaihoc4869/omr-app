@@ -1,0 +1,637 @@
+{
+  "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+  "native": [
+    574,
+    185
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C2-B7-D1-II-3",
+      "de": "Phân tử maltose có cấu tạo như sau:",
+      "refs": [
+        {
+          "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+          "where": "VIP27-C2-B7-D1-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "beb6e294754f725f097b67865c7cb4aba4c8e94ce9d47d36b99ad6bbefbf670e"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "12C11O-6freeOH2CH2OH8hydroxylO-2ringO1bridgeO/2Haworth4TAPER2boldfront6pxVERTICALfeet77-172and349-443/12regularnums1..6EACH/RIGHTwave4crests4troughs-LEFTjunction49493-RIGHTfree51993-WHITEgapbeforeOH/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO/0standaloneH-caption-arrows/NOextraOHrightC4-alphaBeta-answer-alias64-149/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL5x/LEFT-RIGHT5x/wave-frontfeet-top15x/allpublicde. 12C11O6freeOH2CH2OH, no OHrightC4. FourTAPERverticalfeet77-172/349-4436px. Fourwavecrest-troughnot8cycles. Allregular black, nativeAAfringenotdatacolors. NativeapproxnotSubpixel.",
+  "independentSourceAudit": {
+    "i": 244,
+    "assetIndexProvided": 1306,
+    "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c.png",
+    "size": [
+      574,
+      185
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C2-B7-D1-II-3",
+        "de": "Phân tử maltose có cấu tạo như sau:",
+        "allHinh": [
+          {
+            "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+            "where": "VIP27-C2-B7-D1-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "beb6e294754f725f097b67865c7cb4aba4c8e94ce9d47d36b99ad6bbefbf670e"
+          }
+        ],
+        "missingHashes": [
+          "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/421-full3x.png",
+        "/workspace/scratch/421-wave.png",
+        "/workspace/scratch/421-frontL.png",
+        "/workspace/scratch/421-frontR.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "C": 12,
+        "O": 11,
+        "freeOH": 6,
+        "CH2OH": 2,
+        "ringO": 2,
+        "bridgeO": 1,
+        "carbonNumberLabels": 12,
+        "TAPER": 4,
+        "boldFronts": 2,
+        "wavyCrests": 4,
+        "wavyTroughs": 4,
+        "standaloneH": 0
+      },
+      "font": "Allregularuprightserif OH/O/CH2OH andsmaller1..6numbers.2SUB. No actualboldatom/caption; coloredfringesantialiasnotblue/orangeatomdata.",
+      "left": {
+        "ringCPositions": {
+          "1": [
+            229,
+            98
+          ],
+          "2": [
+            172,
+            128
+          ],
+          "3": [
+            77,
+            128
+          ],
+          "4": [
+            23,
+            98
+          ],
+          "5": [
+            91,
+            62
+          ]
+        },
+        "ringO": {
+          "bbox": [
+            172,
+            54,
+            188,
+            70
+          ]
+        },
+        "thinBackBonds": [
+          [
+            [
+              23,
+              98
+            ],
+            [
+              91,
+              62
+            ],
+            [
+              167,
+              62
+            ]
+          ],
+          [
+            [
+              190,
+              69
+            ],
+            [
+              229,
+              98
+            ]
+          ]
+        ],
+        "tapers": [
+          {
+            "tip": [
+              23,
+              98
+            ],
+            "broadVerticalFoot": [
+              [
+                77,
+                125
+              ],
+              [
+                77,
+                131
+              ]
+            ]
+          },
+          {
+            "tip": [
+              229,
+              98
+            ],
+            "broadVerticalFoot": [
+              [
+                172,
+                125
+              ],
+              [
+                172,
+                131
+              ]
+            ]
+          }
+        ],
+        "boldHorizontal": {
+          "from": [
+            77,
+            128
+          ],
+          "to": [
+            172,
+            128
+          ],
+          "widthApprox": 6
+        },
+        "CH2OH": {
+          "literal": "CH₂OH",
+          "bbox": [
+            83,
+            13,
+            154,
+            34
+          ],
+          "stem": [
+            [
+              91,
+              34
+            ],
+            [
+              91,
+              62
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "freeOH": [
+          {
+            "carbon": "4",
+            "literal": "OH",
+            "bbox": [
+              15,
+              128,
+              47,
+              144
+            ],
+            "stem": [
+              [
+                23,
+                98
+              ],
+              [
+                23,
+                124
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "carbon": "3",
+            "literal": "OH",
+            "bbox": [
+              69,
+              80,
+              104,
+              97
+            ],
+            "stem": [
+              [
+                77,
+                128
+              ],
+              [
+                77,
+                100
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "carbon": "2",
+            "literal": "OH",
+            "bbox": [
+              164,
+              160,
+              198,
+              177
+            ],
+            "stem": [
+              [
+                172,
+                128
+              ],
+              [
+                172,
+                155
+              ]
+            ],
+            "anchor": "FIRST O"
+          }
+        ],
+        "numberCenters": {
+          "1": [
+            229,
+            81
+          ],
+          "2": [
+            171,
+            109
+          ],
+          "3": [
+            78,
+            146
+          ],
+          "4": [
+            29,
+            84
+          ],
+          "5": [
+            83,
+            52
+          ],
+          "6": [
+            77,
+            20
+          ]
+        }
+      },
+      "right": {
+        "ringCPositions": {
+          "1": [
+            494,
+            93
+          ],
+          "2": [
+            443,
+            124
+          ],
+          "3": [
+            349,
+            124
+          ],
+          "4": [
+            296,
+            92
+          ],
+          "5": [
+            363,
+            57
+          ]
+        },
+        "ringO": {
+          "bbox": [
+            443,
+            49,
+            460,
+            66
+          ]
+        },
+        "thinBackBonds": [
+          [
+            [
+              296,
+              92
+            ],
+            [
+              363,
+              57
+            ],
+            [
+              439,
+              57
+            ]
+          ],
+          [
+            [
+              462,
+              66
+            ],
+            [
+              494,
+              93
+            ]
+          ]
+        ],
+        "tapers": [
+          {
+            "tip": [
+              296,
+              92
+            ],
+            "broadVerticalFoot": [
+              [
+                349,
+                121
+              ],
+              [
+                349,
+                127
+              ]
+            ]
+          },
+          {
+            "tip": [
+              494,
+              93
+            ],
+            "broadVerticalFoot": [
+              [
+                443,
+                121
+              ],
+              [
+                443,
+                127
+              ]
+            ]
+          }
+        ],
+        "boldHorizontal": {
+          "from": [
+            349,
+            124
+          ],
+          "to": [
+            443,
+            124
+          ],
+          "widthApprox": 6
+        },
+        "CH2OH": {
+          "literal": "CH₂OH",
+          "bbox": [
+            354,
+            8,
+            426,
+            29
+          ],
+          "stem": [
+            [
+              363,
+              29
+            ],
+            [
+              363,
+              57
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "freeOH": [
+          {
+            "carbon": "3",
+            "literal": "OH",
+            "bbox": [
+              341,
+              76,
+              374,
+              93
+            ],
+            "stem": [
+              [
+                349,
+                124
+              ],
+              [
+                349,
+                96
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "carbon": "2",
+            "literal": "OH",
+            "bbox": [
+              436,
+              155,
+              469,
+              172
+            ],
+            "stem": [
+              [
+                443,
+                124
+              ],
+              [
+                443,
+                151
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "carbon": "1",
+            "literal": "OH",
+            "bbox": [
+              524,
+              84,
+              558,
+              101
+            ],
+            "stemType": "WAVY",
+            "anchor": "FIRST O"
+          }
+        ],
+        "numberCenters": {
+          "1": [
+            497,
+            78
+          ],
+          "2": [
+            441,
+            105
+          ],
+          "3": [
+            349,
+            141
+          ],
+          "4": [
+            299,
+            80
+          ],
+          "5": [
+            354,
+            48
+          ],
+          "6": [
+            349,
+            15
+          ]
+        },
+        "wavyRight": {
+          "orderedTurns": [
+            [
+              494,
+              93
+            ],
+            [
+              497,
+              95
+            ],
+            [
+              500,
+              90
+            ],
+            [
+              503,
+              95
+            ],
+            [
+              506,
+              90
+            ],
+            [
+              509,
+              95
+            ],
+            [
+              512,
+              90
+            ],
+            [
+              515,
+              95
+            ],
+            [
+              518,
+              90
+            ],
+            [
+              519,
+              93
+            ]
+          ],
+          "crests": [
+            [
+              500,
+              90
+            ],
+            [
+              506,
+              90
+            ],
+            [
+              512,
+              90
+            ],
+            [
+              518,
+              90
+            ]
+          ],
+          "troughs": [
+            [
+              497,
+              95
+            ],
+            [
+              503,
+              95
+            ],
+            [
+              509,
+              95
+            ],
+            [
+              515,
+              95
+            ]
+          ],
+          "strokeApprox": 1.6,
+          "ends": "LeftjoinsC1, rightstopsx519leavingwhitegapbeforeOHglyphx524; no clippedwavyends/noarrowhead.",
+          "instruction": "Sourcepixelirregularwave, useindividualguidesnotlongerperiodic8cyclewave."
+        }
+      },
+      "bridgeO": {
+        "literal": "O",
+        "bbox": [
+          253,
+          110,
+          269,
+          126
+        ],
+        "leftArm": [
+          [
+            229,
+            98
+          ],
+          [
+            249,
+            110
+          ]
+        ],
+        "rightArm": [
+          [
+            273,
+            110
+          ],
+          [
+            296,
+            92
+          ]
+        ],
+        "warning": "RightC4onlybridge, NOextraOHbelowit. Count6freeOHnot7."
+      },
+      "crop": "Entirefigureinside574×185, no missinglabelsrestored. No caption.",
+      "noAdded": [
+        "No Hstandalone",
+        "No extraC4OHright",
+        "No alpha/betacaptions",
+        "No stereohash",
+        "No numbercolors",
+        "No glycosidicanglelabel"
+      ]
+    },
+    "measurementLimits": "Approxnativecoordinates±1px; eachfrontmacrofreshlycreatedandopened, feetverticalattwofrontcarbonpositions notnormaloffset. Fourwavecrests/troughsfromown12x, no guessedcycles. CountsfromliteralOHpositions, notmaltosename.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull5xLeftRight5xWaveFrontFeetTop15x": true,
+    "allPublicDeRead": true,
+    "freshChromiumFull3xEachRingWaveBridge3xOpened": true,
+    "C12O11FreeOH6CH2OH2HydroxylO8": true,
+    "fourTapersTwoBold6pxVerticalFeet77_172_349_443": true,
+    "twelveNumbersAllRegularUpright": true,
+    "rightWaveFourCrestsFourTroughsWhiteOHGap": true,
+    "noExtraRightC4OHNoStandaloneH": true,
+    "nativeApproxNotSubpixel": true,
+    "noSvgNegative": true
+  }
+}

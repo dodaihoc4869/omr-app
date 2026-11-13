@@ -1,0 +1,29 @@
+[
+  {
+    "i": 244,
+    "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+    "fileNguon": "anh/2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c.png",
+    "svg": "malt244-native-ddh-15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b.svg",
+    "hashSvg": "15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b",
+    "byteSvg": 19409,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B7-D1-II-3",
+        "de": "Phân tử maltose có cấu tạo như sau:",
+        "refs": [
+          {
+            "hash": "2a36b01f67bd6be6a792cb328a5e329758c0453ec029433239c8b844b6e2d77c",
+            "where": "VIP27-C2-B7-D1-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "beb6e294754f725f097b67865c7cb4aba4c8e94ce9d47d36b99ad6bbefbf670e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O-6freeOH2CH2OH8hydroxylO-2ringO1bridgeO/2Haworth4TAPER2boldfront6pxVERTICALfeet77-172and349-443/12regularnums1..6EACH/RIGHTwave4crests4troughs-LEFTjunction49493-RIGHTfree51993-WHITEgapbeforeOH/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO/0standaloneH-caption-arrows/NOextraOHrightC4-alphaBeta-answer-alias64-149/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "15baa72e7baf9ff792e0ac3c41480747647de43811a67aa3c2815602701ec26b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
