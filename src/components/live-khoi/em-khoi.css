@@ -44,4 +44,16 @@ html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt
 :root[data-lke-cot] .bpu-hs, :root[data-lke-cot] .hh-lop { right: var(--lke-cot); }
 .lke.co-cot { right: var(--lke-cot, 300px); }
 .lke.co-cot > .lc-ngan.lc-ghim { right: calc(-1 * var(--lke-cot, 300px)); width: var(--lke-cot, 300px); }
+/* NGHỈ GIẢI LAO (nút «Nghỉ» 13/11, bản vẽ 69–70): băng nhỏ trên sân trò + tấm đếm 3 giây khi thầy gọi học tiếp. */
+.lke-nghi { position: absolute; left: 50%; top: max(44px, calc(env(safe-area-inset-top, 0px) + 44px)); transform: translateX(-50%); z-index: 38; display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px); padding: 7px 16px 7px 12px; border-radius: 999px; white-space: nowrap; pointer-events: none; background: color-mix(in srgb, var(--lk-nen) 94%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lk-chu-y) 60%, transparent), 0 10px 30px color-mix(in srgb, var(--lk-nen) 60%, transparent); }
+.lke-nghi i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--lk-chu-y); }
+.lke-nghi b { font-size: 14.5px; font-weight: 800; }
+.lke-nghi span { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; font-weight: 600; color: var(--lk-chu-2); }
+.lke-nghi time { font-size: 13px; font-weight: 800; color: var(--lk-chu-y); font-variant-numeric: tabular-nums; }
+.lke-vao-lai { position: absolute; inset: 0; z-index: 39; display: grid; place-items: center; background: color-mix(in srgb, var(--lk-nen) 72%, transparent); }
+.lke-vao-lai > div { text-align: center; padding: 22px 40px; border-radius: 24px; background: var(--lk-mat); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--p-xanh) 60%, transparent), 0 24px 70px color-mix(in srgb, var(--lk-nen) 70%, transparent); }
+.lke-vao-lai small { display: block; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-xanh); }
+.lke-vao-lai b { display: block; margin: 6px 0 4px; font-size: 24px; font-weight: 800; }
+.lke-vao-lai p { margin: 0; font-size: 14px; font-weight: 600; color: var(--lk-chu-2); }
+.lke-vao-lai span { display: grid; place-items: center; width: 64px; height: 64px; margin: 12px auto 0; border-radius: 50%; box-shadow: inset 0 0 0 4px var(--p-xanh); font-size: 30px; font-weight: 800; }
 

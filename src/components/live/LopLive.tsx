@@ -201,14 +201,12 @@ interface PropsKhay {
   /** Lần ĐẦU vào live mà tiếng đang tắt ⇒ khay tự mở 3 giây rồi tự thu; `khiGioiThieu` báo lớp trên «đã cho xem» (một lần mỗi buổi). */
   gioiThieu?: boolean
   khiGioiThieu?: () => void
-  /** Live theo khối (13/11): VUỐT NGANG từ mép phải / từ tay nắm ⇒ khung «Tin nhắn lớp» trượt theo ngón tay (báo `ddh-lk-keo` · `ddh-lk-tha`), không mở khay. */
-  keoChat?: boolean
   children: ReactNode
 }
 /** TAY NẮM + KHAY ở MÉP PHẢI (thầy 11/11 lần 3: «thanh ẩn sang hẳn góc phải ở giữa bảng đen … thiết kế ẩn hết vào thanh ẩn»): viên thuốc DỌC mảnh giữa mép
  *  phải; chạm ⇒ khay trượt ra từ phải; vuốt sang trái từ tay nắm ⇒ khay bám ngón tay; chạm ngoài / 4 giây không chạm ⇒ thu. Kéo dọc ⇒ dời tay nắm dọc mép
  *  phải. Dùng cho cả bảng live lẫn màn câu hỏi. */
-function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiThieu, khiGioiThieu, keoChat, children }: PropsKhay) {
+function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiThieu, khiGioiThieu, children }: PropsKhay) {
   const khayTrong = useRef<HTMLDivElement | null>(null), namTrong = useRef<HTMLButtonElement | null>(null)
   const khay = khayRef ?? khayTrong, nam = namRef ?? namTrong
   const henThu = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -233,22 +231,21 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
   const toaDo = (e: { clientX: number; clientY: number }) => (xoay?.() ? toaDoXoay(e, { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }) : { x: e.clientX, y: e.clientY })
   /** Quãng khay phải trượt để ra hẳn ngoài mép phải (bề rộng khay + khoảng cách tới mép). */
   const quang = () => { const k = khay.current; return k ? k.offsetWidth + 16 + (parseFloat(getComputedStyle(k).right) || 0) : 240 }
-  const namXuong = (e: React.PointerEvent<HTMLElement>) => {
+  const namXuong = (e: React.PointerEvent<HTMLButtonElement>) => {
     const p = toaDo(e)
     keo.current = { id: e.pointerId, x0: p.x, y0: p.y, kieu: '' }
     try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* trình duyệt cũ */ }
   }
-  const namDi = (e: React.PointerEvent<HTMLElement>) => {
+  const namDi = (e: React.PointerEvent<HTMLButtonElement>) => {
     const k = keo.current
     if (!k || k.id !== e.pointerId) return
     const p = toaDo(e), dx = p.x - k.x0, dy = p.y - k.y0
     if (!k.kieu && Math.hypot(dx, dy) > 8) k.kieu = Math.abs(dx) >= Math.abs(dy) ? 'ngang' : 'doc'
     if (k.kieu === 'doc') {
-      if (!cao || !namY || e.currentTarget !== nam.current) return
+      if (!cao || !namY) return
       namY.current = Math.max(0.14, Math.min(0.86, p.y / Math.max(1, cao())))
       e.currentTarget.style.top = `${namY.current * 100}%`
-    } else if (k.kieu === 'ngang' && keoChat) window.dispatchEvent(new CustomEvent('ddh-lk-keo', { detail: Math.max(0, -dx) }))
-    else if (k.kieu === 'ngang' && khay.current) {
+    } else if (k.kieu === 'ngang' && khay.current) {
       // bám ngón tay 1:1 (vuốt từ mép phải vào); kéo quá ⇒ đàn hồi
       const q = quang(), ra = Math.max(0, -dx), vuot = Math.max(0, ra - q)
       khay.current.style.transition = 'none'
@@ -256,21 +253,18 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
       khay.current.style.opacity = '1'; khay.current.style.visibility = 'visible'
     }
   }
-  const namNha = (e: React.PointerEvent<HTMLElement>) => {
+  const namNha = (e: React.PointerEvent<HTMLButtonElement>) => {
     const k = keo.current
     keo.current = null
     if (!k || k.id !== e.pointerId) return
     const p = toaDo(e)
     if (khay.current) { khay.current.style.transition = ''; khay.current.style.transform = ''; khay.current.style.opacity = ''; khay.current.style.visibility = '' }
-    if (k.kieu === 'ngang' && keoChat) window.dispatchEvent(new CustomEvent('ddh-lk-tha', { detail: k.x0 - p.x }))
-    else if (k.kieu === 'ngang') datMo(k.x0 - p.x > quang() * 0.3)
-    else if (!k.kieu && e.currentTarget === nam.current) datMo((m) => !m)
-    else if (!k.kieu) { const t = e.currentTarget; t.style.pointerEvents = 'none'; const d = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null; t.style.pointerEvents = ''; d?.click?.() } // chạm vào dải vuốt = chạm thứ nằm dưới
+    if (k.kieu === 'ngang') datMo(k.x0 - p.x > quang() * 0.3)
+    else if (!k.kieu) datMo((m) => !m)
   }
   const het = dau ?? [], ds = het.filter((d) => d.loai !== 'loa') // «loa đang bật» = trạng thái thường: chỉ là chấm sáng, không đọc thành dấu
   return (
     <>
-      {keoChat && laDienThoai() ? <i className="lv-vuot" aria-hidden="true" onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha} /> : null}
       <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo} data-dau={ds.length ? ds.map((d) => d.loai).join(' ') : undefined}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}>
         {/* thầy 12/11: chỉ còn HAI chấm sáng — loa đang bật (trên thanh), mic của em đang bật (dưới thanh, nhấp nháy); các dấu khác nằm trong khay + nhãn đọc màn hình */}
@@ -466,7 +460,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   )
   if (che === 'dau') return (
     <div className="lv-phu lv-dau" role="group" aria-label="Thầy đang live" style={{ ...(MAU_CHIEU as CSSProperties), ...(doi ? {} : { ['--doi' as string]: 'var(--tr-chieu-giay)' }) }}>
-      <Khay mo={moDau} datMo={setMoDau} keoChat={!!view.khoi} xoay={xoayDau ? () => true : undefined} lopNam={`song${micMo ? ' noi' : ''}`} dau={dauNam(matMang)} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu}>
+      <Khay mo={moDau} datMo={setMoDau} xoay={xoayDau ? () => true : undefined} lopNam={`song${micMo ? ' noi' : ''}`} dau={dauNam(matMang)} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu}>
         {dongKhay(<span>{tt.banNoi ? `Bạn ${tenNgan(tt.banNoi.ten)} đang nói` : 'Thầy đang live'}</span>)}
       </Khay>
       {tamMoi ?? (tt.mic === 'tu-choi' ? <BaoTam ms={8000}>Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.</BaoTam>
@@ -648,7 +642,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       {tamMoi ? tamMoi : tt.duocMoi && (micMo || tt.mic === 'xin-quyen') ? <VienNoi goc={theMic} dangMo={micMo} lenBang={false} onTat={tatMic} ghi={ghi} />
         : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
         : banNoi && !phongTo && !luot ? <div ref={daiBan} className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
-      <Khay mo={mo} datMo={setMo} keoChat={epPhong !== undefined} xoay={() => !!hinh.current?.xoay} cao={() => hinh.current?.h ?? window.innerHeight} namRef={nam} khayRef={khay} namY={namY}
+      <Khay mo={mo} datMo={setMo} xoay={() => !!hinh.current?.xoay} cao={() => hinh.current?.h ?? window.innerHeight} namRef={nam} khayRef={khay} namY={namY}
         lopNam={(thayNoi && nghe) || micMo ? 'noi' : ''} dau={dauNam(matMang || mang < 3)} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu}>
         {dongKhay(<>{thayNoi ? <><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><span>Thầy đang nói</span></> : <span>Thầy đang im</span>}<Vach n={matMang ? 0 : mang} /></>, hangChia)}
       </Khay>

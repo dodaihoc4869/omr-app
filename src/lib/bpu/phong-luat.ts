@@ -40,7 +40,7 @@ export const biMoiRa = (st: TrangThaiPhong, sbd: string): boolean => !!luatCua(s
 /** Gọi khi phòng vừa ghi MỘT LẦN RỜI MỚI của em lúc đang live. Đủ số lần ⇒ mời ra. Trả true nếu em vừa bị mời ra. */
 export function luatKhiRoi(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   const l = st.live, u = l?.luat
-  if (!l || !u || !l.bat || l.khoi?.gd === 'cho' || u.ra[sbd] || biCam(st, sbd)) return false
+  if (!l || !u || !l.bat || l.khoi?.gd === 'cho' || l.khoi?.giaiLao || u.ra[sbd] || biCam(st, sbd)) return false // phòng chờ / đang nghỉ giải lao: không đếm
   const lan = (u.dem[sbd] ?? 0) + 1
   u.dem[sbd] = lan
   if (lan < u.n) return false
