@@ -238,3 +238,24 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - **Nhẹ máy:** chỉ transform + opacity; trần 36 tinh thể cùng lúc (máy yếu 12, không vệt, không quầng), mỗi lượt số mới một đội tối đa 8, phần dư chỉ làm thẻ nháy; giảm chuyển động ⇒ chỉ nháy. Em vào muộn / lời gọi mới ⇒ không phát bù.
     - Chỉ bay khi bạn còn đang lên bảng (thầy chưa chấm). Máy thầy đang ở màn không có thẻ tên ⇒ không bay. CHƯA thử với lớp đông thật (60 em bấm dồn).
 55. **VĂN PHÒNG CHỈ NHẮN NHÓM KHI THẦY BẬT LUẬT** (thầy 13/11): sổ `live_moi_ra` có thêm dòng `bat` / `tat`; `/gv/bpu/live-thong-ke` trả `luat { daBat, dangBat, n, batLuc }`. Tin kết thúc live vẫn luôn gửi. Hợp đồng: `docs/hop-dong-live-moi-ra-van-phong-1311.md`.
+56. **XEM LẠI: CÂY BÚT LƯỚT GIỮA HAI NÉT + MÁY TÍNH FX4869** (thầy 13/11 «Nét bút xem lại vẫn bị giật, chưa mượt như trong live. Sửa triệt để và áp dụng mọi bản ghi lại» · «Máy tính không hiện trong video, hôm qua live có bật máy tính»):
+    - **Đo trước khi sửa** (không đoán): `scripts/chup-live-xem-lai-hs-1111/do-net.mjs` — Chromium thật, tiếng thật qua `<audio>`, nét viết tay giả có giờ từng điểm (`tests/_live-xem-lai-net-gia.ts`); ở MỖI khung hình bắt đúng chỗ ngòi cây bút vừa được dán lên lớp «đang viết» rồi so với chỗ đầu nét lý tưởng theo giờ.
+    - **Video thầy quay** (30 khung/giây): trong 341 khung lúc đang phát có 121 khung «đứng»; 67 khung trong số đó rơi đều đúng chu kỳ 6 khung ⇒ là khung TRÙNG của trình quay (quay 25 khung/giây, lưu 30), không phải của app. Phần còn lại là lúc thầy NHẤC BÚT giữa hai nét (nét của thầy rất ngắn: 2–3 khung một nét).
+    - **Nguyên nhân thật:** TRONG nét, đầu bút đã đi đều (máy tính: 0 khung đứng, 0 khung nhảy, lệch chỗ lý tưởng p95 < 1 px). Chỗ khác live là GIỮA HAI NÉT: lúc live máy em nhận cả đường bút lơ lửng của thầy nên cây bút lướt sang nét sau; bản ghi không lưu đường lơ lửng ⇒ cây bút ĐỨNG ở cuối nét suốt lúc nhấc bút rồi VỤT sang đầu nét sau, 3–5 lần mỗi giây khi viết chữ.
+    - **Sửa ở TRÌNH PHÁT** (bản ghi cũ tự hưởng, KHÔNG phải dựng lại):
+      - `may-phat.ts` `troGiuaNet`: nhìn trước nét kế trong hàng đợi, cho cây bút lướt từ cuối nét tới ĐÚNG đầu nét sau, tới nơi đúng lúc nét bắt đầu. Nghỉ ≤ 0,7 giây: lướt suốt quãng nghỉ; lâu hơn: nán rồi lướt 0,22–0,7 giây; nghỉ rất lâu: ẩn, hiện sẵn ở đầu nét kế trước 0,3 giây. Không lướt giữa giấy ↔ bảng, qua «bảng mới», tới nét dựng lại tức thì.
+      - `raiGio`: cụm điểm cùng một giờ (máy thầy gom mẫu) được rải đều ⇒ đầu nét không đứng rồi nhảy cả cụm. Nhiều nét chồng giờ: cây bút bám một nét tới khi xong.
+      - `dong-ho.ts`: `readyState` tụt dưới 0,25 giây (tiếng tải theo khúc) không còn đặt lại đồng hồ. `TrinhPhat.tsx`: dùng giờ của khung hình (tham số `requestAnimationFrame`) thay cho lúc hàm được gọi.
+      - `ve-bang.ts` / `tro-but.ts`: cây bút đang lướt (`sat`) bám đúng chỗ, giữ phần lẻ điểm ảnh. Đường live của máy em không đổi.
+    - **Số đo trước → sau** (Chromium, 60 khung/giây):
+      - Viết chữ, máy tính 1366: lúc nhấc bút cây bút đứng 768/968 khung → 97/963; vụt 32 → 0. Điện thoại CPU ×4: 645/959 → 129/960; vụt 36 → 0.
+      - Nét dài viết liền: lúc nhấc bút đứng 116/133 → 0/133; vụt 7 → 0. Tốc độ 2×: 46/64 → 0/62.
+      - Điểm dồn cụm 33 ms: trong nét đứng 47 → 0, nhảy 2 → 0, lệch p95 7,5 → 2,8 px.
+      - Giờ tiếng đổi theo bậc 120 ms + `readyState` tụt mỗi 0,3 giây (mô phỏng): đứng 56 → 0, nhảy 57 → 0, lệch lớn nhất 186 → 1,2 px.
+      - Bảng có sẵn 2000–3000 nét: khung hình không đổi (p95 16,8 ms; khung dài duy nhất là lúc dựng bảng khi mở).
+      - Máy yếu vẫn 30 khung/giây theo thiết kế.
+    - **CHƯA kiểm được:** điện thoại / máy tính thật với tệp MP3 thật; nét thật của thầy (không có dữ liệu thật trong máy đo). Hai mục «điểm dồn cụm» và «`readyState` tụt» là phòng thủ theo mô phỏng, chưa thấy trên bản ghi thật.
+    - **MÁY TÍNH FX4869:** trước 13/11 phòng chỉ CHUYỂN TIẾP tin `mt` của thầy (`kenh-lop-may.ts`), nhật ký và `buoi.json` không có gì ⇒ **buổi đã live không khôi phục được máy tính**. Từ nay:
+      - Phòng (`phong-binh-phan-ung.ts` → `NhatKyXl.mayTinh`) lọc rồi ghi vào nhật ký riêng `xl:mt:<i>` (`src/lib/live/xem-lai-may-tinh.ts`): mở / bấm phím / cất ghi ngay; đang kéo dồn 0,2 giây; tin nhắc lại chỉ ghi dòng «còn» mỗi 3,5 giây; trần 8000 dòng một buổi. Chỉ đụng bộ nhớ trên đường nhận tin, ghi gom 1 giây cùng nhật ký; 0 D1, không đổi schema.
+      - Bộ dựng (`dungMayTinh`) đưa vào `buoi.json` trường `mayTinh` (chỉ thêm) theo trục tiếng; thầy im quá 13 giây hoặc tắt live ⇒ cất, đúng luật máy em lúc live.
+      - Trình phát tra máy tính tại giờ đang phát (kể cả tạm dừng, tua) và vẽ bằng chính mặt máy chỉ-xem của bảng live (`MayTinhXem` trong `MayTinhEm.tsx`, nạp lười, chỉ buổi có máy tính mới tải): đúng lúc, đúng chỗ, đúng màn hình, phím vừa bấm nháy viền. Ảnh kiểm: `chup.mjs` cảnh 32–34.

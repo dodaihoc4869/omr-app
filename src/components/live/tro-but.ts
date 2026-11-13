@@ -36,12 +36,12 @@ const LO_MS = 420, NGHI_MS = 1600
 export function taoTroBut(tuy: { yeu?: boolean } = {}) {
   let x = 0, y = 0, nang = 1, goc = 0, mo = 0, lucCham = -1e9, hien = false, truot = false, luc = 0, lucDoi = 0, dx = 0, dy = 0
   /** MỘT bước mỗi khung hình. `dich` = chỗ ngòi bút theo đệm phát (px CSS trong hình) hoặc null = ẩn. Trả hình để dời lớp, hoặc null. */
-  function buoc(dich: { x: number; y: number; cham: boolean } | null, nay: number): HinhBut | null {
+  function buoc(dich: { x: number; y: number; cham: boolean; /** chỗ này đã mượt sẵn (trình phát xem lại tự lướt bút giữa hai nét) ⇒ bám đúng, không trượt thêm */ sat?: boolean } | null, nay: number): HinhBut | null {
     const dt = Math.min(64, Math.max(0, nay - luc))
     luc = nay
     if (!dich) { hien = false; mo = 0; return null }
     const x0 = x, y0 = y
-    if (!hien || dich.cham || tuy.yeu) { x = dich.x; y = dich.y; truot = false; if (!hien) { nang = dich.cham ? 0 : 1; goc = 0; lucDoi = nay } }
+    if (!hien || dich.cham || dich.sat || tuy.yeu) { x = dich.x; y = dich.y; truot = false; if (!hien) { nang = dich.cham ? 0 : 1; goc = 0; lucDoi = nay } }
     else {
       const q = Math.hypot(dich.x - x, dich.y - y)
       if (truot || q > XA_PX) {

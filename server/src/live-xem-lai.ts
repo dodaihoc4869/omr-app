@@ -13,6 +13,7 @@ import { chamTra, type TrangThaiPhong } from '../../src/lib/bpu/phong'
 import { liveHetHan, liveTat } from '../../src/lib/bpu/phong-live'
 import { MANH_NET_BYTE, bangVangCua, giaiNetXl, laTrangThaiGhi, maNetXl, soVet, vetRong, type DauVet } from '../../src/lib/bpu/phong-nhat-ky'
 import { dungBuoi, type KhucVao, type LuotChup, type MucTieng, type NetXl, type SuKienXl } from '../../src/lib/live/xem-lai-dung'
+import { MT_MOI_MANH, taoLocMayTinh, type MucMayTinhXl } from '../../src/lib/live/xem-lai-may-tinh'
 import { docDauGon, docKhuc } from '../../src/lib/live/xem-lai-khuc'
 import { TEP_LIVE } from '../../src/lib/live/xem-lai-kieu'
 import { BYTE_MOI_KHUNG, catKhung, dayCam, tachKhung } from '../../src/lib/live/xem-lai-mp3'
@@ -74,7 +75,7 @@ export interface ChuXl {
   /** Luật so đáp số Phần III của phòng — chỉ để ĐẾM số em đúng của lượt chưa mở đáp án đang chữa trên bảng (ảnh chụp kín, 11/11). */
   chamSo?(traLoi: string, dapAn: string): boolean
 }
-interface MetaXl { daLive: boolean; e: number; n: number; nByte: number; luot: number[]; mat: number | null; don: boolean; xoa: boolean }
+interface MetaXl { daLive: boolean; e: number; n: number; nByte: number; luot: number[]; mat: number | null; don: boolean; xoa: boolean; /** số mảnh nhật ký máy tính `xl:mt:<i>` (13/11; vắng = 0) */ mt?: number }
 interface CauHinhXl { bat: boolean; lop: string }
 interface KetQuaChot { ban: number; bam: string; luc: number; byte: number }
 interface TienTieng { bam: string; uploadId: string | null; parts: { partNumber: number; etag: string }[]; vt: number; du: number; doc: number }
@@ -122,6 +123,9 @@ export class NhatKyXl {
   private skCho: SuKienXl[] = []
   private netCho: Uint8Array[] = []
   private netTong = 0
+  /** Máy tính FX4869 của thầy (13/11): bộ lọc trong bộ nhớ + các dòng chờ ghi gom cùng nhật ký. */
+  private locMt = taoLocMayTinh()
+  private mtCho: MucMayTinhXl[] = []
   private chupCho = new Map<number, LuotChup>()
   private henXa: ReturnType<typeof setTimeout> | null = null
   private henChotH: ReturnType<typeof setTimeout> | null = null
@@ -215,8 +219,19 @@ export class NhatKyXl {
     const st = this.chu.nho()
     if (!st?.live || st.live.ghi === undefined) return
     st.live.ghi = 'tat' // lần live mới: chờ máy ghi tự báo
+    this.locMt = taoLocMayTinh() // lần live mới: tin máy tính đầu tiên ghi đủ trạng thái
     this.netCho.push(maNetXl({ loai: 1, luc: nay, khung: new Uint8Array(0) }))
     for (const k of so) { const b = maNetXl({ loai: 2, luc: nay, khung: k }); this.netCho.push(b); this.netTong += b.length }
+    this.henXaSau()
+  }
+  /** Tin `mt` của THẦY trên kênh lớp (máy tính FX4869) lúc đang live có ghi: lọc (bấm phím ghi ngay, kéo dồn 200 ms, nhắc lại chỉ ghi dòng «còn») rồi ghi gom
+   *  cùng nhật ký. Đồng bộ, chỉ đụng bộ nhớ — không D1, không chờ storage trên đường nhận tin. */
+  mayTinh(st: TrangThaiPhong, x: unknown, nay: number): void {
+    const l = st.live
+    if (!l?.bat || l.ghi === undefined || st.ketThuc) return
+    const ds = this.locMt.nhan(x, nay)
+    if (!ds.length) return
+    for (const m of ds) this.mtCho.push(m)
     this.henXaSau()
   }
   /** Tin `live-ghi` của máy ghi: `{ tt, dh, p, xong? }`. Trả true khi trạng thái ghi đổi (phòng lưu + phát view). */
@@ -260,6 +275,15 @@ export class NhatKyXl {
         for (const b of ds) { if (byte >= MANH_NET_BYTE) { await ghi(); i += 1; cur = []; byte = 0 } cur.push(b); byte += b.length }
         await ghi(); m.n = i + 1; m.nByte = byte
       }
+      if (this.mtCho.length) {
+        // (máy tính ghi hỏng thì chỉ mất máy tính — không được làm đứt nhật ký sự kiện + nét ở trên)
+        const ds = this.mtCho; this.mtCho = []
+        try {
+          let i = Math.max(0, (m.mt ?? 0) - 1), cur = m.mt ? ((await kho.get<MucMayTinhXl[]>(`xl:mt:${i}`)) ?? []) : []
+          for (const e of ds) { if (cur.length >= MT_MOI_MANH) { await kho.put(`xl:mt:${i}`, cur); i += 1; cur = [] } cur.push(e) }
+          await kho.put(`xl:mt:${i}`, cur); m.mt = i + 1
+        } catch (e) { console.error('[live-xem-lai] ghi nhật ký máy tính lỗi:', e instanceof Error ? e.message : e) }
+      }
       await kho.put('xl:m', m)
       if (this.vet) await kho.put('xl:v', this.vet)
     } catch (e) { console.error('[live-xem-lai] ghi nhật ký lỗi:', e instanceof Error ? e.message : e) }
@@ -301,7 +325,7 @@ export class NhatKyXl {
     await this.chu.ghiSom?.().catch(() => undefined)
     const nay = Date.now()
     // Đầu vào: nhật ký của phòng + phần đầu các khúc trên R2 + tên bài / dạng + dòng D1 đang có (tên thầy đặt, bản dựng).
-    const [suKien, net, luot, khuc, cf, dong, cu] = await Promise.all([
+    const [suKien, net, luot, khuc, cf, dong, cu, mayTinh] = await Promise.all([
       Promise.all(Array.from({ length: m.e }, (_, i) => this.kho.get<SuKienXl[]>(`xl:e:${i}`))).then((ds) => ds.flatMap((x) => x ?? [])),
       Promise.all(Array.from({ length: m.n }, (_, i) => this.kho.get<Uint8Array>(`xl:n:${i}`))).then((ds) => ds.flatMap((x): NetXl[] => (x instanceof Uint8Array ? giaiNetXl(x) : []))),
       Promise.all(m.luot.map((so) => this.kho.get<LuotChup>(`xl:l:${so}`))).then((ds) => Object.fromEntries(ds.filter((x): x is LuotChup => !!x).map((x) => [x.so, x]))),
@@ -309,13 +333,14 @@ export class NhatKyXl {
       this.docCf(),
       env.DB ? damBaoBangLive(env).catch(() => undefined).then(() => env.DB.prepare('SELECT ten_thay, ban, trang_thai FROM live_buoi WHERE id = ?').bind(id).first<Row>()).catch(() => null) : Promise.resolve(null),
       this.kho.get<KetQuaChot>('xl:c'),
+      Promise.all(Array.from({ length: m.mt ?? 0 }, (_, i) => this.kho.get<MucMayTinhXl[]>(`xl:mt:${i}`))).then((ds) => ds.flatMap((x) => x ?? [])),
     ])
     if (m.xoa || str(dong?.trang_thai) === 'dang_xoa') return { ok: false, lyDo: 'da-xoa' }
     const lop = cf?.lop ?? ''
     const ten = await traTenCau(env, Object.values(luot).map((x) => x.qid), lop)
     const banCu = Math.max(cu?.ban ?? 0, cu ? 0 : Number(dong?.ban) && str(dong?.trang_thai) === 'xong' ? Number(dong?.ban) : 0)
     const tenThay = str(dong?.ten_thay).trim() || null
-    const v = { id, ban: 0, lop, suKien, net, khuc, luot, ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), bangVang: bangVangCua(st), ten, tenThay, nay, khoi: !!st.live?.khoi || lop.startsWith('Live Khối ') }
+    const v = { id, ban: 0, lop, suKien, net, khuc, luot, ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), bangVang: bangVangCua(st), ten, tenThay, nay, khoi: !!st.live?.khoi || lop.startsWith('Live Khối '), mayTinh }
     const kq = dungBuoi(v)
     if (!kq.du) {
       // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi»): KHÔNG BAO GIỜ bỏ im một buổi đã live. Chưa có đoạn nào ⇒ dòng vẫn nằm trong «Lịch sử Live» của
@@ -463,9 +488,10 @@ export class NhatKyXl {
     for (let i = 0; i < m.e; i++) await this.kho.delete(`xl:e:${i}`)
     for (let i = 0; i < m.n; i++) await this.kho.delete(`xl:n:${i}`)
     for (const so of m.luot) await this.kho.delete(`xl:l:${so}`)
+    for (let i = 0; i < (m.mt ?? 0); i++) await this.kho.delete(`xl:mt:${i}`)
     for (const k of ['xl:t', 'xl:c', 'xl:v']) await this.kho.delete(k)
     this.meta = { ...metaRong(), don: true, xoa }
-    this.vet = vetRong(); this.skCho = []; this.netCho = []; this.netTong = 0
+    this.vet = vetRong(); this.skCho = []; this.netCho = []; this.netTong = 0; this.mtCho = []; this.locMt = taoLocMayTinh()
     await this.kho.put('xl:m', this.meta)
     return { ok: true }
   }

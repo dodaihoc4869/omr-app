@@ -16,7 +16,7 @@ import { DAU_BANG, DAU_DU, NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, bu
 import { taoVeBang, type VeBang } from './ve-bang'
 
 export interface HinhDL { w: number; h: number; xoay: boolean; at: AnToan }
-export interface ButDL { x: number; y: number; cham: boolean; net?: string; mau?: string }
+export interface ButDL { x: number; y: number; cham: boolean; net?: string; mau?: string; /** chỗ này đã mượt sẵn ⇒ cây bút bám đúng (tro-but.ts) */ sat?: boolean }
 export interface TayKhungDL {
   /** Tính lại bố cục (đổi cỡ màn, xoay, đổi trang). */
   xep: () => void

@@ -9,7 +9,7 @@
 // · «Bỏ khoảng lặng», tốc độ 1× / 1,5× / 2×, lùi / tới 10 giây, «Đoạn 3/5», thanh tua chia khúc theo câu + vạch em nói, dải tự ẩn sau 3 giây.
 // · Mất mạng: dừng tại chỗ, có mạng phát tiếp. Tệp trả 404 ⇒ thầy đã gỡ buổi (`khiGo`). Máy yếu: 30 khung/giây, bỏ quầng con trỏ.
 // AN TOÀN: chỉ đọc ba tệp của buổi qua vé; đề trên giấy là câu trong `buoi.json`.
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Suspense, lazy, memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { anToanHinh, canXoayCss, giaiTrang, khungChieu, laTrangBang } from '../../../components/live/bo-cuc'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from '../../../components/live/KhungDocLap'
@@ -17,7 +17,7 @@ import { DauGiay, PhuongAnTinh } from '../../../components/live/GiayDung'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
 import { chonHeSoGiay } from '../../../components/live/vua-giay'
 import type { SuKienBut } from '../../../lib/but-bang-loi'
-import { TEP_LIVE, cheTai, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
+import { TEP_LIVE, cheTai, chiSoMayTinh, mayTinhTai, type BuoiLiveJson, type DoanBuoiLive, type MayTinhLuc } from '../../../lib/live/xem-lai-kieu'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
 import { nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tuViTriHang, viTriHang } from './dong-ho'
 import { taoKhoNet, type KhoNet } from './kho-net'
@@ -50,6 +50,8 @@ export interface PropsTrinhPhat {
   /** Tệp của buổi trả 404 ⇒ «Thầy đã gỡ buổi này.» */
   khiGo: () => void
 }
+// MÁY TÍNH FX4869 của thầy (13/11): mặt máy chỉ-xem của bảng live, nạp lười — chỉ buổi có `buoi.mayTinh` mới tải (cùng mảnh `MayTinhEm-*` của lúc live).
+const MayTinhXem = lazy(() => import('../../../components/may-tinh/MayTinhEm').then((m) => ({ default: m.MayTinhXem })))
 const TOC_DO = [1, 1.5, 2] as const
 /** Đang báo «Mất mạng · đang nối lại…» ⇒ thử lại sau chừng này. */
 const THU_LAI_MS = 4000
@@ -105,10 +107,12 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const [boLang, setBoLang] = useState(true)
   const [hien, setHien] = useState(true)
   const [luoc, setLuoc] = useState(0)
+  /** Máy tính của thầy tại chỗ đang phát (null = thầy đang cất / buổi không có). */
+  const [mayTinh, setMayTinh] = useState<MayTinhLuc | null>(null)
   /** Trạng thái chạy (không gây vẽ lại): mọi thứ vòng khung hình đọc. */
   const S = useRef({
     vt: Math.max(0, Math.min(batDau, hang.length - 1)), phat: false, tocDo: 1, boLang: true, luot: 0, daNap: -1, dangNapKe: false, dangDung: false, matMang: false,
-    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false, lucHien: 0, che: '' as '' | 'hoc' | 'bang',
+    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false, lucHien: 0, che: '' as '' | 'hoc' | 'bang', mt: -2,
   })
   const [rieng] = useState(taoDongHoRieng), [muot] = useState(taoLamMuot)
   const hangRef = useRef(hang)
@@ -125,7 +129,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     if (!a) return S.current.gioCuoi
     // chưa có siêu dữ liệu: `currentTime` chưa nhận lệnh tua ⇒ dùng mốc đang muốn tới
     if (S.current.gioMuon >= 0 && a.readyState < 1) return S.current.gioMuon
-    return muot.doc(a.currentTime * 1000, nay, !a.paused && a.readyState > 2, S.current.tocDo)
+    return muot.doc(a.currentTime * 1000, nay, !a.paused, S.current.tocDo, a.readyState > 2)
   }, [coTieng, rieng, muot])
   const datGio = useCallback((ms: number): void => {
     S.current.gioCuoi = ms
@@ -242,21 +246,25 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     }
     may.current = taoMayPhat(ap)
     kho.current = taoKhoNet({ byteNet: buoi.byteNet, moc: buoi.mocBang, tai: async (tu, den) => { const k = await taiKhucNet(goc, buoi.id, ve, tu, den); if (!k.ok) throw new LoiTai(k.loai); return k.d } })
-    S.current.daNap = -1; S.current.luot += 1
+    S.current.daNap = -1; S.current.luot += 1; S.current.mt = -2
     xep()
     // mở đầu: dựng bảng tại đầu đoạn (phát ngay nếu em vừa bấm một đoạn). Hiệu ứng chạy lại (chế độ kiểm của React) ⇒ dựng lại tại chỗ đang đứng.
     { const d0 = hangRef.current[S.current.vt]; if (d0) void tuaRef.current(S.current.vt, S.current.gioCuoi > d0.t0 ? S.current.gioCuoi : d0.t0, daMo.current ? S.current.phat : tuPhat); daMo.current = true }
     const yeu = mayYeu()
     let raf = 0, le = false
-    const khung = () => {
+    const khung = (gioKhung: number) => {
       raf = requestAnimationFrame(khung)
       if (yeu && (le = !le)) return // máy yếu: 30 khung / giây
       const ds = hangRef.current, d = ds[S.current.vt], m = may.current, k = kho.current
       if (!d || !m || !k) return
-      const nay = performance.now()
+      // GIỜ CỦA KHUNG HÌNH (mốc trình duyệt đặt cho cả khung, cách đều theo nhịp màn) chứ không phải lúc hàm này được gọi: luồng chính bận thì hàm bị gọi
+      // muộn vài mili-giây, nét sẽ đi quãng dài quãng ngắn dù khung nào cũng lên màn đúng nhịp.
+      const nay = gioKhung > 0 ? gioKhung : performance.now()
       let t = docGio(nay)
       // Chế độ Học / Bảng tại đúng giờ đang phát (kể cả lúc tạm dừng, tua): đổi là xếp lại hình ngay, y như máy em lúc live.
       { const c = cheTai(buoi.che, t); if (c && c !== S.current.che) { S.current.che = c; setEp(c === 'bang' ? 'bang' : null) } }
+      // Máy tính của thầy tại đúng giờ đang phát (cả lúc tạm dừng, tua): chỉ khi sang mốc khác mới báo React
+      if (buoi.mayTinh) { const k = chiSoMayTinh(buoi.mayTinh, t); if (k !== S.current.mt) { S.current.mt = k; setMayTinh(mayTinhTai(buoi.mayTinh, k)) } }
       if (dangChay() && !S.current.dangDung) {
         S.current.gioCuoi = t
         if (S.current.boLang) { const den = nhayLang(t, buoi.lang, d); if (den != null) { S.current.luoc += den - t; setLuoc(S.current.luoc); datGio(den); t = den } }
@@ -278,9 +286,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       if (m.gio() >= 0 && !S.current.dangDung) {
         const f = m.buoc(t)
         // Con trỏ = CÂY BÚT của bảng live (11/11, tro-but.ts): lớp vẽ tự vẽ nó trên lớp «đang viết», ngòi ở đúng đầu nét, bảng đã cuộn thì trôi theo;
-        // khung thầy đang viết tự nở, giấy tự trôi theo bút (KhungDocLap).
-        const dn = f.dau.length ? f.dau[f.dau.length - 1]! : null
-        v.khung(nay, f.dau, f.tro ? { x: f.tro.x, y: f.tro.y, cham: !!dn, net: dn?.id } : null)
+        // khung thầy đang viết tự nở, giấy tự trôi theo bút (KhungDocLap). Giữa hai nét máy phát cho cây bút lướt sang đầu nét kế (may-phat.ts).
+        v.khung(nay, f.dau, f.tro)
       }
       // thanh tua + giờ: đổi thẳng DOM (không vẽ lại React mỗi khung)
       const ray = tua.current?.children[S.current.vt]?.querySelector<HTMLElement>('.xp-ray')
@@ -408,6 +415,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       <div ref={nen} className="xp-nen" style={nhung && bc ? { height: bc.h } : undefined} onClick={chamNen}>
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập như bảng live (giấy ở đây dựng theo khối đề của chặng ⇒ `tiLeChu` null: chữ không phụ thuộc bề ngang khung) */}
         <KhungDocLap ref={kdl} lop="xp" epPhong={ep} layHinh={layHinh} layTrang={layTrang} netGiay tiLeChu={null} tuUuTien={!mayYeu()} dong={!giamDong()} giay={dungGiay} />
+        {buoi.mayTinh?.length ? <Suspense fallback={null}><MayTinhXem tin={mayTinh} /></Suspense> : null}
         {!dangPhat && !cho && !matMang ? <button type="button" className="xp-giua" onClick={(e) => { e.stopPropagation(); bamPhat() }} aria-label={het ? 'Phát lại từ đầu' : 'Phát'}><BtPhat s={38} /></button> : null}
         {luoc >= 1000 && boLang ? <div className="xp-luoc so" role="status">Đã lược {gioPhat(Math.round(luoc / 1000) * 1000)} khoảng lặng</div> : null}
         {matMang ? <div className="xp-mat" role="status"><i aria-hidden="true" />Mất mạng · đang nối lại…</div> : null}
