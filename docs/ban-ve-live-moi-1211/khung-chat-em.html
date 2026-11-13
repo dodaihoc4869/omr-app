@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: khung chat máy em — vuốt từ mép phải (điện thoại xoay ngang) và cột ghim (máy tính)</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --nen-2: #0e171b; --giay: #f4efe4; --muc: #1f2429; --chu: #f1f7fb; --chu2: #cfdae0; --chu3: #8fa1ab; --na: #f59e0b; --k: #8b5cf6; --cu: #10b981; --ca: #ef4444; --vang: #f5c84a; --tim: #7c6cf6; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+.man { position: fixed; left: 0; top: 0; bottom: 0; right: var(--ghim, 0px); }
+.bang { position: absolute; inset: 5px; border-radius: 14px; border: 2px solid #33434c; }
+.ke { position: absolute; left: 66.667%; top: 0; bottom: 0; width: 2px; background: #2b3a42; }
+.giay { position: absolute; left: 8px; top: 8px; bottom: 8px; width: calc(60% - 12px); border-radius: 16px; background: var(--giay); color: var(--muc); padding: 20px 28px; font-size: 23px; line-height: 1.5; }
+.giay .chip { display: flex; gap: 8px; margin-bottom: 10px; font-size: 13.5px; font-weight: 800; } .giay .chip b { background: #d9e4fb; padding: 3px 12px; border-radius: 99px; } .giay .chip span { background: #e6e0d2; color: #5d6770; padding: 3px 12px; border-radius: 99px; }
+.giay .pa { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; font-size: 21px; } .giay .pa b { margin-right: 8px; }
+.bang-hoc { position: absolute; left: calc(60% + 4px); right: 8px; top: 8px; bottom: 8px; border-radius: 16px; border: 2px solid #33434c; }
+svg.viet { position: absolute; overflow: visible; } svg.viet text { font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; fill: #eef4f7; font-style: italic; }
+/* tay nắm vàng mép phải (đang có) + số tin mới */
+.nam { position: fixed; right: calc(var(--ghim, 0px) + 5px); top: 42%; width: 8px; height: 64px; border-radius: 99px; background: #e8a13a; }
+.nam b { position: absolute; right: 12px; top: -8px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--ca); color: #fff; font-size: 11.5px; font-weight: 800; display: grid; place-items: center; }
+.bong { position: fixed; right: 24px; top: 16px; max-width: 250px; padding: 7px 12px 8px; border-radius: 14px 14px 4px 14px; background: #1c2930; border: 1.5px solid #33434c; box-shadow: 0 10px 28px rgba(0,0,0,.4); }
+.bong b { display: block; font-size: 12.5px; font-weight: 800; color: color-mix(in srgb, var(--cu) 78%, #fff); } .bong span { font-size: 12.5px; font-weight: 500; color: var(--chu2); }
+/* ngón tay + mũi tên chỉ dẫn (chỉ có trên bản vẽ) */
+.ngon { position: fixed; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.22); border: 2px solid rgba(255,255,255,.6); }
+.mui { position: fixed; height: 2px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.7) 0 8px, transparent 8px 14px); }
+.mui::before { content: ''; position: absolute; left: -2px; top: -5px; border: 6px solid transparent; border-right-color: rgba(255,255,255,.8); border-left: 0; }
+.ghi { position: fixed; padding: 5px 12px; border-radius: 99px; background: rgba(245,200,74,.16); border: 1.5px solid rgba(245,200,74,.5); color: var(--vang); font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+/* KHUNG CHAT máy em — cùng kiểu dòng tin với cột của thầy */
+.cot { position: fixed; top: 0; bottom: 0; right: 0; width: var(--c); background: #0f191e; display: flex; flex-direction: column; }
+.cot.truot { border-radius: 18px 0 0 18px; border: 1.5px solid #2a3942; border-right: 0; box-shadow: -18px 0 44px rgba(0,0,0,.5); }
+.cot.ghim { border-left: 1.5px solid #24323a; }
+.cot .tay { position: absolute; left: -15px; top: 42%; width: 8px; height: 64px; border-radius: 99px; background: #e8a13a; }
+.dau { flex: none; display: flex; align-items: center; gap: 8px; height: var(--hd, 44px); padding: 0 6px 0 14px; border-bottom: 1.5px solid #1f2c33; font-size: 14.5px; font-weight: 800; white-space: nowrap; }
+.dau small { font-size: 12px; font-weight: 700; color: var(--chu3); }
+.dau .nut { margin-left: auto; display: flex; gap: 2px; } .dau .nut i { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-style: normal; color: var(--chu3); font-size: 15px; } .dau .nut i.bat { background: #1d2a31; color: var(--vang); }
+.ds { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; padding: 8px; }
+.tin { position: relative; flex: none; padding: 6px 10px 7px 13px; border-radius: 10px; background: color-mix(in srgb, var(--d) 9%, #141f25); }
+.tin::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 99px; background: var(--d); }
+.tin .ten { display: flex; align-items: baseline; gap: 7px; font-size: 14px; font-weight: 800; line-height: 1.25; color: color-mix(in srgb, var(--d) 78%, #fff); }
+.tin .ten span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tin .ten time { margin-left: auto; flex: none; font-size: 11px; font-weight: 700; color: #6f828d; }
+.tin .ten em { flex: none; font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 99px; background: rgba(245,200,74,.16); color: var(--vang); }
+.tin .ten em.toi { background: rgba(255,255,255,.12); color: #fff; }
+.tin p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.36; font-weight: 500; color: var(--chu2); overflow-wrap: anywhere; }
+.tin.thay { --d: #dfe8ee; background: #1b272e; } .tin.thay .ten { color: #fff; }
+.tin.toi { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--d) 45%, transparent); }
+.na { --d: var(--na); } .kk { --d: var(--k); } .cu { --d: var(--cu); } .ca { --d: var(--ca); }
+.nhanh { flex: none; display: flex; gap: 6px; padding: 0 8px 6px; overflow: hidden; } .nhanh i { flex: none; font-style: normal; padding: 5px 11px; border-radius: 99px; background: #18242a; border: 1.5px solid #2a3942; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.nhap { flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px 8px; }
+.nhap .o { flex: 1; height: 38px; border-radius: 12px; background: #18242a; border: 1.5px solid #2a3942; display: flex; align-items: center; padding: 0 12px; font-size: 13.5px; font-weight: 600; color: #6f828d; }
+.nhap .o.dang { border-color: var(--tim); color: var(--chu); box-shadow: 0 0 0 3px rgba(124,108,246,.22); } .nhap .o.dang::after { content: ''; width: 1.5px; height: 17px; margin-left: 2px; background: var(--chu); }
+.nhap .gui { width: 38px; height: 38px; border-radius: 12px; background: var(--tim); display: grid; place-items: center; }
+.phim-tat { flex: none; padding: 0 10px 8px; font-size: 11.5px; font-weight: 700; color: #6f828d; } .phim-tat kbd { font: inherit; padding: 1px 6px; border-radius: 6px; background: #1d2a31; border: 1px solid #33434c; color: var(--chu2); }
+/* bàn phím của điện thoại (chỉ để thấy chỗ còn lại) */
+.ban-phim { position: fixed; left: 0; right: 0; bottom: 0; height: 196px; background: #262b30; padding: 7px 26px; display: grid; grid-template-rows: repeat(4, 1fr); gap: 6px; }
+.ban-phim div { display: flex; gap: 5px; justify-content: center; } .ban-phim i { flex: 1; max-width: 62px; border-radius: 6px; background: #4a5057; } .ban-phim i.dai { max-width: 330px; flex: 5; }
+</style></head><body>
+<div class="man" id="man"></div>
+<script>
+const q = new URLSearchParams(location.search), k = q.get('k') || 'mo', W = innerWidth, H = innerHeight, mayTinh = W >= 1000
+const viet = (x, y, co, dong, mau) => `<svg class="viet" style="left:${x}%;top:${y}%"><g>${dong.map((d, i) => `<text x="0" y="${i * co * 1.55}" font-size="${co}" ${mau && mau[i] ? `style="fill:${mau[i]}"` : ''}>${d}</text>`).join('')}</g></svg>`
+const man = document.getElementById('man'), them = (h) => document.body.insertAdjacentHTML('beforeend', h)
+const bang = (co) => `<div class="bang"><i class="ke"></i>${viet(5, 12, co, ['Liên kết cộng hoá trị', 'H₂ :  H · · H  ⇒  H – H', 'O₂ :  O :: O  ⇒  O = O', 'Δχ = 1,24  ⇒  LK CHT phân cực'], ['#f5c84a'])}${viet(70, 12, co * 0.85, ['VD1:  CH₄', 'Δχ = 0,35'], [0, '#f5c84a'])}</div>`
+const T = [
+  ['cu', 'Lê Hoàng Nam', '19:48', 'Dạ em nghe rõ rồi ạ'],
+  ['na', 'Đỗ Thu Trang', '19:49', 'Thầy ơi hiệu độ âm điện bao nhiêu thì tính là liên kết ion ạ', 'hoi'],
+  ['thay', 'Thầy', '19:49', 'Từ 1,7 trở lên em nhé'],
+  ['ca', 'Phạm Ngọc Bảo Anh', '19:50', 'Em chép xong phần H₂ và O₂ rồi ạ'],
+  ['kk', 'Nguyễn Thị Hà', '19:51', 'Em hiểu rồi ạ', 'toi'],
+  ['cu', 'Trần Minh Khôi', '19:51', 'CO₂ có liên kết phân cực mà sao phân tử lại không phân cực ạ', 'hoi'],
+  ['na', 'Vũ Gia Bảo', '19:52', 'Câu VD1 em ra 0,35 giống thầy'],
+  ['ca', 'Hoàng Đức Anh', '19:52', 'Dạ rõ ạ'],
+  ['cu', 'Đặng Quỳnh Chi', '19:53', 'Thầy viết to hơn một chút được không ạ'],
+]
+const tin = (n) => T.slice(-n).map(([d, ten, gio, chu, loai]) => `<div class="tin ${d}${loai === 'toi' ? ' toi' : ''}"><div class="ten"><span>${ten}</span>${loai === 'hoi' ? '<em>Câu hỏi</em>' : loai === 'toi' ? '<em class="toi">Em</em>' : ''}<time>${gio}</time></div><p>${chu}</p></div>`).join('')
+const gui = '<div class="gui"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M4 12 20 4l-6 16-3-7-7-1Z"/></svg></div>'
+const cot = (lop, o) => `<aside class="cot ${lop}" style="--c:${o.c}px;${o.x ? `transform:translateX(${o.x}px);` : ''}${o.day ? `bottom:${o.day}px;` : ''}${o.hd ? `--hd:${o.hd}px;` : ''}">${lop === 'truot' ? '<i class="tay"></i>' : ''}
+  ${o.khongDau ? '' : `<div class="dau">Tin nhắn lớp<small>62 em</small><div class="nut">${mayTinh ? `<i class="${lop === 'ghim' ? 'bat' : ''}" title="Ghim cột">◧</i>` : ''}<i>✕</i></div></div>`}
+  <div class="ds">${tin(o.n)}</div>
+  ${o.khongNhanh ? '' : '<div class="nhanh"><i>Em hiểu rồi ạ</i><i>Thầy giảng lại ạ</i><i>Em chưa rõ ạ</i></div>'}
+  <div class="nhap"><div class="o${o.dang ? ' dang' : ''}">${o.dang ? 'Thầy ơi cho em hỏi' : 'Nhắn thầy và cả lớp…'}</div>${gui}</div>
+  ${o.phim ? '<div class="phim-tat"><kbd>Enter</kbd> gõ ngay · <kbd>Esc</kbd> về bài</div>' : ''}</aside>`
+if (mayTinh) {
+  // MÁY TÍNH: chế độ Học (giấy đề + bảng). Cột ghim bên phải; bảng và giấy thu theo phần còn lại.
+  const C = k === 'mt-dong' ? 0 : 300
+  if (C) document.documentElement.style.setProperty('--ghim', C + 'px')
+  man.innerHTML = `<div class="giay"><div class="chip"><b>Câu 3</b><span>Trắc nghiệm</span></div>Đốt cháy hoàn toàn 0,1 mol một ester no, đơn chức, mạch hở X thu được 8,8 gam CO₂. Công thức phân tử của X là<div class="pa"><span><b>A.</b>C₂H₄O₂</span><span><b>B.</b>C₃H₆O₂</span><span><b>C.</b>C₄H₈O₂</span><span><b>D.</b>C₅H₁₀O₂</span></div></div><div class="bang-hoc">${viet(7, 9, 21, ['n CO₂ = 8,8 : 44 = 0,2 mol', 'Số C = 0,2 : 0,1 = 2', '⇒ C₂H₄O₂'], [0, 0, '#f5c84a'])}</div>`
+  if (C) them(cot('ghim', { c: C, n: 9, phim: true }))
+  else { them('<i class="nam" style="width:10px;height:84px"><b>2</b></i>'); them('<div class="bong" style="right:28px;top:20px;max-width:300px"><b>Trần Minh Khôi</b><span>CO₂ có liên kết phân cực mà sao phân tử lại không phân cực ạ</span></div>'); them(`<span class="ghi" style="right:30px;top:${H * 0.42 + 26}px">Bấm vạch vàng hoặc nhấn Enter để mở tin nhắn</span>`) }
+} else {
+  // ĐIỆN THOẠI XOAY NGANG: chế độ Bảng kín màn.
+  const C = Math.round(Math.min(380, W * 0.44))
+  man.innerHTML = bang(H < 380 ? 19 : 21)
+  if (k === 'dong') { them('<i class="nam"><b>2</b></i>'); them('<div class="bong"><b>Trần Minh Khôi</b><span>CO₂ có liên kết phân cực mà sao phân tử lại không phân cực ạ</span></div>'); them(`<i class="ngon" style="right:2px;top:${H * 0.42 + 9}px"></i>`); them(`<i class="mui" style="right:56px;top:${H * 0.42 + 31}px;width:150px"></i>`); them(`<span class="ghi" style="right:64px;top:${H * 0.42 + 46}px">Vuốt từ mép phải vào</span>`) }
+  else if (k === 'keo') { const x = Math.round(C * 0.52); them(cot('truot', { c: C, n: 6, x })); them(`<i class="ngon" style="right:${C - x - 6}px;top:${H * 0.42 + 9}px"></i>`); them(`<span class="ghi" style="left:24px;bottom:18px">Khung trượt theo ngón tay · thả tay quá nửa là mở hẳn</span>`) }
+  else if (k === 'go') { them(cot('truot', { c: C, n: 2, day: 196, khongDau: true, khongNhanh: true, dang: true })); them('<div class="ban-phim">' + [10, 9, 9, 3].map((n, r) => `<div>${Array.from({ length: n }, (_, i) => `<i${r === 3 && i === 1 ? ' class="dai"' : ''}></i>`).join('')}</div>`).join('') + '</div>') }
+  else them(cot('truot', { c: C, n: H < 380 ? 4 : 5 }))
+}
+</script>
+</body></html>
