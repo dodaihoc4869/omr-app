@@ -6,7 +6,16 @@ import type { SinhTonAnh } from '../../lib/live-khoi/kieu'
 import { ANH_MS, MAU_DAY, coKhien, docDong, laMay, ngoaiVong, type BanDo, type Diem, type NhanVat, type Toi, type Vong } from '../../lib/live-khoi/sinh-ton-loi'
 import { taoBangMau, type BangMau, type Rgb } from './sinh-ton-hinh'
 import { cauChuoi, veBanDoNho, type NvVe } from './sinh-ton-ve'
-import type { Bao, DongVang, KetQua } from './sinh-ton-phu'
+import type { Bao, DongVang, KetQua, ThanhLon } from './sinh-ton-phu'
+
+/** Nguồn thanh máu: vòng khung ghi (≤ 2 lần / giây), chỉ hai lớp phủ đọc — không vẽ lại cả màn trò mỗi lần máu đổi. */
+export class NguonThanh {
+  private v: ThanhLon = { thay: null, boss: null }
+  private f = new Set<() => void>()
+  lay = (): ThanhLon => this.v
+  nghe = (f: () => void): (() => void) => { this.f.add(f); return () => { this.f.delete(f) } }
+  dat(v: ThanhLon): void { this.v = v; for (const f of this.f) f() }
+}
 
 export const kepDoi = (d: number): number => (d >= 0 && d < 4 ? Math.floor(d) : 0)
 /** Hai chữ cuối của tên (tên gọi của người Việt), cắt ở 16 ký tự cho gọn trên sân. */

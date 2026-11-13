@@ -26,7 +26,7 @@ import {
   BangDiem, DaiThongBao, DaiTruyNa, DauHo, DsTin, NhanBieuCam, NutThay, TheBiHa, TheCuoiVan, TheHop, ThanhMau, ThanhSung, type Bao, type BiHa, type DaiBao, type Dau, type KetQua,
   type ManhTin, type ThanhLon, type TinTran, type TruyNa, type Vang,
 } from './sinh-ton-phu'
-import { DoTuHa, bienDoi, cauHoHa, chonBao, chuGio, docBangMau, docBangVang, docPhang, ghiPhang, kepDoi, noiSuyAnh, phanCungYeu, rungNhe, tenNgan, veNho, xepHangVan, type NoiSuy } from './sinh-ton-tien-ich'
+import { DoTuHa, NguonThanh, bienDoi, cauHoHa, chonBao, chuGio, docBangMau, docBangVang, docPhang, ghiPhang, kepDoi, noiSuyAnh, phanCungYeu, rungNhe, tenNgan, veNho, xepHangVan, type NoiSuy } from './sinh-ton-tien-ich'
 import './tro-giu-lua.css'
 import './tro-sinh-ton.css'
 
@@ -75,7 +75,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   const [vang, setVang] = useState<Vang | null>(null)
   const [tatTieng, setTatTieng] = useState(() => { if (!imLang) return docTat(); datTat(true, false); return true })
   /** Đợt 3: thanh máu Thầy / Ma Mực, dải báo, Thầy đang trong trận (máy thầy) + máu bé ma Thầy. */
-  const [thanh, setThanh] = useState<ThanhLon>({ thay: null, boss: null })
+  const [nguonThanh] = useState(() => new NguonThanh())
   const [dai, setDai] = useState<DaiBao | null>(null)
   const [trongTran, setTrongTran] = useState(false)
   const thayRef = useRef(false)
@@ -103,7 +103,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     let tyAnh = '', mauThayAnh = 0, thanhCu = ''
     let hnCu: Record<string, string> = {}, hnSo = -1, choK = 0
     let haThay: string[] = []
+    /** Dùng lại mỗi khung (không sinh rác): hộp còn trên sân, Ma Mực nội suy. */
     const hopVe: HopVe[] = []
+    const bossKhung: NhanVat = { id: MA_MUC, x: 0, y: 0, mau: 0, doi: 0, cap: 1, t: '' }
     const bossVe: BossVe = { x: 0, y: 0, t: null }
 
     // ── Trạng thái trò (không qua React: đổi 60 lần / giây) ──
@@ -429,7 +431,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       }
       // Ma Mực tại lúc này (nội suy giữa hai ảnh) — đặt CUỐI danh sách ngắm.
       let bossNay: NhanVat | null = null
-      if (boss) { const f = Math.min(1, (luc - lucBoss) / ANH_MS); bossNay = { ...boss, x: bossTx + (boss.x - bossTx) * f, y: bossTy + (boss.y - bossTy) * f } }
+      if (boss) { const f = Math.min(1, (luc - lucBoss) / ANH_MS); bossNay = Object.assign(bossKhung, boss); bossNay.x = bossTx + (boss.x - bossTx) * f; bossNay.y = bossTy + (boss.y - bossTy) * f }
       const matMang = soAnh > 0 && luc - lucAnh > 2500
       // Nhân vật khác tại lúc này (nội suy giữa hai ảnh chụp); dùng lại mảng để không sinh rác mỗi khung. `khacBan` bỏ dòng giữ lại của ảnh mỏng (không ngắm).
       let n = 0
@@ -555,7 +557,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         const mThay = laThay ? (dangChet(tt, nay) ? 0 : tt.mau) : tyAnh ? mauThayAnh : null
         const tl: ThanhLon = { thay: mThay === null ? null : Math.ceil(mThay), boss: boss ? { mau: boss.mau, max: Math.max(bossMax, boss.mau), p: bossP } : null }
         const khoaT = `${tl.thay}|${tl.boss ? `${tl.boss.mau}|${tl.boss.max}|${tl.boss.p.join()}` : ''}`
-        if (khoaT !== thanhCu) { thanhCu = khoaT; setThanh(tl) }
+        if (khoaT !== thanhCu) { thanhCu = khoaT; nguonThanh.dat(tl) }
         if (hieu.length) hieu = hieu.filter((e) => luc - e.luc < MUC_MS)
         // Em mới VÀO PHÒNG (danh sách lớp `lop-ds` / `st-ds` có thêm người) ⇒ «<tên> vào <đội>».
         if (dsRef.current !== dsCu) {
@@ -627,8 +629,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       hinh.han = tVe - lucMo < 2500 ? tVe + 9 : 0
       // Hộp còn trên sân (dùng lại mảng) + Ma Mực và chân mục tiêu đang bị phun mực.
       const soHopVe = hopSo(nay), dsHopVe = viTriHop(bd)
-      hopVe.length = 0
-      if (!nghi) for (let k = 0; k < dsHopVe.length; k++) if (conHop(k, soHopVe)) hopVe.push({ x: dsHopVe[k].x, y: dsHopVe[k].y, loai: loaiHopO(soHopVe, k) })
+      let nHop = 0
+      if (!nghi) for (let k = 0; k < dsHopVe.length; k++) if (conHop(k, soHopVe)) { const o = hopVe[nHop] ?? (hopVe[nHop] = { x: 0, y: 0, loai: 'mau' }); o.x = dsHopVe[k].x; o.y = dsHopVe[k].y; o.loai = loaiHopO(soHopVe, k); nHop++ }
+      hopVe.length = nHop
       if (bossNay) { bossVe.x = bossNay.x; bossVe.y = bossNay.y; const mt = bossNay.t && !nghi ? viTri(bossNay.t) : undefined; bossVe.t = mt ? { x: mt.x, y: mt.y } : null }
       veKhung({ g, W, H, dpr, ti, cx: cam.x, cy: cam.y, bd, bang: bm, hinh, san, ten: bangTen, phang, em: banEm, luc, vong: v, nv: nvVe, hop: hopVe, boss: bossNay ? bossVe : null, nghi, duong, hieu, yeu, o: oSan, ranh: phiVe < 9 })
       phiVe = performance.now() - tVe
@@ -687,11 +690,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       {coVung ? <div className="st-vung" onPointerDown={xuong} onPointerMove={di} onPointerUp={buong} onPointerCancel={buong} onLostPointerCapture={buong} /> : null}
       <BangDiem diem={diem} gio={gio} xem={xem} doiToi={doiToi} />
       <DsTin tin={tin} />
-      {(thanh.thay !== null || thanh.boss) && !ketQua ? <ThanhMau t={thanh} /> : null}
+      <ThanhMau nguon={nguonThanh} an={!!ketQua} />
       {dai && !biHa && !ketQua ? <DaiThongBao key={`dai${dai.id}`} dai={dai} /> : truyNa && !biHa && !ketQua ? <DaiTruyNa key={`truy${truyNa.id}`} truyNa={truyNa} /> : null}
       {bao ? <div className="st-bao" data-kieu={bao.kieu} role="status">{bao.chu}</div> : null}
       {xem ? null : <ThanhSung cap={cap} sao={sao} />}
-      {xem && thayVao ? <NutThay trong={trongTran} mau={thanh.thay ?? MAU_THAY} bam={bamThay} /> : null}
+      {xem && thayVao ? <NutThay trong={trongTran} nguon={nguonThanh} bam={bamThay} /> : null}
       {theHop && bang && !biHa && !ketQua ? <TheHop key={`hop${theHop.id}`} bang={bang} loai={theHop.loai} /> : null}
       {bieuCam && !biHa && !ketQua ? <NhanBieuCam bieuCam={bieuCam} chon={guiBieuCam} /> : null}
       {xem ? null : (

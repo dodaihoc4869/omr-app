@@ -1,12 +1,12 @@
 // LỚP PHỦ DOM của trò «Sinh Tồn · Trang vở» (tách khỏi TroSinhTon.tsx 13/11, chỉ dời mã — DOM / lớp CSS / chữ y nguyên): băng dính điểm, tin trận, dải truy nã,
 // thanh cấp súng, thẻ nhặt hộp, nhãn biểu cảm, con dấu câu hô, thẻ bị hạ, thẻ cuối ván / bảng vàng máy em, bục bảng vàng máy thầy, hình bé ma `AnhMa`.
 // Chỉ TroSinhTon.tsx nhập (tĩnh) ⇒ nằm chung mảnh lười TroSinhTon. Khoá (`key`) để hiện lại hoạt hoạ đặt ở chỗ gọi, như cũ.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { CAP_TOI_DA, MAU_THAY, SUNG_TEN, type Diem, type LoaiHop } from '../../lib/live-khoi/sinh-ton-loi'
 import { BoHinh, type BangMau } from './sinh-ton-hinh'
 import { BIEU_CAM, KY_BIEU_CAM, THE_HOP, chuXep, duoiBiHa } from './sinh-ton-ve'
-import { bienDoi } from './sinh-ton-tien-ich'
+import { bienDoi, type NguonThanh } from './sinh-ton-tien-ich'
 
 export interface ManhTin { c: string; doi?: number; noi?: boolean }
 export interface TinTran { id: number; het: number; manh: ManhTin[] }
@@ -82,21 +82,24 @@ export function DaiTruyNa({ truyNa }: { truyNa: TruyNa }) {
 }
 
 /** Thanh máu Thầy / Ma Mực ở đầu màn (cả lớp cùng thấy). */
-export function ThanhMau({ t }: { t: ThanhLon }) {
+export function ThanhMau({ nguon, an }: { nguon: NguonThanh; an: boolean }) {
+  const t = useSyncExternalStore(nguon.nghe, nguon.lay)
+  if (an || (t.thay === null && !t.boss)) return null
   return (
     <div className="st-hp" data-hai={t.thay !== null && t.boss ? '1' : undefined}>
       {t.thay !== null ? (
         <div className="st-hp-dong" role="meter" aria-label="Máu của Thầy" aria-valuemin={0} aria-valuemax={MAU_THAY} aria-valuenow={Math.round(t.thay)}>
           <span className="st-hp-ten">Thầy · {so(t.thay)} / {so(MAU_THAY)} máu</span>
-          <span className="st-hp-vach"><i style={{ width: `${Math.max(0, Math.min(100, (100 * t.thay) / MAU_THAY))}%` }} /></span>
+          <span className="st-hp-vach"><i style={{ transform: `scaleX(${Math.max(0, Math.min(1, t.thay / MAU_THAY))})` }} /></span>
         </div>
       ) : null}
       {t.boss ? (
         <div className="st-hp-dong" role="meter" aria-label="Máu của Ma Mực" aria-valuemin={0} aria-valuemax={t.boss.max} aria-valuenow={Math.round(t.boss.mau)}>
           <span className="st-hp-ten">Ma Mực · {so(t.boss.mau)} / {so(t.boss.max)} máu</span>
-          <span className="st-hp-vach"><i style={{ width: `${Math.max(0, Math.min(100, (100 * t.boss.mau) / Math.max(1, t.boss.max)))}%` }} /></span>
-          <span className="st-hp-doi" aria-label={`Sát thương bốn đội: ${DOI_BPU.map((d, i) => `${d.ky} ${t.boss!.p[i] ?? 0}%`).join(', ')}`}>
-            {DOI_BPU.map((d, i) => <i key={d.ky} style={{ ...bienDoi(i), flexGrow: t.boss!.p[i] ?? 0 }}><small>{d.ky} {t.boss!.p[i] ?? 0}%</small></i>)}
+          <span className="st-hp-vach"><i style={{ transform: `scaleX(${Math.max(0, Math.min(1, t.boss.mau / Math.max(1, t.boss.max)))})` }} /></span>
+          <span className="st-hp-doi" aria-hidden="true">{DOI_BPU.map((d, i) => <i key={d.ky} style={{ ...bienDoi(i), flexGrow: t.boss!.p[i] ?? 0 }} />)}</span>
+          <span className="st-hp-pt" aria-label={`Sát thương bốn đội: ${DOI_BPU.map((d, i) => `${d.ten} ${t.boss!.p[i] ?? 0}%`).join(', ')}`}>
+            {DOI_BPU.map((d, i) => <small key={d.ky} style={bienDoi(i)}>{d.ky} {t.boss!.p[i] ?? 0}%</small>)}
           </span>
         </div>
       ) : null}
@@ -107,7 +110,8 @@ export function DaiThongBao({ dai }: { dai: DaiBao }) {
   return <div className="st-truy st-dai" role="status"><b>{dai.chu}</b><span>{dai.phu}</span></div>
 }
 /** Máy thầy (chỉ phòng chờ live): nút «Thầy vào trận / Rời trận» (≥ 44 px) + trạng thái máu + gợi ý điều khiển. */
-export function NutThay({ trong, mau, bam }: { trong: boolean; mau: number; bam: () => void }) {
+export function NutThay({ trong, nguon, bam }: { trong: boolean; nguon: NguonThanh; bam: () => void }) {
+  const mau = useSyncExternalStore(nguon.nghe, nguon.lay).thay ?? MAU_THAY
   return (
     <div className="st-thay">
       {trong ? <p className="st-thay-goi">Thầy chạm vào sân để bé ma Thầy chạy tới · bút đỏ tự bắn · bị hạ thì 5 giây sau quay lại</p> : null}
