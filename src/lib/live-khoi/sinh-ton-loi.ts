@@ -1,5 +1,5 @@
-// TRÒ «SINH TỒN» ở phòng chờ Live theo khối (thầy chốt 12/11; đặc tả docs/dac-ta-sinh-ton-1211.md mục 4) — LÕI THUẦN: không DOM, không đồng hồ, không
-// ngẫu nhiên ẩn. Máy em tự mô phỏng bé ma của mình; phòng gom vị trí, tính máy bù chỗ và phát ảnh chụp mỗi 250 ms (hợp đồng ./kieu.ts).
+// TRÒ «SINH TỒN» ở phòng chờ Live theo khối (thầy chốt 12/11; đặc tả docs/dac-ta-sinh-ton-1211.md mục 4; bản 2 thầy duyệt 13/11: sáu khẩu súng + sân ghép
+// trang theo sĩ số — docs/dac-ta-sinh-ton-v2-1311.md) — LÕI THUẦN: không DOM, không đồng hồ, không ngẫu nhiên ẩn. Máy em tự mô phỏng bé ma của mình; phòng gom vị trí, tính máy bù chỗ và phát ảnh chụp mỗi 250 ms (hợp đồng ./kieu.ts).
 // Sát thương do bên BỊ bắn tự tính từ ảnh chụp (ai khai `t` = mình) ⇒ không có gói «đạn»; đạn trên màn chỉ là hình vẽ.
 import type { SinhTonDong } from './kieu'
 
@@ -29,19 +29,28 @@ export const BAT_TU_MS = 2000
 export const LO_GAN = 70
 /** Đứng yên trong bụi chừng này thì súng ngừng bắn (ẩn hẳn, máu hồi). */
 export const AN_YEN_MS = 400
-/** Máu mất mỗi giây theo cấp súng 1..4 của bên bắn (thầy 13/11: «cho đạn của 4 cấp súng bắn nhanh hơn chút nữa» ⇒ nhịp bắn nhanh hơn 1/3, sát thương tăng 20%; trước là 30 · 40 · 50 · 60). */
-export const SAT_THUONG_GIAY = [36, 48, 60, 72] as const
-/** Nhịp bắn (ms giữa hai phát) theo cấp súng — hình đạn và tiếng súng cùng theo số này (trước: 333 · 333 · 333 · 1000). */
-export const NHIP_BAN_MS = [250, 250, 250, 700] as const
-/** Đạn bay từ nòng tới mục tiêu trong chừng này ms (trước: 230 · 230 · 230 · 380). */
-export const DAN_BAY_MS = [170, 170, 170, 280] as const
+/** SÁU KHẨU SÚNG (bản 2, thầy duyệt 13/11 — docs/dac-ta-sinh-ton-v2-1311.md): hạ được bạn ⇒ lên một cấp; bị hạ ⇒ về cấp 1. Mọi mảng theo cấp dài đúng 6. */
+export const SUNG_TEN = ['Súng Hạt', 'Súng Đôi', 'Súng Bọt', 'Súng Sấm', 'Súng Lửa Màu', 'Pháo Sao'] as const
+/** Máu mất mỗi giây theo cấp súng 1..6 của bên bắn (bản 1 bốn cấp: 36 · 48 · 60 · 72). */
+export const SAT_THUONG_GIAY = [34, 42, 50, 58, 66, 74] as const
+/** Nhịp bắn (ms giữa hai phát) theo cấp súng — hình đạn và tiếng súng theo số này; sát thương tính theo giây nên nhịp chỉ là hình.
+ *  Bọt bay chậm, phát thưa hơn; Sấm nhanh; Pháo Sao chậm, nổ to (bản 1: 250 · 250 · 250 · 700). */
+export const NHIP_BAN_MS = [250, 250, 340, 250, 280, 700] as const
+/** Đạn bay từ nòng tới mục tiêu trong chừng này ms (luôn ngắn hơn nhịp bắn: đạn tới đích trước phát kế). */
+export const DAN_BAY_MS = [170, 170, 260, 110, 200, 280] as const
 /** Máy bù chỗ bắn yếu hơn người. */
 const HE_MAY = 0.67
-/** Cấp 3 «Súng Sấm»: nảy sang MỘT đối thủ gần mục tiêu; cấp 4 «Pháo Sao»: nổ lan quanh mục tiêu — đều nửa sát thương. */
-const NAY_BK = 90
-const NO_BK = 60
-export const CAP_TOI_DA = 4
-export const CAP_MAY_TOI_DA = 2
+/** Hiệu ứng lan (đều NỬA sát thương, chỉ lên ĐỐI THỦ của bên bắn): cấp 3 «Súng Bọt» vỡ ra trúng bạn đứng sát mục tiêu (bán kính 40); cấp 4 «Súng Sấm» nảy sang
+ *  MỘT đối thủ gần mục tiêu nhất (trong 90); cấp 6 «Pháo Sao» nổ lan quanh mục tiêu (bán kính 60). Cấp 5 «Súng Lửa Màu» không lan — trúng thẳng thì CHÁY. */
+export const BOT_BK = 40
+export const NAY_BK = 90
+export const NO_BK = 60
+/** Cấp 5: trúng thẳng ⇒ cháy thêm 2 giây kể từ phát trúng cuối, 8 máu / giây (bên bị bắn tự trừ — `nhanDon` ghi, `buocToi` / `buocMay` trừ). */
+export const CHAY_MS = 2000
+export const CHAY_MOI_GIAY = 8
+export const CAP_TOI_DA = 6
+/** Máy bù lên tối đa Súng Bọt. */
+export const CAP_MAY_TOI_DA = 3
 /** Hộp tiếp tế giữa sân: 20 giây một hộp. */
 export const HOP_MS = 20_000
 export const HOP_BK = 36
@@ -50,17 +59,20 @@ export const NHIP_GUI_MS = 250
 export const NHIP_NHAC_MS = 2000
 /** Cạnh ô lưới tìm đường. */
 const O = 40
-export const SUNG_TEN = ['Súng Hạt', 'Súng Đôi', 'Súng Sấm', 'Pháo Sao'] as const
 
 export interface Diem { x: number; y: number }
 export interface ChuNhat { x: number; y: number; w: number; h: number }
 export interface BanDo {
   cap: number; rong: number; cao: number
+  /** Số trang 1600 × 1000 ghép theo chiều ngang / dọc. */ ngang: number; doc: number
   tuong: ChuNhat[]; thung: ChuNhat[]; bui: ChuNhat[]
   /** Trại bốn đội (Natri trên-trái · Kali trên-phải · Đồng dưới-trái · Canxi dưới-phải). */ trai: Diem[]
   /** Vật chặn đạn + chặn đường = tường + thùng. */ chan: ChuNhat[]
   cot: number; hang: number
   /** 1 = ô không đi được (tâm ô nằm trong vật chặn đã nới bằng bán kính bé ma). */ luoi: Uint8Array
+  /** CHỈ MỤC THEO TRANG (nướng sẵn lúc `taoBanDo`): `chanTrang[j * ngang + i]` = vật chặn mà hộp nới `NOI_TRANG` chạm trang (i, j); `buiTrang` tương tự cho bụi.
+   *  Phép thử va chạm chỉ quét các trang mà hộp bao của đoạn / điểm chạm tới (sân 4 × 4 có ~550 vật chặn, một trang ~35). */
+  chanTrang: ChuNhat[][]; buiTrang: ChuNhat[][]
 }
 export interface Vong { cx: number; cy: number; rx: number; ry: number }
 /** Một nhân vật như ảnh chụp cho thấy. */
@@ -74,6 +86,8 @@ export interface Toi {
   /** Lần cuối di chuyển (để biết đang đứng yên trong bụi). */ lucDong: number
   van: number
   /** Đường đang tự chạy theo (chạm để tới). */ duong: Diem[]
+  /** Đang CHÁY (trúng Súng Lửa Màu) tới lúc này; 0 = không cháy. */ chayDen: number
+  /** Kẻ châm lửa gần nhất — `buocToi` làm em hết máu khi đang cháy ⇒ giữ mã này để báo lượt hạ (chết vì vòng an toàn ⇒ ''). */ chayAi: string
 }
 
 export const laMay = (id: string): boolean => id.charCodeAt(0) === 126 // '~'
@@ -82,20 +96,22 @@ export const vanSo = (nay: number): number => Math.floor(nay / VAN_MS)
 export const dangNghi = (nay: number): boolean => ((nay % VAN_MS) + VAN_MS) % VAN_MS >= VAN_CHOI_MS
 export const conLai = (nay: number): number => Math.max(0, VAN_CHOI_MS - (((nay % VAN_MS) + VAN_MS) % VAN_MS))
 export const hopSo = (nay: number): number => Math.floor(nay / HOP_MS)
-/** Cỡ bản đồ theo số nhân vật trên sân (em thật + máy bù, ít nhất 16) — thầy 13/11: «Tùy theo số lượng hs thì bản đồ được mở rộng ra hơn để chơi cho thú vị»:
- * tới 20 ⇒ 0 · tới 36 ⇒ 1 · tới 64 ⇒ 2 · tới 96 ⇒ 3 · hơn ⇒ 4 (xem CO_SAN). Cỡ chỉ đổi ở ĐẦU VÁN. */
+/** Cỡ bản đồ theo số nhân vật trên sân (em thật + máy bù, mỗi đội ít nhất 4) — thầy 13/11: «Tùy theo số lượng hs thì bản đồ được mở rộng ra hơn để chơi cho thú vị»:
+ * tới 20 ⇒ 0 (2 × 2 trang) · tới 36 ⇒ 1 (3 × 2) · tới 64 ⇒ 2 (3 × 3) · tới 96 ⇒ 3 (4 × 3) · hơn ⇒ 4 (4 × 4) (xem CO_SAN). Cỡ chỉ đổi ở ĐẦU VÁN. */
 export const capBanDo = (soNhanVat: number): number => (soNhanVat <= 20 ? 0 : soNhanVat <= 36 ? 1 : soNhanVat <= 64 ? 2 : soNhanVat <= 96 ? 3 : 4)
 const kep = (v: number, a: number, b: number): number => (v < a ? a : v > b ? b : v)
 
-// ── Bản đồ: một phần tư rồi lấy đối xứng hai trục ⇒ một KHU 1600 × 1000, bốn đội công bằng. Sân lớn = phóng khu (cỡ 1) hoặc GHÉP nhiều khu cạnh nhau
-//    (cỡ 2–4: thêm đấu trường, thêm chỗ nấp, mật độ vật chặn giữ nguyên). Khu tự đối xứng ⇒ ghép bao nhiêu khu sân vẫn đối xứng hai trục. ──
+// ── Bản đồ: một phần tư rồi lấy đối xứng hai trục ⇒ một TRANG 1600 × 1000, bốn đội công bằng. Mọi cỡ sân (bản 2, thầy duyệt 13/11) = GHÉP các trang cạnh
+//    nhau, không phóng: 2 × 2 · 3 × 2 · 3 × 3 · 4 × 3 · 4 × 4 (mật độ vật chặn giữ nguyên). Trang tự đối xứng ⇒ ghép bao nhiêu trang sân vẫn đối xứng hai trục. ──
 const RONG = 1600
 const CAO = 1000
+/** Hộp vật chặn nới chừng này khi xếp vào trang — phải ≥ mọi `noi` dùng khi thử va chạm (đi: BK_NV + 1). */
+const NOI_TRANG = BK_NV + 2
 const PT_TUONG: readonly (readonly number[])[] = [[262, 150, 44, 130], [110, 312, 130, 44], [450, 262, 170, 44], [650, 372, 44, 92], [650, 372, 112, 44], [778, 60, 44, 96]]
 const PT_THUNG: readonly (readonly number[])[] = [[372, 424, 54, 54], [566, 104, 54, 54], [60, 473, 54, 54]]
 const PT_BUI: readonly (readonly number[])[] = [[340, 150, 150, 92], [205, 452, 130, 96], [715, 190, 170, 86], [470, 620, 140, 90]]
-/** Năm cỡ sân: [hệ số phóng, số khu ngang, số khu dọc] — 1600 × 1000 · 2400 × 1500 · 3200 × 2000 · 4800 × 2000 · 4800 × 3000. */
-const CO_SAN: readonly (readonly [number, number, number])[] = [[1, 1, 1], [1.5, 1, 1], [1, 2, 2], [1, 3, 2], [1, 3, 3]]
+/** Năm cỡ sân: [hệ số phóng, số trang ngang, số trang dọc] — 3200 × 2000 · 4800 × 2000 · 4800 × 3000 · 6400 × 3000 · 6400 × 4000 (thay hẳn thang bản 1). */
+const CO_SAN: readonly (readonly [number, number, number])[] = [[1, 2, 2], [1, 3, 2], [1, 3, 3], [1, 4, 3], [1, 4, 4]]
 export const SO_CO_SAN = CO_SAN.length
 function doiXung(ds: readonly (readonly number[])[], he: number): ChuNhat[] {
   const kq: ChuNhat[] = []
@@ -135,20 +151,42 @@ export function taoBanDo(cap: number): BanDo {
     const j0 = Math.max(0, Math.floor((v.y - NOI) / O) - 1), j1 = Math.min(hang - 1, Math.ceil((v.y + v.h + NOI) / O) + 1)
     for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) if (trongHop(v, i * O + O / 2, j * O + O / 2, NOI)) luoi[j * cot + i] = 1
   }
+  const bui = ghep(PT_BUI)
+  // Chỉ mục theo trang: mỗi vật xếp vào mọi trang mà hộp nới của nó chạm — dùng ĐÚNG hàm chia trang của phép thử (`trangDau` / `trangCuoi`) ⇒ điểm nào
+  // nằm trong hộp nới của vật thì trang của điểm đó chắc chắn có vật trong danh sách (cùng kết quả với quét hết, test so ≥ 20 000 truy vấn mỗi cỡ).
+  const xepTrang = (ds: ChuNhat[], noi: number): ChuNhat[][] => {
+    const kq: ChuNhat[][] = Array.from({ length: ngang * doc }, () => [])
+    for (const v of ds) {
+      const i0 = trangDau(v.x - noi, rk, ngang), i1 = trangCuoi(v.x + v.w + noi, rk, ngang), j0 = trangDau(v.y - noi, ck, doc), j1 = trangCuoi(v.y + v.h + noi, ck, doc)
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) kq[j * ngang + i].push(v)
+    }
+    return kq
+  }
   const bd: BanDo = {
-    cap: c, rong, cao, tuong, thung, bui: ghep(PT_BUI), chan, cot, hang, luoi,
+    cap: c, rong, cao, ngang, doc, tuong, thung, bui, chan, cot, hang, luoi, chanTrang: xepTrang(chan, NOI_TRANG), buiTrang: xepTrang(bui, 1),
     // Trại bốn đội ở bốn góc NGOÀI của cả sân.
     trai: [[130 * he, 122 * he], [rong - 130 * he, 122 * he], [130 * he, cao - 122 * he], [rong - 130 * he, cao - 122 * he]].map(([x, y]) => ({ x, y })),
   }
   NHO_BAN_DO[c] = bd
   return bd
 }
-/** Bụi là hình bầu dục nội tiếp ô của nó. */
+/** Trang chứa toạ độ `v` (cạnh trang `co`, `n` trang), kẹp vào sân. Toạ độ hỏng (NaN) ⇒ trang ĐẦU cho mép dưới, trang CUỐI cho mép trên ⇒ quét cả sân. */
+function trangDau(v: number, co: number, n: number): number { const t = Math.floor(v / co); return t > 0 ? (t < n ? t : n - 1) : 0 }
+function trangCuoi(v: number, co: number, n: number): number { const t = Math.floor(v / co); return t < n - 1 ? (t > 0 ? t : 0) : n - 1 }
+/** Dải trang mà hộp [x0, x1] × [y0, y1] chạm — ghi vào biến của mô-đun (không cấp phát; phép thử chặn được gọi hàng trăm nghìn lần mỗi giây). */
+let I0 = 0, I1 = 0, J0 = 0, J1 = 0
+function dai(bd: BanDo, x0: number, y0: number, x1: number, y1: number): void {
+  const rk = bd.rong / bd.ngang, ck = bd.cao / bd.doc
+  I0 = trangDau(x0, rk, bd.ngang); I1 = trangCuoi(x1, rk, bd.ngang); J0 = trangDau(y0, ck, bd.doc); J1 = trangCuoi(y1, ck, bd.doc)
+}
+const trongBauDuc = (b: ChuNhat, x: number, y: number): boolean => {
+  const dx = (x - b.x - b.w / 2) / (b.w / 2), dy = (y - b.y - b.h / 2) / (b.h / 2)
+  return dx * dx + dy * dy <= 1
+}
+/** Bụi là hình bầu dục nội tiếp ô của nó (chỉ thử bụi của trang chứa điểm). */
 export function trongBui(bd: BanDo, x: number, y: number): boolean {
-  for (const b of bd.bui) {
-    const dx = (x - b.x - b.w / 2) / (b.w / 2), dy = (y - b.y - b.h / 2) / (b.h / 2)
-    if (dx * dx + dy * dy <= 1) return true
-  }
+  dai(bd, x, y, x, y)
+  for (let j = J0; j <= J1; j++) for (let i = I0; i <= I1; i++) { const t = bd.buiTrang[j * bd.ngang + i]; for (let k = 0; k < t.length; k++) if (trongBauDuc(t[k], x, y)) return true }
   return false
 }
 /** Vòng an toàn co dần suốt thời gian chơi của ván: từ kín sân về 42% bán trục. */
@@ -177,11 +215,31 @@ function catHop(c: ChuNhat, x1: number, y1: number, x2: number, y2: number, noi:
   const dx = x2 - x1, dy = y2 - y1
   return tam(-dx, x1 - xa) && tam(dx, xb - x1) && tam(-dy, y1 - ya) && tam(dy, yb - y1) && T0 <= T1
 }
+/** Đoạn cắt vật chặn nào (nới `noi` < NOI_TRANG)? Chỉ thử vật chặn của các trang mà hộp bao của đoạn chạm: điểm cắt nằm trên đoạn (⇒ trong hộp bao)
+ *  và trong hộp nới `noi` của vật (⇒ vật đã được xếp vào trang của điểm đó, vì lúc xếp đã nới NOI_TRANG lớn hơn). */
+function catChan(bd: BanDo, x1: number, y1: number, x2: number, y2: number, noi: number): boolean {
+  dai(bd, Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2))
+  const i0 = I0, i1 = I1, j1 = J1
+  for (let j = J0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+    const t = bd.chanTrang[j * bd.ngang + i]
+    for (let k = 0; k < t.length; k++) if (catHop(t[k], x1, y1, x2, y2, noi)) return true
+  }
+  return false
+}
 /** Tường / thùng chắn đường NGẮM giữa hai điểm? */
-export const chanDuong = (bd: BanDo, x1: number, y1: number, x2: number, y2: number): boolean => bd.chan.some((c) => catHop(c, x1, y1, x2, y2, 0))
+export const chanDuong = (bd: BanDo, x1: number, y1: number, x2: number, y2: number): boolean => catChan(bd, x1, y1, x2, y2, 0)
 /** …chắn đường ĐI (vật chặn nới bằng bán kính bé ma)? */
-const chanDi = (bd: BanDo, x1: number, y1: number, x2: number, y2: number): boolean => bd.chan.some((c) => catHop(c, x1, y1, x2, y2, BK_NV + 1))
-const bi = (bd: BanDo, x: number, y: number): boolean => bd.chan.some((c) => trongHop(c, x, y, BK_NV))
+export const chanDi = (bd: BanDo, x1: number, y1: number, x2: number, y2: number): boolean => catChan(bd, x1, y1, x2, y2, BK_NV + 1)
+/** Điểm (tâm bé ma) đè vật chặn? Chỉ thử vật chặn của trang chứa điểm. */
+export function bi(bd: BanDo, x: number, y: number): boolean {
+  dai(bd, x, y, x, y)
+  const i0 = I0, i1 = I1, j1 = J1
+  for (let j = J0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+    const t = bd.chanTrang[j * bd.ngang + i]
+    for (let k = 0; k < t.length; k++) if (trongHop(t[k], x, y, BK_NV)) return true
+  }
+  return false
+}
 /** Đi một bước, trượt dọc tường (tách hai trục), không ra khỏi sân. */
 export function diChuyen(bd: BanDo, x: number, y: number, dx: number, dy: number): Diem {
   let nx = kep(x + dx, BK_NV, bd.rong - BK_NV)
@@ -204,31 +262,69 @@ function oTrongGan(bd: BanDo, o: number): number {
 }
 const HUONG: readonly (readonly [number, number])[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 /** Đường từ (x1, y1) tới (x2, y2): danh sách điểm phải qua (không gồm điểm đầu). Đích trong tường ⇒ tới ô trống gần nhất. Không có đường ⇒ []. */
+/** Bộ nhớ tìm đường dùng lại cho từng bản đồ (sân 4 × 4 có 16 000 ô — không cấp phát 4 mảng mỗi lần gọi): ô nào có `luot[o] !== lan` coi như chưa chạm. */
+interface NhoTim { lan: number; luot: Uint32Array; g: Float32Array; cha: Int32Array; dong: Uint32Array; dong0: number; heapO: number[]; heapF: number[] }
+const NHO_TIM = new WeakMap<BanDo, NhoTim>()
+function nhoTim(bd: BanDo): NhoTim {
+  let m = NHO_TIM.get(bd)
+  if (!m) { const n = bd.cot * bd.hang; m = { lan: 0, luot: new Uint32Array(n), g: new Float32Array(n), cha: new Int32Array(n), dong: new Uint32Array(n), dong0: 0, heapO: [], heapF: [] }; NHO_TIM.set(bd, m) }
+  return m
+}
+/** Đống nhị phân nhỏ nhất theo f (hai mảng song song); bằng f ⇒ phần tử vào trước ra trước không bảo đảm (đường vẫn ngắn nhất). */
+function dayVao(h: NhoTim, o: number, f: number): void {
+  const O_ = h.heapO, F = h.heapF
+  let i = O_.length
+  O_.push(o); F.push(f)
+  while (i > 0) { const p = (i - 1) >> 1; if (F[p] <= f) break; O_[i] = O_[p]; F[i] = F[p]; i = p }
+  O_[i] = o; F[i] = f
+}
+function layRa(h: NhoTim): number {
+  const O_ = h.heapO, F = h.heapF, top = O_[0], o = O_.pop()!, f = F.pop()!, n = O_.length
+  if (n) {
+    let i = 0
+    for (;;) {
+      const a = 2 * i + 1, b = a + 1
+      let k = i, fk = f
+      if (a < n && F[a] < fk) { k = a; fk = F[a] }
+      if (b < n && F[b] < fk) { k = b; fk = F[b] }
+      if (k === i) break
+      O_[i] = O_[k]; F[i] = F[k]; i = k
+    }
+    O_[i] = o; F[i] = f
+  }
+  return top
+}
 export function timDuong(bd: BanDo, x1: number, y1: number, x2: number, y2: number): Diem[] {
   const dau = oTrongGan(bd, oCua(bd, x1, y1)), dichGoc = oCua(bd, x2, y2), dich = oTrongGan(bd, dichGoc)
-  const n = bd.cot * bd.hang, g = new Float32Array(n).fill(Infinity), f = new Float32Array(n).fill(Infinity), cha = new Int32Array(n).fill(-1), dong = new Uint8Array(n)
-  const uoc = (o: number): number => Math.hypot((o % bd.cot) - (dich % bd.cot), Math.floor(o / bd.cot) - Math.floor(dich / bd.cot))
-  const mo: number[] = [dau]
-  g[dau] = 0; f[dau] = uoc(dau)
+  const h = nhoTim(bd), { luot, g, cha, dong } = h, cot = bd.cot, luoi = bd.luoi
+  // Lượt mới: tăng số lượt (tràn sau 4 tỉ lần ⇒ xoá sạch một lần).
+  if (++h.lan >= 0xffffffff) { h.lan = 1; luot.fill(0); dong.fill(0) }
+  const lan = h.lan, di0 = dich % cot, dj0 = Math.floor(dich / cot)
+  // Ước lượng «tám hướng» (đi chéo √2): sát chi phí thật hơn đường chim bay ⇒ ít ô phải mở hơn trên sân lớn; nhân 1,001 để phá thế hoà (đường dài hơn
+  // tối ưu nhiều nhất 0,1%, không thấy được).
+  const uoc = (o: number): number => {
+    const i = o % cot, a = i > di0 ? i - di0 : di0 - i, j = (o - i) / cot, b = j > dj0 ? j - dj0 : dj0 - j
+    return (a + b + (Math.SQRT2 - 2) * (a < b ? a : b)) * 1.001
+  }
+  h.heapO.length = 0; h.heapF.length = 0
+  luot[dau] = lan; g[dau] = 0; cha[dau] = -1
+  dayVao(h, dau, uoc(dau))
   let toi = -1
-  while (mo.length) {
-    let k = 0
-    for (let i = 1; i < mo.length; i++) if (f[mo[i]] < f[mo[k]]) k = i
-    const o = mo[k]
-    mo[k] = mo[mo.length - 1]; mo.pop()
+  while (h.heapO.length) {
+    const o = layRa(h)
     if (o === dich) { toi = o; break }
-    if (dong[o]) continue
-    dong[o] = 1
-    const i0 = o % bd.cot, j0 = Math.floor(o / bd.cot)
-    for (const [di, dj] of HUONG) {
-      const i = i0 + di, j = j0 + dj
-      if (i < 0 || j < 0 || i >= bd.cot || j >= bd.hang) continue
-      const q = j * bd.cot + i
-      if (bd.luoi[q] || dong[q] || (di && dj && (bd.luoi[j0 * bd.cot + i] || bd.luoi[j * bd.cot + i0]))) continue
+    if (dong[o] === lan) continue
+    dong[o] = lan
+    const i0 = o % cot, j0 = (o - i0) / cot
+    for (let k = 0; k < 8; k++) {
+      const di = HUONG[k][0], dj = HUONG[k][1], i = i0 + di, j = j0 + dj
+      if (i < 0 || j < 0 || i >= cot || j >= bd.hang) continue
+      const q = j * cot + i
+      if (luoi[q] || dong[q] === lan || (di && dj && (luoi[j0 * cot + i] || luoi[j * cot + i0]))) continue
       const moi = g[o] + (di && dj ? Math.SQRT2 : 1)
-      if (moi >= g[q]) continue
-      g[q] = moi; f[q] = moi + uoc(q); cha[q] = o
-      mo.push(q)
+      if (luot[q] === lan && moi >= g[q]) continue
+      luot[q] = lan; g[q] = moi; cha[q] = o
+      dayVao(h, q, moi + uoc(q))
     }
   }
   if (toi < 0) return []
@@ -265,18 +361,24 @@ export function chonMucTieu(bd: BanDo, toi: { x: number; y: number; doi: number 
   return id
 }
 const satThuongCua = (nv: NhanVat): number => SAT_THUONG_GIAY[kep(Math.round(nv.cap), 1, CAP_TOI_DA) - 1] * (laMay(nv.id) ? HE_MAY : 1)
-/** Máu `toi` mất trong `giay` giây theo ảnh chụp `ds` (những nhân vật KHÁC). `ai` = mã kẻ gây nhiều nhất (để báo lượt hạ). */
-export function satThuong(toi: { id: string; x: number; y: number; doi: number }, ds: readonly NhanVat[], giay: number): { tong: number; ai: string } {
-  let tong = 0, ai = '', nhat = 0
+/** Máu `toi` mất trong `giay` giây theo ảnh chụp `ds` (những nhân vật KHÁC). `ai` = mã kẻ gây nhiều nhất (để báo lượt hạ). `chay` = mã kẻ cầm
+ *  Súng Lửa Màu (cấp 5) đang bắn THẲNG vào `toi` ('' = không) — đưa vào `nhanDon(…, chay)` để châm lửa. Đồng đội không bao giờ gây sát thương. */
+export function satThuong(toi: { id: string; x: number; y: number; doi: number }, ds: readonly NhanVat[], giay: number): { tong: number; ai: string; chay: string } {
+  let tong = 0, ai = '', nhat = 0, chay = ''
   for (const e of ds) {
     if (e.doi === toi.doi || e.mau <= 0 || !e.t || e.id === toi.id) continue
+    const cap = kep(Math.round(e.cap), 1, CAP_TOI_DA)
     let he = 0
-    if (e.t === toi.id) he = Math.hypot(e.x - toi.x, e.y - toi.y) <= TAM_XA ? 1 : 0
-    else if (e.cap >= 3) {
+    if (e.t === toi.id) {
+      he = Math.hypot(e.x - toi.x, e.y - toi.y) <= TAM_XA ? 1 : 0
+      if (he && cap === 5 && !chay) chay = e.id
+    } else if (cap === 3 || cap === 4 || cap === 6) {
+      // Hiệu ứng lan quanh MỤC TIÊU của `e` (mục tiêu phải là đối thủ còn máu của `e`).
       const mt = ds.find((n) => n.id === e.t)
       if (!mt || mt.doi === e.doi || mt.mau <= 0) continue
       const d = Math.hypot(mt.x - toi.x, mt.y - toi.y)
-      if (e.cap >= 4) he = d <= NO_BK ? 0.5 : 0
+      if (cap === 3) he = d <= BOT_BK ? 0.5 : 0
+      else if (cap === 6) he = d <= NO_BK ? 0.5 : 0
       else if (d <= NAY_BK && !ds.some((n) => n.id !== mt.id && n.id !== toi.id && n.doi !== e.doi && n.mau > 0 && Math.hypot(mt.x - n.x, mt.y - n.y) < d)) he = 0.5
     }
     if (!he) continue
@@ -284,8 +386,10 @@ export function satThuong(toi: { id: string; x: number; y: number; doi: number }
     tong += mat
     if (mat > nhat) { nhat = mat; ai = e.id }
   }
-  return { tong, ai }
+  return { tong, ai, chay }
 }
+/** Máu mất vì CHÁY trong khoảng (nay − dtMs, nay] khi cháy tới `chayDen` (không kẹp dtMs ⇒ tổng sau phát trúng cuối luôn đúng 16 máu). */
+export const matChay = (chayDen: number, nay: number, dtMs: number): number => (chayDen > nay - dtMs ? (CHAY_MOI_GIAY * (Math.min(nay, chayDen) - Math.max(nay - dtMs, chayDen - CHAY_MS))) / 1000 : 0)
 
 // ── Bé ma của chính em ──
 /** Chỗ hồi sinh quanh trại đội, lệch theo `hat` (0..1) để cả đội không chồng lên nhau. Có `nay` và trại đã nằm NGOÀI vòng an toàn (nửa sau ván — sân lớn
@@ -303,7 +407,7 @@ export function choTrai(bd: BanDo, doi: number, hat: number, nay?: number): Diem
 }
 export function taoToi(bd: BanDo, doi: number, nay: number, hat = 0): Toi {
   const p = choTrai(bd, doi, hat, nay)
-  return { x: p.x, y: p.y, mau: MAU_DAY, doi: kep(Math.floor(doi), 0, 3), cap: 1, chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, lucDong: nay, van: vanSo(nay), duong: [] }
+  return { x: p.x, y: p.y, mau: MAU_DAY, doi: kep(Math.floor(doi), 0, 3), cap: 1, chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, lucDong: nay, van: vanSo(nay), duong: [], chayDen: 0, chayAi: '' }
 }
 export const dangChet = (tt: Toi, nay: number): boolean => tt.chetDen > nay
 /** Một khung hình: hồi sinh, đi (theo tay hoặc theo đường chạm), hồi máu, mất máu ngoài vòng. `dx, dy` trong [-1, 1]. */
@@ -323,19 +427,26 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
     if (kc <= buoc) { x = d.x; y = d.y; duong = duong.slice(1) } else { const p = diChuyen(bd, x, y, ((d.x - x) / kc) * buoc, ((d.y - y) / kc) * buoc); if (p.x === x && p.y === y) duong = []; x = p.x; y = p.y }
     lucDong = nay
   }
-  let lucTrung = kq.lucTrung
+  let lucTrung = kq.lucTrung, chayAi = kq.chayAi
   if (!dangNghi(nay)) {
-    if (ngoaiVong(vong(bd, nay), x, y) && nay >= kq.batTuDen) { mau -= NGOAI_VONG_MOI_GIAY * dt; lucTrung = nay }
-    else if (mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
+    // Cháy (Súng Lửa Màu): trừ theo đúng khoảng thời gian đã trôi (không kẹp 100 ms như bước đi ⇒ tab chậm vẫn đủ 16 máu); bất tử thì không cháy.
+    const chay = nay >= kq.batTuDen ? matChay(kq.chayDen, nay, dtMs) : 0
+    if (chay > 0) { mau -= chay; lucTrung = nay }
+    const vongMat = ngoaiVong(vong(bd, nay), x, y) && nay >= kq.batTuDen
+    if (vongMat) { mau -= NGOAI_VONG_MOI_GIAY * dt; lucTrung = nay }
+    else if (!chay && mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
+    if (mau <= 0 && !chay) chayAi = ''
   }
-  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + HOI_SINH_MS }
+  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + HOI_SINH_MS, chayDen: 0, chayAi }
   return { ...kq, x, y, mau, duong, lucDong, lucTrung }
 }
-/** Trúng đạn `mat` máu. Đang bị hạ / vừa hồi sinh / đang nghỉ giữa ván ⇒ không mất. Hết máu ⇒ bị hạ, hồi sinh sau 3 giây. */
-export function nhanDon(tt: Toi, mat: number, nay: number): Toi {
+/** Trúng đạn `mat` máu; `chay` = mã kẻ cầm Súng Lửa Màu bắn thẳng (từ `satThuong`) ⇒ châm lửa 2 giây kể từ lúc này. Đang bị hạ / vừa hồi sinh / đang nghỉ
+ *  giữa ván ⇒ không mất, không cháy. Hết máu ⇒ bị hạ, hồi sinh sau 3 giây (hết cháy). */
+export function nhanDon(tt: Toi, mat: number, nay: number, chay = ''): Toi {
   if (mat <= 0 || tt.chetDen > nay || nay < tt.batTuDen || dangNghi(nay)) return tt
   const mau = tt.mau - mat
-  return mau <= 0 ? { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + HOI_SINH_MS } : { ...tt, mau, lucTrung: nay }
+  if (mau <= 0) return { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + HOI_SINH_MS, chayDen: 0 }
+  return chay ? { ...tt, mau, lucTrung: nay, chayDen: nay + CHAY_MS, chayAi: chay } : { ...tt, mau, lucTrung: nay }
 }
 /** Súng của em đang ngừng bắn để ẩn: đứng yên trong bụi. */
 export const dangAn = (bd: BanDo, tt: Toi, nay: number): boolean => nay - tt.lucDong >= AN_YEN_MS && trongBui(bd, tt.x, tt.y)
