@@ -57,7 +57,8 @@ describe('«chỉ gửi gần»: ảnh lọc cho từng em = ảnh đủ (sát t
     const lech: string[] = []
     for (let lan = 0; lan < 160; lan++) {
       const co = lan % 2 ? 4 : 0, kieu = (['rai', 'cum', 'luoi'] as const)[lan % 3], n = 8 + Math.floor(r() * 92)
-      const anh = anhNgauNhien(r, co, n, kieu), bd = taoBanDo(co), goi = new GoiSinhTon(anh, T0, new Map())
+      // Ảnh mỏng (vành ngoài không gửi) xen kẽ: máy em tính sát thương / ngắm CHỈ trên dòng của ảnh hiện tại (hợp đồng kieu.ts) ⇒ vẫn phải = ảnh đủ.
+      const anh = anhNgauNhien(r, co, n, kieu), bd = taoBanDo(co), goi = new GoiSinhTon(anh, T0, new Map(), lan % 4 >= 2)
       const du = JSON.parse(goi.du()) as { x: SinhTonAnh }
       for (const id of Object.keys(anh.ds)) {
         const loc = JSON.parse(goi.cho(id)) as { x: SinhTonAnh }
@@ -86,9 +87,9 @@ describe('«chỉ gửi gần»: ảnh lọc cho từng em = ảnh đủ (sát t
         for (const k2 in anh.ds) {
           if (anh.ds[k2][3] !== row[3]) continue
           dongDoi++
-          if (loc.x.ds[k2]) expect(loc.x.ds[k2]).toEqual(anh.ds[k2]); else expect(cham.has(`${anh.ds[k2][0]},${anh.ds[k2][1]}`)).toBe(true)
+          if (loc.x.ds[k2]) expect(loc.x.ds[k2]).toEqual(du.x.ds[k2]); else expect(cham.has(`${anh.ds[k2][0]},${anh.ds[k2][1]}`) || (k2 === id && loc.x.m === 1)).toBe(true)
         }
-        expect(Object.values(loc.x.ds).filter((r) => r[3] === row[3]).length + dd.length / 2).toBe(dongDoi)
+        expect(Object.values(loc.x.ds).filter((r) => r[3] === row[3]).length + dd.length / 2 + (loc.x.m && !loc.x.ds[id] ? 1 : 0)).toBe(dongDoi)
       }
     }
     expect(lech).toEqual([]); expect(soLech).toBe(0)
@@ -113,11 +114,40 @@ describe('«chỉ gửi gần»: ảnh lọc cho từng em = ảnh đủ (sát t
     const xa: Record<string, SinhTonDong> = { ...ds, '700000': [6000, 200, 100, 1, 1, ''] }
     expect(JSON.parse(new GoiSinhTon({ ...anh, ds: xa }, T0, new Map()).cho('200000')).x.ds['700000']).toBeUndefined()
   })
+  it('nhịp gửi: đầu ván ảnh đủ vành; sau đó 1 trong 4 ảnh đủ vành + dòng của chính em, 3 ảnh mỏng `m: 1`; `dd` 1 trong 8; vành ngoài chỉ ở ảnh đủ vành', () => {
+    const m = new MaySinhTon(hat(8))
+    const dau = Math.ceil(T0 / VAN_MS) * VAN_MS
+    const mau: string[] = []
+    for (let k = 0; k < 9; k++) {
+      const nay = dau + k * 250
+      m.nhan('E0', 0, { p: [1600, 1000, 100, 1] }, nay)
+      // Một máy giả đứng ở vành ngoài (cách E0 1000) — đặt thẳng vào ảnh trước khi dựng gói.
+      const anh = m.nhip(nay)!
+      anh.ds['~9-99'] = [2600, 1000, 100, 2, 1, '']
+      const x = JSON.parse(m.goi(anh, nay).cho('E0')).x as SinhTonAnh
+      mau.push(`${x.m ?? 0}${x.ds.E0 ? 'E' : '-'}${x.ds['~9-99'] ? 'V' : '-'}${x.dd ? 'D' : '-'}`)
+    }
+    expect(mau.map((s) => s.slice(0, 3))).toEqual(['0EV', '1--', '1--', '1--', '0EV', '1--', '1--', '1--', '0EV'])
+    // Ba máy đồng đội còn ở trại (xa E0 > 1100) ⇒ chấm `dd` ở nhịp 0 và 8.
+    expect(mau.map((s) => s[3])).toEqual(['D', '-', '-', '-', '-', '-', '-', '-', 'D'])
+    // Máy thầy luôn đủ, không `m`.
+    const anh = m.nhip(dau + 9 * 250)!
+    expect(JSON.parse(m.goi(anh, dau + 9 * 250).du()).x.m).toBeUndefined()
+  })
   it('máy chưa lên sân / mã lạ ⇒ ảnh đủ; ảnh đủ = JSON.stringify của ảnh (tin `lop` · `tro`)', () => {
     const anh = anhNgauNhien(hat(5), 2, 40, 'rai')
     anh.tk = Object.keys(anh.ds)[3]; anh.bc = { [Object.keys(anh.ds)[0]]: 2 }
     const goi = new GoiSinhTon(anh, T0, new Map())
-    expect(JSON.parse(goi.du())).toEqual({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: T0, x: anh })
+    // Ảnh đủ = ảnh của phòng, chỉ khác dòng gọn trên dây (không bắn ai ⇒ bỏ '' cuối); tin trò không mang s / n / d.
+    const doc = JSON.parse(goi.du()) as { x: SinhTonAnh }
+    const { ds: dsDay, ...con } = doc.x
+    expect(doc).toMatchObject({ t: 'lop', k: 'tro', l: T0 }); expect(doc).not.toHaveProperty('s')
+    expect(con).toEqual((({ ds: _b, ...c }) => c)(anh))
+    for (const id in anh.ds) {
+      const r = anh.ds[id]
+      expect(dsDay[id]).toEqual(r[5] ? r : r.slice(0, 5))
+      expect(docDong(id, dsDay[id])).toMatchObject({ x: r[0], y: r[1], mau: r[2], doi: r[3], cap: r[4], t: r[5] })
+    }
     expect(goi.cho('khong-co')).toBe(goi.du())
     // Thủ khoa luôn có trong ảnh lọc (sao trên bản đồ nhỏ).
     for (const id of Object.keys(anh.ds)) expect(JSON.parse(goi.cho(id)).x.ds[anh.tk!]).toEqual(anh.ds[anh.tk!])

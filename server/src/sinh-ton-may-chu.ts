@@ -29,6 +29,12 @@ export const TK_TOI_THIEU = 3
  *  xa vào tập qua luật (b) ⇒ vùng này dư cho mọi phép tính sát thương / ngắm; khung màn điện thoại ngang (±~700 × ±~450) cũng nằm gọn trong. */
 const TRUOT = 250
 export const GUI_GAN_BK = TAM_XA + NAY_BK + NO_BK + BOT_BK + TRUOT
+/** LÕI vùng gửi gần = TAM_XA + TRUOT (910): mọi nhân vật có thể bị em bắn (cách vị trí THẬT ≤ 660) hoặc tham gia lan lên em (≤ 180) đều trong lõi. Lõi + kẻ bắn
+ *  vào tập + thủ khoa gửi MỖI nhịp. Vành ngoài (910, 1100] chỉ để vẽ, và dòng của chính người nhận chỉ để biết đội ⇒ gửi THƯA: nhịp thứ k của ván (k = 0, 1, …)
+ *  chỉ khi k % VANH_NHIP === 0; các ảnh khác mang `m: 1` («ảnh mỏng»). Đồng đội xa (`dd`, bản đồ nhỏ) chỉ khi k % DD_NHIP === 0. Nhịp đầu ván luôn đủ. */
+export const LOI_GAN_BK = TAM_XA + TRUOT
+export const VANH_NHIP = 4
+export const DD_NHIP = 8
 const kep = (v: unknown, tu: number, den: number): number | null => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(den, Math.max(tu, n)) : null }
 
 export class MaySinhTon {
@@ -54,6 +60,8 @@ export class MaySinhTon {
   private lucBc = new Map<string, number>()
   /** Hạng lượt hạ của từng em thật trên sân — chỉ có trong 5 giây nghỉ cuối ván (gửi riêng từng em: `hg`). */
   private hang = new Map<string, number>()
+  /** Số thứ tự nhịp trong ván (0 = nhịp đầu ván) — quyết ảnh mỏng / có `dd`. */
+  private nhipVan = 0
   /** `tenTranh` = tên em thật mà máy bù phải tránh (máy mang tên như học sinh — src/lib/live-khoi/ten-may.ts); chỉ gọi lúc phải thêm máy. */
   constructor(private rng: () => number = Math.random, private tenTranh?: () => Iterable<string>) {}
 
@@ -138,9 +146,10 @@ export class MaySinhTon {
     if (van !== this.van) {
       // Ván ĐẦU (trò vừa bắt đầu) giữ lượt hạ đã ghi trước nhịp đầu; các ván sau xoá điểm, lượt hạ ván, chuỗi, thủ khoa.
       if (this.van !== -1) { this.diem = [0, 0, 0, 0]; this.an = []; this.haVan.clear(); this.lucHa.clear(); this.chuoi.clear(); this.tk = '' }
-      this.van = van; this.soVan++; this.may = []
+      this.van = van; this.soVan++; this.may = []; this.nhipVan = -1
       this.bd = taoBanDo(capBanDo(soEm.reduce((t, n) => t + Math.max(4, n), 0)))
     }
+    this.nhipVan++
     this.may = khopMay(this.bd, this.may, soEm, nay, this.rng, this.tenTranh)
     const that: NhanVat[] = []
     for (const [s, v] of this.tro) that.push({ id: s, x: v.p[0], y: v.p[1], mau: v.p[2], doi: v.p[3], cap: v.p[4], t: v.p[5] })
@@ -191,7 +200,7 @@ export class MaySinhTon {
   }
 
   /** Gói phát của ảnh vừa dựng (gọi ngay sau `nhip`, cùng `nay`): `du()` cho máy thầy / máy chưa lên sân, `cho(mã em)` cho từng em. */
-  goi(anh: SinhTonAnh, nay: number): GoiSinhTon { return new GoiSinhTon(anh, nay, this.hang) }
+  goi(anh: SinhTonAnh, nay: number): GoiSinhTon { return new GoiSinhTon(anh, nay, this.hang, this.nhipVan % VANH_NHIP !== 0, this.nhipVan % DD_NHIP === 0) }
 }
 
 /** «CHỈ GỬI GẦN» (đặc tả bản 2 mục 6: 78 em nhận đủ ảnh ⇒ ~700 KB / giây; đích ≤ 200). Mỗi dòng nhân vật thành chuỗi JSON đúng MỘT lần, mỗi người nhận
@@ -211,7 +220,8 @@ export class GoiSinhTon {
   private dau: string; private duoi: string
   private duSan = ''
   private danh: Uint32Array; private lan = 0
-  constructor(private anh: SinhTonAnh, nay: number, private hang: ReadonlyMap<string, number>) {
+  /** `mong` = ảnh mỏng (vành ngoài không gửi, ảnh lọc mang `m: 1`); `coDd` = ảnh lọc mang chấm đồng đội xa `dd`. */
+  constructor(private anh: SinhTonAnh, nay: number, private hang: ReadonlyMap<string, number>, private mong = false, private coDd = true) {
     // Thứ tự = thứ tự JSON.stringify của ảnh đủ (Object.keys: khoá dạng số nguyên lên trước) ⇒ tập con giữ đúng thứ tự máy em đọc được từ ảnh đủ.
     const ids = (this.ids = Object.keys(anh.ds)), n = ids.length
     this.x = new Float64Array(n); this.y = new Float64Array(n); this.doi = new Int8Array(n); this.ban = new Array(n); this.danh = new Uint32Array(n)
@@ -219,7 +229,8 @@ export class GoiSinhTon {
       const r = anh.ds[ids[i]]
       this.chiSo.set(ids[i], i)
       this.x[i] = r[0]; this.y[i] = r[1]; this.doi[i] = r[3]
-      this.dong.push(`${JSON.stringify(ids[i])}:${JSON.stringify(r)}`)
+      // Dòng gọn trên dây: không bắn ai ⇒ bỏ phần tử thứ 6 ('') — `docDong` đã coi thiếu là ''.
+      this.dong.push(`${JSON.stringify(ids[i])}:${JSON.stringify(r[5] ? r : r.slice(0, 5))}`)
     }
     for (let i = 0; i < n; i++) {
       const t = anh.ds[ids[i]][5], j = t ? this.chiSo.get(t) : undefined
@@ -227,7 +238,8 @@ export class GoiSinhTon {
     }
     this.tkI = anh.tk ? this.chiSo.get(anh.tk) ?? -1 : -1
     const { ds: _ds, bc: _bc, hg: _hg, ...chung } = anh
-    this.dau = `{"t":"lop","k":"tro","s":"","n":"","d":-1,"l":${JSON.stringify(nay)},"x":{"ds":{`
+    // Tin trò không mang `s` / `n` / `d` của TinLop (màn trò chỉ đọc `l` và `x`; bỏ 21 byte mỗi gói × 312 gói / giây ở 78 em).
+    this.dau = `{"t":"lop","k":"tro","l":${JSON.stringify(nay)},"x":{"ds":{`
     this.duoi = JSON.stringify(chung).slice(1, -1)
   }
 
@@ -244,10 +256,10 @@ export class GoiSinhTon {
   cho(id: string): string {
     const i0 = this.chiSo.get(id)
     if (i0 === undefined) return this.du()
-    const n = this.ids.length, danh = this.danh, x0 = this.x[i0], y0 = this.y[i0], d0 = this.doi[i0], R2 = GUI_GAN_BK * GUI_GAN_BK
+    const n = this.ids.length, danh = this.danh, x0 = this.x[i0], y0 = this.y[i0], d0 = this.doi[i0], R2 = (this.mong ? LOI_GAN_BK : GUI_GAN_BK) ** 2
     if (++this.lan >= 0xffffffff) { this.lan = 1; danh.fill(0) }
     const lan = this.lan, q: number[] = []
-    // (a) vùng tròn quanh X (gồm chính X).
+    // (a) vùng tròn quanh X (gồm chính X); ảnh mỏng chỉ lấy lõi.
     for (let i = 0; i < n; i++) { const dx = this.x[i] - x0, dy = this.y[i] - y0; if (dx * dx + dy * dy <= R2) { danh[i] = lan; q.push(i) } }
     // (b) kẻ bắn vào người trong tập — lặp tới ổn định (hàng đợi mở rộng dần).
     for (let k = 0; k < q.length; k++) {
@@ -258,12 +270,13 @@ export class GoiSinhTon {
     if (this.tkI >= 0) danh[this.tkI] = lan
     let ds = '', dd = ''
     for (let i = 0; i < n; i++) {
-      if (danh[i] === lan) ds += ds ? `,${this.dong[i]}` : this.dong[i]
-      else if (this.doi[i] === d0) dd += `${dd ? ',' : ''}${Math.round(this.x[i])},${Math.round(this.y[i])}`
+      // Dòng của CHÍNH X chỉ để máy em biết đội mình (đổi đội) ⇒ ảnh mỏng không gửi (vẫn là hạt giống của luật (b) ở trên).
+      if (danh[i] === lan) { if (i !== i0 || !this.mong) ds += ds ? `,${this.dong[i]}` : this.dong[i] }
+      else if (this.coDd && this.doi[i] === d0) dd += `${dd ? ',' : ''}${Math.round(this.x[i])},${Math.round(this.y[i])}`
     }
     let bc = ''
     if (this.anh.bc) for (const k in this.anh.bc) { const j = this.chiSo.get(k); if (j !== undefined && danh[j] === lan) bc += `${bc ? ',' : ''}${JSON.stringify(k)}:${this.anh.bc[k]}` }
     const hg = this.hang.get(id)
-    return `${this.dau}${ds}},${this.duoi}${dd ? `,"dd":[${dd}]` : ''}${bc ? `,"bc":{${bc}}` : ''}${hg ? `,"hg":${hg}` : ''}}}`
+    return `${this.dau}${ds}},${this.duoi}${this.mong ? ',"m":1' : ''}${dd ? `,"dd":[${dd}]` : ''}${bc ? `,"bc":{${bc}}` : ''}${hg ? `,"hg":${hg}` : ''}}}`
   }
 }

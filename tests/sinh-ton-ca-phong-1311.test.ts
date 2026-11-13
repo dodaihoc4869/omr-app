@@ -103,17 +103,18 @@ describe('Phòng Sinh Tồn của ca — nhịp trò', () => {
     tien(TRO_NHIP_MS); p.nhip()
     for (const k of [a, b, c]) expect(dem(k, 'lop')).toBe(1)
     const tin = cuoi(a, 'lop')!
-    expect(tin).toMatchObject({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: T0 + 60 + TRO_NHIP_MS })
+    expect(tin).toMatchObject({ t: 'lop', k: 'tro', l: T0 + 60 + TRO_NHIP_MS })
     const x = anh(a)
     // Toạ độ kẹp trong sân 2000 (cỡ 0 = 3200 × 2000), cấp kẹp về 6; đội do PHÒNG đóng dấu (S1 đội 0, S2 đội 1).
     // «Chỉ gửi gần» (bản 4): S1 ở góc dưới-trái, S2 cách 1700 theo dọc ⇒ S1 không nhận dòng S2; S2 nhận dòng của chính mình.
-    expect(x.ds.S1).toEqual([100, 2000, 50, 0, 6, ''])
+    // Dòng trên dây: không bắn ai ⇒ 5 phần tử.
+    expect(x.ds.S1).toEqual([100, 2000, 50, 0, 6])
     expect(x.ds.S2).toBeUndefined()
-    expect(anh(b).ds.S2).toEqual([300, 300, 0, 1, 2, ''])
+    expect(anh(b).ds.S2).toEqual([300, 300, 0, 1, 2])
     expect(x.ds.S3).toBeUndefined() // S3 mới ở phòng, chưa gửi gói ⇒ chưa lên sân
     // S3 chưa lên sân ⇒ nhận ảnh ĐỦ: máy bù đủ 4 mỗi đội.
     const du = anh(c)
-    expect(du.ds.S2).toEqual([300, 300, 0, 1, 2, ''])
+    expect(du.ds.S2).toEqual([300, 300, 0, 1, 2])
     expect(x.an).toEqual([['S1', 'S2', 0, 1, 0]]); expect(x.d).toEqual([1, 0, 0, 0]); expect(x.v).toBe(1); expect(x.c).toBe(0)
     expect(Object.keys(du.ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
     expect([0, 1, 2, 3].map((d) => Object.values(du.ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
@@ -139,7 +140,7 @@ describe('Phòng Sinh Tồn của ca — nhịp trò', () => {
     const xem = vao(p, 'XEM') // chưa gửi gói ⇒ không lên sân ⇒ nhận ảnh ĐỦ (đếm máy bù)
     tien(TRO_NHIP_MS); p.nhip()
     expect(Object.keys(anh(xem).ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
-    expect(anh(a).ds.S2).toEqual([800, 800, 100, 1, 1, '']) // S2 cách S1 990 ⇒ trong vùng gửi gần
+    expect(anh(a).ds.S2).toEqual([800, 800, 100, 1, 1]) // S2 cách S1 990 ⇒ trong vùng gửi gần
     const n = dem(a, 'st-ds')
     p.roi(b)
     expect(dem(a, 'st-ds')).toBe(n + 1)
@@ -273,7 +274,7 @@ describe('Durable Object của ca — Sinh Tồn: cửa, vé, lệnh đóng củ
       const anhB = docTin(b).filter((t) => t.t === 'lop')
       expect(anhB).toHaveLength(1)
       expect(anhB[0]).toMatchObject({ t: 'lop', k: 'tro' })
-      expect((anhB[0].x as SinhTonAnh).ds.S1).toEqual([100, 100, 100, 0, 1, ''])
+      expect((anhB[0].x as SinhTonAnh).ds.S1).toEqual([100, 100, 100, 0, 1])
       vi.advanceTimersByTime(6000) // S1 im quá 5 giây
       expect(vi.getTimerCount()).toBe(0)
       const n = b.gui.length
@@ -316,7 +317,7 @@ describe('Durable Object của ca — Sinh Tồn: cửa, vé, lệnh đóng củ
       const d = tao() // Durable Object mới, chưa có gì trong bộ nhớ
       await d.webSocketMessage(a, goi({ p: [500, 500, 100, 1] }))
       vi.advanceTimersByTime(TRO_NHIP_MS + 10)
-      expect((docTin(b).at(-1)!.x as SinhTonAnh).ds.S1).toEqual([500, 500, 100, 2, 1, ''])
+      expect((docTin(b).at(-1)!.x as SinhTonAnh).ds.S1).toEqual([500, 500, 100, 2, 1])
       const d2 = tao()
       await d2.fetch(new Request('https://phong-dau/dong', { method: 'POST' }))
       expect(a.ma).toBe(MA_DONG.batDau); expect(b.ma).toBe(MA_DONG.batDau)

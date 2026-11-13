@@ -479,8 +479,8 @@ export function nhanDon(tt: Toi, mat: number, nay: number, chay = ''): Toi {
 }
 /** Súng của em đang ngừng bắn để ẩn: đứng yên trong bụi. */
 export const dangAn = (bd: BanDo, tt: Toi, nay: number): boolean => nay - tt.lucDong >= AN_YEN_MS && trongBui(bd, tt.x, tt.y)
-/** Đọc một dòng ảnh chụp thành nhân vật (dòng hỏng ⇒ null). */
-export function docDong(id: string, d: SinhTonDong | undefined): NhanVat | null {
+/** Đọc một dòng ảnh chụp thành nhân vật (dòng hỏng ⇒ null). Bản 4: dòng không bắn ai chỉ có 5 phần tử (mục tiêu thiếu ⇒ ''). */
+export function docDong(id: string, d: SinhTonDong | readonly number[] | undefined): NhanVat | null {
   if (!Array.isArray(d) || d.length < 5 || !d.slice(0, 5).every((v) => typeof v === 'number' && Number.isFinite(v))) return null
   return { id, x: d[0], y: d[1], mau: d[2], doi: kep(Math.floor(d[3]), 0, 3), cap: kep(Math.round(d[4]), 1, CAP_TOI_DA), t: typeof d[5] === 'string' ? d[5] : '' }
 }

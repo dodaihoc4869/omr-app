@@ -154,8 +154,9 @@ describe('kênh lớp', () => {
       expect(Object.keys(loc.ds).length).toBeLessThan(Object.keys(anh.ds).length)
       expect((doc(hs2).at(-1)!.x as typeof anh).ds.S2).toEqual(anh.ds.S2)
       // S1: y kẹp trong sân 2000 (cỡ 0 = 3200 × 2000), cấp kẹp về 6; mục tiêu S2 chưa có lúc gói S1 tới ⇒ bỏ. S2: mục tiêu không có thật ⇒ bỏ.
-      expect(anh.ds.S1).toEqual([100, 2000, 50, doi('S1'), 6, ''])
-      expect(anh.ds.S2).toEqual([300, 300, 0, doi('S2'), 2, ''])
+      // Dòng trên dây (bản 4): không bắn ai ⇒ 5 phần tử.
+      expect(anh.ds.S1).toEqual([100, 2000, 50, doi('S1'), 6])
+      expect(anh.ds.S2).toEqual([300, 300, 0, doi('S2'), 2])
       // Lượt hạ (bản 4): [kẻ hạ, bị hạ, chuỗi người bị hạ, chuỗi kẻ hạ sau lượt này, người bị hạ là thủ khoa].
       expect(anh.an).toEqual([['S1', 'S2', 0, 1, 0]])
       expect(anh.d[doi('S1')]).toBe(1)

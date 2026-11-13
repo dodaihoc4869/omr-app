@@ -42,10 +42,15 @@ export type SinhTonHa = [ai: string, bi: string, chuoiBi?: number, chuoiAi?: num
 export interface SinhTonAnh {
   ds: Record<string, SinhTonDong>; an: SinhTonHa[]; d: [number, number, number, number]; v: number; c: number; h: [number, string]
   tk?: string; bc?: Record<string, number>; bv?: [string, number][]; hg?: number; dd?: number[]
+  /** Bản 4: 1 = ẢNH MỎNG (chỉ ảnh lọc, 3 trong 4 ảnh): người ở vành ngoài (cách em 910 – 1100) và dòng của chính em không gửi ở ảnh này. */ m?: 1
 }
 // HỢP ĐỒNG CHO MÀN (TroSinhTon…) theo bản 4 — máy chủ đã làm, màn phải làm theo, và PHẢI phát hành CÙNG LÚC với máy chủ (không thì: banner «vào đội» mỗi
 // khi có người lọt vào `ds`, bản đồ nhỏ thiếu, hộp lệch luật, phòng ca đóng 4010 lặp nếu Worker lên trước Pages):
 //  · Vào / rời phòng chỉ đọc từ `lop-ds` / `st-ds`; người mới xuất hiện trong `ds` KHÔNG phải «vào đội». Bản đồ nhỏ = đồng đội trong `ds` + chấm `dd` + `tk`.
+//  · Tin trò `{ t: 'lop', k: 'tro', l, x }` KHÔNG có `s` / `n` / `d` (thừa, đã bỏ). Dòng `ds` KHÔNG bắn ai chỉ có 5 phần tử ⇒ luôn đọc bằng `docDong`.
+//  · Ảnh mỏng (`m: 1`, 3 trong 4 ảnh): người ở vành ngoài + dòng của chính em vắng mặt ⇒ GIỮ dòng cũ của người vắng để VẼ / nội suy (dòng của em thiếu ⇒
+//    giữ đội cũ); ảnh không có `m` mà vẫn vắng ⇒ đã ra khỏi tập, bỏ. `dd` chỉ có 1 trong 8 ảnh (2 giây) ⇒ thiếu thì giữ chấm cũ. QUAN TRỌNG: `satThuong` và
+//    `chonMucTieu` CHỈ dùng các dòng có trong ẢNH VỪA NHẬN (dòng giữ lại chỉ để vẽ) — vậy mới bằng ảnh đủ (test tests/sinh-ton-v2-dot2-1311.test.ts).
 //  · Khung nhìn màn (nửa đường chéo, đơn vị sân) ≤ ~850 (= 1100 − 250 trượt) — rộng hơn thì góc màn máy tính bảng thấy người hiện đột ngột.
 //  · Lượt hạ `an[i]`: chuỗi người bị hạ = an[i][2] ?? 0 (≥ 3 ⇒ «ĐÁNH TRƯỢT ĐẠI HỌC!»), chuỗi kẻ hạ = an[i][3] ?? 0 (thay map `chuoi` tự đếm ở máy);
 //    an[i][4] === 1 ⇒ người bị hạ là thủ khoa («ĐÃ TIÊU DIỆT THỦ KHOA!») và nếu an[i][0] là em ⇒ lên THÊM 1 cấp (tổng +2, tối đa 6; máy bù phòng tự +2, tối đa 3).
