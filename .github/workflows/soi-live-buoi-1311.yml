@@ -1,0 +1,27 @@
+# SOI BUỔI LIVE CHO NHẬT KÝ BÀI DẠY (CHỈ ĐỌC, 13/11) — thầy hỏi «Văn phòng thông để soạn luôn cho 2 live hiện tại chưa». In các buổi live gần nhất:
+# trạng thái bản xem lại, giờ tắt live, số câu / đoạn, bản dựng, đã có nhật ký chưa. KHÔNG in tên / số báo danh học sinh (repo công khai, nhật ký ai cũng đọc).
+name: Soi buổi live cho nhật ký (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  soi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Buổi live gần nhất (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "── $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]?' || echo "(chưa đọc được)"; }
+          q "buổi live 2 ngày gần nhất" "SELECT id, lop, ngay, bat_luc, tat_luc, trang_thai, tien_do, so_cau, so_doan, giay_live, ban, substr(ten_tu_dong,1,60) ten FROM live_buoi WHERE bat_luc >= datetime('now','-2 days') ORDER BY bat_luc DESC LIMIT 8"
+          q "nhật ký đã gửi" "SELECT buoi_id, ban_buoi, luc, so_canh, so_dat, phat_hanh FROM live_nhat_ky ORDER BY luc DESC LIMIT 8"
