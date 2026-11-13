@@ -4313,7 +4313,7 @@ LỊCH SỬ404–414 nguyên văn tại docs/hinh-vector-0311/kiem/lich-su-check
 
 ## Lô416 — hai sơ đồ nhựa phenolic nguồn908
 
-1429 câu đủ mọi hình theo bộ trộn snapshot/7 partial;1049 nguồn→792SVG;15831333 byte/localgzip 2796363;379 nguồn chưa đạt. FontNAamr209SVG/210sources/258câu đủ;còn583SVG/839sources(416explicitDDH+168nonexplicit chưa phânloại).
+1429 câu đủ mọi hình theo bộ trộn snapshot/7 partial;1049 nguồn→792SVG;15831333 byte/localgzip 2796363;379 nguồn chưa đạt. FontNAamr209SVG/210sources/258câu đủ;còn583SVG/839sources(415explicitDDH+168nonexplicit chưa phânloại).
 
 Vẽ mới 908/hasha636c32cd592c07ab47aefad2254e18f5a493ad57ccd7cb152a1fe3e5681aae3→SVG952c407fb2a85893d8b6f9b72ed7acf440210af0cac347aae447572bbf5e6564/43410B:71visibleC13O-excludesUNKNOWNoutside2ellipsis/10individualsixrings6TOP4BOTTOM10innerCIRCLES-NOalternatingdouble/8CH2bridges3CH2OHgroups10phenolicOH/2individual3dotellipsis/ALLchemicalregularUPRIGHT-ONLY2captionsTRUEdamBLACKUPRIGHT-EXACT(Hình 1.a)-(Hình 1.b)/HOCH2LEFT-CH2OHBOTTOMandUPRIGHT-HOlastOterminalDOWN/NOaddedH-n-formula-monomer-arrow-answer-alias/nativeapproxNOTsubpixel. RootRIÊNGnativeFULL-allrefs/freshactualChromium3x;readonlyfreshFULL3x/macros/exacthash Đạt. Khôngcộngfont-only. 1sourcekhép1câuVIP27-C4-B14-D2-III-5. KhôngSVGnegative416. NativeapproxNOTsubpixel. NativecaptionBLACKwithrastercolorfringesNOTmaroon;10individualringsnot9/visible71C13OexclUNKNOWNoutsideellipsis.
 
