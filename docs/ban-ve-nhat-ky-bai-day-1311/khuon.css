@@ -174,3 +174,23 @@ html.may-yeu .qt-sang { box-shadow: 0 0 0 4px color-mix(in srgb, var(--m) 30%, t
   .tk { padding: 18px 14px; }
 }
 @media (prefers-reduced-motion: reduce) { .dn-pa { transition: none; } }
+
+/* ── thêm (bản vẽ lại theo giọng Thầy) ── */
+.td-quang { position: absolute; left: -16px; bottom: -14px; width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 210, 122, 0.75), rgba(255, 210, 122, 0) 70%); opacity: 0; pointer-events: none; }
+html.may-yeu .td-quang { display: none; }
+.td-kl { margin: 14px 0 0; padding: 10px 14px; border-radius: 14px; box-shadow: inset 0 0 0 2px var(--phan-ngoc); background: rgba(110, 231, 183, 0.1); font-size: clamp(15.5px, 0.6vw + 12px, 18px); font-weight: 700; line-height: 1.4; }
+.td-kl b { color: var(--phan-ngoc); font-weight: 800; }
+.lw-quang { fill: rgba(255, 210, 122, 0.22); }
+html.may-yeu .lw-quang { display: none; }
+
+/* ── bảng phấn của Thầy (nét thật, phóng to / thu nhỏ / kéo) ── */
+.bp { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--bang); box-shadow: inset 0 0 0 1.5px var(--bang-vien); touch-action: pan-y; cursor: zoom-in; outline-offset: 2px; }
+.bp:focus-visible { outline: 3px solid var(--phan-vang); }
+.bp.dang-to { cursor: grab; }
+.bp canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bp-dk { position: absolute; right: 6px; bottom: 6px; display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 999px; background: rgba(35, 40, 45, 0.9); box-shadow: inset 0 0 0 1px var(--bang-vien); }
+.bp-nut { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--phan-trang); border: 0; background: none; cursor: pointer; touch-action: manipulation; }
+.bp-nut:disabled { opacity: 0.35; cursor: default; }
+.bp-nut:focus-visible { outline: 3px solid var(--phan-vang); outline-offset: -2px; }
+.bp-dk.tren { position: static; margin-left: auto; }
+.bp-muc { min-width: 32px; text-align: center; font: 800 13px var(--phong); color: var(--phan-vang); }

@@ -1,142 +1,1057 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "nhat-ky-bai-day/kich-ban/1",
-  "title": "Kịch bản «Nhật ký bài dạy»: phần A.I sinh ra sau mỗi buổi live",
-  "description": "Lược đồ gửi kèm lệnh gọi Claude API (output_config.format). Chỉ được dùng 7 khuôn. Viết theo giới hạn structured outputs: mọi object additionalProperties false, không minimum / maximum / maxLength / maxItems, không đệ quy. Phần APP điền sau (không nằm trong lược đồ này): buoi, nguon.giay (từ giờ của nét), kết quả kiểm số, quyết định của Thầy. Không có trường nào chứa số độ âm điện riêng: app tra bảng của mình.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["phienBan", "bia", "canh", "canChot"],
-  "properties": {
-    "phienBan": { "const": 1 },
-    "bia": {
-      "type": "object", "additionalProperties": false, "required": ["loi", "hoatHoa"],
-      "properties": {
-        "loi": { "type": "string", "description": "Một câu mời học, xưng Thầy, không quá 30 chữ." },
-        "hoatHoa": { "anyOf": [ { "$ref": "#/$defs/moKeoCo" }, { "$ref": "#/$defs/moQuyTac" } ] }
-      }
-    },
-    "canh": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/canh" } },
-    "canChot": {
-      "type": "array",
-      "description": "Điều A.I thấy cần Thầy quyết: ngưỡng khác SGK, tên người trên bảng, chữ đọc không ra.",
-      "items": {
-        "type": "object", "additionalProperties": false, "required": ["ma", "hoi", "lyDo", "phuongAn", "macDinh", "canh"],
-        "properties": {
-          "ma": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-          "hoi": { "type": "string" }, "lyDo": { "type": "string" },
-          "phuongAn": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["ma", "chu"], "properties": { "ma": { "type": "string" }, "chu": { "type": "string" } } } },
-          "macDinh": { "type": "string" },
-          "canh": { "type": "array", "items": { "type": "string" } }
-        }
-      }
-    }
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "nhat-ky-bai-day/kich-ban/1",
+ "title": "Kịch bản «Nhật ký bài dạy»: phần GEMINI sinh ra sau mỗi buổi live (nghe tieng.mp3 + xem ảnh trang bảng)",
+ "description": "Gửi kèm lệnh gọi Gemini API (generationConfig.responseMimeType = application/json, responseJsonSchema = lược đồ này). Chỉ 7 khuôn. Viết chặt cho mọi bộ sinh JSON có ràng buộc: mọi object additionalProperties false, MỌI trường required, chỉ 3 chỗ anyOf, không null (chuỗi rỗng / 0 / mảng rỗng = «không có»), không minimum / maximum / maxLength / maxItems, không đệ quy. Phần MÁY điền sau, không nằm trong lược đồ: buoi, nguon (đầu tệp), canh[].nguon.vung (từ nét trong đoạn tu đến den), tong-ket y[].giay. Không có trường nào chứa độ âm điện của nguyên tố có ky: máy tra bảng của mình. Không có bước người duyệt: cổng tự kiểm trong khuon.js quyết định cảnh nào được phát hành.",
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "phienBan",
+  "bia",
+  "canh"
+ ],
+ "properties": {
+  "phienBan": {
+   "const": 2
   },
-  "$defs": {
-    "chu": { "type": "string", "description": "Chữ cho học sinh: xưng Thầy, câu không quá 30 chữ, không emoji, không dấu gạch ngang dài, không viết tắt của bảng (VD, LK, CHT…). Được dùng **…** để nhấn." },
-    "loai": { "enum": ["khong-phan-cuc", "phan-cuc", "ion"] },
-    "ky": { "enum": ["H", "C", "N", "O", "F", "Na", "Cl", "K"], "description": "Chỉ nguyên tố có trong bảng độ âm điện của app." },
-    "nguon": {
-      "anyOf": [
-        { "type": "null" },
-        { "type": "object", "additionalProperties": false, "required": ["trang", "cot", "chep"],
-          "properties": {
-            "trang": { "type": "integer", "description": "Số trang ảnh bảng (1, 2, …) mà cảnh lấy nội dung." },
-            "cot": { "enum": ["trai", "phai", "ca-bang"] },
-            "chep": { "type": "string", "description": "Chép NGUYÊN VĂN chữ trên bảng ở vùng đó (kể cả viết tắt, tên). Chỉ Thầy thấy." } } }
-      ]
+  "bia": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "loi",
+    "hoatHoa"
+   ],
+   "properties": {
+    "loi": {
+     "type": "string",
+     "description": "Một câu mời học, xưng Thầy, không quá 30 chữ."
     },
-    "may": {
-      "type": "object", "additionalProperties": false, "required": ["chuaChac", "ngoaiBang"],
-      "properties": {
-        "chuaChac": { "type": ["string", "null"], "description": "Chỗ đọc chưa chắc / Thầy viết dở. null nếu chắc." },
-        "ngoaiBang": { "type": ["string", "null"], "description": "Phần nào KHÔNG có trên bảng. null nếu mọi thứ có trên bảng." }
+    "hoatHoa": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/moKeoCo"
+      },
+      {
+       "$ref": "#/$defs/moQuyTac"
       }
-    },
-    "duKeoCo": {
-      "type": "object", "additionalProperties": false, "required": ["anSo", "thanhPha", "trai", "phai", "pha"],
-      "properties": {
-        "anSo": { "type": "boolean", "description": "true: lực kéo minh hoạ, không in số." },
-        "thanhPha": { "type": "boolean" },
-        "trai": { "$ref": "#/$defs/benKeo" }, "phai": { "$ref": "#/$defs/benKeo" },
-        "pha": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["chiTrai", "chiPhai", "loai", "chu", "loi", "ketLuan"],
-          "properties": { "chiTrai": { "type": ["number", "null"], "description": "Chỉ khi anSo (số minh hoạ). Có ky thì để null: app tra bảng." }, "chiPhai": { "type": ["number", "null"] }, "loai": { "$ref": "#/$defs/loai" }, "chu": { "$ref": "#/$defs/chu" }, "loi": { "type": "array", "items": { "$ref": "#/$defs/chu" } }, "ketLuan": { "type": ["string", "null"] } } } }
-      }
-    },
-    "benKeo": { "type": "object", "additionalProperties": false, "required": ["nhan", "ky"], "properties": { "nhan": { "type": "string" }, "ky": { "anyOf": [ { "$ref": "#/$defs/ky" }, { "type": "null" } ] } } },
-    "duThang": {
-      "type": "object", "additionalProperties": false, "required": ["max", "loiMo", "kim", "loi"],
-      "properties": {
-        "max": { "type": "number" },
-        "loiMo": { "type": "array", "items": { "$ref": "#/$defs/chu" } },
-        "kim": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["nhan", "a", "b", "delta", "loai", "chu"],
-          "properties": { "nhan": { "type": "string" }, "a": { "$ref": "#/$defs/ky" }, "b": { "$ref": "#/$defs/ky" }, "delta": { "type": "number", "description": "Δχ A.I đọc / tính; app tính lại từ bảng và so." }, "loai": { "$ref": "#/$defs/loai" }, "chu": { "type": ["string", "null"] } } } },
-        "loi": { "type": "array", "items": { "$ref": "#/$defs/chu" } }
-      }
-    },
-    "duLewis": {
-      "type": "object", "additionalProperties": false, "required": ["congThuc", "nguyenTu", "lienKet", "capRieng", "nhanChung", "loi"],
-      "properties": {
-        "congThuc": { "type": "string" },
-        "nguyenTu": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["ky", "kieu", "vt"], "properties": { "ky": { "type": "string" }, "kieu": { "enum": ["cham", "x"] }, "vt": { "type": ["array", "null"], "items": { "type": "integer" }, "description": "[cột, hàng] trên lưới; null = xếp một hàng." } } } },
-        "lienKet": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["a", "b", "cap"], "properties": { "a": { "type": "integer" }, "b": { "type": "integer" }, "cap": { "type": "integer", "description": "Số cặp electron dùng chung (1, 2, 3)." } } } },
-        "capRieng": { "type": "array", "items": { "type": "integer" } },
-        "nhanChung": { "type": "string" },
-        "loi": { "type": "array", "items": { "$ref": "#/$defs/chu" }, "description": "3 câu: lúc vẽ cặp riêng, lúc vẽ cặp chung, lúc đếm 8 electron." }
-      }
-    },
-    "duQuyTac": {
-      "type": "object", "additionalProperties": false, "required": ["nhan", "mau", "dong", "viDu", "loi"],
-      "properties": { "nhan": { "type": "string" }, "mau": { "enum": ["vang", "ngoc", "hong"] }, "dong": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/chu" } }, "viDu": { "type": "array", "items": { "type": "string" } }, "loi": { "type": "array", "items": { "$ref": "#/$defs/chu" } } }
-    },
-    "duViDu": {
-      "type": "object", "additionalProperties": false, "required": ["de", "soDo", "tinh"],
-      "properties": {
-        "de": { "type": ["string", "null"] },
-        "soDo": { "type": "object", "additionalProperties": false, "required": ["chat", "muiTen"], "properties": {
-          "chat": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["ct", "heSo", "so"], "properties": {
-            "ct": { "type": "string" }, "heSo": { "type": ["integer", "null"] },
-            "so": { "type": "array", "description": "Số liệu đề cho, ghi theo CỘT DỌC dưới chất (tư duy của Thầy).", "items": { "type": "object", "additionalProperties": false, "required": ["hien", "chi", "M"], "properties": { "hien": { "type": "string" }, "chi": { "anyOf": [ { "$ref": "#/$defs/ky" }, { "type": "null" } ] }, "M": { "type": ["number", "null"] } } } } } } },
-          "muiTen": { "type": ["array", "null"], "items": { "type": "object", "additionalProperties": false, "required": ["tren"], "properties": { "tren": { "type": "string", "description": "Hiệu suất ghi trên mũi tên." } } } } } },
-        "tinh": { "type": "object", "additionalProperties": false, "required": ["ten", "thuaSo", "ketQua"], "properties": {
-          "ten": { "type": "string" },
-          "thuaSo": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["dau", "hien", "gt", "tu", "mau", "noi", "tro", "loai", "ct", "nt", "tuCt", "denCt", "H"], "properties": {
-            "dau": { "enum": ["·", "−", "+", null] }, "hien": { "type": "string" }, "gt": { "type": ["number", "null"] }, "tu": { "type": ["number", "null"] }, "mau": { "type": ["number", "null"] },
-            "noi": { "$ref": "#/$defs/chu", "description": "Lời nói đúng bảng của Thầy: chia M ra số mol; bảo toàn nguyên tố; nhân M ra khối lượng; xuôi × H/100; ngược × 100/H." },
-            "tro": { "type": ["array", "null"], "items": { "type": ["integer", "string"] } },
-            "loai": { "enum": ["chia-M", "nhan-M", "bao-toan", "hieu-suat-xuoi", "hieu-suat-nguoc", "doi-don-vi", "so-lieu", null] },
-            "ct": { "type": ["string", "null"] }, "nt": { "type": ["string", "null"] }, "tuCt": { "type": ["string", "null"] }, "denCt": { "type": ["string", "null"] }, "H": { "type": ["number", "null"] } } } },
-          "ketQua": { "type": "object", "additionalProperties": false, "required": ["hien", "gt", "donVi", "noi"], "properties": { "hien": { "type": "string" }, "gt": { "type": "number" }, "donVi": { "type": ["string", "null"] }, "noi": { "$ref": "#/$defs/chu" } } } } }
-      }
-    },
-    "duDoanNhanh": {
-      "type": "object", "additionalProperties": false, "required": ["hoi", "luaChon", "giai", "mo"],
-      "properties": {
-        "hoi": { "$ref": "#/$defs/chu" },
-        "luaChon": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["chu", "dung"], "properties": { "chu": { "type": "string" }, "dung": { "type": "boolean" } } } },
-        "giai": { "$ref": "#/$defs/chu" },
-        "mo": { "anyOf": [ { "$ref": "#/$defs/moKeoCo" }, { "$ref": "#/$defs/moThang" }, { "$ref": "#/$defs/moLewis" }, { "$ref": "#/$defs/moQuyTac" } ] }
-      }
-    },
-    "duTongKet": {
-      "type": "object", "additionalProperties": false, "required": ["y"],
-      "properties": { "y": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["chu", "canh"], "properties": { "chu": { "$ref": "#/$defs/chu" }, "canh": { "type": "string", "description": "id cảnh; app lấy phút nghe từ nét của cảnh đó." } } } } }
-    },
-    "moKeoCo": { "type": "object", "additionalProperties": false, "required": ["khuon", "duLieu"], "properties": { "khuon": { "const": "keo-co" }, "duLieu": { "$ref": "#/$defs/duKeoCo" } } },
-    "moThang": { "type": "object", "additionalProperties": false, "required": ["khuon", "duLieu"], "properties": { "khuon": { "const": "thang-delta" }, "duLieu": { "$ref": "#/$defs/duThang" } } },
-    "moLewis": { "type": "object", "additionalProperties": false, "required": ["khuon", "duLieu"], "properties": { "khuon": { "const": "lewis" }, "duLieu": { "$ref": "#/$defs/duLewis" } } },
-    "moQuyTac": { "type": "object", "additionalProperties": false, "required": ["khuon", "duLieu"], "properties": { "khuon": { "const": "quy-tac" }, "duLieu": { "$ref": "#/$defs/duQuyTac" } } },
-    "canh": {
-      "anyOf": [
-        { "$ref": "#/$defs/canhKeoCo" }, { "$ref": "#/$defs/canhThang" }, { "$ref": "#/$defs/canhLewis" }, { "$ref": "#/$defs/canhQuyTac" },
-        { "$ref": "#/$defs/canhViDu" }, { "$ref": "#/$defs/canhDoanNhanh" }, { "$ref": "#/$defs/canhTongKet" }
-      ]
-    },
-    "canhKeoCo": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "keo-co" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duKeoCo" } } },
-    "canhThang": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "thang-delta" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duThang" } } },
-    "canhLewis": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "lewis" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duLewis" } } },
-    "canhQuyTac": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "quy-tac" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duQuyTac" } } },
-    "canhViDu": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "vi-du-cot-doc" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duViDu" } } },
-    "canhDoanNhanh": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "doan-nhanh" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duDoanNhanh" } } },
-    "canhTongKet": { "type": "object", "additionalProperties": false, "required": ["id", "khuon", "tieuDe", "deXuat", "nguon", "may", "duLieu"], "properties": { "id": { "type": "string" }, "khuon": { "const": "tong-ket" }, "tieuDe": { "$ref": "#/$defs/chu" }, "deXuat": { "type": "boolean" }, "nguon": { "$ref": "#/$defs/nguon" }, "may": { "$ref": "#/$defs/may" }, "duLieu": { "$ref": "#/$defs/duTongKet" } } }
+     ]
+    }
+   }
+  },
+  "canh": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/canhKeoCo"
+     },
+     {
+      "$ref": "#/$defs/canhThang"
+     },
+     {
+      "$ref": "#/$defs/canhLewis"
+     },
+     {
+      "$ref": "#/$defs/canhQuyTac"
+     },
+     {
+      "$ref": "#/$defs/canhViDu"
+     },
+     {
+      "$ref": "#/$defs/canhDoanNhanh"
+     },
+     {
+      "$ref": "#/$defs/canhTongKet"
+     }
+    ]
+   }
   }
+ },
+ "$defs": {
+  "chu": {
+   "type": "string",
+   "description": "Chữ cho học sinh: xưng Thầy, câu không quá 30 chữ, không emoji, không dấu gạch ngang dài, không viết tắt của bảng (VD, LK, CHT…). Được dùng **…** để nhấn."
+  },
+  "dsChu": {
+   "type": "array",
+   "items": {
+    "$ref": "#/$defs/chu"
+   }
+  },
+  "loai": {
+   "enum": [
+    "khong-phan-cuc",
+    "phan-cuc",
+    "ion"
+   ]
+  },
+  "ky": {
+   "enum": [
+    "H",
+    "C",
+    "N",
+    "O",
+    "F",
+    "Na",
+    "Cl",
+    "K"
+   ],
+   "description": "Chỉ nguyên tố có trong bảng độ âm điện của app."
+  },
+  "kyHoacRong": {
+   "enum": [
+    "",
+    "H",
+    "C",
+    "N",
+    "O",
+    "F",
+    "Na",
+    "Cl",
+    "K"
+   ]
+  },
+  "nguon": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "trang",
+    "cot",
+    "tu",
+    "den",
+    "chep"
+   ],
+   "properties": {
+    "trang": {
+     "type": "integer",
+     "description": "Số trang ảnh bảng (1, 2, …) mà cảnh lấy nội dung. 0 = không có nguồn (máy sẽ bỏ cảnh)."
+    },
+    "cot": {
+     "enum": [
+      "trai",
+      "phai",
+      "ca-bang"
+     ]
+    },
+    "tu": {
+     "type": "number",
+     "description": "Giây trên trục tiếng của buổi, lúc Thầy bắt đầu nói phần này."
+    },
+    "den": {
+     "type": "number",
+     "description": "Giây lúc Thầy nói xong phần này."
+    },
+    "chep": {
+     "type": "string",
+     "description": "Chép NGUYÊN VĂN chữ trên bảng ở vùng đó (kể cả viết tắt). Không hiện cho học sinh; máy dùng để kiểm nguồn."
+    }
+   }
+  },
+  "benKeo": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "nhan",
+    "ky"
+   ],
+   "properties": {
+    "nhan": {
+     "type": "string"
+    },
+    "ky": {
+     "$ref": "#/$defs/kyHoacRong"
+    }
+   }
+  },
+  "duKeoCo": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "anSo",
+    "thanhPha",
+    "trai",
+    "phai",
+    "pha"
+   ],
+   "properties": {
+    "anSo": {
+     "type": "boolean",
+     "description": "true: lực kéo minh hoạ, không in số."
+    },
+    "thanhPha": {
+     "type": "boolean"
+    },
+    "trai": {
+     "$ref": "#/$defs/benKeo"
+    },
+    "phai": {
+     "$ref": "#/$defs/benKeo"
+    },
+    "pha": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "chiTrai",
+       "chiPhai",
+       "loai",
+       "chu",
+       "ketLuan"
+      ],
+      "properties": {
+       "chiTrai": {
+        "type": "number",
+        "description": "Chỉ dùng khi không có ky (số minh hoạ). Có ky thì ghi 0: app tra bảng."
+       },
+       "chiPhai": {
+        "type": "number"
+       },
+       "loai": {
+        "$ref": "#/$defs/loai"
+       },
+       "chu": {
+        "type": "string"
+       },
+       "ketLuan": {
+        "type": "string",
+        "description": "Chuỗi rỗng: app dùng tên loại liên kết."
+       }
+      }
+     }
+    }
+   }
+  },
+  "duThang": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "max",
+    "kim",
+    "ketLuan"
+   ],
+   "properties": {
+    "max": {
+     "type": "number"
+    },
+    "kim": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "nhan",
+       "a",
+       "b",
+       "delta",
+       "loai"
+      ],
+      "properties": {
+       "nhan": {
+        "type": "string"
+       },
+       "a": {
+        "$ref": "#/$defs/ky"
+       },
+       "b": {
+        "$ref": "#/$defs/ky"
+       },
+       "delta": {
+        "type": "number",
+        "description": "Δχ A.I đọc hoặc tính; app tính lại từ bảng và so."
+       },
+       "loai": {
+        "$ref": "#/$defs/loai"
+       }
+      }
+     }
+    },
+    "ketLuan": {
+     "type": "string",
+     "description": "Kết luận khung phấn dưới thang; chuỗi rỗng nếu không có."
+    }
+   }
+  },
+  "duLewis": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "congThuc",
+    "nguyenTu",
+    "lienKet",
+    "capRieng",
+    "nhanChung"
+   ],
+   "properties": {
+    "congThuc": {
+     "type": "string"
+    },
+    "nguyenTu": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "ky",
+       "kieu",
+       "vt"
+      ],
+      "properties": {
+       "ky": {
+        "type": "string"
+       },
+       "kieu": {
+        "enum": [
+         "cham",
+         "x"
+        ]
+       },
+       "vt": {
+        "type": "array",
+        "items": {
+         "type": "integer"
+        },
+        "description": "[cột, hàng] trên lưới; mảng rỗng = xếp một hàng."
+       }
+      }
+     }
+    },
+    "lienKet": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "a",
+       "b",
+       "cap"
+      ],
+      "properties": {
+       "a": {
+        "type": "integer"
+       },
+       "b": {
+        "type": "integer"
+       },
+       "cap": {
+        "type": "integer",
+        "description": "Số cặp electron dùng chung (1, 2, 3)."
+       }
+      }
+     }
+    },
+    "capRieng": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     }
+    },
+    "nhanChung": {
+     "type": "string"
+    }
+   }
+  },
+  "duQuyTac": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "nhan",
+    "mau",
+    "dong",
+    "viDu"
+   ],
+   "properties": {
+    "nhan": {
+     "type": "string"
+    },
+    "mau": {
+     "enum": [
+      "vang",
+      "ngoc",
+      "hong"
+     ]
+    },
+    "dong": {
+     "$ref": "#/$defs/dsChu"
+    },
+    "viDu": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "duViDu": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "de",
+    "soDo",
+    "tinh"
+   ],
+   "properties": {
+    "de": {
+     "type": "string"
+    },
+    "soDo": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "chat",
+      "muiTen"
+     ],
+     "properties": {
+      "chat": {
+       "type": "array",
+       "minItems": 1,
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "ct",
+         "heSo",
+         "so"
+        ],
+        "properties": {
+         "ct": {
+          "type": "string"
+         },
+         "heSo": {
+          "type": "integer",
+          "description": "0 = không ghi hệ số."
+         },
+         "so": {
+          "type": "array",
+          "description": "Số liệu đề cho, ghi theo CỘT DỌC dưới chất (tư duy của Thầy).",
+          "items": {
+           "type": "object",
+           "additionalProperties": false,
+           "required": [
+            "hien",
+            "chi",
+            "M"
+           ],
+           "properties": {
+            "hien": {
+             "type": "string"
+            },
+            "chi": {
+             "$ref": "#/$defs/kyHoacRong"
+            },
+            "M": {
+             "type": "number",
+             "description": "0 = ô này không phải khối lượng mol."
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      "muiTen": {
+       "type": "array",
+       "description": "Mũi tên giữa hai chất liền nhau; mảng rỗng = không có mũi tên.",
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "tren"
+        ],
+        "properties": {
+         "tren": {
+          "type": "string",
+          "description": "Hiệu suất ghi trên mũi tên."
+         }
+        }
+       }
+      }
+     }
+    },
+    "tinh": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "ten",
+      "thuaSo",
+      "ketQua"
+     ],
+     "properties": {
+      "ten": {
+       "type": "string"
+      },
+      "thuaSo": {
+       "type": "array",
+       "minItems": 1,
+       "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "dau",
+         "hien",
+         "gt",
+         "tu",
+         "mau",
+         "tro",
+         "loai",
+         "ct",
+         "nt",
+         "tuCt",
+         "denCt",
+         "H"
+        ],
+        "properties": {
+         "dau": {
+          "enum": [
+           "",
+           "·",
+           "−",
+           "+"
+          ]
+         },
+         "hien": {
+          "type": "string"
+         },
+         "gt": {
+          "type": "number"
+         },
+         "tu": {
+          "type": "number"
+         },
+         "mau": {
+          "type": "number",
+          "description": "0 = không phải phân số."
+         },
+         "tro": {
+          "type": "string",
+          "description": "Ô liên quan sáng lên: «chất:ô» (0:1), «muiTen:0», «chất:heSo»; chuỗi rỗng = không."
+         },
+         "loai": {
+          "enum": [
+           "",
+           "chia-M",
+           "nhan-M",
+           "bao-toan",
+           "hieu-suat-xuoi",
+           "hieu-suat-nguoc",
+           "doi-don-vi"
+          ]
+         },
+         "ct": {
+          "type": "string"
+         },
+         "nt": {
+          "type": "string"
+         },
+         "tuCt": {
+          "type": "string"
+         },
+         "denCt": {
+          "type": "string"
+         },
+         "H": {
+          "type": "number"
+         }
+        }
+       }
+      },
+      "ketQua": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "hien",
+        "gt",
+        "donVi"
+       ],
+       "properties": {
+        "hien": {
+         "type": "string"
+        },
+        "gt": {
+         "type": "number"
+        },
+        "donVi": {
+         "type": "string"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "duDoanNhanh": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "hoi",
+    "luaChon",
+    "giai",
+    "mo"
+   ],
+   "properties": {
+    "hoi": {
+     "$ref": "#/$defs/chu"
+    },
+    "luaChon": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "chu",
+       "dung"
+      ],
+      "properties": {
+       "chu": {
+        "type": "string"
+       },
+       "dung": {
+        "type": "boolean"
+       }
+      }
+     }
+    },
+    "giai": {
+     "$ref": "#/$defs/chu"
+    },
+    "mo": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/moKeoCo"
+      },
+      {
+       "$ref": "#/$defs/moThang"
+      },
+      {
+       "$ref": "#/$defs/moLewis"
+      },
+      {
+       "$ref": "#/$defs/moQuyTac"
+      }
+     ]
+    }
+   }
+  },
+  "duTongKet": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "y"
+   ],
+   "properties": {
+    "y": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "chu",
+       "canh"
+      ],
+      "properties": {
+       "chu": {
+        "$ref": "#/$defs/chu"
+       },
+       "canh": {
+        "type": "string",
+        "description": "id cảnh; app lấy phút nghe từ nét của cảnh đó."
+       }
+      }
+     }
+    }
+   }
+  },
+  "moKeoCo": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "khuon",
+    "duLieu"
+   ],
+   "properties": {
+    "khuon": {
+     "const": "keo-co"
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duKeoCo"
+    }
+   }
+  },
+  "moThang": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "khuon",
+    "duLieu"
+   ],
+   "properties": {
+    "khuon": {
+     "const": "thang-delta"
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duThang"
+    }
+   }
+  },
+  "moLewis": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "khuon",
+    "duLieu"
+   ],
+   "properties": {
+    "khuon": {
+     "const": "lewis"
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duLewis"
+    }
+   }
+  },
+  "moQuyTac": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "khuon",
+    "duLieu"
+   ],
+   "properties": {
+    "khuon": {
+     "const": "quy-tac"
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duQuyTac"
+    }
+   }
+  },
+  "canhKeoCo": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "keo-co"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duKeoCo"
+    }
+   }
+  },
+  "canhThang": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "thang-delta"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duThang"
+    }
+   }
+  },
+  "canhLewis": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "lewis"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duLewis"
+    }
+   }
+  },
+  "canhQuyTac": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "quy-tac"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duQuyTac"
+    }
+   }
+  },
+  "canhViDu": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "vi-du-cot-doc"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duViDu"
+    }
+   }
+  },
+  "canhDoanNhanh": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "doan-nhanh"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duDoanNhanh"
+    }
+   }
+  },
+  "canhTongKet": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "khuon",
+    "tieuDe",
+    "nguon",
+    "loi",
+    "khop",
+    "duLieu"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "khuon": {
+     "const": "tong-ket"
+    },
+    "tieuDe": {
+     "$ref": "#/$defs/chu"
+    },
+    "nguon": {
+     "$ref": "#/$defs/nguon"
+    },
+    "loi": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/cau"
+     }
+    },
+    "khop": {
+     "type": "array",
+     "items": {
+      "type": "integer"
+     },
+     "description": "Bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k] (chỉ số trong loi)."
+    },
+    "duLieu": {
+     "$ref": "#/$defs/duTongKet"
+    }
+   }
+  },
+  "cau": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "chu",
+    "tu",
+    "den"
+   ],
+   "properties": {
+    "chu": {
+     "type": "string",
+     "description": "Một câu Thầy nói, chép lại đúng cách nói của Thầy: bỏ nói lắp, ậm ừ; không thêm ý; không quá 30 chữ."
+    },
+    "tu": {
+     "type": "number"
+    },
+    "den": {
+     "type": "number"
+    }
+   }
+  }
+ }
 }

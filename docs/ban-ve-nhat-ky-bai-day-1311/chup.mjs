@@ -39,18 +39,20 @@ const GOC_URL = `http://127.0.0.1:${may.address().port}${DUONG}`
 // [tên ảnh, tệp, tham số, rộng, cao, nền, soát chữ học sinh?]
 const ANH = [
   ['01-nhat-ky-may-tinh-1366-sang', 'nhat-ky.html', 'tua=1', 1366, 768, 'sang', true],
-  ['02-nhat-ky-may-tinh-1366-toi-vi-du-va-thang', 'nhat-ky.html', 'tua=1&cuon=c7&le=70', 1366, 768, 'toi', true],
+  ['02-nhat-ky-may-tinh-1366-toi-vi-du-ch4', 'nhat-ky.html', 'tua=1&cuon=c7&le=70', 1366, 768, 'toi', true],
   ['03-nhat-ky-ngang-844-sang', 'nhat-ky.html', 'tua=1', 844, 390, 'sang', true],
   ['04-nhat-ky-ngang-844-toi-cong-thuc-electron', 'nhat-ky.html', 'tua=1&cuon=c3&le=56', 844, 390, 'toi', true],
   ['05-nhat-ky-doc-390-sang', 'nhat-ky.html', 'tua=1', 390, 844, 'sang', true],
   ['06-nhat-ky-doc-390-toi-doan-nhanh-da-cham', 'nhat-ky.html', 'tua=1&chon=c4:0&cuon=c4&le=64', 390, 844, 'toi', true],
   ['07-khung-giua-keo-co-dang-thanh-ion-1366-toi', 'nhat-ky.html', 'dung=c5:7700&cuon=c5&le=70', 1366, 768, 'toi', true],
   ['08-khung-giua-lewis-dang-ve-cap-chung-390-sang', 'nhat-ky.html', 'dung=c3:2550&cuon=c3&le=64', 390, 844, 'sang', true],
-  ['09-khung-giua-thang-kim-dang-chay-844-sang', 'nhat-ky.html', 'dung=c8:4350&cuon=c8&le=56', 844, 390, 'sang', true],
+  ['09-khung-giua-thang-kim-nay-844-sang', 'nhat-ky.html', 'dung=c9:4380&cuon=c9&le=56', 844, 390, 'sang', true],
   ['10-bai-fes2-vi-du-cot-doc-1366-sang', 'nhat-ky.html', 'kb=fes2&tua=1&cuon=f2&le=70', 1366, 768, 'sang', true],
-  ['11-duyet-thay-1366-sang', 'duyet.html', 'chon=c8', 1366, 768, 'sang', false],
+  ['11-xem-nhu-thay-giang-dang-noi-1366-toi', 'nhat-ky.html', 'giay=c7:1400.5&cuon=c7&le=70', 1366, 768, 'toi', true],
   ['12-cho-gan-may-tinh-1366-sang', 'cho-gan.html', 'nk=5200', 1366, 768, 'sang', false],
   ['13-cho-gan-doc-390-sang', 'cho-gan.html', 'nk=5200', 390, 844, 'sang', false],
+  ['15-xem-nhu-thay-giang-doc-390-toi', 'nhat-ky.html', 'giay=c3:621&cuon=c3&le=64', 390, 844, 'toi', true],
+  ['14-bang-thay-phong-to-390-sang', 'nhat-ky.html', 'tua=1&zoom=c7:2.25&cuon=c7-bang&le=70', 390, 844, 'sang', true],
 ]
 
 const b = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined })
@@ -106,35 +108,25 @@ if (!CHI_VIDEO) for (const [ten, tep, ts, w, h, nen, chuHs] of ANH) {
   await p.close()
 }
 
-// ── 3. video: chạy lần lượt các cảnh của bài liên kết (bìa ⇒ kéo co ⇒ O₂ ⇒ đoán H₂ ⇒ ion ⇒ CH₄ ⇒ thang ⇒ CO₂) ──
+// ── 3. video: chế độ «Xem như Thầy giảng» chạy liền ≥ 3 cảnh (đồng hồ giả chạy nhanh ×2,4 cho vừa 40 giây) ──
+//   máy tính: bìa ⇒ bấm «Xem như Thầy giảng» ⇒ cảnh 1 kéo co ⇒ 2 quy tắc ⇒ 3 công thức electron O₂ ⇒ đoán nhanh H₂ (chạm đáp án, nghe lời Thầy)
+//   điện thoại: vào thẳng chế độ giảng từ cảnh 5 ⇒ 5 lệch sức thành ion ⇒ 6 quy tắc ⇒ 7 ví dụ CH₄ ⇒ tới câu đoán Δχ của O₂
 const VID = []
 if (VIDEO) {
   let coFfmpeg = true
   try { execFileSync('ffmpeg', ['-hide_banner', '-version'], { stdio: 'ignore' }) } catch { coFfmpeg = false }
-  for (const [ten, w, h, nen, dpr] of [['video-nhat-ky-may-tinh-1366', 1366, 768, 'sang', 1], ['video-nhat-ky-dien-thoai-390', 390, 844, 'toi', 2]]) {
+  for (const [ten, w, h, nen, dpr, ts, denCanh] of [['video-nhat-ky-may-tinh-1366', 1366, 768, 'sang', 1, 'toc=2.6&ghi=0', 'c4'], ['video-nhat-ky-dien-thoai-390', 390, 844, 'toi', 2, 'toc=2.4&ghi=0&giang=1&tu=4', 'c8']]) {
     const tam = mkdtempSync(join(tmpdir(), 'nk-video-'))
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: nen === 'toi' ? 'dark' : 'light', hasTouch: w < 900, isMobile: w < 900, recordVideo: { dir: tam, size: { width: w * dpr, height: h * dpr } } })
     const p = await ctx.newPage(), batDau = Date.now()
-    await p.goto(`${GOC_URL}nhat-ky.html?toc=1.5&ghi=0`)
+    await p.goto(`${GOC_URL}nhat-ky.html?${ts}`)
     await p.waitForSelector('html[data-san]', { timeout: 10000 })
     const tai = (Date.now() - batDau) / 1000
-    await p.waitForTimeout(2600)
-    const toi = async (id, them) => {
-      await p.evaluate((id) => { const e = document.getElementById(id); window.scrollTo({ top: e.getBoundingClientRect().top + scrollY - (innerWidth < 900 ? 64 : 72), behavior: 'smooth' }) }, id)
-      await p.waitForTimeout(750)
-      const ms = await p.evaluate((id) => window.NK_TRANG.dk[id].thoiLuong, id)
-      await p.waitForTimeout(Math.min(9000, ms + (them || 300)))
-    }
-    await toi('c1')
-    await toi('c3')
-    await toi('c4', 0)
-    await p.click('#c4 .dn-pa >> nth=0'); await p.waitForTimeout(400)
-    await p.evaluate(() => { const e = document.querySelector('#c4 .dn-mo'); e.scrollIntoView({ behavior: 'smooth', block: 'center' }) })
-    await p.waitForTimeout(3300)
-    await toi('c5')
-    await toi('c7')
-    await toi('c8')
-    await toi('c10', -300)
+    if (!ts.includes('giang=1')) { await p.waitForTimeout(1800); await p.click('#nut-giang') }
+    // đợi tới cảnh đoán nhanh cuối, chạm đáp án đúng, nghe lời Thầy
+    await p.waitForFunction((id) => window.NK_TRANG.Giang.canh === id, denCanh, { timeout: 60000, polling: 200 })
+    await p.waitForTimeout(1600)
+    if (denCanh === 'c4') { await p.click('#c4 .dn-pa >> nth=0'); await p.waitForTimeout(3200) }
     const tong = (Date.now() - batDau) / 1000
     await ctx.close()
     const webm = readdirSync(tam).find((x) => x.endsWith('.webm'))

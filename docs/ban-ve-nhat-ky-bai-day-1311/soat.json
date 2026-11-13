@@ -1,6 +1,6 @@
 {
  "tong": {
-  "anh": 13,
+  "anh": 15,
   "loiTrang": 0,
   "tranNgang": 0,
   "dichNho": 0,
@@ -11,7 +11,7 @@
  "anh": [
   {
    "anh": "01-nhat-ky-may-tinh-1366-sang.jpg",
-   "kb": 140,
+   "kb": 144,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -19,8 +19,8 @@
    "chuHocSinh": []
   },
   {
-   "anh": "02-nhat-ky-may-tinh-1366-toi-vi-du-va-thang.jpg",
-   "kb": 148,
+   "anh": "02-nhat-ky-may-tinh-1366-toi-vi-du-ch4.jpg",
+   "kb": 140,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -38,7 +38,7 @@
   },
   {
    "anh": "04-nhat-ky-ngang-844-toi-cong-thuc-electron.jpg",
-   "kb": 106,
+   "kb": 82,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -47,7 +47,7 @@
   },
   {
    "anh": "05-nhat-ky-doc-390-sang.jpg",
-   "kb": 140,
+   "kb": 138,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -56,7 +56,7 @@
   },
   {
    "anh": "06-nhat-ky-doc-390-toi-doan-nhanh-da-cham.jpg",
-   "kb": 129,
+   "kb": 132,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -65,7 +65,7 @@
   },
   {
    "anh": "07-khung-giua-keo-co-dang-thanh-ion-1366-toi.jpg",
-   "kb": 145,
+   "kb": 143,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -74,7 +74,7 @@
   },
   {
    "anh": "08-khung-giua-lewis-dang-ve-cap-chung-390-sang.jpg",
-   "kb": 96,
+   "kb": 102,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -82,7 +82,7 @@
    "chuHocSinh": []
   },
   {
-   "anh": "09-khung-giua-thang-kim-dang-chay-844-sang.jpg",
+   "anh": "09-khung-giua-thang-kim-nay-844-sang.jpg",
    "kb": 83,
    "loiTrang": [],
    "tranNgang": 0,
@@ -100,8 +100,8 @@
    "chuHocSinh": []
   },
   {
-   "anh": "11-duyet-thay-1366-sang.jpg",
-   "kb": 146,
+   "anh": "11-xem-nhu-thay-giang-dang-noi-1366-toi.jpg",
+   "kb": 142,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -125,18 +125,36 @@
    "dichNho": [],
    "chuBiCat": [],
    "chuHocSinh": []
+  },
+  {
+   "anh": "15-xem-nhu-thay-giang-doc-390-toi.jpg",
+   "kb": 114,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "14-bang-thay-phong-to-390-sang.jpg",
+   "kb": 123,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
   }
  ],
  "video": [
   {
    "video": "video-nhat-ky-may-tinh-1366.mp4",
-   "giay": 39,
-   "mb": 2.21
+   "giay": 38,
+   "mb": 1.75
   },
   {
    "video": "video-nhat-ky-dien-thoai-390.mp4",
-   "giay": 39,
-   "mb": 0.81
+   "giay": 36,
+   "mb": 0.59
   }
  ]
 }

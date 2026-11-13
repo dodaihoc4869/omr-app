@@ -1,9 +1,10 @@
-// BẢN VẼ «Nhật ký bài dạy» · THƯ VIỆN KHUÔN HOẠT HOẠ (dùng chung cho nhat-ky.html, duyet.html, cho-gan.html).
+// BẢN VẼ «Nhật ký bài dạy» · THƯ VIỆN KHUÔN HOẠT HOẠ (dùng chung cho nhat-ky.html, cho-gan.html, kiem-kich-ban.mjs).
 // Mỗi khuôn dựng một cảnh từ DỮ LIỆU (một mục trong `canh` của kich-ban-*.json). Không thư viện ngoài: SVG + HTML + Web Animations API.
 // Hoạt hoạ chỉ đổi transform / opacity (riêng nét khung, mũi tên vẽ bằng stroke-dashoffset, ít phần tử).
 // Mỗi cảnh có MỘT dòng thời gian tua được: chạy, xem lại, đứng hình ở mốc bất kỳ (để chụp), nhảy tới cuối (giảm chuyển động).
 // Bảy khuôn: keo-co · thang-delta · lewis · quy-tac · vi-du-cot-doc · doan-nhanh · tong-ket. Kịch bản chỉ được dùng đúng bảy khuôn này (luoc-do.json).
-// Phần cuối tệp là BỘ KIỂM SỐ của app: tính lại mọi con số bằng bảng cố định, không tin số trong kịch bản.
+// Mỗi cảnh khớp GIỌNG THẦY: bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k]; phụ đề chạy theo câu; nét phấn thật của Thầy vẽ theo giờ tiếng.
+// Phần cuối tệp là CỔNG TỰ KIỂM của máy: đúng khuôn, tính lại mọi con số, mọi điều trên cảnh phải có nguồn (bảng hoặc lời Thầy). Không có bước người duyệt.
 (function () {
   'use strict'
   const NS = 'http://www.w3.org/2000/svg'
@@ -16,11 +17,6 @@
   const CHI = { H: 2.20, C: 2.55, N: 3.04, O: 3.44, F: 3.98, Na: 0.93, Cl: 3.16, K: 0.82 } // độ âm điện Pauling
   const E_NGOAI = { H: 1, C: 4, N: 5, O: 6, F: 7, Na: 1, Cl: 7, K: 1, S: 6 } // electron lớp ngoài cùng
   const KHOI = { H: 1, C: 12, N: 14, O: 16, Na: 23, S: 32, Cl: 35.5, K: 39, Fe: 56 } // nguyên tử khối
-  // Ngưỡng Δχ: hai phương án, Thầy chốt một (duyet.html). Bộ kiểm và khuôn thang-delta đều đọc tham số này.
-  const NGUONG = {
-    sgk: { ten: 'Theo SGK Hoá 10 (2018)', vung: [{ loai: 'khong-phan-cuc', tu: 0, den: 0.4 }, { loai: 'phan-cuc', tu: 0.4, den: 1.7 }, { loai: 'ion', tu: 1.7, den: null }] },
-    thay: { ten: 'Theo đúng bảng Thầy viết', vung: [{ loai: 'cong-hoa-tri', tu: 0, den: 1.7 }, { loai: 'ion', tu: 1.7, den: null, lonHon: true }] },
-  }
   const TEN_LOAI = { 'khong-phan-cuc': 'Cộng hoá trị không phân cực', 'phan-cuc': 'Cộng hoá trị phân cực', ion: 'Liên kết ion', 'cong-hoa-tri': 'Liên kết cộng hoá trị' }
   const TEN_DAY = { 'khong-phan-cuc': 'Liên kết cộng hoá trị không phân cực', 'phan-cuc': 'Liên kết cộng hoá trị phân cực', ion: 'Liên kết ion', 'cong-hoa-tri': 'Liên kết cộng hoá trị' }
   const MAU_LOAI = { 'khong-phan-cuc': 'ngoc', 'phan-cuc': 'vang', ion: 'hong', 'cong-hoa-tri': 'ngoc' }
@@ -67,13 +63,6 @@
     m = t.match(/^-?\d+(?:,\d+)?$/)
     return m ? +t.replace(',', '.') : NaN
   }
-  function phanLoai(d, ng) {
-    const v = NGUONG[ng] || NGUONG.sgk
-    for (const z of v.vung) { const tren = z.den == null ? Infinity : z.den; if (z.lonHon ? d > z.tu && d <= tren : d >= z.tu && d < tren) return z.loai }
-    return v.vung[v.vung.length - 1].loai
-  }
-  const hopLoai = (ghi, tinh) => ghi === tinh || (tinh === 'cong-hoa-tri' && (ghi === 'khong-phan-cuc' || ghi === 'phan-cuc'))
-
   // ── DÒNG THỜI GIAN: mọi hoạt hoạ của một cảnh nằm trên một trục, tua được ──
   class Dong {
     constructor() { this.ds = []; this.vong = []; this.t = 0; this.hen = 0 }
@@ -111,7 +100,7 @@
   }
 
   // ═══════════ KHUÔN 1 · keo-co: hai nguyên tử kéo co cặp electron dùng chung ═══════════
-  // duLieu: { trai: {nhan, ky?}, phai: {nhan, ky?}, anSo?, pha: [{ chiTrai?, chiPhai?, loai, chu, loi?: [], ketLuan? }] }
+  // duLieu: { trai: {nhan, ky}, phai: {nhan, ky}, anSo, thanhPha, pha: [{ chiTrai, chiPhai, loai, chu, ketLuan }] } · bước: đầu pha, kết luận pha
   // ky có trong bảng ⇒ χ lấy từ bảng của app; không có ky ⇒ số minh hoạ (anSo: không in ra).
   function keoCo(goc, d, dg, ctx) {
     // khổ hẹp (điện thoại dọc) ⇒ bố cục gọn để chữ trên bảng không dưới 15 px
@@ -162,7 +151,8 @@
       if (!d.anSo && d[ben].ky && CHI[d[ben].ky] != null) g.append(s('text', { x, y: Y + R + 74, class: 'kc-chi', text: `χ = ${soChi(CHI[d[ben].ky])}` }))
       return g
     }
-    svg.append(nhan(XT, 'trai', 'ngoc'), nhan(XP, 'phai', 'hong'))
+    const nhanT = nhan(XT, 'trai', 'ngoc'), nhanP = nhan(XP, 'phai', 'hong')
+    svg.append(nhanT, nhanP)
     // dấu điện tích (khi thành ion)
     const dauT = s('text', { x: XT + R - 2, y: Y - R + 6, class: 'kc-dau mau-ngoc', text: '+', style: 'opacity:0' }), dauP = s('text', { x: XP + R + 4, y: Y - R + 6, class: 'kc-dau mau-hong', text: '−', style: 'opacity:0' })
     svg.append(dauT, dauP)
@@ -207,7 +197,7 @@
     const DAI = 4400, dauPha = (i) => 300 + i * DAI
     let viTruoc = { x: 0, y: 0 }, scT = 0.62, scP = 0.62
     dg.hien(NT.ngoai, 0, 500, { transform: 'scale(.6)' }); dg.hien(NP.ngoai, 120, 500, { transform: 'scale(.6)' })
-    dg.hien(day, 200, 500)
+    dg.hien(day, 200, 500); dg.hien(nhanT, 250, 400, { transform: 'translateY(8px)' }); dg.hien(nhanP, 350, 400, { transform: 'translateY(8px)' })
     dg.hien(bocNgoai, 500, 400, { transform: 'scale(.4)' })
     const lichLucT = [[0, { transform: 'scaleX(0)', opacity: 0 }]], lichLucP = [[0, { transform: 'scaleX(0)', opacity: 0 }]]
     d.pha.forEach((p, i) => {
@@ -244,8 +234,7 @@
       const kl = [[t0 + 2400, { opacity: 0 }], [t0 + 2800, { opacity: 1 }]]
       if (het) kl.push([het - 300, { opacity: 1 }], [het, { opacity: 0 }])
       dg.chuoi(klPha[i].g, kl); dg.ve(klPha[i].khung, t0 + 2600, 800)
-      ;(p.loi || []).forEach((l, k) => ctx.noi(l, t0 + 200 + k * 1100))
-      if (p.ketLuan || TEN_DAY[p.loai]) ctx.noi(p.ketLuan || TEN_DAY[p.loai], t0 + 2800, MAU_LOAI[p.loai])
+      ctx.buoc(t0); ctx.buoc(t0 + 2400)
     })
     lichLucT.push([dauPha(d.pha.length - 1) + 1200, { transform: `scaleX(${scT})`, opacity: 1 }]); lichLucP.push([dauPha(d.pha.length - 1) + 1200, { transform: `scaleX(${scP})`, opacity: 1 }])
     dg.chuoi(lucT.ngoai, lichLucT); dg.chuoi(lucP.ngoai, lichLucP)
@@ -255,10 +244,10 @@
     dg.lap(lucP.trong, [{ transform: 'scaleX(1.05)' }, { transform: 'scaleX(1)' }], 700)
   }
 
-  // ═══════════ KHUÔN 2 · thang-delta: thang Δχ, kim chạy tới giá trị, vùng sáng lên ═══════════
-  // duLieu: { max, kim: [{ nhan, a, b, delta, loai, chu? }] } · vùng lấy theo ngưỡng đang dùng (ctx.nguong)
+  // ═══════════ KHUÔN 2 · thang-delta: thang Δχ, kim chạy tới giá trị rồi nảy, vùng sáng lên ═══════════
+  // duLieu: { max, kim: [{ nhan, a, b, delta, loai }], ketLuan } · vùng theo ngưỡng máy tự dùng (ctx.nguong: bảng Thầy trước, SGK sau)
   function thangDelta(goc, d, dg, ctx) {
-    const max = d.max || 3, ng = NGUONG[ctx.nguong] || NGUONG.sgk, phan = (x) => Math.max(0, Math.min(1, x / max))
+    const max = d.max || 3, ng = ctx.nguong && ctx.nguong.vung ? ctx.nguong : nguongTuDong(null), phan = (x) => Math.max(0, Math.min(1, x / max))
     const khung = h('div', { class: 'td', style: `--hang:${d.kim.length}` })
     const tren = h('div', { class: 'td-tren' }), ray = h('div', { class: 'td-ray' })
     const vungEl = ng.vung.map((z) => {
@@ -272,42 +261,45 @@
     const kimEl = d.kim.map((k, i) => {
       const p = phan(k.delta), phai = p > 0.62
       const kd = h('div', { class: 'td-kd' })
-      const kim = h('div', { class: 'td-kim', style: `top:calc(${i} * var(--hang-cao))` }, [h('span', { class: `td-nhan${phai ? ' phai' : ''}`, html: `${dam(k.nhan)} <b class="so">Δχ = ${soDelta(k.delta)}</b>` })])
+      const kim = h('div', { class: 'td-kim', style: `top:calc(${i} * var(--hang-cao))` }, [h('i', { class: 'td-quang', 'aria-hidden': 'true' }), h('span', { class: `td-nhan${phai ? ' phai' : ''}`, html: `${dam(k.nhan)} <b class="so">Δχ = ${soDelta(k.delta)}</b>` })])
       kd.append(kim); tren.append(kd); return { kd, kim, p }
     })
     const ten = h('div', { class: 'td-ten', style: `grid-template-columns:repeat(${ng.vung.length},minmax(0,1fr))` })
     const tenEl = ng.vung.map((z) => {
-      const tam = z.den == null ? (z.lonHon ? `Δχ > ${soGon(z.tu)}` : `Δχ ≥ ${soGon(z.tu)}`) : z.tu === 0 ? (z.loai === 'cong-hoa-tri' ? `Δχ ≤ ${soGon(z.den)}` : `0 ≤ Δχ < ${soGon(z.den)}`) : `${soGon(z.tu)} ≤ Δχ < ${soGon(z.den)}`
+      const tam = z.den == null ? `Δχ ${z.lonHon ? '>' : '≥'} ${soGon(z.tu)}` : z.tu === 0 ? `0 ≤ Δχ < ${soGon(z.den)}` : `${soGon(z.tu)} ≤ Δχ ${z.denBang ? '≤' : '<'} ${soGon(z.den)}`
       const e = h('div', { class: `td-o mau-${MAU_LOAI[z.loai]}` }, [h('i', { class: 'td-o-sang' }), h('b', { text: TEN_LOAI[z.loai] }), h('span', { class: 'so', text: tam })])
       ten.append(e); return e
     })
     khung.append(h('div', { class: 'td-khung' }, [tren, ray]), moc, ten)
+    let kl = null
+    if (d.ketLuan) { kl = h('p', { class: 'td-kl', html: dam(d.ketLuan) }); khung.append(kl) }
     goc.append(khung)
-    // lịch
+    // lịch: vùng mọc lên ⇒ kim chạy, vượt nhẹ rồi nảy về đúng giá trị ⇒ vùng của kim sáng lên ⇒ kết luận
+    ctx.buoc(0)
     vungEl.forEach((e, i) => dg.hien(e, 100 + i * 200, 420, { transform: 'scaleY(.2)' }))
     mocEl.forEach((e, i) => dg.hien(e, 500 + i * 120, 300))
     tenEl.forEach((e, i) => dg.hien(e, 300 + i * 200, 420, { transform: 'translateY(8px)' }))
-    ;(d.loiMo || []).forEach((l, k) => ctx.noi(l, 200 + k * 1200))
-    let t = 1100 + (d.loiMo || []).length * 600
+    let t = 1100
     kimEl.forEach((k, i) => {
-      const kim = d.kim[i], loai = phanLoai(kim.delta, ctx.nguong), vi = ng.vung.findIndex((z) => z.loai === loai)
+      const kim = d.kim[i], loai = phanLoai(kim.delta, ng), vi = ng.vung.findIndex((z) => z.loai === loai), vuot = Math.min(1, k.p + 0.05)
+      ctx.buoc(t)
       dg.hien(k.kim, t, 300)
-      dg.chuoi(k.kd, [[t, { transform: 'translateX(0%)' }, 'cubic-bezier(.3,0,.2,1.15)'], [t + 1100, { transform: `translateX(${(k.p * 100).toFixed(3)}%)` }]])
+      dg.chuoi(k.kd, [[t, { transform: 'translateX(0%)' }, 'cubic-bezier(.3,0,.25,1)'], [t + 900, { transform: `translateX(${(vuot * 100).toFixed(3)}%)` }, 'ease-in-out'], [t + 1150, { transform: `translateX(${(Math.max(0, k.p - 0.015) * 100).toFixed(3)}%)` }, 'ease-out'], [t + 1350, { transform: `translateX(${(k.p * 100).toFixed(3)}%)` }]])
+      dg.chuoi(k.kim.firstChild, [[t + 1250, { opacity: 0, transform: 'scale(.4)' }], [t + 1450, { opacity: 1, transform: 'scale(1.4)' }], [t + 2000, { opacity: 0.35, transform: 'scale(1)' }]])
       if (vi >= 0) {
-        dg.chuoi(vungEl[vi].firstChild, [[t + 1000, { opacity: 0 }], [t + 1300, { opacity: 1 }], [t + 1900, { opacity: 0.55 }]])
-        dg.chuoi(tenEl[vi].firstChild, [[t + 1000, { opacity: 0 }], [t + 1300, { opacity: 1 }]])
+        dg.chuoi(vungEl[vi].firstChild, [[t + 1200, { opacity: 0 }], [t + 1500, { opacity: 1 }], [t + 2100, { opacity: 0.55 }]])
+        dg.chuoi(tenEl[vi].firstChild, [[t + 1200, { opacity: 0 }], [t + 1500, { opacity: 1 }]])
       }
-      if (kim.chu) ctx.noi(kim.chu, t + 1100, MAU_LOAI[kim.loai])
-      t += 2100
+      t += 2300
     })
-    ;(d.loi || []).forEach((l, k) => ctx.noi(l, t + k * 1100))
+    if (kl) { ctx.buoc(t); dg.hien(kl, t, 500, { transform: 'translateY(10px)' }); t += 700 }
     dg.chuoi(khung, [[0, { opacity: 1 }], [t + 400, { opacity: 1 }]])
   }
 
   // ═══════════ KHUÔN 3 · lewis: công thức electron tự vẽ từng cặp, cặp dùng chung nằm giữa ═══════════
-  // duLieu: { congThuc, nguyenTu: [{ ky, kieu: 'cham'|'x', vt?: [cột, hàng] }], lienKet: [{ a, b, cap }], capRieng: [số cặp riêng mỗi nguyên tử], nhanChung?, loi?: [3 câu] }
+  // duLieu: { congThuc, nguyenTu: [{ ky, kieu: 'cham'|'x', vt: [cột, hàng] | [] }], lienKet: [{ a, b, cap }], capRieng: [số cặp riêng], nhanChung } · bước: kí hiệu, cặp dùng chung, đếm 8 electron
   function lewis(goc, d, dg, ctx) {
-    const B = 168, nt = d.nguyenTu.map((a, i) => Object.assign({ i }, a, { vt: a.vt || [i, 0] }))
+    const B = 168, nt = d.nguyenTu.map((a, i) => Object.assign({ i }, a, { vt: a.vt && a.vt.length === 2 ? a.vt : [i, 0] }))
     const c0 = Math.min(...nt.map((a) => a.vt[0])), c1 = Math.max(...nt.map((a) => a.vt[0])), r0 = Math.min(...nt.map((a) => a.vt[1])), r1 = Math.max(...nt.map((a) => a.vt[1]))
     const W = Math.max(520, (c1 - c0) * B + 280), H = (r1 - r0) * B + 300
     const ox = (W - (c1 - c0) * B) / 2, oy = 128
@@ -341,6 +333,7 @@
       const n = l.cap
       for (let k = 0; k < n; k++) {
         const o = (k - (n - 1) / 2) * 24, g = s('g')
+        g.append(s('circle', { cx: mx + p[0] * o, cy: my + p[1] * o, r: 24, class: 'lw-quang', style: 'transform-box:fill-box;transform-origin:center' }))
         g.append(eDot(mx - v[0] * 11 + p[0] * o, my - v[1] * 11 + p[1] * o, A.kieu, true), eDot(mx + v[0] * 11 + p[0] * o, my + v[1] * 11 + p[1] * o, Bt.kieu, true))
         svg.append(g); chung.push(g)
       }
@@ -357,23 +350,22 @@
     svg.append(nhanChung)
     // lịch
     kyEl.forEach((e, i) => dg.hien(e, i * 220, 420, { transform: 'scale(.5)' }))
-    const loi = d.loi || []
-    if (loi[0]) ctx.noi(loi[0], 300)
+    ctx.buoc(0)
     let t = 300 + kyEl.length * 220
     rieng.forEach((g, i) => { [...g.children].forEach((e, k) => dg.hien(e, t + k * 110, 300, { transform: 'scale(0)' })); t += 260 })
     t += 300
-    if (loi[1]) ctx.noi(loi[1], t)
-    chung.forEach((g) => { [...g.children].forEach((e, k) => dg.hien(e, t + k * 160, 360, { transform: 'scale(0)' })); t += 560 })
+    ctx.buoc(t)
+    chung.forEach((g) => { [...g.children].forEach((e, k) => (k === 0 ? dg.chuoi(e, [[t + 200, { opacity: 0, transform: 'scale(.3)' }], [t + 520, { opacity: 1, transform: 'scale(1.25)' }], [t + 900, { opacity: 0.85, transform: 'scale(1)' }]]) : dg.hien(e, t + (k - 1) * 160, 360, { transform: 'scale(0)' }))); t += 560 })
     vungChung.forEach((r, i) => dg.ve(r, t + i * 150, 700))
     dg.hien(nhanChung, t + 300, 500, { transform: 'translateY(8px)' })
     t += 1300
-    if (loi[2]) ctx.noi(loi[2], t)
+    ctx.buoc(t)
     dem.forEach((e, i) => dg.hien(e, t + i * 200, 400, { transform: 'translateY(-6px)' }))
     dg.chuoi(svg, [[0, { opacity: 1 }], [t + dem.length * 200 + 600, { opacity: 1 }]])
   }
 
   // ═══════════ KHUÔN 4 · quy-tac: thẻ quy tắc, chữ hiện dần, khung sáng ═══════════
-  // duLieu: { nhan, dong: [chữ có **nhấn**], mau: 'vang'|'ngoc'|'hong', viDu?: [], loi?: [] }
+  // duLieu: { nhan, dong: [chữ có **nhấn**], mau: 'vang'|'ngoc'|'hong', viDu: [] } · bước: khung, chữ, ví dụ
   function quyTac(goc, d, dg, ctx) {
     const mau = d.mau || 'vang'
     const the = h('div', { class: `qt mau-${mau}` })
@@ -398,20 +390,20 @@
     let vd = null
     if (d.viDu && d.viDu.length) { vd = h('div', { class: 'qt-vd' }, [h('span', { class: 'qt-vd-nhan', text: 'Ví dụ trên bảng' })].concat(d.viDu.map((x) => h('span', { class: 'qt-vd-o', text: x })))); the.append(vd) }
     goc.append(h('div', { class: 'qt-boc' }, the))
+    ctx.buoc(0); ctx.buoc(700)
     dg.ve(khungSvg.firstChild, 0, 900)
     dg.hien(nhan, 300, 400, { transform: 'translateY(6px)' })
     tu.forEach((e, i) => dg.hien(e, 700 + i * 90, 360, { transform: 'translateY(10px)' }))
     const t = 700 + tu.length * 90 + 300
     dg.chuoi(sang, [[t, { opacity: 0 }], [t + 500, { opacity: 1 }], [t + 1400, { opacity: 0.5 }]])
-    if (vd) dg.hien(vd, t + 600, 450, { transform: 'translateY(8px)' })
-    ;(d.loi || []).forEach((l, k) => ctx.noi(l, 400 + k * 1500))
+    if (vd) { ctx.buoc(t + 600); dg.hien(vd, t + 600, 450, { transform: 'translateY(8px)' }) }
     dg.chuoi(the, [[0, { opacity: 1 }], [t + 1500, { opacity: 1 }]])
   }
 
   // ═══════════ KHUÔN 5 · vi-du-cot-doc: sơ đồ cột dọc của Thầy + phép tính hiện từng thừa số ═══════════
   // duLieu: { de?, soDo: { chat: [{ ct, heSo?, so: [{ hien, chi?, M? }] }], muiTen: [{ tren }] | null },
   //           tinh: { ten, thuaSo: [{ dau?, hien, gt?|tu+mau, noi, tro?: [chất, ô] | ['muiTen', i] | [chất, 'heSo'], loai?, ct?, nt?, tuCt?, denCt?, H? }],
-  //                   ketQua: { hien, gt, donVi?, noi } } }
+  //                   ketQua: { hien, gt, donVi } } } · bước: sơ đồ, từng thừa số, kết quả (lời nói từng thừa số là lời Thầy, ở phụ đề)
   function viDuCotDoc(goc, d, dg, ctx) {
     const sd = d.soDo, root = h('div', { class: 'vd' })
     if (d.de) root.append(h('p', { class: 'vd-de', html: dam(d.de) }))
@@ -453,7 +445,7 @@
     t += oChat.length * 250
     muiTenEl.forEach((m) => { dg.ve(m.path, t, 600); dg.hien(m.e.firstChild, t + 300, 400) })
     t += 500
-    if (d.loiMo) d.loiMo.forEach((l, k) => ctx.noi(l, 200 + k * 1200))
+    ctx.buoc(0)
     oChat.forEach((c) => c.o.forEach((li) => { dg.hien(li, t, 380, { transform: 'translateY(-6px)' }); t += 300 }))
     heSoEl.forEach((e) => { if (e) e.style.display = 'inline-block' })
     t += 400
@@ -461,19 +453,20 @@
     const sang = (el, tai) => { if (!el) return; const g = el.querySelector('.vd-sang') || el; dg.chuoi(g, [[tai, { opacity: 0 }], [tai + 260, { opacity: 1 }], [tai + 1300, { opacity: 0 }]]) }
     d.tinh.thuaSo.forEach((f, i) => {
       dg.hien(tsEl[i], t, 420, { transform: 'translateY(10px) scale(.8)' })
-      ctx.noi(f.noi, t, null, f.hien)
-      const tro = f.tro
-      if (tro) {
-        if (tro[0] === 'muiTen') { const m = muiTenEl[tro[1]]; if (m) sang(m.e.firstChild, t) }
-        else if (tro[1] === 'heSo') { const e = heSoEl[tro[0]]; if (e) dg.hien(e, t + 150, 420, { transform: 'scale(2.2)' }) }
-        else if (oChat[tro[0]]) sang(oChat[tro[0]].o[tro[1]], t)
+      ctx.buoc(t)
+      // tro: «chất:ô» (0:1), «muiTen:0», «chất:heSo»; chuỗi rỗng = không trỏ ô nào
+      const tro = f.tro ? String(f.tro).split(':') : null
+      if (tro && tro.length === 2) {
+        if (tro[0] === 'muiTen') { const m = muiTenEl[+tro[1]]; if (m) sang(m.e.firstChild, t) }
+        else if (tro[1] === 'heSo') { const e = heSoEl[+tro[0]]; if (e) dg.hien(e, t + 150, 420, { transform: 'scale(2.2)' }) }
+        else if (oChat[+tro[0]]) sang(oChat[+tro[0]].o[+tro[1]], t)
       }
       t += 1250
     })
-    heSoEl.forEach((e, i) => { if (e && !d.tinh.thuaSo.some((f) => f.tro && f.tro[0] === i && f.tro[1] === 'heSo')) dg.hien(e, 0, 1) })
+    heSoEl.forEach((e, i) => { if (e && !d.tinh.thuaSo.some((f) => f.tro === `${i}:heSo`)) dg.hien(e, 0, 1) })
     dg.hien(kqEl, t, 500, { transform: 'scale(.7)' })
     dg.ve(gach, t + 300, 600)
-    ctx.noi(kq.noi, t + 200, 'vang')
+    ctx.buoc(t)
     dg.chuoi(root, [[0, { opacity: 1 }], [t + 1200, { opacity: 1 }]])
   }
 
@@ -492,7 +485,7 @@
     dg.hien(hoi, 0, 450, { transform: 'translateY(8px)' })
     nut.forEach((b, i) => dg.hien(b, 450 + i * 140, 380, { transform: 'translateY(10px)' }))
     dg.hien(nhacChon, 450 + nut.length * 140, 380)
-    ;(d.loi || []).forEach((l, k) => ctx.noi(l, 200 + k * 1100))
+    ctx.buoc(0)
     let dgMo = null
     const traLoi = (i, ngay) => {
       if (root.dataset.da) return
@@ -506,7 +499,7 @@
       const bang = h('div', { class: `dn-mo-bang k-${d.mo.khuon}` }); mo.append(bang)
       if (dgMo) dgMo.huy()
       dgMo = new Dong()
-      DUNG[d.mo.khuon](bang, d.mo.duLieu, dgMo, { id: ctx.id + '-mo', nguong: ctx.nguong, noi: () => {}, tieuDe: d.hoi })
+      DUNG[d.mo.khuon](bang, d.mo.duLieu, dgMo, { id: ctx.id + '-mo', nguong: ctx.nguong, buoc: () => {}, tieuDe: d.hoi })
       dgMo.hien(phan, 0, 380, { transform: 'translateY(6px)' })
       if (ngay) dgMo.cuoi(); else dgMo.chay()
       ctx.khiTraLoi && ctx.khiTraLoi(i, i === dungI)
@@ -528,68 +521,224 @@
         h('span', { text: 'Nghe Thầy giảng đoạn này' }), h('b', { class: 'so', text: gio(y.giay) })]) : null
       const li = h('li', { class: 'tk-y' }, [dau, h('div', { class: 'tk-than' }, [h('p', { html: dam(y.chu) }), nut])])
       ul.append(li)
+      ctx.buoc(200 + i * 700)
       dg.hien(li, 200 + i * 700, 450, { transform: 'translateX(-10px)' })
       dg.ve(dau.firstChild, 400 + i * 700, 420)
     })
     goc.append(ul)
-    ;(d.loi || []).forEach((l, k) => ctx.noi(l, 300 + k * 1200))
     goc.addEventListener('click', (e) => { const b = e.target.closest('.tk-nghe'); if (b && ctx.khiNghe) ctx.khiNghe(+b.dataset.giay) })
   }
 
   const DUNG = { 'keo-co': keoCo, 'thang-delta': thangDelta, lewis, 'quy-tac': quyTac, 'vi-du-cot-doc': viDuCotDoc, 'doan-nhanh': doanNhanh, 'tong-ket': tongKet }
 
-  /** Dựng một cảnh vào `bang` (bảng đen) + `loi` (cột lời Thầy). Trả bộ điều khiển { dg, chay, toi, cuoi, datLai, thoiLuong }. */
-  function dungCanh(bang, loiEl, canh, opt) {
-    opt = opt || {}
-    const dg = new Dong(), dieuKhien = {}
-    const ctx = {
-      id: 'k' + String(canh.id).replace(/[^a-z0-9]/gi, ''), nguong: opt.nguong || 'sgk', tieuDe: canh.tieuDe, dieuKhien, hat: !!opt.hat, nho: !!opt.nho,
-      khiNghe: opt.khiNghe, khiTraLoi: opt.khiTraLoi,
-      noi(chu, tai, mau, the) {
-        if (!loiEl || !chu) return
-        const li = h('li', { class: mau ? `loi-kl mau-${mau}` : '' }, [the ? h('span', { class: 'loi-the so', text: the }) : null, h('span', { html: dam(chu) })])
-        loiEl.append(li); dg.hien(li, tai, 420, { transform: 'translateY(8px)' })
-      },
+  // ═══════════ ĐỒNG HỒ TIẾNG ═══════════
+  // Bản thật: <audio> phát tieng.mp3 của buổi (đoạn tu → den, máy chủ trả theo Range). Bản vẽ chưa có tệp tiếng thật ⇒ đồng hồ giả
+  // chạy đúng thời lượng đoạn tiếng (cùng giao diện). Mọi hoạt hoạ, phụ đề, nét phấn đều đọc giờ từ đây ⇒ khớp lời Thầy.
+  class DongHo {
+    constructor(tep) { this.au = null; this.tep = tep || ''; this.t0 = 0; this.tu = 0; this.chay = false; this.dungLuc = 0 }
+    batDau(tu) {
+      this.tu = tu; this.dungLuc = tu; this.chay = true; this.t0 = performance.now()
+      if (this.tep) {
+        if (!this.au) { this.au = new Audio(this.tep); this.au.preload = 'auto' }
+        try { this.au.currentTime = tu } catch (e) { /* chưa tải */ }
+        const p = this.au.play(); if (p && p.catch) p.catch(() => { this.au = null; this.tep = '' })
+      }
     }
-    bang.classList.add('k-' + canh.khuon)
-    if (!DUNG[canh.khuon]) { bang.append(h('p', { class: 'k-loi', text: 'Cảnh này dùng khuôn chưa có trong thư viện.' })); return { dg, chay() {}, toi() {}, cuoi() {}, datLai() {}, thoiLuong: 0 } }
-    DUNG[canh.khuon](bang, canh.duLieu, dg, ctx)
-    return {
-      dg, dieuKhien,
-      get thoiLuong() { return dg.t },
-      chay(xong) { if (dieuKhien.datLai && opt.datLaiKhiChay) dieuKhien.datLai(); dg.chay(xong) },
-      toi(ms) { dg.toi(ms) }, cuoi() { dg.cuoi() }, dungVong() { dg.dungVong() },
-      datLai() { if (dieuKhien.datLai) dieuKhien.datLai(); dg.toi(0) },
-    }
+    get bay() { if (!this.chay) return this.dungLuc; if (this.au && !this.au.paused) return this.au.currentTime; return this.tu + ((performance.now() - this.t0) / 1000) * TOC }
+    tamDung() { this.dungLuc = this.bay; this.chay = false; if (this.au) this.au.pause() }
+    tiep() { this.tu = this.dungLuc; this.t0 = performance.now(); this.chay = true; if (this.au) { const p = this.au.play(); if (p && p.catch) p.catch(() => {}) } }
+    dung() { this.chay = false; if (this.au) this.au.pause() }
   }
 
-  // ═══════════ BỘ KIỂM CỦA APP: tính lại mọi con số, soát chữ, soát khuôn ═══════════
-  // Trả { canh: { [id]: [{ ok: true|false|null, chu }] }, tong: { dung, sai, chuaKiem } }. ok = null: không có số để kiểm (chỉ ghi chú).
-  const TU_CAM = ['tiền', 'nhà', 'giàu', 'thuế']
-  const VIET_TAT = ['VD', 'VD1', 'VD2', 'LK', 'CHT', 'KPC', 'PC', 'ntố', 'QT', 'QT3', 'QT₃']
+  // ═══════════ BẢNG PHẤN CỦA THẦY: nét thật của trang bảng, vẽ theo giờ tiếng; em phóng to / thu nhỏ / kéo xem ═══════════
+  // net: [{ m, c, t (ms trên trục tiếng), p: [x*4, y*4, ms, …] }] (cùng dạng net.bin) · vung: [x0, y0, x1, y1] trên bảng 1600 × 900
+  class BangPhan {
+    constructor(khung, nguonNet, vung, opt) {
+      this.khung = khung; this.opt = opt || {}; this.mau = nguonNet.mau
+      this.net = nguonNet.net.map((n) => { const k = n.p.length / 3, x = new Float32Array(k), y = new Float32Array(k), dt = new Float32Array(k); for (let j = 0; j < k; j++) { x[j] = n.p[j * 3] / 4; y[j] = n.p[j * 3 + 1] / 4; dt[j] = n.p[j * 3 + 2] } return { m: n.m, c: n.c, t0: n.t, t1: n.t + dt[k - 1], x, y, dt, k } })
+      this.vung = vung; this.T = Infinity; this.tu = 0; this.zoom = 1; this.dx = 0; this.dy = 0
+      this.cv = h('canvas', { 'aria-hidden': 'true' }); this.ctx = this.cv.getContext('2d')
+      khung.append(this.cv)
+      const nut = (nhan, ten, ve) => { const b = h('button', { type: 'button', class: 'bp-nut', 'aria-label': ten, html: ve }); b.addEventListener('click', (e) => { e.stopPropagation(); nhan() }); return b }
+      this.nutTo = nut(() => this.doiZoom(1.5), 'Phóng to bảng của Thầy', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>')
+      this.nutNho = nut(() => this.doiZoom(1 / 1.5), 'Thu nhỏ bảng của Thầy', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>')
+      this.nutVua = nut(() => this.datLai(), 'Xem vừa khung', '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>')
+      this.mucZoom = h('span', { class: 'bp-muc so', 'aria-live': 'polite', text: '1×' })
+      // thanh nút đặt ở đầu thẻ (không che nét phấn); không có chỗ thì nổi ở góc bảng
+      const dk = h('div', { class: 'bp-dk' + (this.opt.noiDk ? ' tren' : '') }, [this.nutNho, this.mucZoom, this.nutTo, this.nutVua]);
+      (this.opt.noiDk || khung).append(dk)
+      this.ganCu(); this.co()
+      if (window.ResizeObserver) { this.ro = new ResizeObserver(() => { this.co(); this.ve() }); this.ro.observe(khung) }
+    }
+    co() { const dpr = Math.min(3, window.devicePixelRatio || 1), r = this.khung.getBoundingClientRect(); this.w = Math.max(1, Math.round(r.width * dpr)); this.h = Math.max(1, Math.round(r.height * dpr)); this.dpr = dpr; if (this.cv.width !== this.w || this.cv.height !== this.h) { this.cv.width = this.w; this.cv.height = this.h } }
+    /** tỉ lệ + gốc toạ độ: vùng của cảnh vừa khung, rồi nhân zoom và dời theo tay em */
+    phep() { const v = this.vung, vw = v[2] - v[0], vh = v[3] - v[1], s0 = Math.min(this.w / vw, this.h / vh) * 0.94, s = s0 * this.zoom; return { s, ox: this.w / 2 - ((v[0] + v[2]) / 2) * s + this.dx * this.dpr, oy: this.h / 2 - ((v[1] + v[3]) / 2) * s + this.dy * this.dpr } }
+    doiZoom(k, cx, cy) {
+      const z0 = this.zoom, z = Math.max(1, Math.min(5, z0 * k)); if (z === z0) return
+      const r = this.khung.getBoundingClientRect(), px = cx == null ? r.width / 2 : cx, py = cy == null ? r.height / 2 : cy
+      // giữ điểm dưới ngón tay đứng yên
+      this.dx = px - r.width / 2 - ((px - r.width / 2 - this.dx) * z) / z0; this.dy = py - r.height / 2 - ((py - r.height / 2 - this.dy) * z) / z0
+      this.zoom = z; if (z === 1) { this.dx = 0; this.dy = 0 }
+      this.capNhatTay(); this.ve()
+    }
+    datLai() { this.zoom = 1; this.dx = 0; this.dy = 0; this.capNhatTay(); this.ve() }
+    capNhatTay() { this.khung.style.touchAction = this.zoom > 1 ? 'none' : 'pan-y'; this.khung.classList.toggle('dang-to', this.zoom > 1); this.mucZoom.textContent = (Math.round(this.zoom * 10) / 10 + '×').replace('.', ','); this.nutNho.disabled = this.zoom <= 1 }
+    ganCu() {
+      const tay = new Map(); let khoang0 = 0, zoom0 = 1, cham0 = 0
+      const el = this.khung
+      this.capNhatTay()
+      el.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.bp-dk')) return
+        tay.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (tay.size === 2) { const [a, b] = [...tay.values()]; khoang0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = this.zoom }
+        if (this.zoom > 1 || tay.size === 2) el.setPointerCapture(e.pointerId)
+        const nay = performance.now(); if (tay.size === 1 && nay - cham0 < 300) { const r = el.getBoundingClientRect(); this.zoom > 1 ? this.datLai() : this.doiZoom(2, e.clientX - r.left, e.clientY - r.top) } cham0 = nay
+      })
+      el.addEventListener('pointermove', (e) => {
+        if (!tay.has(e.pointerId)) return
+        const cu = tay.get(e.pointerId), moi = { x: e.clientX, y: e.clientY }; tay.set(e.pointerId, moi)
+        if (tay.size === 2) { const [a, b] = [...tay.values()], k = Math.hypot(a.x - b.x, a.y - b.y) / (khoang0 || 1), r = el.getBoundingClientRect(); this.doiZoom((zoom0 * k) / this.zoom, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top) }
+        else if (this.zoom > 1) { this.dx += moi.x - cu.x; this.dy += moi.y - cu.y; this.ve() }
+      })
+      const tha = (e) => { tay.delete(e.pointerId) }
+      el.addEventListener('pointerup', tha); el.addEventListener('pointercancel', tha)
+      el.addEventListener('wheel', (e) => { if (!e.ctrlKey && this.zoom === 1) return; e.preventDefault(); const r = el.getBoundingClientRect(); this.doiZoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left, e.clientY - r.top) }, { passive: false })
+      el.addEventListener('keydown', (e) => { if (e.key === '+' || e.key === '=') this.doiZoom(1.5); else if (e.key === '-') this.doiZoom(1 / 1.5); else if (e.key === '0') this.datLai() })
+    }
+    /** Vẽ bảng tới giờ T (giây trên trục tiếng). Nét viết trước đoạn của cảnh mờ hơn (ngữ cảnh), nét trong đoạn rõ, đầu phấn sáng. */
+    ve(T) {
+      if (T != null) this.T = T
+      const ctx = this.ctx, { s, ox, oy } = this.phep(), Tms = this.T * 1000, tuMs = this.tu * 1000
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.w, this.h); ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+      ctx.globalAlpha = 0.1; ctx.fillStyle = '#f4efe4'; ctx.fillRect(ox + 1067 * s - this.dpr, 0, 2 * this.dpr, this.h)
+      let dau = null
+      for (const n of this.net) {
+        if (n.t0 > Tms) continue
+        const cu = n.t1 < tuMs - 500, phan = Tms >= n.t1 ? 1 : (Tms - n.t0) / Math.max(1, n.t1 - n.t0)
+        let cat = n.k - 1, du = 0
+        if (phan < 1) { const tc = phan * n.dt[n.k - 1]; cat = 0; while (cat < n.k - 1 && n.dt[cat + 1] <= tc) cat++; du = cat < n.k - 1 ? (tc - n.dt[cat]) / Math.max(1, n.dt[cat + 1] - n.dt[cat]) : 0 }
+        const X = (j) => ox + n.x[j] * s, Y = (j) => oy + n.y[j] * s
+        ctx.beginPath(); ctx.moveTo(X(0), Y(0))
+        for (let j = 1; j < cat; j++) ctx.quadraticCurveTo(X(j), Y(j), (X(j) + X(j + 1)) / 2, (Y(j) + Y(j + 1)) / 2)
+        if (cat >= 1) ctx.lineTo(X(cat), Y(cat))
+        const cx = cat < n.k - 1 ? X(cat) + (X(cat + 1) - X(cat)) * du : X(n.k - 1), cy = cat < n.k - 1 ? Y(cat) + (Y(cat + 1) - Y(cat)) * du : Y(n.k - 1)
+        ctx.lineTo(cx, cy)
+        const rong = Math.max(1.2, n.c * s), mau = this.mau[n.m][0]
+        if (!cu && !yeu()) { ctx.globalAlpha = 0.16; ctx.lineWidth = rong * 3; ctx.strokeStyle = mau; ctx.stroke() }
+        ctx.globalAlpha = cu ? 0.42 : 1; ctx.lineWidth = rong; ctx.strokeStyle = mau; ctx.stroke()
+        if (phan < 1) dau = [cx, cy]
+      }
+      if (dau && !GIAM) { const r = 7 * this.dpr; ctx.globalAlpha = 0.25; ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(dau[0], dau[1], r * 2, 0, 6.3); ctx.fill(); ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(dau[0], dau[1], r * 0.45, 0, 6.3); ctx.fill() }
+      ctx.globalAlpha = 1
+    }
+    huy() { if (this.ro) this.ro.disconnect() }
+  }
+
+  /** Dựng một cảnh: `bang` (hoạt hoạ minh hoạ), `opt.loiEl` (phụ đề lời Thầy), `opt.phanEl` + `opt.net` (bảng phấn của Thầy).
+   *  Hai cách chạy: chay() tự nhiên (chế độ Tự đọc) · giang(dongHo) khớp giọng Thầy (chế độ Xem như Thầy giảng). */
+  function dungCanh(bang, canh, opt) {
+    opt = opt || {}
+    const dg = new Dong(), dieuKhien = {}, buoc = []
+    const ctx = {
+      id: 'k' + String(canh.id).replace(/[^a-z0-9]/gi, ''), nguong: opt.nguong || nguongTuDong(null), tieuDe: canh.tieuDe, dieuKhien,
+      khiNghe: opt.khiNghe, khiTraLoi: opt.khiTraLoi, hat: !!opt.hat, nho: !!opt.nho,
+      buoc(t) { buoc.push(t) },
+    }
+    bang.classList.add('k-' + canh.khuon)
+    if (!DUNG[canh.khuon]) { bang.append(h('p', { class: 'k-loi', text: 'Cảnh này dùng khuôn chưa có trong thư viện.' })); return null }
+    DUNG[canh.khuon](bang, canh.duLieu, dg, ctx)
+    const ng = canh.nguon || {}, loi = canh.loi || [], tu = ng.tu || 0, den = ng.den || tu
+    // phụ đề: mỗi câu Thầy nói một dòng; câu đang nói sáng lên
+    const dongLoi = []
+    if (opt.loiEl) loi.forEach((l) => { const li = h('li', { class: 'pd-cau' }, [h('span', { html: dam(l.chu) })]); opt.loiEl.append(li); dongLoi.push(li) })
+    // nét phấn của chính Thầy ở trang bảng của cảnh
+    let phan = null
+    if (opt.phanEl && opt.net && ng.vung) { phan = new BangPhan(opt.phanEl, opt.net, ng.vung, { noiDk: opt.phanDk }); phan.tu = tu; phan.T = den + 1 }
+    // mốc khớp: bước k của khuôn bắt đầu đúng lúc Thầy nói câu khop[k]; chạy tự nhiên trong bước rồi đợi câu kế
+    buoc.sort((a, b) => a - b)
+    const B = buoc.length ? buoc : [0], khop = canh.khop || [], moc = []
+    B.forEach((s, k) => {
+      const muon = khop[k] != null && loi[khop[k]] ? loi[khop[k]].tu : tu + (k * Math.max(0, den - tu)) / Math.max(1, B.length)
+      const truoc = moc[k - 1], som = truoc ? truoc.a + (s - truoc.s) / 1000 : tu
+      moc.push({ s, a: Math.max(muon, som) })
+    })
+    // mốc bước (ctx.buoc) tính bằng ms CHƯA chia tốc độ; dòng thời gian dg đã chia TOC ⇒ DT là tổng thời lượng chưa chia
+    const DT = dg.t * TOC
+    const ketThuc = Math.max(den, moc[moc.length - 1].a + Math.max(0, DT - moc[moc.length - 1].s) / 1000)
+    function noiBo(T) {
+      if (T <= moc[0].a) return Math.min(moc[0].s, Math.max(0, (T - tu) * 1000))
+      for (let k = moc.length - 1; k >= 0; k--) if (T >= moc[k].a) return Math.min(k < moc.length - 1 ? moc[k + 1].s : DT + 5, moc[k].s + (T - moc[k].a) * 1000)
+      return 0
+    }
+    const capPhuDe = (T, tatCa) => dongLoi.forEach((li, i) => { const l = loi[i]; li.classList.toggle('dang', !tatCa && T >= l.tu && T < l.den); li.classList.toggle('qua', !tatCa && T >= l.den); li.classList.toggle('chua', !tatCa && T < l.tu) })
+    let raf = 0, dh = null, xongCb = null, tienCb = null
+    function khung() {
+      const T = dh.bay
+      dg.toi(noiBo(T) / TOC); capPhuDe(T); if (phan) phan.ve(T); if (tienCb) tienCb(Math.min(1, (T - tu) / Math.max(0.1, ketThuc - tu)), T)
+      if (T >= ketThuc) { raf = 0; dh.dung(); dg.cuoi(); capPhuDe(den + 1); if (phan) phan.ve(den + 1); const x = xongCb; xongCb = null; if (x) x(); return }
+      raf = requestAnimationFrame(khung)
+    }
+    const ctrl = {
+      dg, dieuKhien, phan, tu, den, ketThuc, loi,
+      get thoiLuong() { return dg.t },
+      /** Chế độ Tự đọc: hoạt hoạ chạy tự nhiên, phụ đề hiện đủ, bảng phấn hiện trọn đoạn. */
+      chay(xong) { cancelAnimationFrame(raf); raf = 0; capPhuDe(0, true); if (phan) phan.ve(den + 1); for (const a of dg.vong) a.play(); dg.chay(xong) },
+      /** Chế độ Xem như Thầy giảng: mọi thứ theo đồng hồ tiếng (giọng Thầy). */
+      giang(dongHo, xong, tien) { cancelAnimationFrame(raf); dh = dongHo; xongCb = xong || null; tienCb = tien || null; dh.batDau(tu); for (const a of dg.vong) a.play(); raf = requestAnimationFrame(khung) },
+      tamDung() { if (dh) dh.tamDung(); cancelAnimationFrame(raf); raf = 0 },
+      tiep() { if (dh) { dh.tiep(); raf = requestAnimationFrame(khung) } },
+      dungGiang() { cancelAnimationFrame(raf); raf = 0; if (dh) dh.dung(); xongCb = null },
+      toi(ms) { dg.toi(ms) },
+      /** Đứng hình ở giây T của đoạn tiếng (để chụp ảnh giữa lúc giảng). */
+      toiGiay(T) { dg.toi(noiBo(T) / TOC); capPhuDe(T); if (phan) phan.ve(T) },
+      cuoi() { dg.cuoi(); capPhuDe(0, true); if (phan) phan.ve(den + 1) },
+      dungVong() { dg.dungVong() },
+      datLai() { if (dieuKhien.datLai) dieuKhien.datLai(); cancelAnimationFrame(raf); raf = 0; dg.toi(0) },
+    }
+    return ctrl
+  }
+
+  // ═══════════ CỔNG TỰ KIỂM CỦA MÁY (không có bước người duyệt) ═══════════
+  // (a) đúng lược đồ, đúng 7 khuôn · (b) mọi con số tính lại bằng bảng cố định · (c) có nguồn: trang bảng + đoạn tiếng, mọi số / công thức
+  // trên cảnh phải có trên bảng (chép) hoặc trong lời Thầy · (d) đủ cảnh tin được mới phát hành, không thì chỉ hiện bảng gốc như cũ.
+  const VIET_TAT = [[/\bVD\s?(\d)/g, 'Ví dụ $1'], [/\bVD\b/g, 'Ví dụ'], [/\bLK\b/g, 'liên kết'], [/\bCHT\b/g, 'cộng hoá trị'], [/\b(KPC|kpc)\b/g, 'không phân cực'], [/\bPC\b/g, 'phân cực'], [/\bntố\b/g, 'nguyên tố'], [/\bko\b/g, 'không'], [/\bQT\s?[₀-₉\d]*/g, 'Quy tắc'], [/\s*—\s*/g, ', ']]
+  /** Chữ do máy sinh: tự sửa viết tắt của bảng và dấu gạch ngang dài (không bỏ cảnh vì lỗi chữ sửa được). */
+  const sachChu = (t) => VIET_TAT.reduce((x, [a, b]) => x.replace(a, b), String(t))
   function kiemChu(t) {
     const loi = [], x = boDam(t)
-    if (/—/.test(x)) loi.push('có dấu gạch ngang dài')
     if (/\p{Extended_Pictographic}/u.test(x)) loi.push('có emoji')
     for (const cau of x.split(/(?<=[.!?])\s+/)) { const n = cau.trim().split(/\s+/).filter(Boolean).length; if (n > 30) loi.push(`câu ${n} chữ (quá 30)`) }
     const tok = x.toLowerCase().split(/[^\p{L}\p{N}₀-₉]+/u)
-    for (const w of TU_CAM) if (tok.includes(w)) loi.push(`có chữ «${w}»`)
-    for (const w of VIET_TAT) if (x.split(/[^\p{L}\p{N}₀-₉]+/u).includes(w)) loi.push(`viết tắt «${w}»`)
+    for (const w of ['tiền', 'nhà', 'giàu', 'thuế']) if (tok.includes(w)) loi.push(`có chữ «${w}»`)
     for (const k of KHUON) if (x.includes(k)) loi.push(`lộ mã khuôn «${k}»`)
     return loi
   }
+  /** Ngưỡng Δχ máy tự dùng: bảng hoặc lời Thầy có ghi thì theo Thầy, không thì theo SGK Hoá 10 (2018). */
+  function nguongTuDong(kb) {
+    let kpc = 0.4, nKpc = 'sgk', ion = 1.7, lonHon = false, nIon = 'sgk'
+    const chu = kb ? kb.canh.flatMap((c) => [(c.nguon || {}).chep || ''].concat((c.loi || []).map((l) => l.chu))).join(' \n ') : ''
+    let m = chu.match(/Δχ\s*(>|≥|>=)\s*(\d+(?:,\d+)?)/)
+    if (m) { ion = +m[2].replace(',', '.'); lonHon = m[1] === '>'; nIon = 'bang' }
+    m = chu.match(/Δχ\s*<\s*(0,\d+)/)
+    if (m) { kpc = +m[1].replace(',', '.'); nKpc = 'bang' }
+    return {
+      kpc, ion, lonHon, nguon: { kpc: nKpc, ion: nIon },
+      moTa: `Không phân cực khi Δχ < ${soGon(kpc)} (${nKpc === 'bang' ? 'theo Thầy' : 'theo SGK'}); liên kết ion khi Δχ ${lonHon ? '>' : '≥'} ${soGon(ion)} (${nIon === 'bang' ? 'theo bảng Thầy' : 'theo SGK'})`,
+      vung: [{ loai: 'khong-phan-cuc', tu: 0, den: kpc }, { loai: 'phan-cuc', tu: kpc, den: ion, denBang: lonHon }, { loai: 'ion', tu: ion, den: null, lonHon }],
+    }
+  }
+  function phanLoai(d, ng) { ng = ng && ng.vung ? ng : nguongTuDong(null); if (d < ng.kpc - 1e-9) return 'khong-phan-cuc'; if (ng.lonHon ? d > ng.ion + 1e-9 : d >= ng.ion - 1e-9) return 'ion'; return 'phan-cuc' }
+  const hopLoai = (ghi, tinh) => ghi === tinh
   function chuCua(canh) {
     const ra = [canh.tieuDe]
-    const di = (v) => { if (typeof v === 'string') ra.push(v); else if (Array.isArray(v)) v.forEach(di); else if (v && typeof v === 'object') for (const k in v) if (!['khuon', 'loai', 'kieu', 'ky', 'a', 'b', 'mau', 'ct', 'nt', 'tuCt', 'denCt'].includes(k)) di(v[k]) }
+    const di = (v) => { if (typeof v === 'string') ra.push(v); else if (Array.isArray(v)) v.forEach(di); else if (v && typeof v === 'object') for (const k in v) if (!['khuon', 'loai', 'kieu', 'ky', 'a', 'b', 'mau', 'ct', 'nt', 'tuCt', 'denCt', 'tro', 'dau', 'chi', 'canh'].includes(k)) di(v[k]) }
     di(canh.duLieu); return ra.filter(Boolean)
   }
   function kiemKeoCo(d, ng, kq) {
     d.pha.forEach((p, i) => {
       const cT = d.trai.ky ? CHI[d.trai.ky] : p.chiTrai, cP = d.phai.ky ? CHI[d.phai.ky] : p.chiPhai
       if (cT == null || cP == null) { kq.push({ ok: false, chu: `Pha ${i + 1}: thiếu độ âm điện` }); return }
-      const delta = Math.abs(cP - cT), loai = phanLoai(delta, ng)
-      const that = d.trai.ky && d.phai.ky
-      kq.push({ ok: hopLoai(p.loai, loai), chu: that ? `Pha ${i + 1}: Δχ = ${soChi(Math.max(cT, cP))} − ${soChi(Math.min(cT, cP))} = ${soDelta(delta)} ⇒ ${TEN_LOAI[loai]}` : `Pha ${i + 1}: lực kéo minh hoạ (không in số), lệch ${soDelta(delta)} ⇒ ${TEN_LOAI[loai]}` + (hopLoai(p.loai, loai) ? '' : ` (kịch bản ghi ${TEN_LOAI[p.loai]})`) })
+      const delta = Math.abs(cP - cT), loai = phanLoai(delta, ng), that = d.trai.ky && d.phai.ky
+      kq.push({ ok: hopLoai(p.loai, loai), chu: that ? `Pha ${i + 1}: Δχ = ${soChi(Math.max(cT, cP))} − ${soChi(Math.min(cT, cP))} = ${soDelta(delta)} ⇒ ${TEN_LOAI[loai]}` : `Pha ${i + 1}: lực kéo minh hoạ (không in số), lệch ${soDelta(delta)} ⇒ ${TEN_LOAI[loai]}` })
     })
   }
   function kiemThang(d, ng, kq) {
@@ -597,7 +746,7 @@
       if (CHI[k.a] == null || CHI[k.b] == null) { kq.push({ ok: false, chu: `${boDam(k.nhan)}: nguyên tố ngoài bảng độ âm điện` }); return }
       const delta = Math.abs(CHI[k.a] - CHI[k.b]), loai = phanLoai(delta, ng), khop = Math.abs(delta - k.delta) < 0.005
       kq.push({ ok: khop, chu: `${boDam(k.nhan)}: |${soChi(CHI[k.a])} − ${soChi(CHI[k.b])}| = ${soDelta(delta)}` + (khop ? '' : ` (kịch bản ghi ${soDelta(k.delta)})`) })
-      kq.push({ ok: hopLoai(k.loai, loai), chu: `${boDam(k.nhan)}: ${soDelta(delta)} thuộc vùng «${TEN_LOAI[loai]}» (${NGUONG[ng].ten})` })
+      kq.push({ ok: hopLoai(k.loai, loai), chu: `${boDam(k.nhan)}: ${soDelta(delta)} thuộc vùng «${TEN_LOAI[loai]}»` })
     })
   }
   function kiemLewis(d, kq) {
@@ -610,12 +759,12 @@
   }
   function kiemViDu(d, kq) {
     d.soDo.chat.forEach((c) => c.so.forEach((x) => {
-      if (x.chi) { const m = String(x.hien).match(/(\d+(?:,\d+)?)\s*$/), v = m ? +m[1].replace(',', '.') : NaN; kq.push({ ok: Math.abs(v - CHI[x.chi]) < 0.005, chu: `χ của ${x.chi} trên sơ đồ ${m ? m[1] : '?'}, bảng của app ${soChi(CHI[x.chi])}` }) }
+      if (x.chi) { const m = String(x.hien).match(/(\d+(?:,\d+)?)\s*$/), v = m ? +m[1].replace(',', '.') : NaN; kq.push({ ok: Math.abs(v - CHI[x.chi]) < 0.005, chu: `χ của ${x.chi} trên sơ đồ ${m ? m[1] : '?'}, bảng của máy ${soChi(CHI[x.chi])}` }) }
       if (x.M) { const M = khoiMol(c.ct); kq.push({ ok: M === x.M, chu: `M ${c.ct} = ${soVi(M)} (sơ đồ ghi ${x.M})` }) }
     }))
     let v = null
     d.tinh.thuaSo.forEach((f, i) => {
-      const gt = f.tu != null ? f.tu / f.mau : f.gt, doc = docSo(f.hien)
+      const gt = f.mau ? f.tu / f.mau : f.gt, doc = docSo(f.hien)
       if (Math.abs(doc - gt) > 1e-9 * Math.max(1, Math.abs(gt))) kq.push({ ok: false, chu: `Thừa số «${f.hien}» đọc ra ${doc}, kịch bản ghi ${gt}` })
       if (f.loai === 'chia-M') { const M = khoiMol(f.ct); kq.push({ ok: Math.abs(gt - 1 / M) < 1e-12, chu: `«${f.hien}»: chia M ${f.ct} = ${soVi(M)}` }) }
       if (f.loai === 'nhan-M') { const M = khoiMol(f.ct); kq.push({ ok: gt === M, chu: `«${f.hien}»: nhân M ${f.ct} = ${soVi(M)}` }) }
@@ -628,7 +777,36 @@
     const kq0 = d.tinh.ketQua, sai = Math.abs(v - kq0.gt) > 1e-6 * Math.max(1, Math.abs(kq0.gt)), docKq = docSo(kq0.hien)
     kq.push({ ok: !sai && Math.abs(docKq - kq0.gt) < 1e-9, chu: `Tính lại cả chuỗi: ${d.tinh.ten} = ${soVi(Math.round(v * 1e6) / 1e6)}${kq0.donVi ? ' ' + kq0.donVi : ''} (kịch bản ghi ${kq0.hien})` })
   }
-  function kiemCanh(canh, ng) {
+  // (c) có nguồn: số và công thức trên cảnh phải có trên bảng hoặc trong lời Thầy (cả bài). Bỏ qua: phương án sai của câu đoán (nhiễu), mốc ngưỡng.
+  const soTrong = (t) => (boDuoi(String(t)).match(/\d+(?:,\d+)?/g) || []).map((x) => +x.replace(',', '.'))
+  const ctTrong = (t) => (String(t).match(/(?:[A-Z][a-z]?[₀-₉]*){2,}|[A-Z][a-z]?[₀-₉]+/g) || []).map(boDuoi)
+  function chuCanNguon(canh) {
+    const d = canh.duLieu, ra = []
+    if (canh.khuon === 'doan-nhanh') { ra.push(d.hoi, d.giai); d.luaChon.filter((c) => c.dung).forEach((c) => ra.push(c.chu)) }
+    else if (canh.khuon === 'tong-ket') d.y.forEach((y) => ra.push(y.chu))
+    else ra.push(...chuCua(canh).slice(1))
+    if (canh.khuon === 'thang-delta') d.kim.forEach((k) => ra.push(k.nhan, soDelta(k.delta)))
+    return ra
+  }
+  function kiemNguon(canh, kb, kq) {
+    const ng = canh.nguon || {}
+    if (canh.khuon !== 'tong-ket') {
+      if (!(ng.trang >= 1)) kq.push({ ok: false, nguon: true, chu: 'Không trỏ được tới trang bảng nào' })
+      if (!(ng.den > ng.tu)) kq.push({ ok: false, nguon: true, chu: 'Không có đoạn tiếng của Thầy' })
+      const ngoai = (canh.loi || []).filter((l) => l.tu < ng.tu - 1 || l.den > ng.den + 1)
+      if (ngoai.length) kq.push({ ok: false, nguon: true, chu: `${ngoai.length} câu lời Thầy nằm ngoài đoạn tiếng của cảnh` })
+    } else if (canh.duLieu.y.some((y) => !kb.canh.some((c) => c.id === y.canh))) kq.push({ ok: false, nguon: true, chu: 'Ý tổng kết trỏ tới cảnh không có' })
+    const nguonChu = kb.canh.flatMap((c) => [(c.nguon || {}).chep || ''].concat((c.loi || []).map((l) => l.chu))).join(' ')
+    const soNguon = soTrong(nguonChu), ctNguon = new Set(ctTrong(nguonChu))
+    const thieuSo = new Set(), thieuCt = new Set()
+    for (const t of chuCanNguon(canh)) {
+      for (const x of soTrong(t)) if (!soNguon.some((y) => Math.abs(x - y) < 1e-9)) thieuSo.add(soVi(x))
+      for (const c of ctTrong(t)) if (!ctNguon.has(c)) thieuCt.add(c)
+    }
+    if (thieuSo.size || thieuCt.size) kq.push({ ok: false, nguon: true, chu: `Không có trên bảng, không có trong lời Thầy: ${[...thieuCt, ...thieuSo].join(', ')}` })
+    else kq.push({ ok: true, chu: 'Mọi số và công thức trên cảnh đều có trên bảng hoặc trong lời Thầy' })
+  }
+  function kiemCanh(canh, ng, kb) {
     const kq = [], d = canh.duLieu || {}
     if (!KHUON.includes(canh.khuon)) { kq.push({ ok: false, chu: `Khuôn «${canh.khuon}» không có trong thư viện` }); return kq }
     try {
@@ -639,22 +817,33 @@
       if (canh.khuon === 'doan-nhanh') {
         const n = d.luaChon.filter((c) => c.dung).length
         kq.push({ ok: n === 1, chu: `Đúng ${n} đáp án được đánh dấu là đúng (cần 1)` })
-        const con = kiemCanh({ khuon: d.mo.khuon, duLieu: d.mo.duLieu, tieuDe: '' }, ng); con.forEach((x) => kq.push(Object.assign({}, x, { chu: 'Hoạt hoạ mở đáp án: ' + x.chu })))
+        kiemCanh({ khuon: d.mo.khuon, duLieu: d.mo.duLieu, tieuDe: '' }, ng, null).forEach((x) => kq.push(Object.assign({}, x, { chu: 'Hoạt hoạ mở đáp án: ' + x.chu })))
       }
-      if (canh.khuon === 'tong-ket') d.y.forEach((y, i) => { if (y.giay == null) kq.push({ ok: null, chu: `Ý ${i + 1}: chưa có phút để nghe` }) })
+      if (kb) kiemNguon(canh, kb, kq)
     } catch (e) { kq.push({ ok: false, chu: 'Dữ liệu cảnh sai dạng: ' + e.message }) }
-    for (const t of chuCua(canh)) for (const l of kiemChu(t)) kq.push({ ok: false, chu: `Chữ «${boDam(t).slice(0, 40)}…»: ${l}` })
-    if (!kq.length) kq.push({ ok: null, chu: 'Không có con số để kiểm' })
+    for (const t of chuCua(canh).concat((canh.loi || []).map((l) => l.chu))) for (const l of kiemChu(t)) kq.push({ ok: false, chu: `Chữ «${boDam(t).slice(0, 40)}…»: ${l}` })
     return kq
   }
-  function kiemKichBan(kb, ng) {
-    ng = ng || kb.nguongDangDung || 'sgk'
-    const ra = { canh: {}, tong: { dung: 0, sai: 0, chuaKiem: 0 } }
+  /** Cổng: trả cảnh đạt / cảnh bỏ (kèm lý do), ngưỡng đã dùng, và có phát hành bài hoạt hoạ không. */
+  const CONG = { itNhat: 4, tiLe: 0.6 }
+  function kiemCong(kb) {
+    const ng = nguongTuDong(kb), dat = [], bo = [], chiTiet = {}
     for (const c of kb.canh) {
-      const kq = kiemCanh(c, ng); ra.canh[c.id] = kq
-      for (const x of kq) { if (x.ok === true) ra.tong.dung++; else if (x.ok === false) ra.tong.sai++; else ra.tong.chuaKiem++ }
+      const kq = kiemCanh(c, ng, kb); chiTiet[c.id] = kq
+      const sai = kq.filter((x) => x.ok === false)
+      if (sai.length) bo.push({ id: c.id, tieuDe: c.tieuDe, lyDo: sai.map((x) => x.chu) }); else dat.push(c.id)
     }
-    return ra
+    // tổng kết chỉ giữ ý trỏ tới cảnh còn lại
+    const phatHanh = dat.length >= CONG.itNhat && dat.length / kb.canh.length >= CONG.tiLe
+    return { nguong: ng, dat, bo, chiTiet, phatHanh, soCau: kb.canh.length }
+  }
+  /** Kịch bản sau cổng: bỏ cảnh hỏng, sửa chữ viết tắt, tổng kết bỏ ý của cảnh đã bỏ. */
+  function quaCong(kb) {
+    const cong = kiemCong(kb), giu = new Set(cong.dat)
+    const sach = (v) => (typeof v === 'string' ? sachChu(v) : Array.isArray(v) ? v.map(sach) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, ['chep', 'khuon', 'loai', 'kieu', 'ky', 'ct', 'nt', 'tuCt', 'denCt', 'tro'].includes(k) ? x : sach(x)])) : v)
+    const canh = kb.canh.filter((c) => giu.has(c.id)).map(sach)
+    canh.forEach((c) => { if (c.khuon === 'tong-ket') c.duLieu.y = c.duLieu.y.filter((y) => giu.has(y.canh)) })
+    return { kb: Object.assign({}, kb, { canh }), cong }
   }
 
   /** Tải kịch bản: đọc JSON thật; mở thẳng từ ổ đĩa (file://) thì trình duyệt chặn fetch ⇒ dùng bản nhúng do chup.mjs dựng từ đúng tệp JSON. */
@@ -668,5 +857,5 @@
     }))
   }
 
-  window.NKB = { CHI, E_NGOAI, KHOI, NGUONG, TEN_LOAI, TEN_KHUON, KHUON, GIAM, TOC, Dong, dungCanh, kiemKichBan, kiemCanh, kiemChu, taiKichBan, gio, soDelta, soChi, h, s, dam, boDam, phanLoai, khoiMol }
+  window.NKB = { CHI, E_NGOAI, KHOI, CONG, TEN_LOAI, TEN_KHUON, KHUON, GIAM, TOC, Dong, DongHo, BangPhan, dungCanh, kiemCong, quaCong, kiemCanh, kiemChu, sachChu, nguongTuDong, taiKichBan, gio, soDelta, soChi, soGon, h, s, dam, boDam, phanLoai, khoiMol }
 })()
