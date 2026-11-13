@@ -277,4 +277,15 @@ describe('bàn tay cầm bút (tro-but.ts)', () => {
     expect([coTay(100), coTay(2000)]).toEqual([15, 44])
     expect(tiLeTay(60)).toBe(1)
   })
+  it('(14/11 tốc độ) chấm laze đứng yên: độ rõ chấm không đổi khi bàn tay mờ dần lơ lửng → nghỉ ⇒ KHÔNG vẽ lại lớp sống khung nào', () => {
+    const m = dung(), anh = () => m.lenh(m.cvSong).filter((x) => x.loai === 'anh')
+    m.v.datBut({ x: 0.8, y: 0.3, cham: false, lz: true })
+    let t = chay(m.v, 30, 1000)
+    expect(anh().pop()!.mo).toBe(1)
+    // giữ yên tới khi mức «lơ lửng» bắt đầu trôi về «nghỉ» (> 1,6 giây) rồi suốt quãng mờ: lệnh vẽ không tăng
+    t = chay(m.v, 55, t)
+    const n0 = m.lenh(m.cvSong).length
+    chay(m.v, 120, t)
+    expect(m.lenh(m.cvSong).length).toBe(n0)
+  })
 })
