@@ -1,0 +1,25 @@
+[
+  {
+    "i": 92,
+    "hashSvg": "c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/public de-ref và fresh FINAL Chromium3x FULL/macro cả4rows. Bốn phản ứng literal đúng, 4FILLEDheads/7SQUARE+nSUB/ncoefbaseline. Row2 CH₃-COO lastO anchor, row3 explicitC=O hai tia giữ whiteglyphgaps; hai chair cá biệt ALLTHIN không taper, CH₂OH/HO/OH→CH₂OAc/AcO/OAc đúng phía và Oanchor. Giữ 3n(Ac)₂O/3nAcOH, số(1)..(4), allregularupright. Hai tSUPo row1/4 nay có whitegap hẹp rõ; row2/3 vẫn sạch, không carry old9b864negative. Không chạm/cắt/tràn mới, runtimeSHApre/post đúng.",
+    "render": "/workspace/scratch/soat411-final-92-fresh.png",
+    "macro": [
+      "/workspace/scratch/poly92-final-row1.png",
+      "/workspace/scratch/poly92-final-row2.png",
+      "/workspace/scratch/poly92-final-row3.png",
+      "/workspace/scratch/poly92-final-leftchair.png",
+      "/workspace/scratch/poly92-final-rightchair.png",
+      "/workspace/scratch/poly92-final-t1.png",
+      "/workspace/scratch/poly92-final-t4.png"
+    ],
+    "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+    "hashSvgDaSoat": "c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6",
+    "runtimeProof": {
+      "file": "/workspace/scratch/poly92-final-runtime.log",
+      "sha256": "330d8f40d5ca6d073857baf518c7161971c5f4e2f37637e591b16b70509cc6bb",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/poly92-native-ddh-c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6.svg c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6\n92 { x: 0, y: 0, width: 1340, height: 587 }\n\nPOSTSHOT_SHA c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6\nCOMMAND node /workspace/scratch/agent-render411-final.cjs\nCONTEXT VIP27-C4-B14-D2-III-1.hinh.0.du_lieu; one public de/ref, no answers.\n"
+    }
+  }
+]

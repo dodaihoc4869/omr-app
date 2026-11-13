@@ -1,0 +1,1522 @@
+{
+  "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+  "native": [
+    1340,
+    587
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B14-D2-III-1",
+      "de": "Cho các phản ứng (1), (2), (3), (4) như hình.\nLiệt kê các phản ứng không làm thay đổi (hay giữ nguyên) mạch polymer theo số thứ tự tăng dần.",
+      "refs": [
+        {
+          "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+          "where": "VIP27-C4-B14-D2-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "0439491ccac45d684a29dd631c8ddd05b0841bd35f0d0d96ddd35faaa0155f7c"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "4literalpolymerreactions-UNKNOWNnTotal/4FULLFILLEDrightheads/7SQUAREpairs7nSUB-othernBASELINE/row1CH2-CH=CH-CH2+nHCl-ClDOWN-FIRSTC/row2CH3-COO-LASTOanchor-CH3DOWN-toOHUP-CH3DOWN+nCH3COONa/row3NH-(CH2)5-C-EXPLICITCdoubleO2verticalraysWHITEglyphgaps-toH2N-(CH2)5-COONa/row4TWOindividualALLTHINchairsNOtaper-bareC-CH2OH-HO-OH-toCH2OAc-AcO-OAc-ACKEEP/AcO-LASTOanchors/3n(Ac)2O-3nAcOH/ALLregularUPRIGHT-4nums/NOtheoryfix-addedH-water-formula-name-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL/chairs2x/explicitCO8x/allpublicde. SourceagentassetIndexProvided1366 transcriptionwrong ROOTcorrect actual1369, hashnativeqidunchanged. ApproxnativeNOTsubpixel.",
+  "independentSourceAudit": {
+    "i": 92,
+    "assetIndexProvided": 1366,
+    "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae.png",
+    "size": [
+      1340,
+      587
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B14-D2-III-1",
+        "de": "Cho các phản ứng (1), (2), (3), (4) như hình.\nLiệt kê các phản ứng không làm thay đổi (hay giữ nguyên) mạch polymer theo số thứ tự tăng dần.",
+        "allHinh": [
+          {
+            "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+            "where": "VIP27-C4-B14-D2-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "0439491ccac45d684a29dd631c8ddd05b0841bd35f0d0d96ddd35faaa0155f7c"
+          }
+        ],
+        "missingHashes": [
+          "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/411-full2x.png",
+        "/workspace/scratch/411-r122x.png",
+        "/workspace/scratch/411-r32x.png",
+        "/workspace/scratch/411-chairs2x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": "Allregularuprightserif chemical/stepnumbers/conditions.2/3/5SUB, polymernSUB, coefficientnBASELINE, tsmalloSUP. No actualbold/italic.",
+      "counts": {
+        "rows": 4,
+        "filledRightHeads": 4,
+        "squareBracketPairs": 7,
+        "chairTapers": 0,
+        "chairBoldFronts": 0,
+        "chairThinRingEdgesEach": 6,
+        "stepNumbers": 4
+      },
+      "rows": [
+        {
+          "number": "(1)",
+          "numberBox": [
+            1288,
+            29,
+            1322,
+            53
+          ],
+          "leftTokens": [
+            {
+              "text": "CH₂",
+              "bbox": [
+                58,
+                25,
+                104,
+                49
+              ]
+            },
+            {
+              "text": "CH",
+              "bbox": [
+                134,
+                25,
+                173,
+                45
+              ]
+            },
+            {
+              "text": "CH",
+              "bbox": [
+                211,
+                25,
+                250,
+                45
+              ]
+            },
+            {
+              "text": "CH₂",
+              "bbox": [
+                275,
+                25,
+                321,
+                49
+              ]
+            }
+          ],
+          "backboneBonds": [
+            [
+              [
+                22,
+                36
+              ],
+              [
+                56,
+                36
+              ]
+            ],
+            [
+              [
+                109,
+                36
+              ],
+              [
+                131,
+                36
+              ]
+            ],
+            [
+              [
+                175,
+                33
+              ],
+              [
+                204,
+                33
+              ]
+            ],
+            [
+              [
+                175,
+                40
+              ],
+              [
+                204,
+                40
+              ]
+            ],
+            [
+              [
+                252,
+                36
+              ],
+              [
+                272,
+                36
+              ]
+            ],
+            [
+              [
+                324,
+                36
+              ],
+              [
+                365,
+                36
+              ]
+            ]
+          ],
+          "leftBracket": [
+            [
+              53,
+              8
+            ],
+            [
+              36,
+              8
+            ],
+            [
+              36,
+              67
+            ],
+            [
+              53,
+              67
+            ]
+          ],
+          "rightBracket": [
+            [
+              327,
+              8
+            ],
+            [
+              344,
+              8
+            ],
+            [
+              344,
+              67
+            ],
+            [
+              327,
+              67
+            ]
+          ],
+          "nsubBox": [
+            352,
+            63,
+            367,
+            80
+          ],
+          "reagent": {
+            "literal": "+ n HCl",
+            "bbox": [
+              415,
+              28,
+              516,
+              50
+            ]
+          },
+          "arrow": {
+            "shaft": [
+              [
+                540,
+                39
+              ],
+              [
+                629,
+                39
+              ]
+            ],
+            "filledHead": [
+              [
+                613,
+                34
+              ],
+              [
+                629,
+                39
+              ],
+              [
+                613,
+                44
+              ],
+              [
+                616,
+                39
+              ]
+            ],
+            "condition": {
+              "literal": "xt, tᵒ",
+              "bbox": [
+                554,
+                5,
+                615,
+                27
+              ]
+            }
+          },
+          "rightTokens": [
+            {
+              "text": "CH₂",
+              "bbox": [
+                697,
+                30,
+                744,
+                54
+              ]
+            },
+            {
+              "text": "CH",
+              "bbox": [
+                774,
+                30,
+                813,
+                50
+              ]
+            },
+            {
+              "text": "CH₂",
+              "bbox": [
+                851,
+                30,
+                898,
+                54
+              ]
+            },
+            {
+              "text": "CH₂",
+              "bbox": [
+                925,
+                30,
+                972,
+                54
+              ]
+            }
+          ],
+          "rightBonds": [
+            [
+              [
+                663,
+                40
+              ],
+              [
+                696,
+                40
+              ]
+            ],
+            [
+              [
+                747,
+                40
+              ],
+              [
+                771,
+                40
+              ]
+            ],
+            [
+              [
+                816,
+                40
+              ],
+              [
+                848,
+                40
+              ]
+            ],
+            [
+              [
+                900,
+                40
+              ],
+              [
+                922,
+                40
+              ]
+            ],
+            [
+              [
+                974,
+                40
+              ],
+              [
+                1015,
+                40
+              ]
+            ]
+          ],
+          "rightBrackets": {
+            "left": [
+              [
+                692,
+                11
+              ],
+              [
+                675,
+                11
+              ],
+              [
+                675,
+                70
+              ],
+              [
+                692,
+                70
+              ]
+            ],
+            "right": [
+              [
+                969,
+                11
+              ],
+              [
+                985,
+                11
+              ],
+              [
+                985,
+                70
+              ],
+              [
+                969,
+                70
+              ]
+            ],
+            "nsubBox": [
+              994,
+              67,
+              1008,
+              83
+            ]
+          },
+          "Clbranch": {
+            "stem": [
+              [
+                783,
+                55
+              ],
+              [
+                783,
+                72
+              ]
+            ],
+            "literal": "Cl",
+            "bbox": [
+              774,
+              76,
+              800,
+              96
+            ],
+            "anchor": "FIRST C underCH center, notlowercasel"
+          }
+        },
+        {
+          "number": "(2)",
+          "numberBox": [
+            1285,
+            184,
+            1320,
+            208
+          ],
+          "leftBackbone": {
+            "CH2box": [
+              94,
+              183,
+              141,
+              207
+            ],
+            "Cbox": [
+              204,
+              183,
+              222,
+              203
+            ],
+            "freeAndSingleBonds": [
+              [
+                [
+                  53,
+                  193
+                ],
+                [
+                  92,
+                  193
+                ]
+              ],
+              [
+                [
+                  143,
+                  193
+                ],
+                [
+                  201,
+                  193
+                ]
+              ],
+              [
+                [
+                  225,
+                  193
+                ],
+                [
+                  279,
+                  193
+                ]
+              ]
+            ],
+            "brackets": {
+              "left": [
+                [
+                  82,
+                  151
+                ],
+                [
+                  65,
+                  151
+                ],
+                [
+                  65,
+                  217
+                ],
+                [
+                  82,
+                  217
+                ]
+              ],
+              "right": [
+                [
+                  231,
+                  151
+                ],
+                [
+                  247,
+                  151
+                ],
+                [
+                  247,
+                  217
+                ],
+                [
+                  231,
+                  217
+                ]
+              ],
+              "nsubBox": [
+                257,
+                211,
+                272,
+                229
+              ]
+            }
+          },
+          "acetoxyUp": {
+            "literal": "CH₃–COO",
+            "bbox": [
+              94,
+              115,
+              223,
+              138
+            ],
+            "textDashApprox": [
+              [
+                141,
+                126
+              ],
+              [
+                160,
+                126
+              ]
+            ],
+            "verticalToBackbone": [
+              [
+                215,
+                138
+              ],
+              [
+                215,
+                180
+              ]
+            ],
+            "anchor": "LAST O ofCOO overcentralC, notFIRST CH3C"
+          },
+          "methylDown": {
+            "stem": [
+              [
+                215,
+                208
+              ],
+              [
+                215,
+                236
+              ]
+            ],
+            "literal": "CH₃",
+            "bbox": [
+              209,
+              240,
+              254,
+              264
+            ],
+            "anchor": "FIRST C"
+          },
+          "reagent": {
+            "literal": "+ n NaOH",
+            "bbox": [
+              314,
+              185,
+              441,
+              208
+            ]
+          },
+          "arrow": {
+            "shaft": [
+              [
+                471,
+                196
+              ],
+              [
+                563,
+                196
+              ]
+            ],
+            "filledHead": [
+              [
+                547,
+                191
+              ],
+              [
+                563,
+                196
+              ],
+              [
+                547,
+                201
+              ],
+              [
+                550,
+                196
+              ]
+            ],
+            "condition": {
+              "literal": "tᵒ",
+              "bbox": [
+                505,
+                166,
+                524,
+                189
+              ]
+            }
+          },
+          "rightBackbone": {
+            "CH2box": [
+              630,
+              187,
+              677,
+              211
+            ],
+            "Cbox": [
+              728,
+              187,
+              746,
+              207
+            ],
+            "bonds": [
+              [
+                [
+                  590,
+                  196
+                ],
+                [
+                  627,
+                  196
+                ]
+              ],
+              [
+                [
+                  680,
+                  196
+                ],
+                [
+                  725,
+                  196
+                ]
+              ],
+              [
+                [
+                  750,
+                  196
+                ],
+                [
+                  814,
+                  196
+                ]
+              ]
+            ],
+            "brackets": {
+              "left": [
+                [
+                  627,
+                  154
+                ],
+                [
+                  609,
+                  154
+                ],
+                [
+                  609,
+                  220
+                ],
+                [
+                  627,
+                  220
+                ]
+              ],
+              "right": [
+                [
+                  777,
+                  154
+                ],
+                [
+                  792,
+                  154
+                ],
+                [
+                  792,
+                  220
+                ],
+                [
+                  777,
+                  220
+                ]
+              ],
+              "nsubBox": [
+                801,
+                217,
+                817,
+                234
+              ]
+            }
+          },
+          "OHup": {
+            "stem": [
+              [
+                735,
+                182
+              ],
+              [
+                735,
+                157
+              ]
+            ],
+            "literal": "OH",
+            "bbox": [
+              725,
+              133,
+              764,
+              153
+            ],
+            "anchor": "FIRST O"
+          },
+          "CH3down": {
+            "stem": [
+              [
+                736,
+                210
+              ],
+              [
+                736,
+                239
+              ]
+            ],
+            "literal": "CH₃",
+            "bbox": [
+              733,
+              244,
+              780,
+              267
+            ]
+          },
+          "byproduct": {
+            "literal": "+ nCH₃COONa",
+            "bbox": [
+              849,
+              187,
+              1035,
+              213
+            ]
+          }
+        },
+        {
+          "number": "(3)",
+          "numberBox": [
+            1288,
+            309,
+            1322,
+            333
+          ],
+          "polyamide": {
+            "literal": "NH–(CH₂)₅–C withdownO",
+            "NHbox": [
+              66,
+              313,
+              102,
+              334
+            ],
+            "repeatCH2box": [
+              145,
+              313,
+              222,
+              337
+            ],
+            "Cbox": [
+              251,
+              312,
+              268,
+              332
+            ],
+            "bonds": [
+              [
+                [
+                  18,
+                  321
+                ],
+                [
+                  64,
+                  321
+                ]
+              ],
+              [
+                [
+                  105,
+                  321
+                ],
+                [
+                  141,
+                  321
+                ]
+              ],
+              [
+                [
+                  225,
+                  321
+                ],
+                [
+                  248,
+                  321
+                ]
+              ],
+              [
+                [
+                  271,
+                  321
+                ],
+                [
+                  305,
+                  321
+                ]
+              ]
+            ],
+            "COdoubleRays": [
+              [
+                [
+                  255,
+                  336
+                ],
+                [
+                  255,
+                  353
+                ]
+              ],
+              [
+                [
+                  262,
+                  336
+                ],
+                [
+                  262,
+                  353
+                ]
+              ]
+            ],
+            "Obox": [
+              250,
+              357,
+              269,
+              377
+            ],
+            "COcontact": "ExplicitCletter: BOTHraytops haveWHITEglyphgapfromC, raybottomwhitegaptoO. Do notbuildbareVsplitfeet/contactcrossbar.",
+            "brackets": {
+              "left": [
+                [
+                  56,
+                  298
+                ],
+                [
+                  37,
+                  298
+                ],
+                [
+                  37,
+                  351
+                ],
+                [
+                  56,
+                  351
+                ]
+              ],
+              "right": [
+                [
+                  276,
+                  298
+                ],
+                [
+                  292,
+                  298
+                ],
+                [
+                  292,
+                  351
+                ],
+                [
+                  276,
+                  351
+                ]
+              ],
+              "nsubBox": [
+                300,
+                346,
+                315,
+                363
+              ]
+            }
+          },
+          "reagent": {
+            "literal": "+ n NaOH",
+            "bbox": [
+              336,
+              313,
+              466,
+              336
+            ]
+          },
+          "arrow": {
+            "shaft": [
+              [
+                495,
+                323
+              ],
+              [
+                586,
+                323
+              ]
+            ],
+            "filledHead": [
+              [
+                570,
+                318
+              ],
+              [
+                586,
+                323
+              ],
+              [
+                570,
+                328
+              ],
+              [
+                573,
+                323
+              ]
+            ],
+            "condition": {
+              "literal": "tᵒ",
+              "bbox": [
+                527,
+                291,
+                547,
+                315
+              ]
+            }
+          },
+          "product": {
+            "literal": "n H₂N–(CH₂)₅–COONa",
+            "bbox": [
+              611,
+              315,
+              919,
+              340
+            ],
+            "dashBonds": [
+              [
+                [
+                  687,
+                  323
+                ],
+                [
+                  723,
+                  323
+                ]
+              ],
+              [
+                [
+                  804,
+                  323
+                ],
+                [
+                  829,
+                  323
+                ]
+              ]
+            ],
+            "nBaseline": true
+          }
+        },
+        {
+          "number": "(4)",
+          "numberBox": [
+            1287,
+            489,
+            1321,
+            513
+          ],
+          "reactant3nAc2O": {
+            "literal": "+ 3n (Ac)₂O",
+            "bbox": [
+              422,
+              481,
+              564,
+              505
+            ]
+          },
+          "arrow": {
+            "shaft": [
+              [
+                574,
+                491
+              ],
+              [
+                663,
+                491
+              ]
+            ],
+            "filledHead": [
+              [
+                647,
+                486
+              ],
+              [
+                663,
+                491
+              ],
+              [
+                647,
+                496
+              ],
+              [
+                650,
+                491
+              ]
+            ],
+            "condition": {
+              "literal": "xt, tᵒ",
+              "bbox": [
+                588,
+                462,
+                648,
+                486
+              ]
+            }
+          },
+          "byproduct": {
+            "literal": "+ 3nAcOH",
+            "bbox": [
+              1106,
+              491,
+              1230,
+              515
+            ]
+          }
+        }
+      ],
+      "chairs": {
+        "style": "ALL thinuniformordinarylines~1–1.3px, NOtaper/no boldfront/no wedge. Read separately native, notoldstereopolymeralias.",
+        "left": {
+          "ringNodes": [
+            {
+              "C": [
+                55,
+                435
+              ]
+            },
+            {
+              "C": [
+                134,
+                470
+              ]
+            },
+            {
+              "OBox": [
+                227,
+                444,
+                246,
+                462
+              ]
+            },
+            {
+              "C": [
+                288,
+                522
+              ]
+            },
+            {
+              "C": [
+                170,
+                501
+              ]
+            },
+            {
+              "C": [
+                95,
+                517
+              ]
+            }
+          ],
+          "bonds": [
+            [
+              [
+                0,
+                458
+              ],
+              [
+                55,
+                435
+              ],
+              [
+                134,
+                470
+              ],
+              [
+                222,
+                456
+              ]
+            ],
+            [
+              [
+                247,
+                465
+              ],
+              [
+                288,
+                522
+              ],
+              [
+                170,
+                501
+              ],
+              [
+                95,
+                517
+              ],
+              [
+                55,
+                435
+              ]
+            ],
+            [
+              [
+                288,
+                522
+              ],
+              [
+                328,
+                495
+              ]
+            ],
+            [
+              [
+                355,
+                493
+              ],
+              [
+                393,
+                518
+              ]
+            ]
+          ],
+          "ringOvsBridgeO": "FirstOat237452 insidechair, secondOat342484 externalrightbridge; do notswap.",
+          "bridgeObox": [
+            333,
+            474,
+            352,
+            493
+          ],
+          "topCH2OH": {
+            "literal": "CH₂OH",
+            "bbox": [
+              104,
+              411,
+              192,
+              433
+            ],
+            "branch": [
+              [
+                134,
+                470
+              ],
+              [
+                113,
+                434
+              ]
+            ],
+            "anchor": "FIRST C"
+          },
+          "leftHO": {
+            "literal": "HO",
+            "bbox": [
+              26,
+              485,
+              65,
+              505
+            ],
+            "branch": [
+              [
+                71,
+                502
+              ],
+              [
+                95,
+                517
+              ]
+            ],
+            "anchor": "LAST O"
+          },
+          "lowerOH": {
+            "literal": "OH",
+            "bbox": [
+              189,
+              523,
+              227,
+              544
+            ],
+            "branch": [
+              [
+                170,
+                501
+              ],
+              [
+                187,
+                519
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          "brackets": {
+            "left": [
+              [
+                31,
+                402
+              ],
+              [
+                14,
+                402
+              ],
+              [
+                14,
+                548
+              ],
+              [
+                31,
+                548
+              ]
+            ],
+            "right": [
+              [
+                357,
+                402
+              ],
+              [
+                373,
+                402
+              ],
+              [
+                373,
+                548
+              ],
+              [
+                357,
+                548
+              ]
+            ],
+            "nsubBox": [
+              382,
+              541,
+              397,
+              558
+            ]
+          },
+          "knownChairC": 6,
+          "knownOIncludingOHAndBridge": 5
+        },
+        "right": {
+          "ringNodes": [
+            {
+              "C": [
+                747,
+                456
+              ]
+            },
+            {
+              "C": [
+                825,
+                490
+              ]
+            },
+            {
+              "OBox": [
+                919,
+                464,
+                938,
+                483
+              ]
+            },
+            {
+              "C": [
+                979,
+                541
+              ]
+            },
+            {
+              "C": [
+                862,
+                521
+              ]
+            },
+            {
+              "C": [
+                786,
+                536
+              ]
+            }
+          ],
+          "bonds": [
+            [
+              [
+                683,
+                483
+              ],
+              [
+                747,
+                456
+              ],
+              [
+                825,
+                490
+              ],
+              [
+                915,
+                477
+              ]
+            ],
+            [
+              [
+                939,
+                486
+              ],
+              [
+                979,
+                541
+              ],
+              [
+                862,
+                521
+              ],
+              [
+                786,
+                536
+              ],
+              [
+                747,
+                456
+              ]
+            ],
+            [
+              [
+                979,
+                541
+              ],
+              [
+                1019,
+                515
+              ]
+            ],
+            [
+              [
+                1047,
+                513
+              ],
+              [
+                1086,
+                538
+              ]
+            ]
+          ],
+          "bridgeObox": [
+            1025,
+            494,
+            1044,
+            514
+          ],
+          "upperCH2OAc": {
+            "literal": "CH₂OAc",
+            "bbox": [
+              799,
+              431,
+              897,
+              454
+            ],
+            "branch": [
+              [
+                825,
+                490
+              ],
+              [
+                804,
+                455
+              ]
+            ],
+            "anchor": "FIRST C"
+          },
+          "leftAcO": {
+            "literal": "AcO",
+            "bbox": [
+              706,
+              506,
+              757,
+              526
+            ],
+            "branch": [
+              [
+                763,
+                522
+              ],
+              [
+                786,
+                536
+              ]
+            ],
+            "anchor": "LAST O, notA orc"
+          },
+          "lowerOAc": {
+            "literal": "OAc",
+            "bbox": [
+              882,
+              543,
+              934,
+              565
+            ],
+            "branch": [
+              [
+                862,
+                521
+              ],
+              [
+                881,
+                540
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          "brackets": {
+            "left": [
+              [
+                717,
+                422
+              ],
+              [
+                700,
+                422
+              ],
+              [
+                700,
+                568
+              ],
+              [
+                717,
+                568
+              ]
+            ],
+            "right": [
+              [
+                1045,
+                422
+              ],
+              [
+                1061,
+                422
+              ],
+              [
+                1061,
+                568
+              ],
+              [
+                1045,
+                568
+              ]
+            ],
+            "nsubBox": [
+              1070,
+              562,
+              1086,
+              579
+            ]
+          },
+          "knownChairBackboneC": 6,
+          "AcShorthand": "Do notexpandAcformulaorclaimedatomcountfromtheory."
+        }
+      },
+      "noAdded": [
+        "No answersreactionlist",
+        "No expandedCOstrokesforCOO",
+        "No chairTAPER/bold",
+        "No coefficientnormalization",
+        "No Acnameexpansion",
+        "No extraCH2onbarechairvertices"
+      ]
+    },
+    "measurementLimits": "Approxnativecenterlines/glyphboxes±1–2px. Bothchairs independentlyreadthinlines, explicitrow3C/Oglyphgaps separatedfrombarecarbonyljoinconcept. Fourfilledheadtypes ownFULL/macros visuallyconfirmed.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull": true,
+    "allPublicDe": true,
+    "freshFinalChromiumFull3x": true,
+    "freshFinalMacros": [
+      "411-final-o1.png",
+      "411-final-o4.png"
+    ],
+    "finalHash": "c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6",
+    "initialNegative": "9b864b8c952b03948de72492eeaf8da69e6703a4dc1a99c5fa66771ac3468004",
+    "changedChildrenOnly": [
+      18,
+      121
+    ],
+    "allOtherGeometryGlyphExact": true,
+    "correction": "Root+readonly ROW1AND4supOcontact confirmedOWNnarrow; ROW2AND3WHITEgap. Initial broadall4claim corrected beforefinal. FINALONLY2supOx+5; nooldpositivecarry.",
+    "verdict": "Đạt root + independent freshFINAL/full/macros/exactSHA"
+  }
+}

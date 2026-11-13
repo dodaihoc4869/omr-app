@@ -1,0 +1,29 @@
+[
+  {
+    "i": 92,
+    "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+    "fileNguon": "anh/1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae.png",
+    "svg": "poly92-native-ddh-c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6.svg",
+    "hashSvg": "c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6",
+    "byteSvg": 90842,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-III-1",
+        "de": "Cho các phản ứng (1), (2), (3), (4) như hình.\nLiệt kê các phản ứng không làm thay đổi (hay giữ nguyên) mạch polymer theo số thứ tự tăng dần.",
+        "refs": [
+          {
+            "hash": "1200858d9f515e33003c505680c550675f4fbdc2466757dd8422acaa1c0a67ae",
+            "where": "VIP27-C4-B14-D2-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "0439491ccac45d684a29dd631c8ddd05b0841bd35f0d0d96ddd35faaa0155f7c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4literalpolymerreactions-UNKNOWNnTotal/4FULLFILLEDrightheads/7SQUAREpairs7nSUB-othernBASELINE/row1CH2-CH=CH-CH2+nHCl-ClDOWN-FIRSTC/row2CH3-COO-LASTOanchor-CH3DOWN-toOHUP-CH3DOWN+nCH3COONa/row3NH-(CH2)5-C-EXPLICITCdoubleO2verticalraysWHITEglyphgaps-toH2N-(CH2)5-COONa/row4TWOindividualALLTHINchairsNOtaper-bareC-CH2OH-HO-OH-toCH2OAc-AcO-OAc-ACKEEP/AcO-LASTOanchors/3n(Ac)2O-3nAcOH/ALLregularUPRIGHT-4nums/NOtheoryfix-addedH-water-formula-name-answer-alias/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "c88ae6f73ac300d8c04878f2136d45124a29a85dd303c4661174ba824dbcb0e6",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
