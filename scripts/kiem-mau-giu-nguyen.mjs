@@ -283,6 +283,13 @@ const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
   'src/styles/tokens.css · --v2-vang: #f7a800',
+  // 13/11 thầy (trò «Sinh Tồn · Trang vở», docs/dac-ta-sinh-ton-v2-1311.md): «tối là #131f24 mặc định là nền này luôn nhé» ⇒ đúng NĂM biến --st-* nền luôn tối
+  // (bảng Duolingo tối app học sinh); mọi sắc khác của trò pha từ chúng + token đội.
+  'src/styles/tokens.css · --st-nen: #131f24',
+  'src/styles/tokens.css · --st-mat: #202f36',
+  'src/styles/tokens.css · --st-vien: #37464f',
+  'src/styles/tokens.css · --st-vien-2: #1a282e',
+  'src/styles/tokens.css · --st-chu: #f1f7fb',
   ...LENH_2110.moi,
   // 27/10 thầy: «màu sắc của linh vật cũng siêu tươi mịn mắt như dolingo» (Boss chuyển: Tí #58CC02, Cô Cốc #CE82FF, Chú Tam #FF9600, Giáo sư Kíp #FF4B4B) —
   // đúng BỐN màu thân của 4 giám thị, khai một chỗ; mọi sắc dẫn xuất pha color-mix từ chúng.

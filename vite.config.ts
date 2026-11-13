@@ -374,6 +374,7 @@ export default defineConfig({
           // Live theo khối (12/11): mọi mảnh của tính năng (bảng Live máy thầy, thẻ Live, lớp nổi, trò Sinh Tồn, chat, màn bốn đội) chỉ dùng khi ĐANG có mạng
           // (live) ⇒ kho chạy-lúc, không vào precache (giữ trần 170 tệp).
           '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroSinhTon,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
+          '**/patrick-hand-*.woff2', // phông viết tay trò Sinh Tồn «Trang vở» (13/11) — chỉ tờ kiểu của mảnh lười TroSinhTon khai, tải lúc mở trò
           // Máy tính «Đỗ Đại Học FX4869» (12/11): chỉ hiện trong buổi live (đang có mạng) ⇒ kho chạy-lúc. `dong-bo-????????` = mảnh chung mặt máy + CSS (8 dấu ? = đúng mã băm, không bắt nhầm `dong-bo-thu-muc-*`).
           '**/{MayTinhThay,MayTinhEm}-*.js', '**/dong-bo-????????.{js,css}',
           '**/{HoiHieuThay,HoiHieuEm,hoi-hieu,LuatRoiThay,LuatRoiEm,luat-roi}-*.{js,css}', // phím / «Hiểu chưa?» (12/11) — cũng chỉ dùng lúc live
