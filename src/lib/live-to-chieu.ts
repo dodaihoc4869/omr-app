@@ -396,7 +396,7 @@ export const JS_LIVE_TO_CHIEU = `
   /** Xem lại Live: ngăn ghi của viên Live. ghi vắng = công tắc tắt ⇒ không vẽ. Máy ghi chưa báo trong 15 giây đầu ⇒ chưa vẽ gì (đang khởi động). */
   function lvNganGhi(t) {
     if (!t.ghi) return '';
-    if (t.ghi === 'dang-ghi') return '<span class="ghi" role="status">' + LV_BT.mic + 'Đang ghi<b>&nbsp;để xem lại</b></span>';
+    if (t.ghi === 'dang-ghi') return '<span class="ghi" role="status" title="Đang ghi để xem lại"><i class="cham"></i>Ghi</span>';
     if (t.ghi === 'loi' || Date.now() - (t.tu || Date.now()) > 15000) return '<span class="ghi-loi" role="status">Chưa ghi được · live vẫn chạy</span>';
     return '';
   }
@@ -424,8 +424,8 @@ export const JS_LIVE_TO_CHIEU = `
         h = '';
         for (i = 0; i < 7; i++) h += '<i style="height:' + [36, 59, 82, 100, 73, 45, 27][i] + '%"></i>';
         lvCum.innerHTML = '<span><i class="cham"></i>' + (t.nghi ? 'TẠM DỪNG' : 'LIVE') + ' <b id="mc-lv-dh">' + lvDongHo(t.tu || Date.now()) + '</b></span>'
-          + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + ' em xem</small></span>'
-          + (t.coTieng && !t.khongTieng && !t.nghi ? '<span class="' + (t.xem && !t.nghe ? 'im' : '') + '" aria-label="Số em đang nghe tiếng thầy qua máy"><b>' + (t.nghe || 0) + '</b><small> em nghe</small></span>' : '')
+          + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + '</small></span>'
+          + (t.coTieng && !t.khongTieng && !t.nghi ? '<span class="' + (t.xem && !t.nghe ? 'im' : '') + '" title="Số em đang nghe tiếng thầy" aria-label="Số em đang nghe tiếng thầy qua máy">' + LV_BT.loa + '<b>' + (t.nghe || 0) + '</b></span>' : '')
           + (t.nghi ? '' : t.coTieng && !t.khongTieng && !t.lyDoKT ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>' + lvSach(t.lyDoKT || 'Không tiếng') + '</span>')
           + lvNganGhi(t);
         LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); lvBaoGiay(); if (LV.tt && LV.tt.ghi === 'tat' && !lvCum.querySelector('.ghi-loi') && Date.now() - (LV.tt.tu || Date.now()) > 15000) lvVe(); }, 1000);
