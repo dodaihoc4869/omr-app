@@ -1,0 +1,645 @@
+{
+  "i": 642,
+  "assetIndexProvided": 1347,
+  "hash": "776785bba30e579d706c3cd8bf1ebeecaa9698e530b4dc5896ce5518eee29105",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/776785bba30e579d706c3cd8bf1ebeecaa9698e530b4dc5896ce5518eee29105.png",
+  "size": [
+    1127,
+    262
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B13-III-5",
+      "de": "Nylon-6,6 được điều chế từ buta-1,3-diene theo sơ đồ như hình.\nHiệu suất toàn bộ quá trình tạo hexamethylenediamine là 80%; hiệu suất phản ứng tạo adipic acid là 90% và hiệu suất phản ứng trùng ngưng đạt 90%. Khối lượng buta-1,3-diene cần lấy (theo tấn) để điều chế được 10 tấn nylon-6,6. (Làm tròn kết quả đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "776785bba30e579d706c3cd8bf1ebeecaa9698e530b4dc5896ce5518eee29105",
+          "where": "VIP27-C4-B13-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "2265f13ac9a1a19aec2d3afd7a890c615c4d23813d1890f456e70db42ebd0048"
+        }
+      ],
+      "missingHashes": [
+        "776785bba30e579d706c3cd8bf1ebeecaa9698e530b4dc5896ce5518eee29105"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/402-full3x.png",
+      "/workspace/scratch/402-left3x.png",
+      "/workspace/scratch/402-chains3x.png",
+      "/workspace/scratch/402-bottom3x.png",
+      "/workspace/scratch/402-heads3x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "font": "All literal labels/formulas/conditions/stepnumbers regular upright serif. No actual bold/italic. Nativefilledheads thickblack are geometry not boldfont.",
+    "counts": {
+      "butadieneBareC": 4,
+      "dinitrile": {
+        "bareChainC": 4,
+        "textNC_C": 1,
+        "textCN_C": 1,
+        "C": 6,
+        "N": 2
+      },
+      "diamineTop": {
+        "C": 6,
+        "N": 2
+      },
+      "diacid": {
+        "bareChainC": 4,
+        "textHOOC_C": 1,
+        "textCOOH_C": 1,
+        "C": 6,
+        "O": 4
+      },
+      "fixedUpperStructuresCExcludingConditions": 22,
+      "bottomMonomerPrintedUnitsC": 12,
+      "bottomCoefficient": "n unknown, not nsubscript; do not claim fixednumberofmolecules",
+      "polymerC": "UNKNOWN nameonly Nylon-6,6",
+      "heads": 4,
+      "butadieneCCdouble": 2
+    },
+    "butadiene": {
+      "vertexGuides": [
+        [
+          23,
+          75
+        ],
+        [
+          62,
+          98
+        ],
+        [
+          100,
+          76
+        ],
+        [
+          138,
+          98
+        ]
+      ],
+      "actualDoubleStrokeGuides": [
+        [
+          [
+            25,
+            72.5
+          ],
+          [
+            64,
+            94.5
+          ]
+        ],
+        [
+          [
+            20,
+            78.5
+          ],
+          [
+            59,
+            101
+          ]
+        ],
+        [
+          [
+            102,
+            72.5
+          ],
+          [
+            141,
+            94.5
+          ]
+        ],
+        [
+          [
+            98,
+            78.5
+          ],
+          [
+            137,
+            101
+          ]
+        ]
+      ],
+      "middleSingle": [
+        [
+          62,
+          98
+        ],
+        [
+          100,
+          76
+        ]
+      ],
+      "note": "Terminaldoublepairs offset outside abstractvertexguides; preserve eachlineend. NoH2Cglyphadded."
+    },
+    "branchArrows": {
+      "commonStart": [
+        160,
+        92
+      ],
+      "upper": {
+        "shaftVertices": [
+          [
+            160,
+            92
+          ],
+          [
+            220,
+            49
+          ],
+          [
+            398,
+            49
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            382,
+            44
+          ],
+          [
+            398,
+            49
+          ],
+          [
+            382,
+            54
+          ],
+          [
+            385,
+            49
+          ]
+        ],
+        "condition": {
+          "literal": "+ HCN /xt",
+          "bboxApprox": [
+            243,
+            17,
+            360,
+            37
+          ]
+        },
+        "step": {
+          "literal": "(1)",
+          "bboxApprox": [
+            273,
+            61,
+            303,
+            80
+          ]
+        }
+      },
+      "lower": {
+        "shaftVertices": [
+          [
+            160,
+            92
+          ],
+          [
+            212,
+            145
+          ],
+          [
+            461,
+            145
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            444,
+            140
+          ],
+          [
+            461,
+            145
+          ],
+          [
+            444,
+            150
+          ],
+          [
+            447,
+            145
+          ]
+        ],
+        "condition": {
+          "literal": "+ CO + H₂O /xt",
+          "bboxApprox": [
+            226,
+            119,
+            403,
+            142
+          ]
+        },
+        "step": {
+          "literal": "(3)",
+          "bboxApprox": [
+            293,
+            160,
+            323,
+            179
+          ]
+        }
+      }
+    },
+    "dinitrile": {
+      "NC": {
+        "literal": "NC",
+        "bboxApprox": [
+          416,
+          20,
+          453,
+          40
+        ],
+        "anchor": "LAST C tochain"
+      },
+      "chainVertices": [
+        [
+          486,
+          54
+        ],
+        [
+          525,
+          31
+        ],
+        [
+          565,
+          54
+        ],
+        [
+          605,
+          31
+        ]
+      ],
+      "leftGlyphArm": [
+        [
+          459,
+          39
+        ],
+        [
+          486,
+          54
+        ]
+      ],
+      "rightGlyphArm": [
+        [
+          605,
+          31
+        ],
+        [
+          622,
+          41
+        ]
+      ],
+      "CN": {
+        "literal": "CN",
+        "bboxApprox": [
+          625,
+          44,
+          662,
+          63
+        ],
+        "anchor": "FIRST C fromchain"
+      }
+    },
+    "upperSecondArrow": {
+      "shaft": [
+        [
+          680,
+          46
+        ],
+        [
+          833,
+          46
+        ]
+      ],
+      "filledHeadApprox": [
+        [
+          816,
+          41
+        ],
+        [
+          833,
+          46
+        ],
+        [
+          816,
+          51
+        ],
+        [
+          819,
+          46
+        ]
+      ],
+      "condition": {
+        "literal": "+ H₂/xt, tᵒ",
+        "bboxApprox": [
+          704,
+          16,
+          812,
+          37
+        ],
+        "tSup": "Smallordinaryo raised, notnumeric0baseline"
+      },
+      "step": {
+        "literal": "(2)",
+        "bboxApprox": [
+          738,
+          59,
+          767,
+          78
+        ]
+      }
+    },
+    "topDiamine": {
+      "literal": "H₂N—(CH₂)₆—NH₂",
+      "bboxApprox": [
+        845,
+        37,
+        1106,
+        62
+      ],
+      "formulaTokens": [
+        {
+          "text": "H₂N",
+          "bbox": [
+            845,
+            38,
+            892,
+            61
+          ]
+        },
+        {
+          "text": "(CH₂)₆",
+          "bbox": [
+            938,
+            36,
+            1015,
+            61
+          ]
+        },
+        {
+          "text": "NH₂",
+          "bbox": [
+            1053,
+            38,
+            1105,
+            61
+          ]
+        }
+      ],
+      "dashSegments": [
+        [
+          [
+            895,
+            46
+          ],
+          [
+            932,
+            46
+          ]
+        ],
+        [
+          [
+            1018,
+            46
+          ],
+          [
+            1049,
+            46
+          ]
+        ]
+      ]
+    },
+    "diacid": {
+      "leftGroup": {
+        "literal": "HOOC",
+        "bboxApprox": [
+          482,
+          113,
+          560,
+          133
+        ],
+        "anchor": "LAST C near550"
+      },
+      "chainVertices": [
+        [
+          591,
+          146
+        ],
+        [
+          631,
+          124
+        ],
+        [
+          671,
+          146
+        ],
+        [
+          711,
+          124
+        ]
+      ],
+      "leftGlyphArm": [
+        [
+          565,
+          131
+        ],
+        [
+          591,
+          146
+        ]
+      ],
+      "rightGlyphArm": [
+        [
+          711,
+          124
+        ],
+        [
+          727,
+          134
+        ]
+      ],
+      "rightGroup": {
+        "literal": "COOH",
+        "bboxApprox": [
+          730,
+          137,
+          807,
+          157
+        ],
+        "anchor": "FIRST C near740"
+      },
+      "noExpandedCO": true
+    },
+    "bottomReaction": {
+      "reactant1": {
+        "literal": "nH₂N—(CH₂)₆—NH₂",
+        "bboxApprox": [
+          10,
+          206,
+          280,
+          231
+        ],
+        "ordinaryNCoefficientBaselineApprox": 224,
+        "dashSegments": [
+          [
+            [
+              74,
+              216
+            ],
+            [
+              110,
+              216
+            ]
+          ],
+          [
+            [
+              194,
+              216
+            ],
+            [
+              224,
+              216
+            ]
+          ]
+        ]
+      },
+      "plus1": {
+        "bboxApprox": [
+          297,
+          207,
+          315,
+          225
+        ]
+      },
+      "reactant2": {
+        "literal": "nHOOC—(CH₂)₄—COOH",
+        "bboxApprox": [
+          347,
+          205,
+          667,
+          231
+        ],
+        "ordinaryNCoefficientBaselineApprox": 224,
+        "dashSegments": [
+          [
+            [
+              443,
+              216
+            ],
+            [
+              468,
+              216
+            ]
+          ],
+          [
+            [
+              552,
+              216
+            ],
+            [
+              586,
+              216
+            ]
+          ]
+        ]
+      },
+      "arrow": {
+        "shaft": [
+          [
+            682,
+            219
+          ],
+          [
+            773,
+            219
+          ]
+        ],
+        "filledHeadApprox": [
+          [
+            757,
+            214
+          ],
+          [
+            773,
+            219
+          ],
+          [
+            757,
+            224
+          ],
+          [
+            760,
+            219
+          ]
+        ],
+        "step": {
+          "literal": "(4)",
+          "bboxApprox": [
+            710,
+            235,
+            739,
+            255
+          ]
+        }
+      },
+      "productName": {
+        "literal": "Nylon-6,6",
+        "bboxApprox": [
+          786,
+          211,
+          899,
+          235
+        ],
+        "straightHyphen": "- notendash/emDash; comma6,6"
+      },
+      "plus2": {
+        "bboxApprox": [
+          926,
+          215,
+          944,
+          233
+        ]
+      },
+      "water": {
+        "literal": "2nH₂O",
+        "bboxApprox": [
+          962,
+          211,
+          1042,
+          235
+        ],
+        "nBaseline": "Ordinarybaseline n immediatelyafter2, notsubscript"
+      }
+    },
+    "noAdded": [
+      "No temperaturesnumericvalues",
+      "No yields80/90 frompublicstem",
+      "No polymerrepeatstructure",
+      "No extraH2Ocoefficients",
+      "No CNtriplelines expanded fromtext",
+      "No stereobonds"
+    ]
+  },
+  "measurementLimits": "Nativeapprox centerlines/bboxes ±1–2px. Skeletalchains eachreadseparately, noaffinecopy. Bottommacro viewerdownscaled but literalconfirmedfull; noquantitativechemicalbalanceinferred. Fourheadsfullfilled fromownfull/macro shape, nohalfharpoon.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "nativeFull2xOpened": true,
+    "fixedTopCCount": 22,
+    "noSvgNegativeBeforeBuilder": true,
+    "measurement": "Individual guides native approximate, not subpixel measurement. Each skeletal chain separately read; do not duplicate by translation. Bottom n ordinary baseline, t superscript is small Latin o.",
+    "left3xUpperSecond3xAndBottom2xOpened": true
+  }
+}
