@@ -12,7 +12,7 @@ import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { khoaTep } from './live-xem-lai'
 import { TEP_LIVE, type BuoiLiveJson, type CauBuoiLive } from '../../src/lib/live/xem-lai-kieu'
-import { svgTrang, tachTrang, vungTrong, type MauAnhTrang, type TrangBang } from '../../src/lib/nhat-ky/trang-bang'
+import { netKhuon, svgTrang, tachTrang, vungTrong, type MauAnhTrang, type TrangBang } from '../../src/lib/nhat-ky/trang-bang'
 /** Màu ảnh trang bảng gửi văn phòng: nền xanh than Duolingo (như bảng thật) · mực xanh sáng lên · phấn trắng. */
 const MAU_ANH: MauAnhTrang = { nen: 'rgb(19,31,36)', mucXanh: 'rgb(125,170,255)', macDinh: 'rgb(244,239,228)' }
 import { LUOC_DO, boPhanMay, kiemKichBan } from '../../src/lib/nhat-ky/luoc-do'
@@ -131,6 +131,13 @@ export async function svgTrangCuaBuoi(env: Env, id: string, stt: number): Promis
   if (!buoi) return null
   const tr = (await trangCuaBuoi(env, id, buoi.msLive)).find((t) => t.stt === stt)
   return tr ? svgTrang(tr, MAU_ANH) : null
+}
+
+/** Nét phấn mọi trang bảng của buổi theo dạng khuôn hoạt hoạ đọc (màn học sinh xem nhật ký — public/nhat-ky/). Thiếu tệp ⇒ null. */
+export async function netTrangCuaBuoi(env: Env, id: string): Promise<{ trang: Record<string, unknown>[] } | null> {
+  const buoi = await docBuoiJson(env, id)
+  if (!buoi) return null
+  return { trang: (await trangCuaBuoi(env, id, buoi.msLive)).map((t) => ({ stt: t.stt, loai: t.loai, ...netKhuon(t, MAU_ANH) })) }
 }
 
 /** Tên người có thể xuất hiện trong lời Thầy: học sinh đã điểm danh buổi + học sinh cùng lớp buổi (họ tên, tên gọi, hai chữ cuối). */
