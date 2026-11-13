@@ -467,7 +467,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       if (x0 < h[0]) h[0] = x0; if (y0 < h[1]) h[1] = y0; if (x1 > h[2]) h[2] = x1; if (y1 > h[3]) h[3] = y1
     }
     // bàn tay cầm bút: chỗ ngòi theo đệm phát (đã trừ độ cuộn của máy em) ⇒ một bước chuyển động ⇒ chỗ dán hình
-    let hb = null, px = 0, py = 0, khoa = ''
+    let hb = null, px = 0, py = 0, khoa = '', roLz = 1
     if (gTay) {
       if (butDich) { const q = toiPx(butDich.x, butDich.y, butDich.net); if (butDich.mau) mauBut.muc = butDich.mau; hb = but.buoc({ x: q[0], y: q[1], cham: butDich.cham, sat: butDich.sat }, nay) }
       else but.buoc(null, nay)
@@ -479,7 +479,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       px = Math.round(hb.x * dd); py = Math.round(hb.y * dd)
       if (butDich?.sat && !yeu) { px = Math.round(hb.x * dd * 8) / 8; py = Math.round(hb.y * dd * 8) / 8 }
       // khoá theo ĐỘ RÕ THẬT của chấm (min(1, mo·8)), không theo `mo` thô: thầy giữ yên chuột thì `mo` trôi 0,58 → 0,14 (~36 khung) mà chấm vẫn rõ hết cỡ ⇒ khỏi vẽ lại
-      khoa = `L|${px}|${py}|${Math.min(1, hb.mo * 8)}|${hinhLaze}`
+      roLz = Math.min(1, hb.mo * 8); khoa = `L|${px}|${py}|${roLz}|${hinhLaze}`
       if (!ve.length && khoa === tayVe) return 0
       const r = LAZE_R + 4
       if (hb.x - r < h[0]) h[0] = hb.x - r; if (hb.y - r < h[1]) h[1] = hb.y - r; if (hb.x + r > h[2]) h[2] = hb.x + r; if (hb.y + r > h[3]) h[3] = hb.y + r
@@ -515,7 +515,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (hb && laze) {
       // chấm laze: không ngả, tâm đúng chỗ ngòi
       gS.setTransform(1, 0, 0, 1, px - Math.round(sx * dd), py - Math.round(sy * dd))
-      gS.globalAlpha = Math.min(1, hb.mo * 8) // chấm chỉ bài LUÔN sáng hết cỡ, kể cả khi thầy giữ yên để giảng (cây bút lơ lửng thì mờ dần); chỉ mờ ở nhịp bút ẩn hẳn
+      gS.globalAlpha = roLz // chấm chỉ bài LUÔN sáng hết cỡ, kể cả khi thầy giữ yên để giảng (cây bút lơ lửng thì mờ dần); chỉ mờ ở nhịp bút ẩn hẳn
       gS.drawImage(cvLaze!, -cvLaze!.width / 2, -cvLaze!.height / 2)
       gS.globalAlpha = 1
     } else if (hb) {
