@@ -893,6 +893,8 @@ const SOAT_KT = { id: 'kt-soat', ngay: soatNgay, moLuc: soatMo, hanLuc: soatMo +
   lyDo: 'Kiểm chứng những phần em đang luyện thêm', thieuNguon: 0, diem: thamSo.get('kt') === 'ket' ? 7.75 : null, nopLuc: thamSo.get('kt') === 'ket' ? now - 3600_000 : null }
 const SOAT_CHANG = [{ stt: 0, soCau: 7, giay: 780, han: now - 1_200_000, daChot: true, daTra: 7 }, { stt: 1, soCau: 7, giay: 780, han: now + 462_000, daChot: false, daTra: 3 },
   { stt: 2, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }, { stt: 3, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0 }]
+// 13/11 `&ll=1` (cùng `kt=ket`): thầy cho làm lại chặng 3 (hết giờ khi em vắng, 0 câu) — bài đã nộp, các chặng khác đã chốt.
+if (thamSo.get('kt') === 'ket' && thamSo.get('ll') === '1') SOAT_CHANG.splice(0, 4, { stt: 0, soCau: 7, giay: 780, han: now - 9e6, daChot: true, daTra: 7 }, { stt: 1, soCau: 7, giay: 780, han: now - 8e6, daChot: true, daTra: 7 }, { stt: 2, soCau: 7, giay: 840, han: null, daChot: false, daTra: 0, lamLai: true } as never, { stt: 3, soCau: 7, giay: 840, han: now - 6e6, daChot: true, daTra: 7 })
 const SOAT_CAU = CAU_HOC.filter((c) => c.phan === 'I').concat(Array.from({ length: 6 }, (_, i) => ({ ...CAU_HOC[0]!, qid: `S${i}`, text: `Câu ${i + 2}: Thuỷ phân hoàn toàn ${(i + 2) * 4.4} gam ester đơn chức X bằng dung dịch NaOH vừa đủ, thu được muối và alcohol. Công thức của X là` })))
 const SOAT_KET = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
   bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 10, daKiem: 10, dungLanNay: 8 }, { ten: 'Bài 7. Carbohydrate (glucose, fructose, saccharose, tinh bột và cellulose)', tong: 10, daKiem: 10, dungLanNay: 7 }, { ten: 'Bài 8. Amine', tong: 8, daKiem: 8, dungLanNay: 6 }],

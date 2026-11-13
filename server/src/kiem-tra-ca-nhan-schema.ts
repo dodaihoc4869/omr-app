@@ -12,5 +12,7 @@ export const SQL_KT_CN = [
   `CREATE INDEX IF NOT EXISTS ktcn_chua_mo ON kiem_tra_ca_nhan(mo_luc) WHERE nop_luc IS NULL`,
   // 13/11: chặng hết giờ khi em vắng (0 câu trả lời) được mở lại MỘT lần — dòng này đánh dấu đã mở lại. Chỉ-thêm.
   `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_mo_lai (bai_id TEXT NOT NULL,stt INTEGER NOT NULL,luc INTEGER NOT NULL,PRIMARY KEY(bai_id,stt))`,
+  // 13/11 (thầy «Cho 20 em làm lại chặng bị khoá»): quyền làm lại MỘT chặng của bài ĐÃ NỘP, có hạn `het_luc`; bat_dau/han = đồng hồ lần làm lại; dung_luc = đã chốt. Chỉ-thêm.
+  `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_lam_lai (bai_id TEXT NOT NULL,stt INTEGER NOT NULL,cap_luc INTEGER NOT NULL,het_luc INTEGER NOT NULL,bat_dau INTEGER,han INTEGER,dung_luc INTEGER,PRIMARY KEY(bai_id,stt))`,
 ] as const
 export const damBaoKtCn = (env: Env) => chayDdlMotLan(env, 'kiem_tra_ca_nhan_v1', SQL_KT_CN)

@@ -18,6 +18,7 @@ import { ketQuaTungY } from './omni-game'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { sqlTenLopHs } from './goi-bai-7'
+import { lamLaiChangKt, SQL_QUYEN_LAM_LAI, quyenTuDong, quyenConDung } from './kiem-tra-ca-nhan-lam-lai'
 import { henHalfLife, type MoHinhHalfLife } from './half-life'
 import { dongGoiDe2026 } from './kiem-tra-ca-nhan-chu-ky'
 import { nguonTuongDuongKt } from './kiem-tra-ca-nhan-nguon'
@@ -80,12 +81,17 @@ const TU_DOC_KT_CN = `FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND
 const SQL_DOC_KT_CN_DU = `SELECT k.* ${TU_DOC_KT_CN}`
 /** 12/11 (H3, đo 24h: 36.863 lượt × ~228 hàng): CHỌN dòng trước (cùng điều kiện, cùng thứ tự — (sbd, ngay) là khoá duy nhất nên không có hoà), RỒI mới tính các
  *  cột nặng (số tính sẵn + đếm "đã trả lời" + chặng đã chốt) cho ĐÚNG dòng đó. Trước: SQLite tính cột cho MỌI lịch từ hôm nay của em rồi mới xếp lấy một. Tham số y hệt. */
-export const sqlDocKtCnMeta = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} FROM kiem_tra_ca_nhan k WHERE k.id=(SELECT k.id ${TU_DOC_KT_CN})`
+/** 13/11 (thầy cho làm lại chặng): em có quyền làm lại còn hạn, chưa dùng, và HÔM NAY không có bài kiểm tra ⇒ sảnh trỏ vào bài có quyền (bài cũ đã nộp) — một câu, dò khoá chính. */
+const ID_LAM_LAI_KT = `(SELECT l.bai_id FROM kiem_tra_ca_nhan_lam_lai l WHERE l.bai_id>='ktcn:'||?1||':' AND l.bai_id<'ktcn:'||?1||';' AND l.dung_luc IS NULL AND l.het_luc>?3 AND (l.bat_dau IS NULL OR l.han>?3) ORDER BY l.bai_id LIMIT 1)`
+const KT_HOM_NAY = `EXISTS(SELECT 1 FROM kiem_tra_ca_nhan t WHERE t.sbd=?1 AND t.ngay=?2 AND t.trang_thai<>'cho_nguon')`
+export const sqlDocKtCnMeta = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT},(SELECT json_group_array(l.stt) FROM kiem_tra_ca_nhan_lam_lai l WHERE l.bai_id=k.id AND l.dung_luc IS NULL AND l.het_luc>?3 AND (l.bat_dau IS NULL OR l.han>?3)) AS lam_lai FROM kiem_tra_ca_nhan k WHERE k.id=CASE WHEN ${KT_HOM_NAY} THEN (SELECT k.id ${TU_DOC_KT_CN}) ELSE COALESCE(${ID_LAM_LAI_KT},(SELECT k.id ${TU_DOC_KT_CN})) END`
+/** Câu 12/11 (trước quyền làm lại) — chỉ để test và đường lùi khi bảng quyền chưa có. */
+export const sqlDocKtCnMeta1211 = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} FROM kiem_tra_ca_nhan k WHERE k.id=(SELECT k.id ${TU_DOC_KT_CN})`
 /** Câu CŨ (trước 12/11) — chỉ để test so cũ↔mới. */
 export const sqlDocKtCnMetaCu = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} ${TU_DOC_KT_CN}`
 export async function docKtCn(env: Env, sbd: string, now: number, chiMeta=false): Promise<Row | null> {
   if (!await coKtCn(env)) return null
-  const r = await env.DB.prepare(chiMeta ? sqlDocKtCnMeta() : SQL_DOC_KT_CN_DU).bind(...(chiMeta ? [sbd, ngayKt(now), now] : [sbd, ngayKt(now)])).first<Row>()
+  const r = chiMeta ? await env.DB.prepare(sqlDocKtCnMeta()).bind(sbd, ngayKt(now), now).first<Row>().catch(() => env.DB.prepare(sqlDocKtCnMeta1211()).bind(sbd, ngayKt(now), now).first<Row>()) : await env.DB.prepare(SQL_DOC_KT_CN_DU).bind(sbd, ngayKt(now)).first<Row>()
   if (!r) return null
   return r
 }
@@ -116,7 +122,7 @@ export function tomTatKt(r: Row, now: number) {
   const thieu=d?.thieu.length??Number(meta!.thieuNguon),tongKienThuc=kn?.length??Number(meta!.tongKienThuc)
   return { id: s(r.id), ngay: s(r.ngay), moLuc: Number(r.mo_luc), hanLuc: Number(r.han_luc), serverNow: now,
     trangThai: s(r.trang_thai) === 'cho_nguon' ? 'cho_nguon' : r.nop_luc ? s(r.trang_thai) : now < Number(r.mo_luc) ? 'sap_den' : now >= Number(r.han_luc) ? 'het_han' : 'can_lam',
-    homNay: laNgayKt(r, now),...(coHocNgayKt(r)?{baiNgayToiThieu:12}:{}),tong,daTra,con:tong-daTra,soChang:d?.chang.length??Number(meta!.soChang),phut:d?.phut??Number(meta!.phut),
+    homNay: laNgayKt(r, now),...(()=>{try{const a=r.lam_lai?JSON.parse(s(r.lam_lai)) as number[]:[];return a.length&&r.nop_luc?{lamLai:a}:{}}catch{return {}}})(),...(coHocNgayKt(r)?{baiNgayToiThieu:12}:{}),tong,daTra,con:tong-daTra,soChang:d?.chang.length??Number(meta!.soChang),phut:d?.phut??Number(meta!.phut),
     soBai:d?(d.bai?.length??new Set(d.muc.map(m=>m.bai)).size):Number(meta!.soBai),tongKienThuc,phuDe:d?(d.phuKienThuc??kn!.filter(m=>!d.thieu.includes(m.id)).length):Number(meta!.phuDe),
     nguonDayDu:thieu===0&&tongKienThuc>0,lyDo:d?.lyDo??String(meta!.lyDo),thieuNguon:thieu,
     diem: r.diem === null || r.diem === undefined ? null : Number(r.diem), nopLuc: r.nop_luc ? Number(r.nop_luc) : null,
@@ -328,11 +334,14 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     // 27/10 tốc độ (thầy: «chỗ bấm kiểm tra phải tức thì»): `kemKetQua` (CHỈ-THÊM) ⇒ bài đã nộp trả luôn phần chữa trong CÙNG lượt — máy em khỏi gọi
     // hoc-tap-ktcn-ket-qua nối tiếp. Đọc chặng và dựng kết quả chạy song song; kết quả giống hệt lệnh ket-qua (chốt lại rồi ketQuaKt).
     const kem=b.kemKetQua===true&&!!r.nop_luc?chotKtCn(env,r,now).then(async x=>({x,k:await ketGonKt(env,s(x.id),sbd,de(x).cau,await ketQuaKt(env,x,now),b)})):null
-    const [rows,kq]=await Promise.all([env.DB.prepare(SQL_CHANG_KEM_MO_LAI).bind(r.id).all<Row>().catch(()=>env.DB.prepare('SELECT *,1 AS mo_lai FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>()),kem])
+    const [rows,kq,qll]=await Promise.all([env.DB.prepare(SQL_CHANG_KEM_MO_LAI).bind(r.id).all<Row>().catch(()=>env.DB.prepare('SELECT *,1 AS mo_lai FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>()),kem,r.nop_luc?env.DB.prepare(SQL_QUYEN_LAM_LAI).bind(r.id).all<Row>().catch(()=>({results:[] as Row[]})):{results:[] as Row[]}])
+    // 13/11 thầy cho làm lại chặng (kiem-tra-ca-nhan-lam-lai.ts): chặng có quyền còn dùng ⇒ «Làm chặng» (chưa mở) / đang chạy, kể cả bài đã nộp.
+    const quyen=new Map((qll.results??[]).map(x=>[Number(x.stt),quyenTuDong(x)] as const)),llOk=(i:number)=>quyenConDung(quyen.get(i),now)
     if(kq)r=kq.x
     // daTra từng chặng (đợt 20, CHỈ-THÊM): đếm chặt như tomTatKt từ đề + tra_json đã đọc sẵn ở docBai — không thêm lượt D1.
     const t=tra(r),phanQ=new Map(d.cau.map(c=>[c.q.qid,c.q.phan]))
-    return {ok:true,kiemTra:tomTatKt(r,now),...(kq?kq.k:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);const lai=!!cr&&!r.nop_luc&&moLaiDuoc(cr,c.qids,t,phanQ,Number(r.han_luc),now);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr&&!lai?Number(cr.han):null,daChot:!lai&&!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
+    const dsLl=d.chang.map((_,i)=>i).filter(llOk)
+    return {ok:true,kiemTra:{...tomTatKt(r,now),...(dsLl.length?{lamLai:dsLl}:{})},...(kq?kq.k:{}),chang:d.chang.map((c,i)=>{if(llOk(i)){const q=quyen.get(i)!;return {stt:i,soCau:c.qids.length,giay:c.giay,han:q.bd==null?null:Number(q.han),daChot:false,lamLai:true,daTra:c.qids.filter(x=>duTraKt(phanQ.get(x)??'',typeof t[x]==='string'?t[x]:'')).length}}const cr=rows.results.find(v=>Number(v.stt)===i);const lai=!!cr&&!r.nop_luc&&moLaiDuoc(cr,c.qids,t,phanQ,Number(r.han_luc),now);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr&&!lai?Number(cr.han):null,daChot:!lai&&!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
   if (laKtBaoTriBo(r,now)) throw new Error(CHU_BAO_TRI_KT)
@@ -355,7 +364,7 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     r=await chotKtCn(env,r,now)
     return {ok:true,kiemTra:tomTatKt(r,now),...await ketGonKt(env,s(r.id),sbd,de(r).cau,await ketQuaKt(env,r,now),b)}
   }
-  if (r.nop_luc) return {ok:true,kiemTra:tomTatKt(r,now),daNop:true}
+  if (r.nop_luc) return (await lamLaiChangKt(env,sbd,action,b,r,now,{de,tra,duTraKt,dungKt,diemBaiKt,tomTatKt,docBai} as never))??{ok:true,kiemTra:tomTatKt(r,now),daNop:true}
   const stt=Number(b.chang)
   if (!Number.isInteger(stt)||stt<0||stt>=d.chang.length) throw new Error('Chặng kiểm tra không hợp lệ.')
   const ch=d.chang[stt]!, cs=d.cau.filter(c=>ch.qids.includes(c.q.qid))

@@ -33,7 +33,7 @@ const tenTrangChinh = (): string => (typeof document !== 'undefined' && document
 // `daTra` của từng chặng: trường CHỈ-THÊM của hoc-tap-ktcn-trang-thai (máy chủ cũ không gửi ⇒ không hiện dòng ấy).
 /** Chờ trước khi tải gói phần chữa đã khoá (giây đầu dành cho câu hỏi). */
 const CHO_GOI_MS=20_000
-type Chang={stt:number;soCau:number;giay:number;han:number|null;daChot:boolean;daTra?:number}
+type Chang={stt:number;soCau:number;giay:number;han:number|null;daChot:boolean;daTra?:number;/** 13/11 thầy cho làm lại chặng (bài đã nộp) */lamLai?:boolean}
 type Ket={bai:{ten:string;tong:number;daKiem:number;dungLanNay:number}[];cau:{de:Question;tra:string;dung:boolean;dapAn:string;loiGiai:unknown}[];chu:string}
 type Loc='tat-ca'|'on'|'trong'|'dung'
 function VongDem({phan,nhan,lop,an=false,children}:{phan:number;nhan?:string;lop?:string;an?:boolean;children?:ReactNode}){
@@ -151,7 +151,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu(Number(r.soGiu)>0?`Đã tải câu trả lời đã lưu · ${Number(r.soGiu)} câu đang được giữ cho ca kiểm tra, không tính điểm`:'Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];if(r.lamLai)setKet(undefined);setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu(Number(r.soGiu)>0?`Đã tải câu trả lời đã lưu · ${Number(r.soGiu)} câu đang được giữ cho ca kiểm tra, không tính điểm`:'Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
   // Mở lại chặng (kể cả sau khi tắt app): TỰ nạp bản nháp trên máy vào đúng câu em đang làm rồi tự gửi — không còn nút «Khôi phục» (thầy 28/10).
   try{
    const vtLuu=Number(localStorage.getItem(`ktcn:vt:${sbd}:${id}:${i}`))
@@ -368,6 +368,12 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
       <div><p className="ktcn-ket-so"><b>{kq.dung}/{ket.cau.length}</b> câu đúng</p><p className="ktcn-ly-do">Các phần cần luyện thêm sẽ vào lịch học tiếp theo của em.</p></div>
      </div>
     </section>
+    {/* 13/11 THẦY CHO LÀM LẠI CHẶNG: chặng hết giờ khi em vắng (0 câu) — mở lại MỘT lần, đồng hồ mới; chốt xong điểm bài tính lại. */}
+    {chang.filter(c=>c.lamLai).map(c=><section key={c.stt} className="ktcn-the" aria-label={`Làm lại chặng ${c.stt+1}`}>
+     <p className="ktcn-nhan">Thầy cho em làm lại</p>
+     <p className="ktcn-ly-do">Chặng {c.stt+1} hết giờ khi em chưa làm câu nào. Em làm lại chặng này một lần ({c.soCau} câu · {Math.ceil(c.giay/60)} phút, đồng hồ chạy cả khi em thoát app); điểm bài sẽ tính lại.</p>
+     <button type="button" className="ktcn-nut-chinh" onClick={()=>void mo(c.stt)} disabled={busy}>{c.han!==null?`Làm tiếp chặng ${c.stt+1}`:`Làm lại chặng ${c.stt+1}`}<ArrowRight size={18} aria-hidden="true"/></button>
+    </section>)}
     <h2 className="ktcn-ket-tieu">Kiến thức trong lần kiểm tra này</h2>
     <div className="ktcn-bai">{ket.bai.map(b=><div className="ktcn-bai-o" key={b.ten}><b>{b.ten}</b>
      <div className="ktcn-hai-thanh"><div><span>Đã kiểm tra</span><span className="ktcn-vach" data-sac="tim"><span style={{width:`${b.tong?Math.round(100*b.daKiem/b.tong):0}%`}}/></span><em>{b.daKiem}/{b.tong} mục</em></div>
