@@ -54,11 +54,10 @@ function oMau(b: Bang, k: number): HTMLCanvasElement {
     g.beginPath(); for (let y = 8; y <= O_MAU; y += 8) if (y % 32) { g.moveTo(0, y - 0.5); g.lineTo(O_MAU, y - 0.5) } g.strokeStyle = mau(b.ke); g.lineWidth = 0.7; g.stroke()
     g.beginPath(); for (let v = 32; v <= O_MAU; v += 32) { g.moveTo(0, v - 0.5); g.lineTo(O_MAU, v - 0.5); g.moveTo(v - 0.5, 0); g.lineTo(v - 0.5, O_MAU) } g.strokeStyle = mau(b.keDam); g.lineWidth = 1; g.stroke()
   } else {
-    g.beginPath(); for (let v = 32; v <= O_MAU; v += 32) { g.moveTo(0, v - 0.5); g.lineTo(O_MAU, v - 0.5); g.moveTo(v - 0.5, 0); g.lineTo(v - 0.5, O_MAU) } g.strokeStyle = mau(v64(b)); g.lineWidth = 1; g.stroke()
+    g.beginPath(); for (let v = 32; v <= O_MAU; v += 32) { g.moveTo(0, v - 0.5); g.lineTo(O_MAU, v - 0.5); g.moveTo(v - 0.5, 0); g.lineTo(v - 0.5, O_MAU) } g.strokeStyle = mau(b.ke); g.lineWidth = 1; g.stroke()
   }
   return c
 }
-const v64 = (b: Bang) => b.ke
 function oGach(b: Bang, k: number): HTMLCanvasElement {
   const c = document.createElement('canvas'), s = 24, n = Math.round(s * k)
   c.width = c.height = n

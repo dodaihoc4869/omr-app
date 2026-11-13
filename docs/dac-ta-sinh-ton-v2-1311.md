@@ -79,11 +79,12 @@ Máy bù lên tối đa cấp 3. Cân bằng chốt bằng mô phỏng `tests/li
 | 65 – 96 | 6400 × 3000 | 4 × 3 |
 | từ 97 | 6400 × 4000 | 4 × 4 |
 
-Mỗi trang 1600 × 1000 có đủ vật chặn, bụi và **một hộp tiếp tế ở giữa trang**. Bốn trại ở bốn góc ngoài sân. Vòng an toàn co nhanh hơn ở sân lớn để cuối ván vẫn chạm trán. Trại đã ngoài vòng thì hồi sinh ngay mép trong vòng (luật `choTrai(…, nay)` đã có).
+Thang này **thay hẳn** thang 5 mức vừa lên sống ở `f5954054d` (bắt đầu 1600 × 1000); lúc build không giữ cả hai. Mỗi trang 1600 × 1000 có đủ vật chặn, bụi và **một hộp tiếp tế ở giữa trang**. Bốn trại ở bốn góc ngoài sân. Vòng an toàn co nhanh hơn ở sân lớn để cuối ván vẫn chạm trán. Trại đã ngoài vòng thì hồi sinh ngay mép trong vòng (luật `choTrai(…, nay)` đã có).
 
 ### Máy bù mang tên như học sinh
 - Không có nhãn «Máy» ở bảng tên, tin hạ hay máy chiếu (máy chiếu ghi «40 bạn đang chơi»).
-- Tên lấy từ kho khoảng 80 tên gọi tiếng Việt (2 chữ). Loại tên trùng với em thật đang trong phòng. Mỗi máy giữ một tên suốt ván. Máy thầy vẫn biết số máy ở bảng điều khiển riêng, không chiếu lên.
+- Tên lấy từ kho khoảng 80 tên gọi tiếng Việt (2 chữ). Loại mọi tên có trong **danh sách lớp** (không chỉ em đang trong phòng), để em vắng mặt không thấy «mình» đang chơi. Mỗi máy giữ một tên suốt ván. Máy thầy vẫn biết số máy ở bảng điều khiển riêng, không chiếu lên.
+- Máy bù **không bao giờ** vào bảng vàng, thi đua tuần hay danh hiệu, để máy chiếu không vinh danh một bạn không có thật.
 
 ## 1. Mục tiêu sư phạm + ai dùng
 Học sinh ở phòng chờ live và phòng chờ ca kiểm tra; thầy chiếu ở máy chiếu. Trò giữ em ở lại sớm và vui trước giờ học. Các mốc thưởng (trang phục, danh hiệu, đội cả kỳ) **nối với học đều** qua chuỗi ngày và cấp EXP, không bao giờ cộng sức mạnh. Câu hô theo «hành trình thi cử» để không khí sôi nổi đúng chất lớp luyện thi. Phòng chờ ca là bản êm.
@@ -141,7 +142,10 @@ Vào trận (đầu ván) · đang chơi · trốn trong bụi · khiên · bấ
 - `npm run build && npm run kiem:toc-do` 0 đỏ: byte tải mở 3 app **không tăng**. Phông và ảnh chỉ nằm trong mảnh `TroSinhTon`, đưa vào `globIgnores`, `kiem-sw` 14/14.
 - `npm run kiem:mau-giu` 0 · `check:mau` 0 (mã màu chỉ ở `tokens.css`).
 - **Khung hình (bộ đo của tác tử toc-do, màn trận 844 × 390, 15 bạn)**: CPU ×4 ≥ 40,2 và ×6 ≥ 25,5 khung / giây (số bản hiện tại).
-  - Trang vẽ nháp đo được 60,3 / 42,7 / 31,7 ở ×1 / ×4 / ×6 (máy không chip đồ hoạ). Chỉ để tham khảo, vì khác mã sản xuất.
+  - Trang vẽ nháp (không chip đồ hoạ, khác mã sản xuất nên chỉ để tham khảo):
+    - 7 bé ma: 60,3 / 42,7 / 31,7 khung / giây ở ×1 / ×4 / ×6;
+    - **15 bạn quanh em như mốc: 60,3 / 37,0 / 24,3**, tức **chưa đạt** mốc 40,2 / 25,5.
+  - Lúc build phải bù bằng cách nướng sẵn bảng tên + vạch máu thành ảnh (trang nháp vẽ chữ mỗi khung) và gộp công thức / hình vẽ chơi vào ô mẫu nền. Chưa đạt mốc thì chưa phát hành.
   - Nền ô mẫu và vùng gạch tô theo **điểm ảnh thiết bị**, không co giãn mẫu mỗi khung: nếu co giãn thì chỉ còn 24 khung / giây ở ×4.
 - Bộ nhớ ảnh nướng sẵn ≤ 12 MB ở dpr 2: bé ma 4 đội × 2 hướng × 2 khung + trang phục đang có trên sân, súng 6 × 4, vật chặn theo cỡ.
 - Ảnh Chromium: 0 lỗi trang, 0 tràn, 0 đè, 0 đích bấm < 44 px (`chup.mjs` đã soát; lượt cuối 24 ảnh: 0 lỗi trang).

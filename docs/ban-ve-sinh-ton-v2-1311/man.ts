@@ -37,6 +37,8 @@ function ma(id: string, tenMa: string, doi: number, x: number, y: number, o: Par
 }
 function dungTran(t: Tran): DaDung {
   const bd = taoBanDo(t.cap ?? 2)
+  // Chỉ để ĐO (?chay=1): thêm bạn cho đủ 15 bạn quanh em như bộ đo của tác tử toc-do.
+  if (CHAY) for (let i = t.nv.length - 1; i < 15; i++) t.nv.push(ma(`X${i}`, ['Tuấn Kiệt', 'Hải Yến', 'Đăng Khoa', 'Mai Anh', 'Trọng Nhân'][i % 5], i % 4, 420 + (i % 4) * 160, 380 + Math.floor(i / 4) * 110, { ban: true, cap: 1 + (i % 6), mau: 60 }))
   const DX = t.giua ? 800 : 0, DY = t.giua ? 500 : 0
   if (DX || DY) {
     for (const n of t.nv) { n.x += DX; n.y += DY }
@@ -186,7 +188,7 @@ const MANS: Record<string, () => void> = {
       ma('S2', 'Gia Bảo', 3, 1010, 560, { cap: 6, ban: true, nham: [800, 440] }), ma('S4', 'Bảo Ngọc', 2, 600, 590, { may: true, cap: 2, ban: true, nham: [800, 440] }),
     ]
     for (const n of nv) { n.x += 800; n.y += 500 }
-    const dan = nv.map((n, i) => ({ x1: n.x + Math.cos(n.goc) * 40, y1: n.y - 30 + Math.sin(n.goc) * 40, x2: 1600, y2: 940, cap: n.cap, doi: n.doi } satisfies Omit<Dan, 't'>)).filter((_, i) => i !== 5)
+    const dan = nv.map((n) => ({ x1: n.x + Math.cos(n.goc) * 40, y1: n.y - 30 + Math.sin(n.goc) * 40, x2: 1600, y2: 940, cap: n.cap, doi: n.doi } satisfies Omit<Dan, 't'>)).filter((_, i) => i !== 5)
     const d = dungTran({ nv, dan, boss: { x: 1600, y: 1020 }, giay: 62, hieu: [{ k: 'so', x: 1530, y: 920, chu: '-24', a: 1 }, { k: 'so', x: 1685, y: 900, chu: '-30', a: 0.8 }] })
     themHtml(hud({ diem: [6, 5, 3, 4], van: 3, con: '0:58', cap: 2, tin: [`${ten(2, 'Đội Đồng')} đánh Ma Mực -30`], trangThai: CHO_LIVE })
       + `<div class="tv-mau-lon" style="top:40px;--c:var(--tr-hs)">Ma Mực · 2 140 / 3 000 máu<div class="ong"><i style="width:71%"></i></div>`
@@ -334,10 +336,10 @@ function veSanh(): void {
 
 function veTuDo(): void {
   const O: { loai: string; ds: { ten: string; tt: string; kieu?: KieuMa; khoa?: boolean; mac?: boolean; tien?: number; ve?: string }[] }[] = [
-    { loai: 'Mũ', ds: [{ ten: 'Mũ tốt nghiệp', tt: 'Đang mặc', kieu: { mu: 'tot-nghiep' }, mac: true }, { ten: 'Tai nghe', tt: 'Đã mở · chuỗi 3 ngày', kieu: { mu: 'tai-nghe' } },
+    { loai: 'Mũ', ds: [{ ten: 'Mũ tốt nghiệp', tt: 'Đang mặc', kieu: { mu: 'tot-nghiep' }, mac: true }, { ten: 'Tai nghe', tt: 'Đã mở · Chuỗi 3 ngày', kieu: { mu: 'tai-nghe' } },
       { ten: 'Mũ phù thuỷ', tt: 'Cấp 20 · em đang cấp 14', kieu: { mu: 'phu-thuy' }, khoa: true, tien: 70 }] },
-    { loai: 'Áo choàng', ds: [{ ten: 'Áo kẻ ô li', tt: 'Đang mặc', kieu: { ao: 'o-li' }, mac: true }, { ten: 'Áo sao đêm', tt: 'Chuỗi 30 ngày · em đang chuỗi 12', kieu: { ao: 'sao-dem' }, khoa: true, tien: 40 }] },
-    { loai: 'Khi em hạ được bạn', ds: [{ ten: 'Pháo giấy', tt: 'Cấp 40', khoa: true, tien: 35, ve: 'phao' }, { ten: 'Điểm 10 đỏ', tt: 'Cấp 60', khoa: true, tien: 23, ve: 'diem' }, { ten: 'Đạn cầu vồng', tt: 'Chuỗi 14 ngày · em đang chuỗi 12', khoa: true, tien: 86, ve: 'dan' }] },
+    { loai: 'Áo choàng', ds: [{ ten: 'Áo kẻ ô li', tt: 'Đang mặc', kieu: { ao: 'o-li' }, mac: true }, { ten: 'Áo sao đêm', tt: 'Chuỗi 30 ngày · em đang Chuỗi 12 ngày', kieu: { ao: 'sao-dem' }, khoa: true, tien: 40 }] },
+    { loai: 'Khi em hạ được bạn', ds: [{ ten: 'Pháo giấy', tt: 'Cấp 40', khoa: true, tien: 35, ve: 'phao' }, { ten: 'Điểm 10 đỏ', tt: 'Cấp 60', khoa: true, tien: 23, ve: 'diem' }, { ten: 'Đạn cầu vồng', tt: 'Chuỗi 14 ngày · em đang Chuỗi 12 ngày', khoa: true, tien: 86, ve: 'dan' }] },
   ]
   let id = 0
   themHtml(`<div class="tu"><div class="tu-dau"><h1>Tủ đồ bé ma</h1><button class="tv-nut" style="position:static" aria-label="Đóng tủ đồ">✕</button></div>
