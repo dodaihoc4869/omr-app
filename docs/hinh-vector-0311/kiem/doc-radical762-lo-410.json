@@ -1,0 +1,1801 @@
+{
+  "hash": "8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004",
+  "native": [
+    1255,
+    553
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B14-D1-III-6",
+      "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn khơi mào, phát triển mạch, tắt mạch như hình.\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị.)",
+      "refs": [
+        {
+          "hash": "8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004",
+          "where": "VIP27-C4-B14-D1-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "93e31df24e7e45f1e9433d48ebce411ba2014668b12295bca51db43737c9e805"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "4TOPcroppedUNKNOWNfragmentsretain-BOTTOMnCROP/20printedC40explicitH-UNKNOWNnTotal/Runknown/7radicalFILLEDdots+3SEPARATElowellipsisDots/4RIGHTOPENVheads/3SQUAREpairsincludeMIDDLE2C+nSUB/2CCdouble4rays/ALLregularUPRIGHT/EXACT- Giai đoạn 1: Khơi mào- Giai đoạn 2: Phát triển mạch- Giai đoạn 3: Tắt mạch/và/2RBASELINE/individualC-H-C-CstrokesWHITEgaps/terminalRRIGHT/NOaddedRformula-initiator-condition-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/stage2and3macros3x/TOPcrop6x. Individualatoms/7radicaldots vs3lowellipsis/4OPENVheads/3SQUAREpairs. NativeapproxNOTsubpixel/noautomaticgate.",
+  "independentSourceAudit": {
+    "i": 762,
+    "assetIndexProvided": 1352,
+    "hash": "8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004.png",
+    "size": [
+      1255,
+      553
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B14-D1-III-6",
+        "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn khơi mào, phát triển mạch, tắt mạch như hình.\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị.)",
+        "allHinh": [
+          {
+            "hash": "8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004",
+            "where": "VIP27-C4-B14-D1-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "93e31df24e7e45f1e9433d48ebce411ba2014668b12295bca51db43737c9e805"
+          }
+        ],
+        "missingHashes": [
+          "8db96b4e6d904c93e0be63e12964f4b1c668d38614bd4c2a205d0c5f6231b004"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/410-full2x.png",
+        "/workspace/scratch/410-stage12x.png",
+        "/workspace/scratch/410-stage22x.png",
+        "/workspace/scratch/410-stage32x.png",
+        "/workspace/scratch/410-top3x.png",
+        "/workspace/scratch/410-top6x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": "Allregularuprightserif R/C/H/captions/coefficient2/nSUB. No truebold/italic.",
+      "counts": {
+        "explicitCglyphs": 20,
+        "explicitHglyphs": 40,
+        "printedRglyphs": 11,
+        "radicalDots": 7,
+        "ellipsisDots": 3,
+        "openVRightHeads": 4,
+        "squareBracketPairs": 3,
+        "knownWholeMoleculeFormula": "UNKNOWN polymern/Rgroup; no C6H5COOexpansionfrompublicstem"
+      },
+      "captions": [
+        {
+          "literal": "- Giai đoạn 1: Khơi mào",
+          "bbox": [
+            1,
+            10,
+            330,
+            38
+          ]
+        },
+        {
+          "literal": "- Giai đoạn 2: Phát triển mạch",
+          "bbox": [
+            1,
+            187,
+            405,
+            219
+          ]
+        },
+        {
+          "literal": "- Giai đoạn 3: Tắt mạch",
+          "bbox": [
+            1,
+            374,
+            325,
+            406
+          ]
+        }
+      ],
+      "stage1": {
+        "decomposition": {
+          "literal": "R – R → 2R•",
+          "Rcenters": [
+            [
+              384,
+              111
+            ],
+            [
+              436,
+              111
+            ],
+            [
+              521,
+              111
+            ]
+          ],
+          "coefficient2Box": [
+            499,
+            100,
+            513,
+            122
+          ],
+          "singleBond": [
+            [
+              398,
+              112
+            ],
+            [
+              420,
+              112
+            ]
+          ],
+          "arrow": {
+            "shaft": [
+              [
+                454,
+                112
+              ],
+              [
+                491,
+                112
+              ]
+            ],
+            "tip": [
+              491,
+              112
+            ],
+            "legs": [
+              [
+                [
+                  485,
+                  106
+                ],
+                [
+                  491,
+                  112
+                ]
+              ],
+              [
+                [
+                  485,
+                  118
+                ],
+                [
+                  491,
+                  112
+                ]
+              ]
+            ]
+          },
+          "radicalDot": [
+            542,
+            111
+          ]
+        },
+        "and": {
+          "literal": "và",
+          "bbox": [
+            604,
+            101,
+            631,
+            121
+          ]
+        },
+        "ethylene": {
+          "Ccenters": [
+            [
+              698,
+              110
+            ],
+            [
+              749,
+              110
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              698,
+              59
+            ],
+            [
+              749,
+              59
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              698,
+              163
+            ],
+            [
+              749,
+              163
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                698,
+                72
+              ],
+              [
+                698,
+                96
+              ]
+            ],
+            [
+              [
+                749,
+                72
+              ],
+              [
+                749,
+                96
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                698,
+                124
+              ],
+              [
+                698,
+                150
+              ]
+            ],
+            [
+              [
+                749,
+                124
+              ],
+              [
+                749,
+                150
+              ]
+            ]
+          ],
+          "horizontalSingles": [],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "ethyleneDoubleRays": [
+          [
+            [
+              713,
+              107
+            ],
+            [
+              735,
+              107
+            ]
+          ],
+          [
+            [
+              713,
+              113
+            ],
+            [
+              735,
+              113
+            ]
+          ]
+        ],
+        "plusBox": [
+          772,
+          100,
+          785,
+          121
+        ],
+        "Rradical": {
+          "Rcenter": [
+            807,
+            111
+          ],
+          "dot": [
+            824,
+            111
+          ]
+        },
+        "additionArrow": {
+          "shaft": [
+            [
+              846,
+              110
+            ],
+            [
+              883,
+              110
+            ]
+          ],
+          "tip": [
+            883,
+            110
+          ],
+          "legs": [
+            [
+              [
+                877,
+                104
+              ],
+              [
+                883,
+                110
+              ]
+            ],
+            [
+              [
+                877,
+                116
+              ],
+              [
+                883,
+                110
+              ]
+            ]
+          ]
+        },
+        "product": {
+          "Ccenters": [
+            [
+              964,
+              110
+            ],
+            [
+              1014,
+              110
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              964,
+              59
+            ],
+            [
+              1014,
+              59
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              964,
+              163
+            ],
+            [
+              1014,
+              163
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                964,
+                72
+              ],
+              [
+                964,
+                96
+              ]
+            ],
+            [
+              [
+                1014,
+                72
+              ],
+              [
+                1014,
+                96
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                964,
+                124
+              ],
+              [
+                964,
+                150
+              ]
+            ],
+            [
+              [
+                1014,
+                124
+              ],
+              [
+                1014,
+                150
+              ]
+            ]
+          ],
+          "horizontalSingles": [
+            [
+              [
+                978,
+                110
+              ],
+              [
+                1000,
+                110
+              ]
+            ]
+          ],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "productR": {
+          "center": [
+            908,
+            110
+          ],
+          "bond": [
+            [
+              923,
+              110
+            ],
+            [
+              950,
+              110
+            ]
+          ]
+        },
+        "productDot": [
+          1037,
+          110
+        ]
+      },
+      "stage2": {
+        "radicalReactant": {
+          "Ccenters": [
+            [
+              454,
+              294
+            ],
+            [
+              504,
+              294
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              454,
+              244
+            ],
+            [
+              504,
+              244
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              454,
+              344
+            ],
+            [
+              504,
+              344
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                454,
+                257
+              ],
+              [
+                454,
+                280
+              ]
+            ],
+            [
+              [
+                504,
+                257
+              ],
+              [
+                504,
+                280
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                454,
+                308
+              ],
+              [
+                454,
+                331
+              ]
+            ],
+            [
+              [
+                504,
+                308
+              ],
+              [
+                504,
+                331
+              ]
+            ]
+          ],
+          "horizontalSingles": [
+            [
+              [
+                468,
+                294
+              ],
+              [
+                490,
+                294
+              ]
+            ]
+          ],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "R": {
+          "center": [
+            400,
+            294
+          ],
+          "bond": [
+            [
+              413,
+              294
+            ],
+            [
+              440,
+              294
+            ]
+          ]
+        },
+        "reactantDot": [
+          526,
+          294
+        ],
+        "plus1": [
+          548,
+          294
+        ],
+        "ethylene": {
+          "Ccenters": [
+            [
+              579,
+              294
+            ],
+            [
+              629,
+              294
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              579,
+              244
+            ],
+            [
+              629,
+              244
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              579,
+              344
+            ],
+            [
+              629,
+              344
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                579,
+                257
+              ],
+              [
+                579,
+                280
+              ]
+            ],
+            [
+              [
+                629,
+                257
+              ],
+              [
+                629,
+                280
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                579,
+                308
+              ],
+              [
+                579,
+                331
+              ]
+            ],
+            [
+              [
+                629,
+                308
+              ],
+              [
+                629,
+                331
+              ]
+            ]
+          ],
+          "horizontalSingles": [],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "ethyleneDoubleRays": [
+          [
+            [
+              593,
+              291
+            ],
+            [
+              615,
+              291
+            ]
+          ],
+          [
+            [
+              593,
+              297
+            ],
+            [
+              615,
+              297
+            ]
+          ]
+        ],
+        "plus2": [
+          657,
+          294
+        ],
+        "ellipsis": {
+          "centers": [
+            [
+              683,
+              299
+            ],
+            [
+              691,
+              299
+            ],
+            [
+              699,
+              299
+            ]
+          ],
+          "radiusApprox": 1.5,
+          "NOTRadical": true
+        },
+        "arrow": {
+          "shaft": [
+            [
+              726,
+              295
+            ],
+            [
+              762,
+              295
+            ]
+          ],
+          "tip": [
+            762,
+            295
+          ],
+          "legs": [
+            [
+              [
+                756,
+                289
+              ],
+              [
+                762,
+                295
+              ]
+            ],
+            [
+              [
+                756,
+                301
+              ],
+              [
+                762,
+                295
+              ]
+            ]
+          ]
+        },
+        "product": {
+          "Ccenters": [
+            [
+              838,
+              292
+            ],
+            [
+              888,
+              292
+            ],
+            [
+              944,
+              292
+            ],
+            [
+              1006,
+              292
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              838,
+              240
+            ],
+            [
+              888,
+              240
+            ],
+            [
+              944,
+              240
+            ],
+            [
+              1006,
+              240
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              838,
+              341
+            ],
+            [
+              888,
+              341
+            ],
+            [
+              944,
+              341
+            ],
+            [
+              1006,
+              341
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                838,
+                253
+              ],
+              [
+                838,
+                278
+              ]
+            ],
+            [
+              [
+                888,
+                253
+              ],
+              [
+                888,
+                278
+              ]
+            ],
+            [
+              [
+                944,
+                253
+              ],
+              [
+                944,
+                278
+              ]
+            ],
+            [
+              [
+                1006,
+                253
+              ],
+              [
+                1006,
+                278
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                838,
+                306
+              ],
+              [
+                838,
+                328
+              ]
+            ],
+            [
+              [
+                888,
+                306
+              ],
+              [
+                888,
+                328
+              ]
+            ],
+            [
+              [
+                944,
+                306
+              ],
+              [
+                944,
+                328
+              ]
+            ],
+            [
+              [
+                1006,
+                306
+              ],
+              [
+                1006,
+                328
+              ]
+            ]
+          ],
+          "horizontalSingles": [
+            [
+              [
+                852,
+                292
+              ],
+              [
+                874,
+                292
+              ]
+            ],
+            [
+              [
+                902,
+                292
+              ],
+              [
+                930,
+                292
+              ]
+            ],
+            [
+              [
+                958,
+                292
+              ],
+              [
+                992,
+                292
+              ]
+            ]
+          ],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "productR": {
+          "center": [
+            785,
+            292
+          ],
+          "bond": [
+            [
+              797,
+              292
+            ],
+            [
+              824,
+              292
+            ]
+          ]
+        },
+        "productDot": [
+          1023,
+          291
+        ],
+        "brackets": {
+          "left": [
+            [
+              873,
+              228
+            ],
+            [
+              862,
+              228
+            ],
+            [
+              862,
+              356
+            ],
+            [
+              873,
+              356
+            ]
+          ],
+          "right": [
+            [
+              959,
+              228
+            ],
+            [
+              971,
+              228
+            ],
+            [
+              971,
+              356
+            ],
+            [
+              959,
+              356
+            ]
+          ],
+          "nsubBox": [
+            976,
+            351,
+            990,
+            367
+          ],
+          "enclosedCpositions": [
+            888,
+            944
+          ],
+          "crossing": "Verticalbracketscrossbackbonebonds862/971 intentionally; do not introducewhitegaps."
+        }
+      },
+      "stage3": {
+        "leftRadical": {
+          "Ccenters": [
+            [
+              426,
+              484
+            ],
+            [
+              476,
+              484
+            ],
+            [
+              532,
+              484
+            ],
+            [
+              592,
+              484
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              426,
+              434
+            ],
+            [
+              476,
+              434
+            ],
+            [
+              532,
+              434
+            ],
+            [
+              592,
+              434
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              426,
+              534
+            ],
+            [
+              476,
+              534
+            ],
+            [
+              532,
+              534
+            ],
+            [
+              592,
+              534
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                426,
+                447
+              ],
+              [
+                426,
+                470
+              ]
+            ],
+            [
+              [
+                476,
+                447
+              ],
+              [
+                476,
+                470
+              ]
+            ],
+            [
+              [
+                532,
+                447
+              ],
+              [
+                532,
+                470
+              ]
+            ],
+            [
+              [
+                592,
+                447
+              ],
+              [
+                592,
+                470
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                426,
+                498
+              ],
+              [
+                426,
+                521
+              ]
+            ],
+            [
+              [
+                476,
+                498
+              ],
+              [
+                476,
+                521
+              ]
+            ],
+            [
+              [
+                532,
+                498
+              ],
+              [
+                532,
+                521
+              ]
+            ],
+            [
+              [
+                592,
+                498
+              ],
+              [
+                592,
+                521
+              ]
+            ]
+          ],
+          "horizontalSingles": [
+            [
+              [
+                440,
+                484
+              ],
+              [
+                462,
+                484
+              ]
+            ],
+            [
+              [
+                490,
+                484
+              ],
+              [
+                518,
+                484
+              ]
+            ],
+            [
+              [
+                546,
+                484
+              ],
+              [
+                578,
+                484
+              ]
+            ]
+          ],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "leftR": {
+          "center": [
+            373,
+            484
+          ],
+          "bond": [
+            [
+              386,
+              484
+            ],
+            [
+              412,
+              484
+            ]
+          ]
+        },
+        "leftDot": [
+          609,
+          483
+        ],
+        "leftBrackets": {
+          "left": [
+            [
+              462,
+              421
+            ],
+            [
+              451,
+              421
+            ],
+            [
+              451,
+              548
+            ],
+            [
+              462,
+              548
+            ]
+          ],
+          "right": [
+            [
+              547,
+              421
+            ],
+            [
+              559,
+              421
+            ],
+            [
+              559,
+              548
+            ],
+            [
+              547,
+              548
+            ]
+          ],
+          "nsubBox": [
+            565,
+            541,
+            579,
+            559
+          ],
+          "enclosedCpositions": [
+            476,
+            532
+          ]
+        },
+        "plus": [
+          638,
+          483
+        ],
+        "Rradical": {
+          "center": [
+            667,
+            483
+          ],
+          "dot": [
+            684,
+            483
+          ]
+        },
+        "arrow": {
+          "shaft": [
+            [
+              706,
+              484
+            ],
+            [
+              745,
+              484
+            ]
+          ],
+          "tip": [
+            745,
+            484
+          ],
+          "legs": [
+            [
+              [
+                739,
+                478
+              ],
+              [
+                745,
+                484
+              ]
+            ],
+            [
+              [
+                739,
+                490
+              ],
+              [
+                745,
+                484
+              ]
+            ]
+          ]
+        },
+        "product": {
+          "Ccenters": [
+            [
+              835,
+              481
+            ],
+            [
+              883,
+              481
+            ],
+            [
+              941,
+              481
+            ],
+            [
+              1000,
+              481
+            ]
+          ],
+          "CglyphSizeApprox": [
+            18,
+            27
+          ],
+          "topHcenters": [
+            [
+              835,
+              430
+            ],
+            [
+              883,
+              430
+            ],
+            [
+              941,
+              430
+            ],
+            [
+              1000,
+              430
+            ]
+          ],
+          "bottomHcenters": [
+            [
+              835,
+              530
+            ],
+            [
+              883,
+              530
+            ],
+            [
+              941,
+              530
+            ],
+            [
+              1000,
+              530
+            ]
+          ],
+          "topVerticalBonds": [
+            [
+              [
+                835,
+                443
+              ],
+              [
+                835,
+                467
+              ]
+            ],
+            [
+              [
+                883,
+                443
+              ],
+              [
+                883,
+                467
+              ]
+            ],
+            [
+              [
+                941,
+                443
+              ],
+              [
+                941,
+                467
+              ]
+            ],
+            [
+              [
+                1000,
+                443
+              ],
+              [
+                1000,
+                467
+              ]
+            ]
+          ],
+          "bottomVerticalBonds": [
+            [
+              [
+                835,
+                495
+              ],
+              [
+                835,
+                517
+              ]
+            ],
+            [
+              [
+                883,
+                495
+              ],
+              [
+                883,
+                517
+              ]
+            ],
+            [
+              [
+                941,
+                495
+              ],
+              [
+                941,
+                517
+              ]
+            ],
+            [
+              [
+                1000,
+                495
+              ],
+              [
+                1000,
+                517
+              ]
+            ]
+          ],
+          "horizontalSingles": [
+            [
+              [
+                849,
+                481
+              ],
+              [
+                869,
+                481
+              ]
+            ],
+            [
+              [
+                897,
+                481
+              ],
+              [
+                927,
+                481
+              ]
+            ],
+            [
+              [
+                955,
+                481
+              ],
+              [
+                986,
+                481
+              ]
+            ]
+          ],
+          "note": "Glyphcenter/gapguides, ±1–2px. Keepnativeindividualxpositions, bracketsmaycrosssingles."
+        },
+        "productLeftR": {
+          "center": [
+            782,
+            481
+          ],
+          "bond": [
+            [
+              795,
+              481
+            ],
+            [
+              821,
+              481
+            ]
+          ]
+        },
+        "productRightR": {
+          "center": [
+            1046,
+            481
+          ],
+          "bond": [
+            [
+              1014,
+              481
+            ],
+            [
+              1033,
+              481
+            ]
+          ]
+        },
+        "productBrackets": {
+          "left": [
+            [
+              868,
+              416
+            ],
+            [
+              857,
+              416
+            ],
+            [
+              857,
+              544
+            ],
+            [
+              868,
+              544
+            ]
+          ],
+          "right": [
+            [
+              955,
+              416
+            ],
+            [
+              967,
+              416
+            ],
+            [
+              967,
+              544
+            ],
+            [
+              955,
+              544
+            ]
+          ],
+          "nsubBox": [
+            973,
+            539,
+            986,
+            556
+          ],
+          "enclosedCpositions": [
+            883,
+            941
+          ]
+        },
+        "crossing": "Allthreebracketpairsencloseonlymiddle2Cwhilebackbonecontinuesoutside; preserveverticaloverlapandnSUB."
+      },
+      "dotStyle": {
+        "radicalRadiusApprox": 4.5,
+        "fill": "solidblack",
+        "noChargeInference": true
+      },
+      "crop": {
+        "top": "Croppedproselowerfragmentsatnativey0, separatefromstage1heading. IntentUNKNOWN; do notrestoretext. Retainrawsmallinkunlessindependentclassificationauthorizesomit.",
+        "bottom": "Stage3leftnsubandproductnsubextendpastnative553; preserveclip, no padding/restoration.",
+        "topFragments": [
+          {
+            "bboxInclusive": [
+              222,
+              0,
+              235,
+              3
+            ],
+            "shape": "Shallow U-shaped clippedglyphbottom, openattopnativecrop",
+            "centerlineGuide": [
+              [
+                222.5,
+                0
+              ],
+              [
+                224,
+                2
+              ],
+              [
+                228.5,
+                3
+              ],
+              [
+                232.5,
+                2
+              ],
+              [
+                234.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              277,
+              0,
+              284,
+              2
+            ],
+            "shape": "Shorthook/clippedbowl lowerarc plusnearverticalleftside",
+            "centerlineGuide": [
+              [
+                277.5,
+                0
+              ],
+              [
+                277.5,
+                2
+              ],
+              [
+                281,
+                2
+              ],
+              [
+                283.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              456,
+              0,
+              469,
+              3
+            ],
+            "shape": "SecondshallowU-shaped clippedglyphbottom, independentlysameapproxnativebboxheight",
+            "centerlineGuide": [
+              [
+                456.5,
+                0
+              ],
+              [
+                458,
+                2
+              ],
+              [
+                462.5,
+                3
+              ],
+              [
+                466.5,
+                2
+              ],
+              [
+                468.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              551,
+              0,
+              554,
+              1
+            ],
+            "shape": "Tinycroppedblacknub/dot",
+            "centerApprox": [
+              552.5,
+              0.5
+            ],
+            "radiusApprox": [
+              1.5,
+              0.5
+            ]
+          }
+        ]
+      },
+      "noAdded": [
+        "No Rgroupformulaexpansion",
+        "No peroxideOlabels",
+        "No answerforn",
+        "No terminationmechanismotherthanprinted",
+        "No filledtriangleheads",
+        "No circlearoundradicaldots"
+      ]
+    },
+    "measurementLimits": "OwnnativeFULLandperstage2xopened. Coordinatesapprox±1–2px; C/Hglyphcenterderivedbondgaps guides notsubpixelmeasurement. Radicaldotcountseparatefromellipsis; sourcecroppedtextuncertainexplicit.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount",
+    "correctionAudit": [
+      {
+        "type": "Addedmissingprecisetopfragmentcoordinates",
+        "old": "Topcroppedprosefragmentsdescribedwithoutbbox",
+        "new": [
+          {
+            "bboxInclusive": [
+              222,
+              0,
+              235,
+              3
+            ],
+            "shape": "Shallow U-shaped clippedglyphbottom, openattopnativecrop",
+            "centerlineGuide": [
+              [
+                222.5,
+                0
+              ],
+              [
+                224,
+                2
+              ],
+              [
+                228.5,
+                3
+              ],
+              [
+                232.5,
+                2
+              ],
+              [
+                234.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              277,
+              0,
+              284,
+              2
+            ],
+            "shape": "Shorthook/clippedbowl lowerarc plusnearverticalleftside",
+            "centerlineGuide": [
+              [
+                277.5,
+                0
+              ],
+              [
+                277.5,
+                2
+              ],
+              [
+                281,
+                2
+              ],
+              [
+                283.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              456,
+              0,
+              469,
+              3
+            ],
+            "shape": "SecondshallowU-shaped clippedglyphbottom, independentlysameapproxnativebboxheight",
+            "centerlineGuide": [
+              [
+                456.5,
+                0
+              ],
+              [
+                458,
+                2
+              ],
+              [
+                462.5,
+                3
+              ],
+              [
+                466.5,
+                2
+              ],
+              [
+                468.5,
+                0
+              ]
+            ],
+            "strokeApprox": 1
+          },
+          {
+            "bboxInclusive": [
+              551,
+              0,
+              554,
+              1
+            ],
+            "shape": "Tinycroppedblacknub/dot",
+            "centerApprox": [
+              552.5,
+              0.5
+            ],
+            "radiusApprox": [
+              1.5,
+              0.5
+            ]
+          }
+        ],
+        "limits": "Ownnarrow6xvisualplusnativeconnectedinkbbox; guidesapproxnotrestoredletteridentities."
+      }
+    ]
+  },
+  "rootActualReview": "Root fresh FINAL890aFULL3x opened after4TOPpieces added. Individual20C40H11printedR/7radicaldotsVS3lowellipsis/4OPENVheads/3SQUAREpairs/nativecrossbackbone/BOTTOMnclip. Initial3626missingTOPnegative retained; FINALONLY4TOPpieces, otherglyphgeometryEXACT. NativeapproxNOTsubpixel/noautomaticpixelgate. PixelprojectionONLYlocates4TOPfragments corroborating ownvisual/independentnative6x."
+}
