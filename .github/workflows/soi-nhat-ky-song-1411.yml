@@ -25,6 +25,10 @@ jobs:
           q() { echo "── $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]?' || echo "(chưa đọc được)"; }
           q "buổi live 3 ngày" "SELECT id, lop, bat_luc, tat_luc, trang_thai, tien_do, so_cau, so_doan, ban FROM live_buoi WHERE bat_luc >= datetime('now','-3 days') ORDER BY bat_luc DESC LIMIT 12"
           q "nhật ký đã gửi" "SELECT buoi_id, ban_buoi, luc, so_canh, so_dat, phat_hanh FROM live_nhat_ky ORDER BY luc DESC LIMIT 12"
+          # Ai MỞ được buổi (đúng điều kiện SQL_DUOC_XEM của live-xem-lai-lenh.ts): tên lớp của em = lop của buổi (quyen 'lop') HOẶC em có mặt (điểm danh). Chỉ in SỐ.
+          TL="CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.ten_lop) WHEN TRIM(COALESCE(h.lop, '')) = '12' THEN '12 - Lớp Thường' WHEN TRIM(COALESCE(h.lop, '')) = '' THEN 'Chưa xếp lớp' ELSE TRIM(h.lop) END"
+          q "ai mở được buổi" "SELECT b.id, b.lop, b.quyen, (SELECT COUNT(*) FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND $TL = b.lop) AS em_khop_lop, (SELECT COUNT(*) FROM buoi_hoc_diem_danh d WHERE d.buoi_id = b.id AND d.trang_thai = 'co_mat') AS em_co_mat FROM live_buoi b WHERE b.bat_luc >= datetime('now','-3 days')"
+          q "lớp có chữ 12 hoặc Live (tên lớp + số em)" "SELECT $TL AS ten_lop, COUNT(*) AS so_em FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND ($TL LIKE '%12%' OR $TL LIKE '%Live%') GROUP BY 1 ORDER BY 2 DESC LIMIT 15"
       - name: Pages (trang tĩnh + thẻ trong bản app)
         env:
           P: https://omr-app-b3u.pages.dev
