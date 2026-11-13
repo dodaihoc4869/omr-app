@@ -65,15 +65,21 @@ export type DongHoRieng = ReturnType<typeof taoDongHoRieng>
 export const SUA_MOI_KHUNG = 0.08, SUA_TRAN = 0.25
 /** Trình duyệt thôi cập nhật giờ tiếng quá chừng này (giờ thật) ⇒ coi là tiếng đang đứng. */
 export const TIENG_DUNG_MS = 400
+/** Tiếng tải theo khúc: `readyState` tụt xuống «chưa đủ dữ liệu» ngắn hơn ngần này (trong khi vẫn đang phát) ⇒ đồng hồ KHÔNG đặt lại. */
+export const CHO_DEM_MS = 250
 /** Làm mượt `audio.currentTime` (ms) — ĐỒNG HỒ BÁM PHA (thầy 13/11: «nét bút xem lại bị giật … làm cho nét bút mượt như lúc live»).
  *  Trước: mỗi lần trình duyệt cập nhật giờ tiếng, đồng hồ nhảy theo con số mới (số mới nhỏ hơn mốc đã hiện ⇒ ĐỨNG chờ, lớn hơn ⇒ NHẢY) ⇒ đầu nét khựng /
  *  giật theo từng lần cập nhật (điện thoại cập nhật thưa và không đều). Nay: đồng hồ tự chạy theo đồng hồ máy × tốc độ phát, chỉ nắn DẦN về giờ tiếng
  *  (mỗi khung một phần nhỏ độ lệch) ⇒ nét đi đều ở mọi khung hình, vẫn khớp tiếng. Lệch quá `TRAN_UOC_MS` (tua, nhảy khoảng lặng) ⇒ theo ngay.
  *  Tiếng đứng (trình duyệt thôi cập nhật quá `TIENG_DUNG_MS`) ⇒ nét đi nốt tới mốc ước rồi đứng, không chạy trước tiếng. Tạm dừng ⇒ đúng con số của audio. */
 export function taoLamMuot() {
-  let tAm = -1, luc = 0, ra = 0, lucRa = 0, chayCu = false
+  let tAm = -1, luc = 0, ra = 0, lucRa = 0, chayCu = false, lucDu = 0
   return {
-    doc(tAudio: number, nay: number, chay: boolean, td: number): number {
+    /** `chay` = em đang để phát (không tạm dừng) · `du` = trình duyệt báo đủ dữ liệu để phát tiếp (`readyState > 2`). Thiếu dữ liệu CHỐC LÁT (< `CHO_DEM_MS`)
+     *  giữa lúc đang chạy thì bỏ qua — bản trước đặt lại về đúng số của audio mỗi lần như vậy (nét lùi / đứng một nhịp); thiếu lâu ⇒ tiếng đứng thật ⇒ theo số của audio. */
+    doc(tAudio: number, nay: number, chay: boolean, td: number, du = true): number {
+      if (du || !chayCu) lucDu = nay
+      if (chay && !du && !(chayCu && nay - lucDu < CHO_DEM_MS)) chay = false
       if (!chay || !chayCu) { tAm = tAudio; luc = nay; lucRa = nay; chayCu = chay; return (ra = tAudio) }
       if (tAudio !== tAm) { tAm = tAudio; luc = nay }
       const di = Math.max(0, nay - lucRa) * td, cho = Math.max(0, nay - luc) // `cho` = giờ THẬT từ lần cập nhật cuối (không nhân tốc độ)

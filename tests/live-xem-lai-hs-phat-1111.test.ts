@@ -119,7 +119,7 @@ describe('máy phát nét', () => {
     expect(dangVe.diem.length).toBeLessThan(n)
     expect(dangVe.diem.every((p) => p[3] <= dai / 2)).toBe(true) // chỉ những điểm đã tới giờ
     expect(giua.dau).toHaveLength(1)
-    expect(giua.tro).toEqual({ x: giua.dau[0]!.x, y: giua.dau[0]!.y })
+    expect(giua.tro).toEqual({ x: giua.dau[0]!.x, y: giua.dau[0]!.y, cham: true, net: net1.net.id }) // (13/11: cây bút mang cả «đang chạm» + mã nét)
     // đầu nét nằm giữa hai điểm kẹp mốc phát
     const k = dangVe.diem.length, a = net1.net.diem[k - 1]!, b = net1.net.diem[k]!
     expect(giua.dau[0]!.x).toBeGreaterThanOrEqual(Math.min(a[0], b[0]) - 1e-9)

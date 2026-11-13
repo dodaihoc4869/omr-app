@@ -25,12 +25,14 @@ await build({ entryPoints: [join(GOC, 'tests/_live-xem-lai-hs-gia.ts')], bundle:
 const gia = await import(pathToFileURL(join(tam, 'gia.mjs')).href)
 const kho = new Map()
 /** Bộ tệp của buổi giả theo (giấy tối, có tiếng). Tệp tiếng là WAV 8 kHz (máy chủ thật trả MP3). */
-function buoiGia(giayToi, coTieng, bang = false, doiChe = false) {
-  const k = `${giayToi}|${coTieng}|${bang}|${doiChe}`
+function buoiGia(giayToi, coTieng, bang = false, doiChe = false, fx = false) {
+  const k = `${giayToi}|${coTieng}|${bang}|${doiChe}|${fx}`
   if (!kho.has(k)) {
     const b = gia.taoBuoiGia({ giayToi, coTieng, ...(bang ? { khoaTrang: 'bl' } : {}) })
     // 13/11: buổi có DÒNG THỜI GIAN CHẾ ĐỘ — đoạn 3: nửa đầu thầy ở «Bảng», giữa đoạn chuyển sang «Học», hết đoạn về «Bảng»
     if (doiChe) { const d = b.buoi.doan[2]; b.buoi.che = [{ t: 0, v: 'bang' }, { t: Math.round(d.t0 + (d.t1 - d.t0) * 0.5), v: 'hoc' }, { t: d.t1, v: 'bang' }] }
+    // 13/11: thầy bật máy tính FX4869 giữa đoạn 3 (mở ở 34 % đoạn, bấm 9,3 ÷ 93 =, dời sang trái sau 12 giây, cất sau 40 giây)
+    if (fx) { const d = b.buoi.doan[2]; b.buoi.mayTinh = gia.mayTinhGia(Math.round(d.t0 + (d.t1 - d.t0) * 0.34)) }
     kho.set(k, { buoi: b.buoi, net: Buffer.from(b.net), tieng: coTieng ? Buffer.from(gia.taoTiengGia(b.buoi.msLive, b.coTieng)) : null })
   }
   return kho.get(k)
@@ -59,7 +61,7 @@ async function ganMayChu(ctx, c) {
     const req = route.request(), u = new URL(req.url())
     st.goi.push(`${req.method()} ${u.pathname}${req.headers().range ? ` [${req.headers().range}]` : ''}`)
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS })
-    const d = buoiGia(c.giay === 'toi', c.tieng !== 0, c.bang === true, c.doiChe === true)
+    const d = buoiGia(c.giay === 'toi', c.tieng !== 0, c.bang === true, c.doiChe === true, c.fx === true)
     const json = (o, status = 200) => route.fulfill({ status, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify(o) })
     if (st.tt === 'mat') return route.abort('internetdisconnected')
     if (u.pathname === '/hs/live-ds') {
@@ -145,6 +147,10 @@ const CANH = [
     await cho(t, 1500); await t.mouse.move(420, 140)
     console.log(`   cảnh 30 · trước khi lùi: ${truoc} → sau khi lùi 90 giây: ${await gio()} giấy đề ${await giay() ? 'CÓ' : 'không'}`)
   } },
+  // 13/11: máy tính FX4869 của thầy hiện lại trong bản xem lại (`fx`) — đúng lúc (đang bấm 9,3 ÷ 93 =), đúng chỗ; sau 12 giây thầy dời sang trái
+  { ten: '32-phat-844-may-tinh-fx-dang-bam', url: '?man=buoi', w: 844, h: 390, fx: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.345); await t.locator('.xp .mtx').waitFor({ timeout: 8000 }); await cho(t, 4200) } },
+  { ten: '33-phat-844-bang-may-tinh-fx-da-doi', url: '?man=buoi', w: 844, h: 390, fx: true, bang: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.345); await t.locator('.xp .mtx').waitFor({ timeout: 8000 }); await cho(t, 13_500) } },
+  { ten: '34-phat-1366-may-tinh-fx', url: '?man=buoi', w: 1366, h: 900, fx: true, mayTinh: true, lam: async (t) => { await choBuoi(t); await t.locator('.xl-doan').first().click(); await cho(t, 900); await tuaToi(t, 2, 0.345); await t.locator('.xp .mtx').waitFor({ timeout: 8000 }); await cho(t, 6500) } },
   { ten: '25-phat-390-iphone-doc-xoay', url: '?man=buoi', w: 390, h: 844, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '26-phat-1180-may-bang', url: '?man=buoi', w: 1180, h: 820, mayBang: true, lam: async (t) => { await choBuoi(t); await t.locator('.xl-doan').first().click(); await t.locator('.xp').waitFor(); await cho(t, 900); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '27-phat-844-khong-tieng', url: '?man=buoi', w: 844, h: 390, tieng: 0, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.3); await cho(t, 2600) } },

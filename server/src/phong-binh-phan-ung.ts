@@ -486,6 +486,8 @@ export class PhongBinhPhanUng {
       j = { t: 'chao-ve' } as Row
     }
     if (st.ketThuc) return
+    // Xem lại Live (13/11): máy tính FX4869 của thầy đi qua kênh lớp ⇒ ghi vào nhật ký buổi (chỉ bộ nhớ, ghi gom nền) rồi mới chuyển tiếp như cũ
+    if (j.t === 'lop' && j.k === 'mt' && a.v === 'gv') { try { this.xl.mayTinh(st, j.x, nay) } catch { /* lỗi ghi nhật ký không chặn kênh lớp */ } }
     if (this.lop.tin(ws, a, j, st, nay)) return
     if (await this.live.tinChu(ws, a, j, st, nay)) return
     let doi = j.t === 'chao-ve', gom = false

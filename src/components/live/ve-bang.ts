@@ -100,7 +100,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   // ── BÀN TAY CẦM BÚT CỦA THẦY: hình dựng sẵn trong canvas rời, mỗi khung dán vào lớp «đang viết» ──
   const yeu = typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
   const but = taoTroBut({ yeu })
-  let butDich: { x: number; y: number; cham: boolean; net?: string; mau?: string } | null = null
+  let butDich: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean } | null = null
   const mauBut: MauBut = { than: 'white', dai: 'orange', bong: 'black', muc: '' }
   let cvTay: HTMLCanvasElement | null = null, gTay: G2 | null = null
   /** Dáng tay · cỡ tay (px CSS) · khoá hình đã dựng · chỗ ngòi trong hình dựng sẵn (px thiết bị) · khoá của khung vừa vẽ khi lớp sống CHỈ có bàn tay. */
@@ -454,13 +454,16 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     // bàn tay cầm bút: chỗ ngòi theo đệm phát (đã trừ độ cuộn của máy em) ⇒ một bước chuyển động ⇒ chỗ dán hình
     let hb = null, px = 0, py = 0, khoa = ''
     if (gTay) {
-      if (butDich) { const q = toiPx(butDich.x, butDich.y, butDich.net); if (butDich.mau) mauBut.muc = butDich.mau; hb = but.buoc({ x: q[0], y: q[1], cham: butDich.cham }, nay) }
+      if (butDich) { const q = toiPx(butDich.x, butDich.y, butDich.net); if (butDich.mau) mauBut.muc = butDich.mau; hb = but.buoc({ x: q[0], y: q[1], cham: butDich.cham, sat: butDich.sat }, nay) }
       else but.buoc(null, nay)
     }
     if (hb) {
       dungHinhTay()
       // ngòi làm tròn theo điểm ảnh thiết bị (hình dán không bị nhoè); lơ lửng thì nhấc chếch phải-trên một chút
-      px = Math.round((hb.x + 0.07 * coT * hb.nang) * dd); py = Math.round((hb.y - 0.15 * coT * hb.nang) * dd)
+      px = (hb.x + 0.07 * coT * hb.nang) * dd; py = (hb.y - 0.15 * coT * hb.nang) * dd
+      // (13/11) trình phát xem lại tự lướt bút giữa hai nét (`sat`): giữ phần lẻ điểm ảnh — quãng lướt giữa hai nét của một chữ chỉ vài px, làm tròn thì
+      // trên màn mật độ 1 cây bút đi nhát gừng (đứng một khung, nhích một khung)
+      if (butDich?.sat && !yeu) { px = Math.round(px * 8) / 8; py = Math.round(py * 8) / 8 } else { px = Math.round(px); py = Math.round(py) }
       khoa = `${px}|${py}|${hb.goc.toFixed(3)}|${hb.mo}|${hinhTay}`
       // lớp sống chỉ có bàn tay và nó y như khung trước ⇒ không vẽ gì (trình duyệt khỏi nộp lại lớp)
       if (!ve.length && khoa === tayVe) return 0
@@ -506,7 +509,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   function theoBut(x: number, y: number, net?: string): void { if (theoBang(x, net)) theo(y) }
   /** Chỗ cây bút của thầy ở khung này (`KhungLiveEm.but` của thư viện live; toạ độ 0..1) — gọi TRƯỚC `veSong`. null = ẩn bút.
    *  `cuonCuaThay` = `KhungLiveEm.cuon`: độ cuộn bảng đen của thầy (null = chưa biết ⇒ tự trôi theo bút; bỏ trống = giữ như cũ). */
-  function datBut(b: { x: number; y: number; cham: boolean; net?: string; mau?: string } | null, cuonCuaThay?: number | null): void { butDich = b; if (cuonCuaThay !== undefined) cuonThay = cuonCuaThay }
+  function datBut(b: { x: number; y: number; cham: boolean; net?: string; mau?: string; sat?: boolean } | null, cuonCuaThay?: number | null): void { butDich = b; if (cuonCuaThay !== undefined) cuonThay = cuonCuaThay }
   /** Độ cuộn của khung GIẤY (px CSS; bố cục độc lập) — đuôi nét và cây bút trên giấy dời theo. */
   function datCuonGiay(px: number): void { if (dl && px !== cuonG) { cuonG = px; tayVe = '' } }
   /** Em tự vuốt bảng đen xem lại: dời tầm nhìn `dy` px (dương = xem phần dưới). `null` = thôi, về chỗ thầy đang viết. Đang tự vuốt ⇒ bảng không tự trôi theo bút. */
