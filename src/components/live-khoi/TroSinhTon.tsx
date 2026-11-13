@@ -91,12 +91,14 @@ function docPhang(): boolean {
 }
 function ghiPhang(): void { try { localStorage.setItem(KHOA_PHANG, String(Date.now())) } catch { /* không có kho */ } }
 
-/** Máy YẾU theo phần cứng, nhận NGAY từ đầu (khỏi chịu vài giây đầu giật): ≤ 4 lõi hoặc ≤ 3 GB RAM. Trình duyệt không khai (`undefined`) thì không đoán. */
+/** Máy YẾU theo phần cứng, nhận NGAY từ đầu (khỏi chịu vài giây đầu giật): ≤ 3 GB RAM (chỉ Chrome Android khai) hoặc ≤ 2 lõi.
+ *  KHÔNG coi «4 lõi» là yếu, và KHÔNG tin số lõi trên iPhone / iPad (Safari có thể khai số lõi thấp hơn thật) — nhiều máy 4 lõi vẫn chạy đủ hình; máy nào giật thật
+ *  thì bộ tự hạ (hai cửa sổ < 48 khung / giây) bắt sau ~2 giây và nhớ theo máy. Trình duyệt không khai (`undefined`) thì không đoán. */
 function phanCungYeu(): boolean {
   try {
     const n = navigator as Navigator & { deviceMemory?: number }
-    const lo = n.hardwareConcurrency, ram = n.deviceMemory
-    return (typeof lo === 'number' && lo > 0 && lo <= 4) || (typeof ram === 'number' && ram > 0 && ram <= 3)
+    const lo = n.hardwareConcurrency, ram = n.deviceMemory, ios = /iPhone|iPad|iPod/.test(n.userAgent)
+    return (typeof ram === 'number' && ram > 0 && ram <= 3) || (!ios && typeof lo === 'number' && lo > 0 && lo <= 2)
   } catch { return false }
 }
 
