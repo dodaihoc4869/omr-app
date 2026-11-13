@@ -181,7 +181,7 @@ describe('B2 + đợt 2 trên màn chiếu', () => {
   // SỬA CÓ CHỦ ĐÍCH 12/11 — thầy: bỏ chữ giải thích («làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): cửa sổ không còn câu
   // «Máy em TRONG LỚP đang tắt tiếng…» / «N em đang nghe qua máy» — nút «Em ở xa» / «Tất cả» được nhấn nói chế độ, số em nghe đứng cạnh nhãn «Máy em».
   it('viên Live đếm cả số em ĐANG NGHE cạnh số em xem; cửa sổ ghi số em nghe cạnh nhãn «Máy em», nút đang nhấn nói chế độ tiếng máy em', () => {
-    expect(JS_LIVE_TO_CHIEU).toContain("'</b><small> em nghe</small></span>'")
+    expect(JS_LIVE_TO_CHIEU).toContain("LV_BT.loa + '<b>' + (t.nghe || 0) + '</b></span>'") // 13/11 viên Live gọn: biểu tượng loa + số (không còn chữ «em nghe» trong viên)
     expect(JS_LIVE_TO_CHIEU).toContain("(t.xem && !t.nghe ? 'im' : '')") // có em xem mà 0 em nghe ⇒ tô cảnh báo
     expect(JS_LIVE_TO_CHIEU).not.toContain('Máy em TRONG LỚP đang tắt tiếng')
     expect(JS_LIVE_TO_CHIEU).not.toContain('em đang nghe qua máy')
