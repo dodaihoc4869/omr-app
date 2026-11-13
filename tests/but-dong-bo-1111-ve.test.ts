@@ -177,11 +177,13 @@ describe('nét dở trên máy em = đúng nét xong; cây bút vẽ cùng lư�
     m.v.datBut({ x: 0.8, y: 0.3, cham: false })
     let t = chay(m.v, 12, 1032)
     expect(anh().pop()!.mo).toBe(RO_TAY.viet)
-    // lơ lửng lâu hơn: mờ dần về mức lơ lửng; đứng yên > 1,6 giây: mờ gần hết
+    // SỬA CÓ CHỦ ĐÍCH 13/11 (thầy «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ»): lơ lửng lâu hơn ⇒ thay cây bút bằng CHẤM LAZE, luôn sáng hết cỡ
+    // kể cả khi thầy giữ yên > 1,6 giây để giảng (trước đây cây bút mờ dần về RO_TAY.lo rồi RO_TAY.nghi)
+    expect(RO_TAY.lo).toBeLessThan(RO_TAY.viet); expect(RO_TAY.nghi).toBeLessThan(RO_TAY.lo)
     t = chay(m.v, 50, t)
-    expect(anh().pop()!.mo).toBe(RO_TAY.lo)
+    expect(anh().pop()!.mo).toBe(1)
     t = chay(m.v, 120, t)
-    expect(anh().pop()!.mo).toBe(RO_TAY.nghi)
+    expect(anh().pop()!.mo).toBe(1)
     expect(ctx.get(hinh)!.lenh.length).toBe(soVe) // suốt quãng đó hình không dựng lại
     // thư viện báo null ⇒ xoá, không dán nữa
     m.v.datBut(null)

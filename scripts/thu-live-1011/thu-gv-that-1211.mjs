@@ -193,6 +193,7 @@ kiem('3T2 «Học»: thầy kẻ nét ngang 20–80 % bề ngang ở 30 % chiề
   kiem('LZ1 thầy đưa bút lơ lửng trên bảng (chưa đặt bút): tờ của thầy hiện CHẤM ĐỎ đúng chỗ con trỏ, con trỏ hệ thống ẩn; máy em hiện chấm đỏ đúng chỗ ấy trên bảng (không còn hình cây bút)', lzGv.hien && lzGv.conTro === 'none' && lzEm.n >= 20 && Math.abs(lzEm.x - 0.5) < 0.06 && Math.abs(lzEm.y - 0.6) < 0.06, JSON.stringify({ lzGv, lzEm }))
   await gv.mouse.move(1300, 300, { steps: 3 }); await ngu(500) // rời tờ (sang cột tin nhắn) ⇒ chấm ẩn, các bước đo nét phía sau không dính chấm
   kiem('LZ2 con trỏ rời lớp bút ⇒ chấm đỏ trên tờ ẩn', await toT.locator('body').evaluate(() => document.querySelector('.mc-laze').hidden))
+  await ngu(1800) // máy em tự ẩn con trỏ sau 1,5 giây không có tin mới
 }
 if (process.env.DO_3T) { await chup(gv, '3T-gv-hoc'); await chup(em1, '3T-em-hoc'); process.exit(3) }
 // Tab ⇒ Bảng: CHÍNH tờ ấy sang chế độ Bảng tức thì (không dựng tờ thứ hai), phòng sang «bang»

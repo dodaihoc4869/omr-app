@@ -393,6 +393,11 @@ ${JS_LOI_BUT}
     function buoc(ts) { var k; ts = ts || gio(); if (!t0) t0 = ts; k = Math.min(1, (ts - t0) / 280); aCuon = 0; datCuon(tu + (dich - tu) * (1 - Math.pow(1 - k, 3))); if (k < 1 && !N) aCuon = khungSau(buoc); }
     aCuon = khungSau(buoc);
   }
+` + /* 13/11 CHẤM LAZE (bút lơ lửng = chấm đỏ để chỉ bài): nhắc vị trí mỗi 0,4 giây lúc bút còn trên tờ — điểm CUỐI khi con trỏ dừng tới được máy em (nhịp
+     15 ms ở dưới bỏ mất mẫu chót) và chấm không tự ẩn khi thầy giữ yên để giảng (máy em ẩn con trỏ im quá 1,5 giây). Bút rời tờ / tắt bút ⇒ thôi nhắc. */ `
+  var hTro = 0;
+  function thoiTro() { if (hTro) { clearInterval(hTro); hTro = 0; } }
+  function nhacTro() { if (!S.but || !KH) { thoiTro(); return; } if (!N && !XT && luotTro > 0) baoTro(); }
   function baoTro() { so.tro(tx0 / KH.W, (ty0 + (B && tx0 >= B[0] * KH.W && tx0 <= B[2] * KH.W ? CY / dpr : 0)) / KH.H); }
 ` + /* Vạch cuộn: dài bằng phần bảng đang thấy so với cả phần đã viết. */ `
   function veRay() {
@@ -467,8 +472,9 @@ ${JS_LOI_BUT}
       if (DO) { t0 = gio() - t0; DO.tCho += t0; DO.tMau += t0; DO.nMau += ds.length; DO.sk++; DO.gop += ds.length; if (ds.length > DO.gopLon) DO.gopLon = ds.length; }
     }
 ` + /* bút lơ lửng (chưa chạm): báo vị trí con trỏ mỗi khung một lần (máy em cần đủ dày để cây bút trượt, không nhảy); trên cột bảng thì y đã cộng độ cuộn */ `
+    if (!N && S.but && KH && !XT) { tx0 = e.clientX; ty0 = e.clientY; if (!hTro) hTro = setInterval(nhacTro, 400); }
     if (!N && S.but && KH && !XT && e.timeStamp - luotTro > 15) {
-      luotTro = e.timeStamp; tx0 = e.clientX; ty0 = e.clientY; baoTro();
+      luotTro = e.timeStamp; baoTro();
 ` + /* nhắc lại độ cuộn của bảng mỗi 0,5 giây (đường gửi không bảo đảm tới nơi; máy em vào sau cũng bắt kịp) */ `
       if (B && e.timeStamp - luotCuon > 500) { luotCuon = e.timeStamp; so.cuon(cuon); }
     }
@@ -498,6 +504,7 @@ ${JS_LOI_BUT}
 ` + /* Hết chạm theo mọi đường: nhấc bút · máy huỷ · mất quyền giữ con trỏ · con trỏ rời bảng (khi không giữ được con trỏ). */ `
   ['pointerup', 'pointercancel', 'lostpointercapture', 'pointerleave'].forEach(function (t) {
     cv.addEventListener(t, function (e) {
+      if (t === 'pointerleave') thoiTro();
       if (t === 'pointerleave' && cv.hasPointerCapture && cv.hasPointerCapture(e.pointerId)) return;
       if (CHO && e.pointerId === CHO.id) CHO = null;
       if (XT && e.pointerId === XT.id) { XT = null; so.dongGop(); return; }

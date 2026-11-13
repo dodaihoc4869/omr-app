@@ -512,7 +512,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (hb && laze) {
       // chấm laze: không ngả, tâm đúng chỗ ngòi
       gS.setTransform(1, 0, 0, 1, px - Math.round(sx * dd), py - Math.round(sy * dd))
-      gS.globalAlpha = hb.mo
+      gS.globalAlpha = Math.min(1, hb.mo * 8) // chấm chỉ bài LUÔN sáng hết cỡ, kể cả khi thầy giữ yên để giảng (cây bút lơ lửng thì mờ dần); chỉ mờ ở nhịp bút ẩn hẳn
       gS.drawImage(cvLaze!, -cvLaze!.width / 2, -cvLaze!.height / 2)
       gS.globalAlpha = 1
     } else if (hb) {

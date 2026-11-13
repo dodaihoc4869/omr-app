@@ -125,10 +125,10 @@ export const LAZE_R = 13, LAZE_TRE_MS = 320
 export function veLaze(g: G, mauDo: string, mauSang: string, yeu: boolean): void {
   const tron = (r: number): void => { g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2) }
   g.fillStyle = mauDo
-  if (!yeu) for (const [r, a] of [[LAZE_R, 0.1], [9.5, 0.2], [6.8, 0.34]] as const) { g.globalAlpha = a; tron(r); g.fill() }
-  g.globalAlpha = 1; tron(4.4); g.fill()
-  g.lineWidth = 1.1; g.strokeStyle = mauSang; g.globalAlpha = 0.9; tron(4.9); g.stroke()
-  g.fillStyle = mauSang; g.globalAlpha = 0.95; tron(1.5); g.fill()
+  if (!yeu) for (const [r, a] of [[LAZE_R, 0.16], [9.8, 0.3], [7.2, 0.5]] as const) { g.globalAlpha = a; tron(r); g.fill() }
+  g.globalAlpha = 1; tron(5); g.fill()
+  g.lineWidth = 1.2; g.strokeStyle = mauSang; g.globalAlpha = 0.95; tron(5.5); g.stroke()
+  g.fillStyle = mauSang; g.globalAlpha = 1; tron(2); g.fill()
   g.globalAlpha = 1
 }
 export function veTay(g: G, dang: DangTay, mau: MauBut, bong: boolean): void {
