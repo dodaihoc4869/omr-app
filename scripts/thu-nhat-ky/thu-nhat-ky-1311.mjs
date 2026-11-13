@@ -20,10 +20,20 @@ await new Promise((r) => may.listen(0, '127.0.0.1', r))
 const TRANG = `http://127.0.0.1:${may.address().port}`, API = 'https://may-chu.thu'
 
 // dữ liệu giả của «máy chủ»
-const kb = JSON.parse(readFileSync(join(BV, 'kich-ban-lien-ket.json'), 'utf8'))
+let kb = JSON.parse(readFileSync(join(BV, 'kich-ban-lien-ket.json'), 'utf8'))
 delete kb.mau; kb.buoi = { ten: kb.buoi.ten, lop: 'Live Khối 10', ngay: '2026-11-12', thu: 'Thứ Năm', gioBatDau: '20:18', phutLive: 39, ban: 2 }
 const hop = { window: {} }; vm.runInNewContext(readFileSync(join(BV, 'net-mau.js'), 'utf8'), hop)
-const trang = { trang: [{ stt: 1, loai: 'bang', ...hop.window.NET_MAU['lien-ket'] }] }
+let trang = { trang: [{ stt: 1, loai: 'bang', ...hop.window.NET_MAU['lien-ket'] }] }
+// THAT=<thư mục>: bài THẬT văn phòng đã soạn (nhat-ky.json) + nét phấn thật (net.bin, buoi.json) — trang.json dựng y như máy chủ (src/lib/nhat-ky/trang-bang.ts)
+if (process.env.THAT) {
+  const { build } = await import('esbuild'), ra = join(ANH, 'trang-bang.mjs')
+  await build({ entryPoints: [join(GOC, 'src/lib/nhat-ky/trang-bang.ts')], bundle: true, format: 'esm', platform: 'node', outfile: ra, logLevel: 'silent' })
+  const TB = await import(ra), D = process.env.THAT
+  kb = JSON.parse(readFileSync(join(D, 'nhat-ky.json'), 'utf8'))
+  const bj = JSON.parse(readFileSync(join(D, 'buoi.json'), 'utf8')), M = { nen: 'rgb(19,31,36)', mucXanh: 'rgb(125,170,255)', macDinh: 'rgb(244,239,228)' }
+  trang = { trang: TB.tachTrang(new Uint8Array(readFileSync(join(D, 'net.bin'))), bj.msLive).map((t) => ({ stt: t.stt, loai: t.loai, ...TB.netKhuon(t, M) })) }
+  console.log(`bài thật: ${kb.canh.length} cảnh · ${trang.trang.length} trang bảng`)
+}
 const mp3 = readFileSync(join(BV, 'tieng-mau.mp3'))
 
 let hong = 0
@@ -46,11 +56,15 @@ for (const [kho, w, h, toi] of [['dien-thoai', 390, 844, true], ['may-tinh', 136
   await p.waitForSelector('html[data-san]', { timeout: 15000 })
   const bia = await p.evaluate(() => ({ ten: document.getElementById('bia-ten')?.textContent ?? '', canh: document.querySelectorAll('section.canh').length, nut: !!document.getElementById('nut-giang'), tieuDe: document.title }))
   kiem(`[${kho}] mở được: bìa có tên bài, đủ cảnh, nút «Xem như Thầy giảng»`, !!bia.ten && bia.canh >= 4 && bia.nut, JSON.stringify(bia))
+  const vungDung = await p.evaluate(() => { const T = window.NK_TRANG; return T ? T.ds.length : 0 })
+  kiem(`[${kho}] đủ cảnh dựng xong`, vungDung === bia.canh, String(vungDung))
   await p.screenshot({ path: join(ANH, `nk-${kho}-bia.jpg`), type: 'jpeg', quality: 60 })
   // cuộn tới cảnh đầu: bảng phấn của Thầy có nét (canvas có điểm ảnh khác nền)
   await p.evaluate(() => document.querySelector('section.canh')?.scrollIntoView({ block: 'start' })); await p.waitForTimeout(2500)
   const net = await p.evaluate(() => { const c = document.querySelector('section.canh .bp canvas'); if (!c) return -1; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 30) n++; return n })
   kiem(`[${kho}] bảng phấn của Thầy ở cảnh đầu có nét thật (nét từ trang bảng)`, net > 200, `điểm có mực: ${net}`)
+  const soBang = await p.evaluate(() => [...document.querySelectorAll('section.canh')].filter((s) => s.getAttribute('data-khuon') !== 'tong-ket').map((s) => { const c = s.querySelector('.bp canvas'); return !!c }))
+  kiem(`[${kho}] mọi cảnh (trừ tổng kết) có ô «Bảng của Thầy»`, soBang.every(Boolean), JSON.stringify(soBang))
   await p.screenshot({ path: join(ANH, `nk-${kho}-canh.jpg`), type: 'jpeg', quality: 60 })
   // Xem như Thầy giảng
   await p.evaluate(() => window.scrollTo(0, 0)); await p.click('#nut-giang'); await p.waitForTimeout(1500)
