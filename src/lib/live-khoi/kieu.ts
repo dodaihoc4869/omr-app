@@ -43,6 +43,18 @@ export interface SinhTonAnh {
   ds: Record<string, SinhTonDong>; an: SinhTonHa[]; d: [number, number, number, number]; v: number; c: number; h: [number, string]
   tk?: string; bc?: Record<string, number>; bv?: [string, number][]; hg?: number; dd?: number[]
 }
+// HỢP ĐỒNG CHO MÀN (TroSinhTon…) theo bản 4 — máy chủ đã làm, màn phải làm theo, và PHẢI phát hành CÙNG LÚC với máy chủ (không thì: banner «vào đội» mỗi
+// khi có người lọt vào `ds`, bản đồ nhỏ thiếu, hộp lệch luật, phòng ca đóng 4010 lặp nếu Worker lên trước Pages):
+//  · Vào / rời phòng chỉ đọc từ `lop-ds` / `st-ds`; người mới xuất hiện trong `ds` KHÔNG phải «vào đội». Bản đồ nhỏ = đồng đội trong `ds` + chấm `dd` + `tk`.
+//  · Khung nhìn màn (nửa đường chéo, đơn vị sân) ≤ ~850 (= 1100 − 250 trượt) — rộng hơn thì góc màn máy tính bảng thấy người hiện đột ngột.
+//  · Lượt hạ `an[i]`: chuỗi người bị hạ = an[i][2] ?? 0 (≥ 3 ⇒ «ĐÁNH TRƯỢT ĐẠI HỌC!»), chuỗi kẻ hạ = an[i][3] ?? 0 (thay map `chuoi` tự đếm ở máy);
+//    an[i][4] === 1 ⇒ người bị hạ là thủ khoa («ĐÃ TIÊU DIỆT THỦ KHOA!») và nếu an[i][0] là em ⇒ lên THÊM 1 cấp (tổng +2, tối đa 6; máy bù phòng tự +2, tối đa 3).
+//  · `cap` của `Toi` là cấp THẬT, lên cấp cộng vào đó; gói gửi `p[3]` = `capSung(tt, nay)`.
+//  · Hộp: KHÔNG còn «đầy máu + lên cấp». Em nhận hộp (`h[1] === sbd`) ⇒ `tt = apHop(tt, loaiHop(h[0]), nay)` (không lên cấp, không kích chuỗi). `h[1]` có thể là
+//    máy bù. Hiệu ứng của người khác suy từ `h` + `loaiHop(h[0])` + thời gian (KHIEN_MS / NHANH_MS / SAO_MS) — không có trường riêng. Khiên chặn cả cháy và ngoài vòng
+//    (`nhanDon` / `buocToi` đã làm); chạy nhanh ×1,35 (`buocToi`); Pháo Sao: súng 6 trong 10 giây, bị hạ ⇒ mất (`nhanDon` / `buocToi`).
+//  · Biểu cảm: gửi `e` 0..3 kèm gói thường (phòng chỉ nhận khi em đã trên sân, 1 lần / 2 giây); hiện `bc[mã]` trên đầu bé ma tới khi mã đó rời `bc`.
+//  · Bảng vàng: `bv` (chỉ em thật) + `hg` của chính em, chỉ trong 5 giây nghỉ; thiếu ⇒ không hiện.
 /** Phiên bản giao thức trò Sinh Tồn ở phòng chờ CA KIỂM TRA (13/11; phòng: server/src/sinh-ton-ca.ts). Gói vào `{ t: 'vao', tro: 'st', v, ve }` phải mang đúng số
  *  này; đổi dạng `SinhTonGui` / `SinhTonAnh` không tương thích ⇒ tăng số, máy còn mảnh cũ bị phòng đóng sạch (mã 4010) thay vì nhận ảnh nó không đọc được. */
 // 2 (13/11): năm cỡ sân — cỡ 2 đổi nghĩa (ghép 2 × 2 khu), thêm cỡ 3 · 4 ⇒ máy còn mảnh cũ dựng sai sân.
