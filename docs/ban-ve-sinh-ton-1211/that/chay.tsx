@@ -15,17 +15,28 @@ const TEN = ['Nguyễn Thị Hà', 'Đỗ Hoàng Nam', 'Lê Gia Huy', 'Ngô Gia 
 const ds: NguoiLop[] = Array.from({ length: soBan + 1 }, (_, i) => ({ sbd: `S${i}`, ten: TEN[i % TEN.length], doi: i % 4 }))
 const st = { ketThuc: false, live: { khoi: { k: 12, gd: 'cho', che: 'hoc' } }, ds: ds.map((e) => ({ ...e, vao: true, kj: 0 })), doiThuong: [0, 0, 0, 0] }
 
-// ── Phòng giả: một «ổ cắm» cho máy em, tin phòng phát xuống chuyển thẳng cho người nghe ──
+// ── Phòng giả: mỗi bạn giả một «ổ cắm» riêng (phòng «chỉ gửi gần» nhận ra người nhận theo ổ cắm). Ổ của em (S0) chuyển ảnh LỌC cho màn; ổ «máy thầy» luôn
+//    nhận ảnh ĐỦ để bạn giả ngắm / tính sát thương như thật, và ở ?xem=1 chuyển ảnh đủ đó cho màn. ──
 const nghe = new Set<(t: TinLop) => void>()
 let anhMoi: Record<string, NhanVat> = {}
-const o = { send(d: string) { const j = JSON.parse(d) as TinLop & { t: string }; if (j.t !== 'lop' || j.k !== 'tro') return; const x = j.x as { ds: Record<string, never> }; anhMoi = {}; for (const id in x.ds) { const n = docDong(id, x.ds[id]); if (n) anhMoi[id] = n } for (const f of nghe) f(j) } }
-const phong = new KenhLopMay({ getWebSockets: (the?: string) => (the === 'gv' ? [] : [o]) } as never, () => st as never)
-const gui = (sbd: string, x: unknown): void => { phong.tin(o as never, { v: 'hs', s: sbd } as never, { t: 'lop', k: 'tro', x } as never, st as never, Date.now()) }
-const kenh: KenhLop = { gui: (k, x) => { if (k === 'tro' && !xem) gui('S0', x) }, nghe: (k, f) => { if (k !== 'tro') return () => {}; nghe.add(f); return () => { nghe.delete(f) } } }
+const phat = (d: string) => { const j = JSON.parse(d) as TinLop & { t: string }; if (j.t === 'lop' && j.k === 'tro') for (const f of nghe) f(j) }
+const oEm = { send(d: string) { if (!xem) phat(d) } }
+const oThay = {
+  send(d: string) {
+    const j = JSON.parse(d) as TinLop & { t: string }
+    if (j.t !== 'lop' || j.k !== 'tro') return
+    const x = j.x as { ds: Record<string, never> }
+    anhMoi = {}; for (const id in x.ds) { const n = docDong(id, x.ds[id]); if (n) anhMoi[id] = n }
+    if (xem) phat(d)
+  },
+}
+const phong = new KenhLopMay({ getWebSockets: (the?: string) => (the === 'gv' ? [oThay] : xem ? [] : [oEm]) } as never, () => st as never)
+const gui = (o: unknown, sbd: string, x: unknown): void => { phong.tin(o as never, { v: 'hs', s: sbd } as never, { t: 'lop', k: 'tro', x } as never, st as never, Date.now()) }
+const kenh: KenhLop = { gui: (k, x) => { if (k === 'tro' && !xem) gui(oEm, 'S0', x) }, nghe: (k, f) => { if (k !== 'tro') return () => {}; nghe.add(f); return () => { nghe.delete(f) } } }
 
 // ── Bạn giả: chạy lung tung quanh giữa sân, súng tự bắn, bị bắn thì mất máu (cùng lõi luật với máy em thật) ──
 const bd = taoBanDo(0)
-const ban = ds.slice(xem ? 0 : 1).map((e, i) => ({ e, tt: taoToi(bd, e.doi, Date.now(), i / 7), dx: 0, dy: 0, doiHuong: 0 }))
+const ban = ds.slice(xem ? 0 : 1).map((e, i) => ({ e, o: { send() {} }, tt: taoToi(bd, e.doi, Date.now(), i / 7), dx: 0, dy: 0, doiHuong: 0 }))
 setInterval(() => {
   const nay = Date.now()
   for (const b of ban) {
@@ -35,7 +46,8 @@ setInterval(() => {
     b.tt = nhanDon(b.tt, don.tong, nay)
     for (let k = 0; k < 5; k++) b.tt = buocToi(bd, b.tt, { dx: b.dx, dy: b.dy }, 50, nay)
     const chet = dangChet(b.tt, nay)
-    gui(b.e.sbd, { p: [b.tt.x, b.tt.y, chet ? 0 : Math.max(1, b.tt.mau), b.tt.cap], t: chet ? '' : chonMucTieu(bd, { x: b.tt.x, y: b.tt.y, doi: b.e.doi }, khac), ...(song && chet && don.ai ? { a: don.ai } : {}) })
+    // Thỉnh thoảng gửi biểu cảm (phòng nhận 1 lần / 2 giây) ⇒ trang chạy thử thấy bong bóng biểu cảm.
+    gui(b.o, b.e.sbd, { p: [b.tt.x, b.tt.y, chet ? 0 : Math.max(1, b.tt.mau), b.tt.cap], t: chet ? '' : chonMucTieu(bd, { x: b.tt.x, y: b.tt.y, doi: b.e.doi }, khac), ...(song && chet && don.ai ? { a: don.ai } : {}), ...(Math.random() < 0.025 ? { e: Math.floor(Math.random() * 4) } : {}) })
   }
 }, 250)
 

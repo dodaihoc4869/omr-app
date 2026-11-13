@@ -4,9 +4,10 @@
 // (bảng tên nướng lại khi máu đổi bậc 10%); KHÔNG shadowBlur, KHÔNG filter, KHÔNG gradient tạo mỗi khung, KHÔNG phủ 'lighter'. Chỉ đạn (vài nét) và hiệu ứng
 // xuất hiện (ngắn) vẽ nét mỗi khung. Thứ tự: ngoài trang → nền ô li → trang (lề, gáy, công thức, trại) → vết mực → hộp tiếp tế → đường chạm → bóng bé ma →
 // vật chặn + bụi + bé ma xếp theo chiều sâu (mép dưới) → bé ma trong bụi mà em thấy → đạn → gạch chéo ngoài vòng + vòng nét đứt → bảng tên → số máu bay.
-import { DAN_BAY_MS, NHIP_BAN_MS, type BanDo, type Diem, type Vong } from '../../lib/live-khoi/sinh-ton-loi'
-import { HINH_MA, MA_H, MA_OX, MA_OY, MA_W, SUNG_DAI, dat, duong, loaiTuong, mau, pha, type BangMau, type BoHinh, type P, type Rgb } from './sinh-ton-hinh'
-import { veTrang, type BoO, type BoSan } from './sinh-ton-san'
+import { DAN_BAY_MS, NHIP_BAN_MS, capSung, type BanDo, type Diem, type LoaiHop, type Toi, type Vong } from '../../lib/live-khoi/sinh-ton-loi'
+import type { SinhTonGui } from '../../lib/live-khoi/kieu'
+import { HINH_MA, MA_H, MA_OX, MA_OY, MA_W, SUNG_DAI, dat, duong, loaiTuong, mau, mauHop, pha, type BangMau, type BoHinh, type P, type Rgb } from './sinh-ton-hinh'
+import { lamTronTi, veTrang, type BoO, type BoSan } from './sinh-ton-san'
 
 const TAU = Math.PI * 2
 /** Thời gian hiệu ứng «hiện ra» (vào trận / sống lại), nằm trong thời gian bất tử thật. */
@@ -26,6 +27,8 @@ export interface NvVe {
   /** Đứng trong bụi mà em vẫn thấy ⇒ vẽ SAU bụi. */ an: boolean
   /** Đang hiện ra: tiến độ 0..1 (âm = không); `song` = sống lại (cục giấy vo mở ra). */ hien: number; song: boolean
   /** Còn bất tử sau khi hiện (vòng nhấp nháy). */ batTu: boolean
+  /** Bản 2 đợt 2: thủ khoa đang bị truy nã (vương miện + tên đỏ) · đang có khiên / chạy nhanh (hộp tiếp tế) · hướng chạy (rad, NaN = đứng) · biểu cảm ('' = không). */
+  tk: boolean; khien: boolean; nhanh: boolean; gio: number; bc: string
 }
 /** Hiệu ứng ngắn: vết mực khi trúng · số máu / «+1» bay lên. */
 export interface Hieu { k: 'muc' | 'so'; x: number; y: number; doi: number; luc: number; chu: string; mau: 'sai' | 'sao' | 'dung' }
@@ -37,6 +40,7 @@ export interface Canh {
   /** Bản ÊM (phòng chờ ca kiểm tra): không chớp nòng, vòng bất tử không nhấp nháy. */ em: boolean
   /** `luc` = đồng hồ khung hình (ms), `vong` = vòng an toàn lúc này. */ luc: number; vong: Vong
   nv: NvVe[]; hopCo: boolean; nghi: boolean
+  /** Loại hộp tiếp tế đang nằm giữa sân (`loaiHop(hopSo(nay))`). */ hopLoai: LoaiHop
   /** Đường «chạm để tới» của em (gồm điểm đang đứng ở đầu) hoặc null. */ duong: Diem[] | null
   hieu: Hieu[]
   /** Máy YẾU: bỏ công thức / hình vẽ chơi, ít hạt (giấy hoa, sao). */ yeu: boolean
@@ -50,6 +54,42 @@ export const cauChuoi = (n: number): string => (n >= 5 ? 'Không ai cản nổi!
 export const XEP_DOI = ['Đỗ thủ khoa', 'Đỗ á khoa', 'Đỗ vớt', 'Thi lại ván sau'] as const
 /** Đuôi thẻ «bị hạ»: bản êm (phòng chờ ca, ngay trước giờ kiểm tra thật) KHÔNG dùng chữ «trượt». */
 export const duoiBiHa = (banEm: boolean): string => (banEm ? 'vừa hạ em' : 'vừa đánh trượt em')
+/** Bốn nhãn biểu cảm cố định (chỉ số = `e` gửi phòng; không chữ tự do) + ký hiệu trên nhãn tròn. */
+export const BIEU_CAM = ['Hay quá!', 'Cứu với!', 'Theo tớ!', 'Haha'] as const
+export const KY_BIEU_CAM = ['♥', '!!', '→', 'ha'] as const
+/** Thẻ báo khi EM nhặt hộp (ảnh 09): [tên đậm, phần giải thích]. */
+export const THE_HOP: Record<LoaiHop, readonly [string, string]> = {
+  mau: ['Hồi đầy máu', 'máu về 100'], khien: ['Khiên 5 giây', 'đạn không trúng được em'], nhanh: ['Chạy nhanh 6 giây', 'em chạy nhanh hơn các bạn'], sao: ['Pháo Sao 10 giây', 'súng tạm lên cấp 6'],
+}
+
+// ── Khung nhìn của máy em (dùng chung vòng vẽ, chạm để tới, chạm bé ma của em) ──
+/** Nửa đường chéo khung nhìn tối đa (đơn vị sân) — hợp đồng «chỉ gửi gần» (kieu.ts): ≤ ~850 = 1100 − 250 trượt, rộng hơn thì góc màn thấy người hiện đột ngột. */
+export const NUA_CHEO_TOI_DA = 840
+/** Điểm ảnh CSS cho một đơn vị sân: máy thầy thấy cả sân; máy em thấy CÙNG diện tích sân (máy to không nhìn xa hơn máy nhỏ) nhưng không quá NUA_CHEO_TOI_DA. */
+export function tiMan(W: number, H: number, dpr: number, xem: boolean, bd: BanDo): number {
+  if (xem) return lamTronTi(Math.min(W / (bd.rong + 40), H / (bd.cao + 40)), dpr)
+  const can = Math.hypot(W, H) / 2 / NUA_CHEO_TOI_DA
+  let ti = lamTronTi(Math.max(0.5, can, Math.min(1.7, Math.sqrt((W * H) / (1000 * 520)))), dpr)
+  if (ti < can) ti = (Math.round(256 * ti * dpr) + 1) / (256 * dpr)
+  return ti
+}
+/** Tâm nhìn (toạ độ sân) khi em đứng ở (x, y): theo em, kẹp mép sân (lùi 40), sân lọt hẳn màn thì đặt giữa. */
+export function camNhin(bd: BanDo, W: number, H: number, ti: number, x: number, y: number): Diem {
+  let cx = Math.max(W / 2 / ti - 40, Math.min(bd.rong + 40 - W / 2 / ti, x)), cy = Math.max(H / 2 / ti - 40, Math.min(bd.cao + 40 - H / 2 / ti, y - 34))
+  if (W / ti >= bd.rong + 80) cx = bd.rong / 2
+  if (H / ti >= bd.cao + 80) cy = bd.cao / 2
+  return { x: cx, y: cy }
+}
+/** Tâm thân bé ma của em (đứng ở (x, y) trên sân) theo toạ độ KHUNG (px). */
+export const diemMaEm = (x: number, y: number, cam: Diem, ti: number, W: number, H: number): Diem => ({ x: (x - cam.x) * ti + W / 2, y: (y - 36 - cam.y) * ti + H / 2 })
+/** Chạm (px, py — toạ độ khung) có trúng thân bé ma của em không — trúng ⇒ mở bốn nhãn biểu cảm thay vì «chạm để tới». Bán kính rộng ≥ 34 px. */
+export const chamMaEm = (px: number, py: number, ma: Diem, ti: number): boolean => Math.hypot(px - ma.x, py - ma.y) <= Math.max(34, 40 * ti)
+/** Gói gửi phòng: `p[3]` = cấp súng ĐANG DÙNG (`capSung`: đang Pháo Sao ⇒ 6), không phải cấp thật. */
+export function taoGoi(tt: Toi, nay: number, chet: boolean, mucTieu: string): SinhTonGui {
+  const goi: SinhTonGui = { p: [Math.round(tt.x), Math.round(tt.y), chet ? 0 : Math.max(1, Math.round(tt.mau)), capSung(tt, nay)] }
+  if (mucTieu) goi.t = mucTieu
+  return goi
+}
 
 export const bamSo = (id: string): number => { let h = 0; for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 997; return h }
 /** Độ nhún lơ lửng của bé ma (đơn vị sân) — bảng tên đi cùng. */
@@ -64,7 +104,7 @@ export class BoTen {
   /** Cỡ chữ (điểm ảnh CSS). */ readonly co: number
   constructor(b: BangMau, dpr: number, co: number) { this.b = b; this.dpr = dpr; this.co = co }
   lay(n: NvVe): The {
-    const bac = Math.max(0, Math.min(10, Math.ceil(n.mau / 10))), khoa = `${n.ten}|${n.doi}|${+n.toi}|${+n.dong}|${bac}`
+    const bac = Math.max(0, Math.min(10, Math.ceil(n.mau / 10))), khoa = `${n.ten}|${n.doi}|${+n.toi}|${+n.dong}|${+n.tk}|${bac}`
     const cu = this.nho.get(n.id)
     if (cu && cu.khoa === khoa) return cu
     if (this.nho.size > 240) this.nho.clear()
@@ -73,10 +113,11 @@ export class BoTen {
     return moi
   }
   private nuong(n: NvVe, bac: number, khoa: string): The {
-    const b = this.b, co = n.toi ? this.co + 2 : this.co, font = `${co}px ${b.phong}`, c = document.createElement('canvas')
+    // Thủ khoa đang bị truy nã: tên đỏ «… · Thủ khoa» (ảnh 07).
+    const b = this.b, co = n.toi ? this.co + 2 : this.co, font = `${co}px ${b.phong}`, c = document.createElement('canvas'), ten = n.tk ? `${n.ten} · Thủ khoa` : n.ten
     this.doRong ??= document.createElement('canvas').getContext('2d')
-    let tw = n.ten.length * co * 0.45
-    if (this.doRong) { this.doRong.font = font; tw = this.doRong.measureText(n.ten).width }
+    let tw = ten.length * co * 0.45
+    if (this.doRong) { this.doRong.font = font; tw = this.doRong.measureText(ten).width }
     const bw = Math.round(co * 2.3), w = Math.ceil(Math.max(tw + 12, bw + 4)), h = Math.ceil(co + 13)
     c.width = Math.ceil(w * this.dpr); c.height = Math.ceil(h * this.dpr)
     const g = c.getContext('2d')
@@ -86,8 +127,8 @@ export class BoTen {
       if (n.toi) { g.fillStyle = mau(b.sao, 0.4); g.fillRect(w / 2 - tw / 2 - 4, 1, tw + 8, co + 2) }
       else if (n.dong) { g.fillStyle = mau(md, 0.85); g.fillRect(w / 2 - tw / 2, co + 2, tw, 1.6) }
       g.font = font; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round'
-      g.lineWidth = 3; g.strokeStyle = mau(b.giay, 0.85); g.strokeText(n.ten, w / 2, co)
-      g.fillStyle = mau(b.muc, 0.95); g.fillText(n.ten, w / 2, co)
+      g.lineWidth = 3; g.strokeStyle = mau(b.giay, 0.85); g.strokeText(ten, w / 2, co)
+      g.fillStyle = mau(n.tk ? b.sai : b.muc, 0.95); g.fillText(ten, w / 2, co)
       const bx = (w - bw) / 2, by = co + 5
       g.fillStyle = mau(b.giay, 0.9); g.fillRect(bx, by, bw, 5)
       g.fillStyle = mau(bac <= 3 ? b.sai : md); g.fillRect(bx, by, (bw * bac) / 10, 5)
@@ -140,8 +181,8 @@ export function veKhung(c: Canh): void {
   const hx = bd.rong / 2, hy = bd.cao / 2
   if (c.hopCo && trong(hx, hy, 80)) {
     const nhip = phang ? 0.3 : (luc / 600) % 1
-    g.beginPath(); g.ellipse(hx, hy + 4, 36 + nhip * 6, 22 + nhip * 4, 0, 0, TAU); g.setLineDash([6, 6]); g.strokeStyle = mau(b.dung, 0.9 - nhip * 0.6); g.lineWidth = 2.4; g.stroke(); g.setLineDash([])
-    dat(g, h.hop(), hx, hy - 4 - (phang ? 0 : Math.sin(luc / 300) * 2))
+    g.beginPath(); g.ellipse(hx, hy + 4, 36 + nhip * 6, 22 + nhip * 4, 0, 0, TAU); g.setLineDash([6, 6]); g.strokeStyle = mau(mauHop(b, c.hopLoai), 0.9 - nhip * 0.6); g.lineWidth = 2.4; g.stroke(); g.setLineDash([])
+    dat(g, h.hop(c.hopLoai), hx, hy - 4 - (phang ? 0 : Math.sin(luc / 300) * 2))
   }
   // ── Đường «chạm để tới» của em ──
   if (c.duong && c.duong.length > 1) {
@@ -185,6 +226,8 @@ export function veKhung(c: Canh): void {
     g.beginPath(); g.ellipse(v.cx, v.cy, v.rx, v.ry, 0, 0, TAU); g.setLineDash([16, 9]); g.lineDashOffset = phang ? 0 : -luc / 60
     g.strokeStyle = mau(b.sai, 0.9); g.lineWidth = Math.max(3.2, 1.6 / ti); g.stroke(); g.setLineDash([]); g.lineDashOffset = 0
   }
+  // ── Bong bóng biểu cảm (ảnh nướng; mũi đuôi trên đầu, lệch phải — cao hơn khi có vương miện / lửa của em) ──
+  for (const n of c.nv) if (n.bc && n.mau > 0 && n.hien < 0 && trong(n.x, n.y - 70, 90)) dat(g, h.loi(n.bc), n.x + 10, n.y - (n.toi ? 92 : n.tk ? 88 : 66) + loLung(n, luc, phang))
   // ── Bảng tên + vạch máu (ảnh nướng theo điểm ảnh màn) ──
   g.setTransform(dpr, 0, 0, dpr, 0, 0)
   for (const n of c.nv) {
@@ -223,6 +266,12 @@ function veMa(c: Canh, n: NvVe): void {
     g.strokeStyle = mau(b.sao, nhap); g.lineWidth = 3; g.stroke(); g.setLineDash([]); g.lineDashOffset = 0
     dat(g, h.chu('Bất tử 2 giây', 14, b.sao, 1, true), n.x, y - 74)
   }
+  // Chạy nhanh (hộp tiếp tế): ba vệt gió ngắn sau lưng, ngược hướng chạy.
+  if (n.nhanh && !Number.isNaN(n.gio)) {
+    const ux = Math.cos(n.gio), uy = Math.sin(n.gio), troi = phang ? 0 : (luc / 40) % 8
+    g.beginPath(); for (const [ngang, dai] of [[-10, 14], [0, 20], [10, 14]]) { const x0 = n.x - ux * (24 + troi) - uy * ngang, y0 = y - 30 - uy * (24 + troi) + ux * ngang; g.moveTo(x0, y0); g.lineTo(x0 - ux * dai, y0 - uy * dai) }
+    g.strokeStyle = mau(b.muc, 0.55); g.lineWidth = 2; g.stroke()
+  }
   dat(g, h.ma(n.doi, trai, khung), n.x, y)
   // súng xoay theo hướng ngắm, gắn ở tay phía trước (chĩa trái thì lật dọc để súng không lộn ngược)
   g.save(); g.translate(n.x + (trai ? -12 : 12), y - 30); g.rotate(n.goc); if (trai) g.scale(1, -1)
@@ -234,6 +283,13 @@ function veMa(c: Canh, n: NvVe): void {
   }
   g.restore()
   if (n.toi) dat(g, h.lua(n.doi), n.x, y - 64)
+  // Thủ khoa đang bị truy nã: vương miện trên đầu (của em thì trên ngọn lửa).
+  if (n.tk) dat(g, h.vuong(), n.x, y - (n.toi ? 86 : 64))
+  // Khiên (hộp tiếp tế): bong bóng nét đứt màu tin bao quanh bé ma — cả lớp thấy.
+  if (n.khien) {
+    g.beginPath(); g.ellipse(n.x, y - 30, 31, 36, 0, 0, TAU); g.fillStyle = mau(b.tin, 0.14); g.fill()
+    g.setLineDash([7, 5]); g.lineDashOffset = phang ? 0 : luc / 50; g.strokeStyle = mau(b.tin, 0.95); g.lineWidth = 2.4; g.stroke(); g.setLineDash([]); g.lineDashOffset = 0
+  }
   g.globalAlpha = 1
 }
 
@@ -332,8 +388,9 @@ function veDan(c: Canh, n: NvVe): void {
   }
 }
 
-/** Bản đồ nhỏ trên tờ giấy nhớ (góc phải dưới): vật chặn, bụi, vòng an toàn, đồng đội và em. Nét = màu nền trang (mực tối trên giấy vàng). */
-export function veBanDoNho(g: CanvasRenderingContext2D, rong: number, cao: number, dpr: number, bd: BanDo, b: BangMau, v: Vong, nv: readonly NvVe[], doiToi: number): void {
+/** Bản đồ nhỏ trên tờ giấy nhớ (góc phải dưới): vật chặn, bụi, vòng an toàn, đồng đội (trong ảnh + chấm `dd` đồng đội ở xa), em, và SAO ĐỎ của thủ khoa
+ *  đang bị truy nã (`tk`). Nét = màu nền trang (mực tối trên giấy vàng). */
+export function veBanDoNho(g: CanvasRenderingContext2D, rong: number, cao: number, dpr: number, bd: BanDo, b: BangMau, v: Vong, nv: readonly NvVe[], doiToi: number, dd: readonly number[], tk: Diem | null): void {
   const ti = Math.min(rong / bd.rong, cao / bd.cao)
   g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, rong, cao)
   g.fillStyle = mau(b.giay, 0.5); for (const t of bd.chan) g.fillRect(t.x * ti, t.y * ti, Math.max(1, t.w * ti), Math.max(1, t.h * ti))
@@ -343,6 +400,11 @@ export function veBanDoNho(g: CanvasRenderingContext2D, rong: number, cao: numbe
   for (const n of nv) {
     if (n.doi !== doiToi || n.mau <= 0 || n.toi) continue
     g.beginPath(); g.arc(n.x * ti, n.y * ti, 2.4, 0, TAU); g.fillStyle = mau(b.doi[n.doi] ?? b.muc); g.fill()
+  }
+  if (dd.length > 1) { g.beginPath(); for (let i = 0; i + 1 < dd.length; i += 2) { g.moveTo(dd[i] * ti + 2.4, dd[i + 1] * ti); g.arc(dd[i] * ti, dd[i + 1] * ti, 2.4, 0, TAU) } g.fillStyle = mau(b.doi[doiToi] ?? b.muc); g.fill() }
+  if (tk) {
+    g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 2.4 : 5.6; g.lineTo(tk.x * ti + Math.cos(a) * r, tk.y * ti + Math.sin(a) * r) } g.closePath()
+    g.fillStyle = mau(b.sai); g.fill(); g.strokeStyle = mau(b.giay); g.lineWidth = 1; g.stroke()
   }
   const toi = nv.find((n) => n.toi)
   if (toi) { g.beginPath(); g.arc(toi.x * ti, toi.y * ti, 3.6, 0, TAU); g.fillStyle = mau(b.doi[toi.doi] ?? b.muc); g.fill(); g.strokeStyle = mau(b.giay); g.lineWidth = 1.2; g.stroke() }

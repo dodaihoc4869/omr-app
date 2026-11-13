@@ -110,8 +110,9 @@ describe('màn trò (jsdom)', () => {
     const { container, anh } = moTro()
     anh(ANH_MAY_HA)
     expect(container.querySelector('.st-dau b')?.textContent).toBe('MỞ BÀI!')
-    anh({ ...ANH_MAY_HA, an: [['S0', 'S2']] })
-    anh({ ...ANH_MAY_HA, an: [['S0', '~3-1']] })
+    // Bản 4: chuỗi do PHÒNG đếm — an[i] = [kẻ hạ, bị hạ, chuỗi người bị hạ, chuỗi kẻ hạ, bị hạ là thủ khoa].
+    anh({ ...ANH_MAY_HA, an: [['S0', 'S2', 0, 1, 0]] })
+    anh({ ...ANH_MAY_HA, an: [['S0', '~3-1', 0, 2, 0]] })
     expect(container.querySelector('.st-dau b')?.textContent).toBe('ĐỖ TỐT NGHIỆP!')
     expect(container.querySelector('.st-tin')!.textContent).toContain('Em chuỗi 2 · Đỗ tốt nghiệp!')
   })

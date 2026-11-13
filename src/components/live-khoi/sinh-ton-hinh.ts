@@ -4,6 +4,7 @@
 // (thước · bút chì · bút dạ · cục tẩy), bụi mây bút dạ có đáy, hộp tiếp tế giấy nhớ, vết mực, cục giấy vo, lửa trên đầu em, sao, chữ viết tay.
 // KIỂU PHẲNG (máy yếu / máy tự hạ): bé ma 1 khung, vật chặn + bụi bỏ khối 3D và bóng đổ (vẫn đủ nét, đọc rõ).
 // Màu: chỉ đọc biến CSS (--st-* nền luôn tối + token đội / trạng thái) — sắc phụ pha bằng `pha`, không mã màu thô.
+import type { LoaiHop } from '../../lib/live-khoi/sinh-ton-loi'
 export type Rgb = [number, number, number]
 export type P = [number, number]
 type G = CanvasRenderingContext2D
@@ -285,9 +286,17 @@ function nuongBui(b: BangMau, k: number, w: number, h: number, hat: number, phan
     netTay(g, p, { mau: xanh, day: 2.2, hat: hat + 1, bien: 1.4 })
   })
 }
-/** Hộp tiếp tế = khối giấy nhớ (hồi đầy máu): mặt trước tối, góc gấp, băng dính, dấu cộng. */
-function nuongHop(b: BangMau, k: number): Anh {
-  const c = b.dung
+/** HỘP TIẾP TẾ 4 LOẠI (bản 2 đợt 2, thầy duyệt 13/11 — ảnh 09): khối giấy nhớ màu theo loại, mặt trước tối, góc gấp, băng dính, hình vẽ giữa mặt:
+ *  + (hồi đầy máu) · khiên · tia chớp (chạy nhanh) · sao (Pháo Sao). Nướng một lần mỗi loại. */
+export const mauHop = (b: BangMau, l: LoaiHop): Rgb => (l === 'mau' ? b.dung : l === 'khien' ? b.tin : l === 'nhanh' ? b.sao : b.sai)
+const HINH_HOP: Record<LoaiHop, readonly (readonly number[])[]> = {
+  mau: [[-3, -9], [3, -9], [3, -3], [9, -3], [9, 3], [3, 3], [3, 9], [-3, 9], [-3, 3], [-9, 3], [-9, -3], [-3, -3]],
+  khien: [[0, -10], [9, -6], [8, 3], [0, 10], [-8, 3], [-9, -6]],
+  nhanh: [[2, -11], [-7, 1], [-1, 1], [-3, 11], [7, -2], [1, -2]],
+  sao: saoP(0, 0, 10.5, 4.5),
+}
+function nuongHop(b: BangMau, k: number, l: LoaiHop): Anh {
+  const c = mauHop(b, l)
   return nuong(52, 56, k, 26, 30, (g) => {
     to(g, hcn(12, 20, 40, 34, 2), b.bong, b.bongA * 1.3)
     const truoc = hcn(6, 30, 40, 22, 2); to(g, truoc, pha(c, DEN, 0.42)); netTay(g, truoc, { mau: b.muc, day: 1.6, hat: 6, bien: 0.6 })
@@ -296,8 +305,29 @@ function nuongHop(b: BangMau, k: number): Anh {
     to(g, [[34, 44], [46, 44], [46, 32]], pha(c, b.giay, 0.45))
     netTay(g, p, { mau: b.muc, day: 1.8, hat: 5, bien: 0.7 })
     const bang = hcn(16, 0, 20, 10, 1); to(g, bang, pha(b.giay, b.sao, 0.3), 0.75); netTay(g, bang, { mau: b.muc, day: 1, hat: 9, bien: 0.4, a: 0.5 })
-    const cong: P[] = [[-3, -9], [3, -9], [3, -3], [9, -3], [9, 3], [3, 3], [3, 9], [-3, 9], [-3, 3], [-9, 3], [-9, -3], [-3, -3]].map(([x, y]) => [26 + x * 1.05, 25 + y * 1.05] as P)
-    to(g, cong, b.giay); netTay(g, cong, { mau: b.muc, day: 1.9, hat: 11, bien: 0.5 })
+    const hinh = HINH_HOP[l].map(([x, y]) => [26 + x * 1.05, 25 + y * 1.05] as P)
+    to(g, hinh, b.giay); netTay(g, hinh, { mau: b.muc, day: 1.9, hat: 11, bien: 0.5 })
+  })
+}
+/** Vương miện của THỦ KHOA đang bị truy nã (ảnh 07): hộp 34 × 24, neo giữa mép dưới. */
+function nuongVuong(b: BangMau, k: number): Anh {
+  return nuong(34, 24, k, 17, 22, (g) => {
+    const p: P[] = [[4, 20], [3, 6], [10, 13], [17, 3], [24, 13], [31, 6], [30, 20]]
+    to(g, p, b.sao); gach(g, p, pha(b.sao, b.muc, 0.3), 0.25, 3, 0.8, 1, 2); netTay(g, p, { mau: b.muc, day: 1.6, hat: 8, bien: 0.5 })
+    for (const x of [10, 17, 24]) to(g, elip(x, 16, 1.8, 1.8, 8), b.sai)
+  })
+}
+/** Bong bóng biểu cảm (ảnh 06): khung tròn góc giấy trắng phấn + đuôi chỉ xuống trái, chữ viết tay. Neo ở mũi đuôi. */
+function nuongLoi(b: BangMau, k: number, chu: string): Anh {
+  const co = 15, doRong = document.createElement('canvas').getContext('2d')
+  let tw = chu.length * co * 0.48
+  if (doRong) { doRong.font = `${co}px ${b.phong}`; tw = doRong.measureText(chu).width }
+  const w = Math.ceil(tw + 20), h = 28
+  return nuong(w + 4, h + 14, k, 10, h + 12, (g) => {
+    const p = hcn(2, 2, w, h, 10)
+    to(g, p, b.mat); to(g, [[12, h], [22, h], [8, h + 11]], b.mat)
+    netTay(g, p, { mau: b.muc, day: 1.6, hat: 4, bien: 0.4 }); netTay(g, [[12, h + 2], [8, h + 11], [22, h + 2]], { mau: b.muc, day: 1.6, hat: 6, kin: false, bien: 0.3 })
+    g.font = `${co}px ${b.phong}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = mau(b.muc); g.fillText(chu, 2 + w / 2, 2 + h / 2 + co * 0.35)
   })
 }
 function nuongVetMuc(b: BangMau, k: number, doi: number, hat: number): Anh {
@@ -380,7 +410,10 @@ export class BoHinh {
   sung(doi: number, cap: number): Anh { return this.lay(`s${doi}${cap}`, () => nuongSung(this.b, this.k, doi, cap)) }
   vat(loai: LoaiVat, w: number, h: number): Anh { return this.lay(`v${loai}${w}x${h}`, () => nuongVat(this.b, this.k, loai, w, h, w * 7 + h, this.phang)) }
   bui(w: number, h: number): Anh { return this.lay(`b${w}x${h}`, () => nuongBui(this.b, this.k, w, h, w + h, this.phang)) }
-  hop(): Anh { return this.lay('h', () => nuongHop(this.b, this.k)) }
+  hop(l: LoaiHop): Anh { return this.lay(`h${l}`, () => nuongHop(this.b, this.k, l)) }
+  vuong(): Anh { return this.lay('w', () => nuongVuong(this.b, this.k)) }
+  /** Bong bóng biểu cảm (khoá = chữ). */
+  loi(chu: string): Anh { return this.lay(`i${chu}`, () => nuongLoi(this.b, this.k, chu)) }
   vet(doi: number, bien: number): Anh { return this.lay(`e${doi}${bien}`, () => nuongVetMuc(this.b, this.k, doi, bien * 2.3 + doi)) }
   vo(): Anh { return this.lay('o', () => nuongGiayVo(this.b, this.k)) }
   lua(doi: number): Anh { return this.lay(`l${doi}`, () => nuongLua(this.b, this.k, doi)) }

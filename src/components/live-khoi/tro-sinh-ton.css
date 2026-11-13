@@ -168,3 +168,79 @@
   .st .st-bang { transform: rotate(-0.6deg); padding: 4px 14px 5px; font-size: 15px; }
   .st .st-cho { bottom: 38px; font-size: 14px; }
 }
+
+/* ── BẢN 2 ĐỢT 2 (thầy duyệt 13/11: ảnh 06 biểu cảm · 07–08 truy nã · 09 hộp 4 loại · 13–14 bảng vàng). Chỉ thêm luật mới; màu chỉ --st-* + token trạng thái / đội. ── */
+/* Dải báo TRUY NÃ thủ khoa: thẻ giấy dán hai mẩu băng dính (bản êm: không bung, viền nhạt). */
+.st-truy { position: absolute; left: 50%; top: 44px; z-index: 1; max-width: min(560px, calc(100% - 24px)); padding: 4px 16px 5px; text-align: center; pointer-events: none;
+  transform: translateX(-50%) rotate(-1deg); background: var(--st-mat); border: 2px solid var(--st-chu); box-shadow: 3px 4px 0 var(--st-vien-2); font-size: 15px; line-height: 1.25;
+  animation: st-truy .35s ease-out both; }
+.st-truy b { display: block; font-weight: 400; font-size: 19px; color: var(--tr-sai); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-truy span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-truy::before, .st-truy::after { content: ''; position: absolute; top: -8px; width: 40px; height: 14px; background: var(--st-bang-dinh); }
+.st-truy::before { left: -12px; transform: rotate(-24deg); }
+.st-truy::after { right: -12px; transform: rotate(24deg); }
+.st[data-em] .st-truy { animation: none; border-color: color-mix(in srgb, var(--st-chu) 45%, transparent); box-shadow: none; font-size: 14px; }
+.st[data-em] .st-truy b { font-size: 16px; color: var(--st-chu); }
+@keyframes st-truy { from { opacity: 0; transform: translateX(-50%) rotate(-1deg) scale(1.15); } to { opacity: 1; transform: translateX(-50%) rotate(-1deg) scale(1); } }
+.st-truy ~ .st-bao { top: 104px; }
+/* Thẻ báo nhặt hộp (ảnh 09): hình hộp + tên hiệu ứng màu theo loại. */
+.st-the-hop { position: absolute; left: 50%; bottom: 72px; z-index: 1; display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px); padding: 4px 14px 4px 8px; pointer-events: none;
+  transform: translateX(-50%) rotate(-1deg); background: var(--st-mat); border: 2px solid var(--st-chu); box-shadow: 3px 4px 0 var(--st-vien-2); font-size: 15px; white-space: nowrap;
+  animation: st-truy .3s ease-out both; --hop: var(--tr-dung); }
+.st-the-hop .st-ma { flex: none; }
+.st-the-hop span { overflow: hidden; text-overflow: ellipsis; }
+.st-the-hop b { font-weight: 400; font-size: 18px; color: var(--hop); }
+.st-the-hop[data-loai='khien'] { --hop: var(--tr-tin); }
+.st-the-hop[data-loai='nhanh'] { --hop: var(--tr-sao); }
+.st-the-hop[data-loai='sao'] { --hop: var(--tr-sai); }
+.st[data-em] .st-the-hop { animation: none; }
+/* Pháo Sao TẠM: sáu vạch tô nét đứt, chữ màu sao. */
+.st .st-sung[data-tam] { color: var(--tr-sao); }
+.st-sung[data-tam] .st-vach i[data-co] { background: var(--tr-sao); border-style: dashed; }
+/* Bốn nhãn biểu cảm tròn 56 px quanh bé ma của em (ảnh 06). */
+.st-nhan { position: absolute; z-index: 2; width: 56px; height: 56px; margin: -28px 0 0 -28px; padding: 2px; border-radius: 50%; border: 2px solid var(--st-chu); display: grid; place-content: center;
+  background: var(--st-nen); color: var(--st-chu); font: inherit; font-size: 13px; line-height: 1.05; text-align: center; box-shadow: 2px 3px 0 var(--st-vien-2); cursor: pointer; touch-action: manipulation; }
+.st-nhan span { display: block; font-size: 20px; line-height: 1; margin-bottom: 1px; }
+.st-nhan:focus-visible { outline: 2px solid var(--tr-sao); outline-offset: 2px; }
+/* Thẻ cuối ván máy em có bảng vàng (ảnh 14): con dấu hạng đội, dòng em, top 3. */
+.st .st-kq[data-vang] p { margin: 4px 0 0; font-size: 16px; line-height: 26px; }
+.st .st-kq[data-vang] p b { font-weight: 400; text-decoration: underline 2px; text-underline-offset: 3px; }
+.st-kq[data-vang] ol { margin: 2px 0 0; padding-left: 22px; font-size: 16px; line-height: 26px; }
+.st-kq[data-vang] li[data-toi] { background: color-mix(in srgb, var(--tr-sao) 40%, transparent); }
+.st .st-kq[data-vang] .st-sau { font-size: 14px; color: color-mix(in srgb, var(--st-chu) 75%, transparent); }
+.st-kq-dau { position: absolute; right: 12px; top: 8px; padding: 1px 8px; border: 3px solid var(--tr-sai); border-radius: 8px; color: var(--tr-sai); font-size: 18px; transform: rotate(9deg); white-space: nowrap; }
+/* BẢNG VÀNG lớn máy thầy (ảnh 13): trang kẻ dòng phủ cả khung sân, bục 3 khối màu đội, bé ma trên bục; bên phải hạng bốn đội. Cỡ theo BỀ NGANG KHUNG (container gl). */
+.st-vv { position: absolute; inset: 0; z-index: 3; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 0 3%; padding: 3% 3% 2% 5%;
+  background: var(--st-nen); background-image: linear-gradient(90deg, transparent 2.6%, color-mix(in srgb, var(--st-nen) 55%, var(--tr-sai)) 2.6% calc(2.6% + 2px), transparent calc(2.6% + 2px)),
+  repeating-linear-gradient(transparent 0 31px, var(--st-vien) 31px 32px); color: var(--st-chu); pointer-events: none; }
+.st-vv h2 { grid-column: 1 / -1; margin: 0 0 8px; font-weight: 400; font-size: clamp(22px, 4.4cqw, 44px); transform: rotate(-1deg); }
+.st-vv h2 small { margin-left: 10px; font-size: .5em; color: color-mix(in srgb, var(--st-chu) 80%, transparent); }
+.st-buc { display: flex; align-items: flex-end; justify-content: center; gap: 2%; min-height: 0; }
+.st-buc-o { flex: 1 1 0; max-width: 190px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.st-buc-o .st-ma { margin-bottom: -6px; }
+.st-khoi { width: 100%; display: grid; place-items: center; border: 2px solid var(--st-chu); border-radius: 4px 4px 2px 2px; background: color-mix(in srgb, var(--doi) 55%, var(--st-nen));
+  box-shadow: 8px 6px 0 color-mix(in srgb, var(--doi) 40%, var(--st-vien-2)); height: clamp(44px, 11cqw, 150px); }
+.st-buc-o[data-hang='1'] .st-khoi { height: clamp(64px, 16cqw, 220px); }
+.st-buc-o[data-hang='3'] .st-khoi { height: clamp(34px, 8cqw, 110px); }
+.st-khoi b { font-weight: 400; font-size: clamp(28px, 6cqw, 64px); line-height: 1; }
+.st-buc-ten { margin-top: 6px; max-width: 100%; text-align: center; font-size: clamp(14px, 2.2cqw, 20px); line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-buc-ten b { font-weight: 400; }
+.st-buc-ten small { display: block; font-size: .8em; color: color-mix(in srgb, var(--st-chu) 80%, transparent); }
+.st-vv-ben { display: flex; flex-direction: column; gap: 10px; min-width: 0; align-self: start; }
+.st-vv-ben p { margin: 0; padding: 6px 12px; background: var(--st-mat); border: 2px solid var(--st-chu); box-shadow: 3px 4px 0 var(--st-vien-2); font-size: clamp(13px, 1.8cqw, 18px); line-height: 1.35; }
+.st-vv-ben p:nth-child(even) { transform: rotate(.8deg); }
+.st-vv-ben p:nth-child(odd) { transform: rotate(-.8deg); }
+.st-vv-ben p b { font-weight: 400; color: color-mix(in srgb, var(--doi, var(--st-chu)) 85%, var(--st-chu)); }
+.st-vv-ben p span { display: block; }
+.st-vv-ben em { font-style: normal; color: var(--tr-sai); }
+.st-vv-ben small { font-size: clamp(12px, 1.5cqw, 16px); color: color-mix(in srgb, var(--st-chu) 75%, transparent); }
+@media (prefers-reduced-motion: reduce) { .st-truy, .st-the-hop { animation: none; } }
+@container gl (max-width: 720px) {
+  /* Khung hẹp: tin trận nằm góc phải ⇒ dải truy nã sang trái (cạnh nút loa), chữ phụ được xuống dòng. */
+  .st-truy { top: 50px; left: 60px; max-width: calc(54% - 66px); transform: rotate(-1deg); font-size: 13px; animation: none; }
+  .st-truy b { font-size: 16px; }
+  .st-truy span { white-space: normal; }
+  .st-truy ~ .st-bao { top: 128px; }
+  .st-vv { grid-template-columns: 1fr; }
+  .st-vv-ben p:nth-child(n + 3) { display: none; }
+}
