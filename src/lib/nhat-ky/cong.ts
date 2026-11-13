@@ -48,7 +48,7 @@ export const sachChu = (t: unknown): string => VIET_TAT.reduce((x, [a, b]) => x.
 export function kiemChu(t: unknown): string[] {
   const loi: string[] = [], x = boDam(t)
   if (/\p{Extended_Pictographic}/u.test(x)) loi.push('có emoji')
-  for (const cau of x.split(/(?<=[.!?])\s+/)) { const n = cau.trim().split(/\s+/).filter(Boolean).length; if (n > 30) loi.push(`câu ${n} chữ (quá 30)`) }
+  for (const cau of x.replace(/([.!?])\s+/g, '$1\u0000').split('\u0000')) /* tách câu sau dấu chấm câu — không dùng nhìn-lùi (Safari cũ) */ { const n = cau.trim().split(/\s+/).filter(Boolean).length; if (n > 30) loi.push(`câu ${n} chữ (quá 30)`) }
   const tok = x.toLowerCase().split(/[^\p{L}\p{N}₀-₉]+/u)
   for (const w of ['tiền', 'nhà', 'giàu', 'thuế']) if (tok.includes(w)) loi.push(`có chữ «${w}»`)
   for (const k of KHUON) if (x.includes(k)) loi.push(`lộ mã khuôn «${k}»`)
