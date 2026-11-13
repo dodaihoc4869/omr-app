@@ -1,0 +1,29 @@
+[
+  {
+    "i": 555,
+    "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+    "fileNguon": "anh/6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485.png",
+    "svg": "tri555-native-ddh-0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83.svg",
+    "hashSvg": "0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83",
+    "byteSvg": 30040,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-8",
+        "de": "Cho các triglyceride X, Y với công thức cấu tạo:",
+        "refs": [
+          {
+            "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+            "where": "DH-12-C1-B1-P2-II-8.hinh.0.du_lieu",
+            "hashDataUrl": "41632be67cfe88814ac950da7ae498b6c60e66bd9a7bc3369138478cf64ef9bf"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "X51C6O-Y57C6Ototal108C12O/6literalOOC-NOexpandedCO/6individualacylchainsLEFT15bareCplusOOCtextC16EACH-RIGHT17bareCplusOOCtextC18EACH/LEFT0CCdouble-RIGHT3CCdouble1EACH-FREEinnerends/4CH2-FIRSTC2CH-FIRSTC6OOC-LASTCanchors/ALLchemicalAND2captionsregularUPRIGHT-EXACTtriglyceride X-triglyceride Y/NOaddedH-formula-caption-stereo-arrow-answer-alias/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

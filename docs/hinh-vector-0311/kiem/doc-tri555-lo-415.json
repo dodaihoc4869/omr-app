@@ -1,0 +1,778 @@
+{
+  "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+  "native": [
+    1024,
+    225
+  ],
+  "questions": [
+    {
+      "qid": "DH-12-C1-B1-P2-II-8",
+      "de": "Cho các triglyceride X, Y với công thức cấu tạo:",
+      "refs": [
+        {
+          "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+          "where": "DH-12-C1-B1-P2-II-8.hinh.0.du_lieu",
+          "hashDataUrl": "41632be67cfe88814ac950da7ae498b6c60e66bd9a7bc3369138478cf64ef9bf"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "X51C6O-Y57C6Ototal108C12O/6literalOOC-NOexpandedCO/6individualacylchainsLEFT15bareCplusOOCtextC16EACH-RIGHT17bareCplusOOCtextC18EACH/LEFT0CCdouble-RIGHT3CCdouble1EACH-FREEinnerends/4CH2-FIRSTC2CH-FIRSTC6OOC-LASTCanchors/ALLchemicalAND2captionsregularUPRIGHT-EXACTtriglyceride X-triglyceride Y/NOaddedH-formula-caption-stereo-arrow-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/lefttext5x/allpublicde; X15bareCeach Y17bareCeach plus literalOOC-C/glycerol3each. ALLregularUPRIGHT. NativeapproxNOTsubpixel. IndependentagentinitialCOOCfalsefindingCORRECTEDown3x+rootown5xBEFOREfirstbuilder; noSVGnegativeforsourcecorrection.",
+  "independentSourceAudit": {
+    "i": 555,
+    "assetIndexProvided": 1155,
+    "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485.png",
+    "size": [
+      1024,
+      225
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-8",
+        "de": "Cho các triglyceride X, Y với công thức cấu tạo:",
+        "allHinh": [
+          {
+            "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+            "where": "DH-12-C1-B1-P2-II-8.hinh.0.du_lieu",
+            "hashDataUrl": "41632be67cfe88814ac950da7ae498b6c60e66bd9a7bc3369138478cf64ef9bf"
+          }
+        ],
+        "missingHashes": [
+          "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/415-full2x.png",
+        "/workspace/scratch/415-literal3x.png",
+        "/workspace/scratch/415-X3x.png",
+        "/workspace/scratch/415-Y3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "correctionAudit": [
+      {
+        "initialFinding": "AtFULL2x mistakenlyreadXupper/lowerCOOC(4glyphs), extraC; initialmessagefalse.",
+        "correctedFinding": "Ownnarrowliteral3x ANDownXpanel3x showOOC(3glyphs), SAMEas middle. FirstglyphclosedovalO, no fourthC. ALL6condensedgroupsareOOC.",
+        "countCorrection": "Xeach15bare+1OOCtextC=16acylC, totalX51C6O. Not53C. Yeach17bare+1=18,total57C6O.",
+        "timing": "Source-only correctionbeforebuilder, noSVGnegative."
+      }
+    ],
+    "geometry": {
+      "font": "ALLchemicalandcaptionsregularuprightsans. Neithertriglyceride X norY actualbold/serif. Subscript2onlyCH2.",
+      "counts": {
+        "X": {
+          "bareChainC_each": 15,
+          "textCarbonylC_each": 1,
+          "acylC_each": 16,
+          "glycerolC": 3,
+          "totalC": 51,
+          "O": 6,
+          "CCdouble": 0
+        },
+        "Y": {
+          "bareChainC_each": 17,
+          "textCarbonylC_each": 1,
+          "acylC_each": 18,
+          "glycerolC": 3,
+          "totalC": 57,
+          "O": 6,
+          "CCdouble": 3
+        },
+        "expandedCOdoubleRays": 0,
+        "literalOOCgroups": 6
+      },
+      "X": {
+        "orderedChains": [
+          [
+            [
+              141,
+              14
+            ],
+            [
+              165,
+              32
+            ],
+            [
+              187,
+              14
+            ],
+            [
+              210,
+              32
+            ],
+            [
+              232,
+              14
+            ],
+            [
+              255,
+              32
+            ],
+            [
+              277,
+              14
+            ],
+            [
+              300,
+              32
+            ],
+            [
+              322,
+              14
+            ],
+            [
+              345,
+              32
+            ],
+            [
+              367,
+              14
+            ],
+            [
+              390,
+              32
+            ],
+            [
+              412,
+              14
+            ],
+            [
+              435,
+              32
+            ],
+            [
+              457,
+              14
+            ]
+          ],
+          [
+            [
+              141,
+              77
+            ],
+            [
+              165,
+              95
+            ],
+            [
+              187,
+              77
+            ],
+            [
+              210,
+              95
+            ],
+            [
+              232,
+              77
+            ],
+            [
+              255,
+              95
+            ],
+            [
+              277,
+              77
+            ],
+            [
+              300,
+              95
+            ],
+            [
+              322,
+              77
+            ],
+            [
+              345,
+              95
+            ],
+            [
+              367,
+              77
+            ],
+            [
+              390,
+              95
+            ],
+            [
+              412,
+              77
+            ],
+            [
+              435,
+              95
+            ],
+            [
+              457,
+              77
+            ]
+          ],
+          [
+            [
+              141,
+              140
+            ],
+            [
+              165,
+              158
+            ],
+            [
+              187,
+              140
+            ],
+            [
+              210,
+              158
+            ],
+            [
+              232,
+              140
+            ],
+            [
+              255,
+              158
+            ],
+            [
+              277,
+              140
+            ],
+            [
+              300,
+              158
+            ],
+            [
+              322,
+              140
+            ],
+            [
+              345,
+              158
+            ],
+            [
+              367,
+              140
+            ],
+            [
+              390,
+              158
+            ],
+            [
+              412,
+              140
+            ],
+            [
+              435,
+              158
+            ],
+            [
+              457,
+              140
+            ]
+          ]
+        ],
+        "glycerolLabels": [
+          {
+            "literal": "CH₂–OOC",
+            "bbox": [
+              4,
+              24,
+              120,
+              47
+            ]
+          },
+          {
+            "literal": "CH–OOC",
+            "bbox": [
+              4,
+              87,
+              120,
+              109
+            ]
+          },
+          {
+            "literal": "CH₂–OOC",
+            "bbox": [
+              4,
+              150,
+              120,
+              173
+            ]
+          }
+        ],
+        "OOCeach": "O O C, threeglyphs only, oneCpergroup. LAST C tobarechain, firstglycerolC leftbaseline.",
+        "glycerolVerticalBonds": [
+          [
+            [
+              13.5,
+              47
+            ],
+            [
+              13.5,
+              83
+            ]
+          ],
+          [
+            [
+              13.5,
+              111
+            ],
+            [
+              13.5,
+              145
+            ]
+          ]
+        ],
+        "chainToTextArms": [
+          [
+            [
+              123,
+              27
+            ],
+            [
+              141,
+              14
+            ]
+          ],
+          [
+            [
+              123,
+              90
+            ],
+            [
+              141,
+              77
+            ]
+          ],
+          [
+            [
+              123,
+              153
+            ],
+            [
+              141,
+              140
+            ]
+          ]
+        ],
+        "caption": {
+          "literal": "triglyceride X",
+          "bbox": [
+            169,
+            198,
+            316,
+            221
+          ],
+          "style": "regularsans"
+        }
+      },
+      "Y": {
+        "orderedChains": [
+          [
+            [
+              653,
+              12
+            ],
+            [
+              675,
+              29
+            ],
+            [
+              698,
+              12
+            ],
+            [
+              720,
+              29
+            ],
+            [
+              743,
+              12
+            ],
+            [
+              765,
+              29
+            ],
+            [
+              788,
+              12
+            ],
+            [
+              810,
+              29
+            ],
+            [
+              840,
+              29
+            ],
+            [
+              863,
+              12
+            ],
+            [
+              885,
+              29
+            ],
+            [
+              908,
+              12
+            ],
+            [
+              930,
+              29
+            ],
+            [
+              953,
+              12
+            ],
+            [
+              975,
+              29
+            ],
+            [
+              997,
+              12
+            ],
+            [
+              1019,
+              29
+            ]
+          ],
+          [
+            [
+              653,
+              76
+            ],
+            [
+              675,
+              93
+            ],
+            [
+              698,
+              76
+            ],
+            [
+              720,
+              93
+            ],
+            [
+              743,
+              76
+            ],
+            [
+              765,
+              93
+            ],
+            [
+              788,
+              76
+            ],
+            [
+              810,
+              93
+            ],
+            [
+              840,
+              93
+            ],
+            [
+              863,
+              76
+            ],
+            [
+              885,
+              93
+            ],
+            [
+              908,
+              76
+            ],
+            [
+              930,
+              93
+            ],
+            [
+              953,
+              76
+            ],
+            [
+              975,
+              93
+            ],
+            [
+              997,
+              76
+            ],
+            [
+              1019,
+              93
+            ]
+          ],
+          [
+            [
+              650,
+              140
+            ],
+            [
+              673,
+              157
+            ],
+            [
+              696,
+              140
+            ],
+            [
+              718,
+              157
+            ],
+            [
+              741,
+              140
+            ],
+            [
+              763,
+              157
+            ],
+            [
+              786,
+              140
+            ],
+            [
+              808,
+              157
+            ],
+            [
+              838,
+              157
+            ],
+            [
+              861,
+              140
+            ],
+            [
+              883,
+              157
+            ],
+            [
+              906,
+              140
+            ],
+            [
+              928,
+              157
+            ],
+            [
+              951,
+              140
+            ],
+            [
+              973,
+              157
+            ],
+            [
+              995,
+              140
+            ],
+            [
+              1018,
+              157
+            ]
+          ]
+        ],
+        "glycerolLabels": [
+          {
+            "literal": "CH₂–OOC",
+            "bbox": [
+              513,
+              21,
+              628,
+              43
+            ]
+          },
+          {
+            "literal": "CH–OOC",
+            "bbox": [
+              512,
+              85,
+              627,
+              107
+            ]
+          },
+          {
+            "literal": "CH₂–OOC",
+            "bbox": [
+              510,
+              150,
+              626,
+              173
+            ]
+          }
+        ],
+        "glycerolVerticalBonds": [
+          [
+            [
+              521,
+              44
+            ],
+            [
+              520,
+              81
+            ]
+          ],
+          [
+            [
+              520,
+              109
+            ],
+            [
+              519,
+              145
+            ]
+          ]
+        ],
+        "chainToTextArms": [
+          [
+            [
+              632,
+              25
+            ],
+            [
+              653,
+              12
+            ]
+          ],
+          [
+            [
+              631,
+              89
+            ],
+            [
+              653,
+              76
+            ]
+          ],
+          [
+            [
+              629,
+              153
+            ],
+            [
+              650,
+              140
+            ]
+          ]
+        ],
+        "doubleMainPairs": [
+          [
+            [
+              810,
+              29
+            ],
+            [
+              840,
+              29
+            ]
+          ],
+          [
+            [
+              810,
+              93
+            ],
+            [
+              840,
+              93
+            ]
+          ],
+          [
+            [
+              808,
+              157
+            ],
+            [
+              838,
+              157
+            ]
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              811,
+              22
+            ],
+            [
+              839,
+              22
+            ]
+          ],
+          [
+            [
+              811,
+              86
+            ],
+            [
+              839,
+              86
+            ]
+          ],
+          [
+            [
+              809,
+              150
+            ],
+            [
+              837,
+              150
+            ]
+          ]
+        ],
+        "caption": {
+          "literal": "triglyceride Y",
+          "bbox": [
+            711,
+            198,
+            862,
+            221
+          ],
+          "style": "regularsans"
+        }
+      },
+      "COfeet": "NONEdrawn. All6carbonylsgivenincondensedOOCtext; doNOTexpandoraddCO2rays/feet.",
+      "literalAnchors": "CH2/CH FIRST C atleftglycerol column, verticalbondbelowfirstC(notH/sub2). ChainbondsfromLAST C ofOOCtowardfirstbarevertex. Do not reverseOOCtoCOO.",
+      "noAdded": [
+        "No molecularformulas",
+        "No namespalmitin/olein",
+        "No expandedCO",
+        "No extraCfrommisreadCOOC",
+        "No boldX/Ycaption",
+        "No isotope/stereo labels"
+      ]
+    },
+    "measurementLimits": "Sixchains ownpanel3x inspected, nativeapprox±1–2px. X15barecountvsY17actualvisiblevertices, notnameinference. Initialliteralerrorcorrectedwithownnarrowmacroauditexplicit.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "sourceFull2xLeftText5x": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": true,
+    "ownGlycerolEach6xCC6x": true,
+    "exactHash": "0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83",
+    "verdict": "Đạt root; cần readonly riêng",
+    "allSixOOC": true,
+    "allRegularUprightCaptions": true,
+    "X51C6O_Y57C6O": true,
+    "sixIndividualChainsNoExpandedCO": true,
+    "noSvgNegative": true
+  }
+}

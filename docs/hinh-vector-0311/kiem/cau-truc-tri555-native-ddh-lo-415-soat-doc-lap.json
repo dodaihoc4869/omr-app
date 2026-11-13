@@ -1,0 +1,23 @@
+[
+  {
+    "i": 555,
+    "hashSvg": "0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất, fresh Chromium3x FULL và riêng từng panel/anchors/3CC macros. Đếm từng mạch trái15bareC+OOC-C=16C (X51C6O), phải17bareC+OOC-C=18C (Y57C6O), tổng108C12O. Sáu OOC giữ condensed không khai triển, trái0CCdouble/phải3CCdouble innerends tự do đúng vị trí. Bốn CH₂ và hai CH firstC neo dọc, 6OOC-lastC neo chain đúng, individualdrift giữ. Hóa học và hai caption EXACTtriglyceride X/triglyceride Y đều regular upright, khe glyph/bond sạch không cắt/chạm/tràn; không thêm dữ kiện/unknown. ActualruntimeSHApre/post khớp.",
+    "render": "/workspace/scratch/soat415-555-fresh.png",
+    "macro": [
+      "/workspace/scratch/tri555-left.png",
+      "/workspace/scratch/tri555-right.png",
+      "/workspace/scratch/tri555-anchorsL.png",
+      "/workspace/scratch/tri555-anchorsR.png",
+      "/workspace/scratch/tri555-CC.png"
+    ],
+    "hash": "6801641f29502072fa9cd415fe808100bb3bf0ab57df518acf6794afa01e6485",
+    "hashSvgDaSoat": "0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83",
+    "runtimeProof": {
+      "file": "/workspace/scratch/tri555-runtime.log",
+      "sha256": "11258f31e1ebe9f2f9d316743afcb515e05329f584915f8020a31b18942a2db2",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/tri555-native-ddh-0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83.svg 0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83\n555 { x: 0, y: 0, width: 1024, height: 225 }\n\nPOSTSHOT_SHA 0738c0002c5c6ed91d12a9f4aadb547e7b6afda5e4261ee30158585eaa314c83\nCOMMAND node /workspace/scratch/agent-render415.cjs\nCONTEXT DH-12-C1-B1-P2-II-8.hinh.0.du_lieu; one public de/ref only, no answers.\n"
+    }
+  }
+]
