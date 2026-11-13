@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1129,
+    "hash": "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de",
+    "fileNguon": "anh/cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de.png",
+    "svg": "cqa1129-native-ddh-1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18.svg",
+    "hashSvg": "1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18",
+    "byteSvg": 10242,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-29",
+        "de": "Cà phê là một trong những loại đồ uống phổ biến nhất trên thế giới. Các nghiên cứu khoa học đã chỉ ra trong hạt cà phê có chứa nhiều hợp chất có lợi cho sức khỏe con người. Nhóm các chlorogenic acid được tìm thấy trong hạt cà phê là nguồn cung cấp chất chống oxi hóa tốt, bao gồm khoảng hơn 30 chất khác nhau được gọi chung là GGA. Một chất phổ biến trong nhóm GGA được tìm thấy trong hạt cà phê trồng ở Việt Nam tên là 5-O-caffeoylquinic acid (ký hiệu 5-CQA) có công thức cấu tạo như hình.",
+        "refs": [
+          {
+            "hash": "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de",
+            "where": "VIP27-CDK-ESTER-TN-II-29.hinh.0.du_lieu",
+            "hashDataUrl": "46c515b02983a81a71a3b6de23b38b81efa7174df09294477956200a251d7e9e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "16C9O/6OHorHO/2sixRingsNO-ringO-1Ph3innerCCdouble/1outsideCCdouble2offsetrays/2CO2splitraysEACHcontactrespectivearms-NOaddedcrossbar/2TAPERindividualOBLIQUEfeet-overlapfront-NOuprightstep-1boldfront3px/ALLregularUPRIGHT-FIRSTO-LASTOanchors/individualringvertices-rays/0standaloneH-hashstereo-arrows-captions-nums/NOadded5CQA-name-formula-answer-alias",
+    "hashSvgDaSoat": "1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

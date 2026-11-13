@@ -1,0 +1,21 @@
+[
+  {
+    "i": 1129,
+    "hashSvg": "1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt FINAL1d959: tự freshOWNChromium3× FULL/SHA trước-sau và mở riêng front/leftCO/rightPhmacros, đối chiếu native FULL/front12× và publicde-ref VIP27-CDK-ESTER-TN-II-29 đã đọc riêng. Hai chân nêm oblique đúng dáng nguồn, overlapfront đã bỏ white notch trái và không còn uprightinnerstep; front liền/độrộng hợp lý, không áp verticaltemplate. Toàn16C9O/sáuOH-HO/hai vòng6khôngringO/Ph3innerCC+outsideCC/twoCOcontact và anchors vẫn đúng; glyph thường thẳng/khe sạch. Không thấy chạm/cắt/tràn/H/nums/caption/đápán thêm. Initial6086/ccfc/989f bị loại/positiveccfc thu hồi giữ history riêng, không carry.",
+    "render": "/workspace/scratch/soat404-overlap-1129-fresh.png",
+    "macro": [
+      "/workspace/scratch/cqa1129-overlap-left.png",
+      "/workspace/scratch/cqa1129-overlap-right.png",
+      "/workspace/scratch/cqa1129-overlap-front.png",
+      "/workspace/scratch/cqa1129-nativefront-correct.png"
+    ],
+    "hash": "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de",
+    "hashSvgDaSoat": "1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18",
+    "runtimeProof": {
+      "sha256": "c1145845c65f629b2c3740ccd6a3643b6d9074e4b760e12844fa006cc5754c94",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/cqa1129-native-ddh-1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18.svg 1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18\n1129 { x: 0, y: 0, width: 277, height: 157 }\nPOSTSHOT_SHA 1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18\n"
+    }
+  }
+]

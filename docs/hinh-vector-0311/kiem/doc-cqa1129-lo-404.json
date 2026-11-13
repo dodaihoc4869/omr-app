@@ -1,0 +1,656 @@
+{
+  "i": 1129,
+  "assetIndexProvided": 1400,
+  "hash": "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de.png",
+  "size": [
+    277,
+    157
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-29",
+      "de": "Cà phê là một trong những loại đồ uống phổ biến nhất trên thế giới. Các nghiên cứu khoa học đã chỉ ra trong hạt cà phê có chứa nhiều hợp chất có lợi cho sức khỏe con người. Nhóm các chlorogenic acid được tìm thấy trong hạt cà phê là nguồn cung cấp chất chống oxi hóa tốt, bao gồm khoảng hơn 30 chất khác nhau được gọi chung là GGA. Một chất phổ biến trong nhóm GGA được tìm thấy trong hạt cà phê trồng ở Việt Nam tên là 5-O-caffeoylquinic acid (ký hiệu 5-CQA) có công thức cấu tạo như hình.",
+      "allHinh": [
+        {
+          "hash": "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de",
+          "where": "VIP27-CDK-ESTER-TN-II-29.hinh.0.du_lieu",
+          "hashDataUrl": "46c515b02983a81a71a3b6de23b38b81efa7174df09294477956200a251d7e9e"
+        }
+      ],
+      "missingHashes": [
+        "cae371b0eac2d1edd05ea048c823cdbfac0223ed6f04de4572a216e96b7428de"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/404-full4x.png",
+      "/workspace/scratch/404-leftco8x.png",
+      "/workspace/scratch/404-upperco8x.png",
+      "/workspace/scratch/404-front8x.png",
+      "/workspace/scratch/404-ph8x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "cyclohexC": 6,
+      "acidC": 1,
+      "esterCarbonylC": 1,
+      "sideAlkeneC": 2,
+      "phenylC": 6,
+      "totalC": 16,
+      "totalO": 9,
+      "OH_or_HO": 6,
+      "COdoublePairs": 2,
+      "sideCCdoublePairs": 1,
+      "phenylInnerDoubleRays": 3,
+      "TAPER": 2,
+      "boldFront": 1,
+      "hashSegments": 0,
+      "standaloneHlabels": 0
+    },
+    "font": "All O/OH/HO regular upright sans. No caption/name/number. The wedge/frontwidth indicates geometry, not boldatomfont.",
+    "cyclohex": {
+      "orderedVertices": [
+        [
+          45,
+          97
+        ],
+        [
+          64,
+          73.5
+        ],
+        [
+          102,
+          73.5
+        ],
+        [
+          120.5,
+          97.5
+        ],
+        [
+          102,
+          121
+        ],
+        [
+          64,
+          121
+        ]
+      ],
+      "thinBackBonds": [
+        [
+          [
+            45,
+            97
+          ],
+          [
+            64,
+            73.5
+          ]
+        ],
+        [
+          [
+            64,
+            73.5
+          ],
+          [
+            102,
+            73.5
+          ]
+        ],
+        [
+          [
+            102,
+            73.5
+          ],
+          [
+            120.5,
+            97.5
+          ]
+        ]
+      ],
+      "frontTapers": [
+        {
+          "tip": [
+            45,
+            97
+          ],
+          "widthApprox": 6,
+          "individualObliqueFoot": [
+            [
+              65.5,
+              119
+            ],
+            [
+              62.5,
+              122
+            ]
+          ]
+        },
+        {
+          "tip": [
+            120.5,
+            97.5
+          ],
+          "widthApprox": 7,
+          "individualObliqueFoot": [
+            [
+              100.5,
+              119
+            ],
+            [
+              103,
+              122
+            ]
+          ]
+        }
+      ],
+      "boldHorizontal": {
+        "from": [
+          64,
+          120.5
+        ],
+        "to": [
+          102,
+          120.5
+        ],
+        "widthApprox": 3.5
+      },
+      "OHbranches": [
+        {
+          "bond": [
+            [
+              45,
+              97
+            ],
+            [
+              45,
+              125
+            ]
+          ],
+          "literal": "OH",
+          "bboxApprox": [
+            39,
+            128,
+            63,
+            141
+          ],
+          "anchor": "FIRST O near45"
+        },
+        {
+          "bond": [
+            [
+              102,
+              121
+            ],
+            [
+              102,
+              137
+            ]
+          ],
+          "literal": "OH",
+          "bboxApprox": [
+            96,
+            139,
+            121,
+            153
+          ],
+          "anchor": "FIRST O near102"
+        },
+        {
+          "bond": [
+            [
+              120.5,
+              97.5
+            ],
+            [
+              120.5,
+              113
+            ]
+          ],
+          "literal": "OH",
+          "bboxApprox": [
+            114,
+            115,
+            140,
+            129
+          ],
+          "anchor": "FIRST O near120"
+        }
+      ]
+    },
+    "leftAcid": {
+      "ringArm": [
+        [
+          45,
+          97
+        ],
+        [
+          45,
+          59.5
+        ]
+      ],
+      "bareCarbonylC": [
+        45,
+        59.5
+      ],
+      "rays": [
+        [
+          [
+            43.5,
+            58
+          ],
+          [
+            58,
+            50
+          ]
+        ],
+        [
+          [
+            46,
+            62
+          ],
+          [
+            60,
+            54
+          ]
+        ]
+      ],
+      "contact": "Upperleft foot contactsincomingHO arm near43.5,58; lowerleftfoot contactsverticalstem46,62. Own8x confirmsnativeinkcontact, not fullwhitegap.",
+      "HO": {
+        "literal": "HO",
+        "bboxApprox": [
+          7,
+          42,
+          31,
+          55
+        ],
+        "anchor": "LAST O near25",
+        "arm": [
+          [
+            33,
+            53
+          ],
+          [
+            43.5,
+            58
+          ]
+        ]
+      },
+      "carbonylO": {
+        "bboxApprox": [
+          61,
+          43,
+          72,
+          56
+        ]
+      }
+    },
+    "esterBridge": {
+      "O": {
+        "bboxApprox": [
+          97,
+          44,
+          109,
+          57
+        ]
+      },
+      "ringOArm": [
+        [
+          102,
+          73.5
+        ],
+        [
+          102,
+          59.5
+        ]
+      ],
+      "OToCarbonyl": [
+        [
+          110,
+          45
+        ],
+        [
+          120.5,
+          38.5
+        ]
+      ],
+      "bareCO": [
+        122.5,
+        38
+      ],
+      "COdoubleRays": [
+        [
+          [
+            120.5,
+            24
+          ],
+          [
+            120.5,
+            38.5
+          ]
+        ],
+        [
+          [
+            125,
+            24
+          ],
+          [
+            125,
+            38.5
+          ]
+        ]
+      ],
+      "Ocarbonyl": {
+        "bboxApprox": [
+          117,
+          8,
+          129,
+          21
+        ]
+      },
+      "contact": "Eachverticalfoot contactstwoascending/descendingarms via smallnativearch around122.5,38; no gap. Olabelabovehaswhiteglyphgap."
+    },
+    "alkeneSideChain": {
+      "orderedBareC": [
+        [
+          122.5,
+          38
+        ],
+        [
+          142,
+          49
+        ],
+        [
+          163,
+          38
+        ],
+        [
+          183.5,
+          49.5
+        ]
+      ],
+      "extraDoubleRay": [
+        [
+          143,
+          44
+        ],
+        [
+          161,
+          33.5
+        ]
+      ],
+      "interpretation": "Main CCbetween142,49and163,38 plusfloatingupperparallel143,44→161,33.5; no extraC atparallelends."
+    },
+    "phenyl": {
+      "vertices": [
+        [
+          183.5,
+          49.5
+        ],
+        [
+          204,
+          38
+        ],
+        [
+          224.5,
+          49.5
+        ],
+        [
+          224.5,
+          73.5
+        ],
+        [
+          204,
+          85
+        ],
+        [
+          183.5,
+          73.5
+        ]
+      ],
+      "innerRays": [
+        [
+          [
+            187.5,
+            52
+          ],
+          [
+            187.5,
+            70.5
+          ]
+        ],
+        [
+          [
+            204,
+            43
+          ],
+          [
+            220,
+            52
+          ]
+        ],
+        [
+          [
+            204,
+            80
+          ],
+          [
+            220,
+            71
+          ]
+        ]
+      ],
+      "OHbranches": [
+        {
+          "bond": [
+            [
+              224.5,
+              49.5
+            ],
+            [
+              238,
+              41.5
+            ]
+          ],
+          "literal": "OH",
+          "bboxApprox": [
+            240,
+            32,
+            264,
+            46
+          ],
+          "anchor": "FIRST O near246"
+        },
+        {
+          "bond": [
+            [
+              224.5,
+              73.5
+            ],
+            [
+              238,
+              81.5
+            ]
+          ],
+          "literal": "OH",
+          "bboxApprox": [
+            240,
+            80,
+            264,
+            94
+          ],
+          "anchor": "FIRST O near246"
+        }
+      ]
+    },
+    "crop": "Canvas277×157 preservesentirefigurewithsmallmargins; no croppedhiddenchain reconstructed.",
+    "noAdded": [
+      "No atomnumbers",
+      "No H on barevertices",
+      "No stereohash",
+      "No formula/caption 5-CQA",
+      "No aromaticcircle replacing3double"
+    ]
+  },
+  "measurementLimits": "Approxnativecenterlines/bboxes ±1px. IndividualCOfeet independentlyreadown8x. Wedgefeetverticalatfrontvertices, notnormal-offsetpolygon. No claimedsubpixelprecision/calculatedchemicalnormalization.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "correctionAudit": [
+    {
+      "reason": "Own reopened front8x and independent native pixel columns confirm broad wedge feet wider than horizontal frontstroke. Initial3px wedge guide wrongly reusedfrontlinewidth. BeforeSVGadmission source-only correction.",
+      "old": {
+        "frontTapers": [
+          {
+            "tip": [
+              45,
+              97
+            ],
+            "broadVerticalFoot": [
+              [
+                64,
+                119.5
+              ],
+              [
+                64,
+                122.5
+              ]
+            ]
+          },
+          {
+            "tip": [
+              120.5,
+              97.5
+            ],
+            "broadVerticalFoot": [
+              [
+                102,
+                119.5
+              ],
+              [
+                102,
+                122.5
+              ]
+            ]
+          }
+        ],
+        "boldHorizontal": {
+          "from": [
+            64,
+            121
+          ],
+          "to": [
+            102,
+            121
+          ],
+          "widthApprox": 3
+        }
+      },
+      "new": {
+        "frontTapers": [
+          {
+            "tip": [
+              45,
+              97
+            ],
+            "broadVerticalFoot": [
+              [
+                64,
+                117
+              ],
+              [
+                64,
+                123
+              ]
+            ],
+            "widthApprox": 6
+          },
+          {
+            "tip": [
+              120.5,
+              97.5
+            ],
+            "broadVerticalFoot": [
+              [
+                102,
+                117
+              ],
+              [
+                102,
+                124
+              ]
+            ],
+            "widthApprox": 7
+          }
+        ],
+        "boldHorizontal": {
+          "from": [
+            64,
+            120.5
+          ],
+          "to": [
+            102,
+            120.5
+          ],
+          "widthApprox": 3.5
+        }
+      },
+      "nativeEvidence": {
+        "x60darkGrayLt160": [
+          113,
+          119
+        ],
+        "x62": [
+          115,
+          122
+        ],
+        "x64": [
+          117,
+          122
+        ],
+        "x80": [
+          119,
+          122
+        ],
+        "x103": [
+          115,
+          123
+        ],
+        "x104": [
+          114,
+          121
+        ]
+      },
+      "limits": "Atx101/102 downwardOH stem overlaps lowerwedgefoot, so do not interpretall darky125+ aswedgewidth. Visual8x separatesstemfromfilledtaper. ±1pxguide; no pixelthresholdpass."
+    }
+  ],
+  "rootSourceAudit": {
+    "nativeFull6xOpened": true,
+    "nativeCO10xOpened": true,
+    "nativeFront10xOpened": true,
+    "countIndependent": "16C9O/6OHorHO/2CO/4CCdouble/2TAPER1bold/0ringO",
+    "COfeet": "Source guide ink neighborhoods are approximate, not measured subpixels. Feet calculated on approximate respective arms to retain native contact. Acid upper43.5,58.6875 lower45,62.57142857; ester left120.5,39.12 right125,39.41025641. No added crossbar.",
+    "nativeApproxNotSubpixel": true,
+    "frontCorrection": "Own native10x matches6/7px taperedfeet, not3px. Preserve source old/new audit. Front y120.5,width3.0 approximate preserves119..122 band; allfoot geometry approximate not measuredsubpixel.",
+    "frontCorrection2": "Rejected ccfc verticalfeet step. Native inneredges go obliquely into upperfront. Root ownfront10x and readonly own12x confirm. Finalindividualfeet leftinner65.5,119 outer62.5,122; rightinner100.5,119 outer103,122. Fronty120.5width3 unchanged. ApproxnotnativeSubpixel; do not impose previousverticaltemplate.",
+    "frontCorrection3": "989f white LEFTnotch rejected by root +readonly. ExtendONLYfrontLEFT64→62.5 overlapouterfoot; keepy120.5width3/right102/ALLothergeometry. NativeapproxnotSubpixel."
+  },
+  "rootActualReview": {
+    "hashSvg": "1d959ae5db2fba61aef9803609ead2e23b9e8f6291061f28563799437f58dc18",
+    "nativeFull6x": true,
+    "nativeCOFront10x": true,
+    "all1PublicDeRef": true,
+    "freshFinalChromium3xFullOpened": true,
+    "freshFinalBothCOFrontPhMacrosOpened": true,
+    "verdict": "Đạt scoped exactSVG; nativeapproxNOTsubpixel. 16C9O/6OH-HO/2CO4CCdouble/2obliquefeetTAPER1boldfront/ALLregularUPRIGHT/NOaddedH-caption-answer. 3negative candidates kept; ccfcpositive revoked. Không dùng pixels tự duyệt."
+  }
+}
