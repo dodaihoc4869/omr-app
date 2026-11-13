@@ -1,0 +1,19 @@
+[
+  {
+    "i": 767,
+    "hashSvg": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref, nativeY4x và fresh Chromium3x FULL/macro baseline2halves/corners/Y/mz. 22UPpeaks7labels26-39-50-76-77-78-79+15weakunlabelled giữ vị trí/heightsnative; 62X26Ytickstemsinclends/nonperiodicmajorlabels giữ, không normalize nonlinearpositions. Closedframe/noheadsgrid, BOTHorigin0.0literalDOT, 7X6Ynums. OwnnativeY thấy strongserifcontrastregular (mảnh hairline+serifs, không uniformbold); DDHregularupright Yrotated phù hợp weight, tất cảrestregular chỉm/ztrueDAMitalic. KheY-40/60 và góc/numeric/mz sạch, không thêm formula/ion/percent/answer. ActualSHApre/post đúng.",
+    "render": "/workspace/scratch/soat430-767-fresh.png",
+    "macro": [
+      "/workspace/scratch/ms767-baselineL.png",
+      "/workspace/scratch/ms767-baselineR.png",
+      "/workspace/scratch/ms767-corners.png",
+      "/workspace/scratch/ms767-mz.png",
+      "/workspace/scratch/ms767-Y.png",
+      "/workspace/scratch/ms767-nativeY.png"
+    ],
+    "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+    "hashSvgDaSoat": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10"
+  }
+]

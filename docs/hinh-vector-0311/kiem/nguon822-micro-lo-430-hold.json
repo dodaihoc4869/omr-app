@@ -1,0 +1,107 @@
+{
+  "lo": 430,
+  "i": 822,
+  "assetIndex": 876,
+  "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+  "native": [
+    750,
+    452
+  ],
+  "status": "source-only HOLD/noSVG/noCount",
+  "rootOpenedNativeFull": true,
+  "publicRefs": [
+    {
+      "qid": "DB-11-B6-D2-I-91",
+      "de": "Trong tự nhiên, khí sulfur dioxide (SO₂) được phát sinh từ nhiều nguồn như hoạt động của núi lửa, cháy rừng. Ngoài ra, tại các thành phố lớn với mật độ phương tiện giao thông cao, các khí SO₂, NOx, … có thể phát ra đáng kể từ khói thải của các phương tiện này.\nĐể hiểu rõ hơn về nồng độ SO₂ tại các khu vực khác nhau, một nghiên cứu đã được tiến hành để đo nồng độ khí SO₂ tại hai vùng X và Y trong vòng 15 ngày.\n(Lưu ý: cả hai vùng này không có nhà máy công nghiệp đốt nhiên liệu hoá thạch và không gần vùng có núi lửa hoạt động) Phát biểu nào sau đây là sai?",
+      "refs": [
+        {
+          "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+          "where": "DB-11-B6-D2-I-91.hinh.0.du_lieu",
+          "hashDataUrl": "ae5552f01257a8b669f4c9634a880b1b49cf0cb67e782921d9bdc3c923d88cdc"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B7-I-57",
+      "de": "Trong tự nhiên, khí sulfur dioxide (SO₂) được phát sinh từ nhiều nguồn như hoạt động của núi lửa, cháy rừng. Ngoài ra, tại các thành phố lớn với mật độ phương tiện giao thông cao, các khí SO₂, NOx, … có thể phát ra đáng kể từ khói thải của các phương tiện này.\nĐể hiểu rõ hơn về nồng độ SO₂ tại các khu vực khác nhau, một nghiên cứu đã được tiến hành để đo nồng độ khí SO₂ tại hai vùng X và Y trong vòng 15 ngày.\n(Lưu ý: cả hai vùng này không có nhà máy công nghiệp đốt nhiên liệu hoá thạch và không gần vùng có núi lửa hoạt động) Phát biểu nào sau đây là sai?",
+      "refs": [
+        {
+          "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+          "where": "DH-11-C2-B7-I-57.hinh.0.du_lieu",
+          "hashDataUrl": "ae5552f01257a8b669f4c9634a880b1b49cf0cb67e782921d9bdc3c923d88cdc"
+        }
+      ]
+    }
+  ],
+  "fontFiles": [
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "muU03BC": false,
+      "microU00B5": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2",
+      "sha256": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "muU03BC": false,
+      "microU00B5": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2",
+      "sha256": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "muU03BC": false,
+      "microU00B5": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "muU03BC": false,
+      "microU00B5": false
+    }
+  ],
+  "strictLabelErrors": {
+    "μ": "Phông app thiếu ký tự ['μ']",
+    "µ": "Phông app thiếu ký tự ['µ']"
+  },
+  "unicodeLimits": "Native raster micro-shaped symbol does not alone distinguish UnicodeμU03BC fromµU00B5; both absentALL4WOFF2, either spelling blocked. NoLatinureplacement/fallback/omit/normalization. No globalfontimpossibilityclaim/no newcandidate.",
+  "sourceIndependentAudit": {
+    "i": 822,
+    "assetIndexProvided": 876,
+    "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8.png",
+    "size": [
+      750,
+      452
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DB-11-B6-D2-I-91",
+        "de": "Trong tự nhiên, khí sulfur dioxide (SO₂) được phát sinh từ nhiều nguồn như hoạt động của núi lửa, cháy rừng. Ngoài ra, tại các thành phố lớn với mật độ phương tiện giao thông cao, các khí SO₂, NOx, … có thể phát ra đáng kể từ khói thải của các phương tiện này.\nĐể hiểu rõ hơn về nồng độ SO₂ tại các khu vực khác nhau, một nghiên cứu đã được tiến hành để đo nồng độ khí SO₂ tại hai vùng X và Y trong vòng 15 ngày.\n(Lưu ý: cả hai vùng này không có nhà máy công nghiệp đốt nhiên liệu hoá thạch và không gần vùng có núi lửa hoạt động) Phát biểu nào sau đây là sai?",
+        "allHinh": [
+          {
+            "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+            "where": "DB-11-B6-D2-I-91.hinh.0.du_lieu",
+            "hashDataUrl": "ae5552f01257a8b669f4c9634a880b1b49cf0cb67e782921d9bdc3c923d88cdc"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B7-I-57",
+        "de": "Trong tự nhiên, khí sulfur dioxide (SO₂) được phát sinh từ nhiều nguồn như hoạt động của núi lửa, cháy rừng. Ngoài ra, tại các thành phố lớn với mật độ phương tiện giao thông cao, các khí SO₂, NOx, … có thể phát ra đáng kể từ khói thải của các phương tiện này.\nĐể hiểu rõ hơn về nồng độ SO₂ tại các khu vực khác nhau, một nghiên cứu đã được tiến hành để đo nồng độ khí SO₂ tại hai vùng X và Y trong vòng 15 ngày.\n(Lưu ý: cả hai vùng này không có nhà máy công nghiệp đốt nhiên liệu hoá thạch và không gần vùng có núi lửa hoạt động) Phát biểu nào sau đây là sai?",
+        "allHinh": [
+          {
+            "hash": "9862acfdf93321e557edfaab2196cecc8acc625ed6b268038e26fd3d8602bfd8",
+            "where": "DH-11-C2-B7-I-57.hinh.0.du_lieu",
+            "hashDataUrl": "ae5552f01257a8b669f4c9634a880b1b49cf0cb67e782921d9bdc3c923d88cdc"
+          }
+        ]
+      }
+    ],
+    "nativeFullOpened": true,
+    "sourceView": "/workspace/scratch/430-822-full2x.png",
+    "blocker": "Unitvisuallymu-likeg/m³. NativebitmapcannotdistinguishGreekμU03BCfrommicroµU00B5; BOTHabsentcurrent4WOFF2cmap. ParentstrictF.labelbothalsoValueError. NoLatinureplace/fallback/omit.",
+    "status": "SOURCE-ONLY HOLD missingglyph/noSVG/noCount",
+    "actualSvgReviewed": false
+  }
+}

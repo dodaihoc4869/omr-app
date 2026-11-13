@@ -1,0 +1,1007 @@
+{
+  "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+  "native": [
+    846,
+    447
+  ],
+  "questions": [
+    {
+      "qid": "DH-11-C3-B12-I-25",
+      "de": "Hình sau đây là phổ khối lượng của phân tử benzene:\nPhân tử khối của benzene bằng",
+      "refs": [
+        {
+          "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+          "where": "DH-11-C3-B12-I-25.hinh.0.du_lieu",
+          "hashDataUrl": "35df55a8db4e88a5e337b30e7444a871eaa22d0497d08debbf6a29d55d5c48fb"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "22BLACKUPpeaks7labelsONLY26-39-50-76-77-78-79/15weakUNLABELLED/62X26YtickstemsNONPERIODICinclends/7X6YlabelsBOTH0.0literalDOT/1closedframe0heads0grid/ALLregularUPRIGHTexceptm-zTRUEdamITALIC/NOaddedbenzenering-formula-intensitypercent-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicdeDH-11-C3-B12-I-25; OWNleft/middle/rightbaseline3x/Y2x/peaklabels6x/top3x/mz4x. 22peaks incl15weakUNLABELLED. 62X26Ytickstems inclframeends, pixelbands belowbaseline/leftaxis SUPPORTvisual notautomaticapproval. NONPERIODICnativegap679.5→696.5keep. Strongserifcontrastregular labelsNOTfauxbold; m/ztrueDAMitalic. No benzeneanswer/massinference/intensitypercentnormalization/nativeapproxNOTsubpixel.",
+  "sourceIndependentAudit": {
+    "i": 767,
+    "assetIndexProvided": 1105,
+    "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6.png",
+    "size": [
+      846,
+      447
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-11-C3-B12-I-25",
+        "de": "Hình sau đây là phổ khối lượng của phân tử benzene:\nPhân tử khối của benzene bằng",
+        "allHinh": [
+          {
+            "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+            "where": "DH-11-C3-B12-I-25.hinh.0.du_lieu",
+            "hashDataUrl": "35df55a8db4e88a5e337b30e7444a871eaa22d0497d08debbf6a29d55d5c48fb"
+          }
+        ],
+        "missingHashes": [
+          "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/430-767-full3x.png",
+        "/workspace/scratch/430-767-baseleft3x.png",
+        "/workspace/scratch/430-767-baseright3x.png",
+        "/workspace/scratch/430-767-labels4x.png",
+        "/workspace/scratch/430-767-ylabel4x.png",
+        "/workspace/scratch/430-767-mz4x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount",
+    "geometry": {
+      "counts": {
+        "peaks": 22,
+        "peakNumberLabels": 7,
+        "XtickBandsIncludingEndpoints": 62,
+        "YtickBandsIncludingEndpoints": 26,
+        "XmajorLabels": 7,
+        "YmajorLabels": 6,
+        "arrowheads": 0
+      },
+      "font": {
+        "axisNumbers": "Regularuprightserif,0.0DOTbothorigins",
+        "peakNumbers": "Serifstrongcontrast, no confidenttrueboldclaim; retainregularweightunlessindependentreviewfindsbold",
+        "Ylabel": "Uprightserifstrongstems, ownmacroappearsbold; independentweightreviewrecommended",
+        "mz": "ClearlyBOLDITALICserifm/z"
+      },
+      "frame": {
+        "rect": [
+          85.5,
+          15.5,
+          829.5,
+          387.5
+        ],
+        "strokeApprox": 1.2,
+        "color": "black"
+      },
+      "peaks": [
+        {
+          "x": 199,
+          "topY": 376,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 3,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 282.5,
+          "topY": 376,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 291.5,
+          "topY": 361,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 301,
+          "topY": 373,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 3,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 374,
+          "topY": 372,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 3,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 383.5,
+          "topY": 362,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 392.5,
+          "topY": 341,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 404,
+          "topY": 378,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 3,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 475.5,
+          "topY": 376,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 484.5,
+          "topY": 361,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 493.5,
+          "topY": 306,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 503.5,
+          "topY": 323,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 512.5,
+          "topY": 376,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 595.5,
+          "topY": 371,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 679.5,
+          "topY": 372,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 688.5,
+          "topY": 355,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 697,
+          "topY": 377,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 3,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 704.5,
+          "topY": 365,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 713,
+          "topY": 272,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 1,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 723,
+          "topY": 17,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 1,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 732.5,
+          "topY": 352,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        },
+        {
+          "x": 741.5,
+          "topY": 378,
+          "baselineY": 387.5,
+          "nativeDarkWidthApprox": 2,
+          "interpretation": "Nativepixelheightnotexactintensity"
+        }
+      ],
+      "peakLabels": [
+        {
+          "literal": "26",
+          "peakX": 291.5,
+          "bboxApprox": [
+            281,
+            339,
+            304,
+            354
+          ]
+        },
+        {
+          "literal": "39",
+          "peakX": 392.5,
+          "bboxApprox": [
+            377,
+            319,
+            400,
+            334
+          ]
+        },
+        {
+          "literal": "50",
+          "peakX": 493.5,
+          "bboxApprox": [
+            483,
+            285,
+            505,
+            300
+          ]
+        },
+        {
+          "literal": "76",
+          "peakX": 688.5,
+          "bboxApprox": [
+            675,
+            336,
+            697,
+            351
+          ]
+        },
+        {
+          "literal": "77",
+          "peakX": 713,
+          "bboxApprox": [
+            695,
+            252,
+            718,
+            267
+          ]
+        },
+        {
+          "literal": "78",
+          "peakX": 723,
+          "bboxApprox": [
+            727,
+            22,
+            751,
+            38
+          ]
+        },
+        {
+          "literal": "79",
+          "peakX": 732.5,
+          "bboxApprox": [
+            729,
+            333,
+            753,
+            349
+          ]
+        }
+      ],
+      "Xticks": [
+        {
+          "x": 85.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 97,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 108.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 121,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 133,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 145,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 157,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 168.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 181,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 193.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 205.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 218,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 230.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 242.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 254,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 265.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 277.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 290,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 302,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 313.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 326,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 338.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 350.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 362,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 373.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 385.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 398.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 410.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 423.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 435.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 448.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 460.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 472.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 485,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 497.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 509,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 521,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 533.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 545.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 557.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 570.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 583.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 595.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 606.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 618.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 630.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 642.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 654.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 666.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 679.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 696.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        },
+        {
+          "x": 708.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 721,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 733,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 744.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 756.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 768.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 780.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 792.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 804.5,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 817,
+          "fromY": 387.5,
+          "toY": 391,
+          "major": false
+        },
+        {
+          "x": 829.5,
+          "fromY": 387.5,
+          "toY": 394,
+          "major": true
+        }
+      ],
+      "Xlabels": [
+        {
+          "literal": "0.0",
+          "centerApprox": [
+            85.5,
+            414
+          ]
+        },
+        {
+          "literal": "15",
+          "centerApprox": [
+            205.5,
+            414
+          ]
+        },
+        {
+          "literal": "30",
+          "centerApprox": [
+            326,
+            414
+          ]
+        },
+        {
+          "literal": "45",
+          "centerApprox": [
+            448.5,
+            414
+          ]
+        },
+        {
+          "literal": "60",
+          "centerApprox": [
+            570.5,
+            414
+          ]
+        },
+        {
+          "literal": "75",
+          "centerApprox": [
+            696.5,
+            414
+          ]
+        },
+        {
+          "literal": "90",
+          "centerApprox": [
+            829.5,
+            414
+          ]
+        }
+      ],
+      "Yticks": [
+        {
+          "y": 15.5,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        },
+        {
+          "y": 30,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 45.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 60.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 75.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 90.5,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        },
+        {
+          "y": 105.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 120.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 135.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 151,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 165.5,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        },
+        {
+          "y": 181.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 196.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 212,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 226.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 242.5,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        },
+        {
+          "y": 257.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 272.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 287.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 303,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 318,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        },
+        {
+          "y": 332.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 346.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 360.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 373.5,
+          "fromX": 85.5,
+          "toX": 81,
+          "major": false
+        },
+        {
+          "y": 387.5,
+          "fromX": 85.5,
+          "toX": 78,
+          "major": true
+        }
+      ],
+      "Ylabels": [
+        {
+          "literal": "100",
+          "centerApprox": [
+            62,
+            15.5
+          ]
+        },
+        {
+          "literal": "80",
+          "centerApprox": [
+            62,
+            90.5
+          ]
+        },
+        {
+          "literal": "60",
+          "centerApprox": [
+            62,
+            165.5
+          ]
+        },
+        {
+          "literal": "40",
+          "centerApprox": [
+            62,
+            242.5
+          ]
+        },
+        {
+          "literal": "20",
+          "centerApprox": [
+            62,
+            318
+          ]
+        },
+        {
+          "literal": "0.0",
+          "centerApprox": [
+            62,
+            387.5
+          ]
+        }
+      ],
+      "labels": [
+        {
+          "literal": "Cường độ tương đối",
+          "bboxApprox": [
+            12,
+            104,
+            36,
+            306
+          ],
+          "rotationCCW90": true
+        },
+        {
+          "literal": "m/z",
+          "bboxApprox": [
+            428,
+            424,
+            468,
+            445
+          ],
+          "italic": true
+        }
+      ],
+      "nonlinearNativeGeometry": "Preserve62Xtickpositions and26Ytickpositions individually, atypicalgap679.5→696.5SOURCE; noevenaxisnormalization.",
+      "peaksVsTicks": "PeaksUP/ticksDOWN; atx697tinyUPpeakand75majorDOWNtickcoexist. All22weakpeaksindividuallyinspected.",
+      "crop": "Frameinside846×447, m/zclosebottomvisible. No topfragment.",
+      "noAdded": [
+        "No molecularionanswer",
+        "No benzenering",
+        "No intensityvalues",
+        "No axesheads",
+        "No grid",
+        "No missingpeaklabels"
+      ]
+    },
+    "measurementLimits": "OwnALLbaseline/macrosread22peaks; ownupwardrunpositionsverified. X62/Y26tickbands measuredseparately andvisualbaselinechecked, ±1px, nottheoreticalmass/intensitymapping. Source822heldseparatelymissingμ/µ."
+  },
+  "rootOldNewXmlAudit": {
+    "oldHash": "137485bb17b0225c2730987103c95fa4dfbab0cdb1a49c8fcaa35be09c228d48",
+    "finalHash": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10",
+    "children": 134,
+    "onlyChangedZeroBasedChildren": [
+      132
+    ],
+    "allOtherXmlExact": true,
+    "allGlyphPathDataExact": true,
+    "change": "OnlyYtitle23→20.5, others unchanged. Noinkcollisionclaim."
+  },
+  "rootActualReview": {
+    "hashSvg": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10",
+    "ownNativeFull": true,
+    "allPublicRefs": 1,
+    "ownFreshChromiumFull3x": true,
+    "detail": "RootOWNnativeFULL/leftmiddleRIGHTbaseline3x/Y2x/peaklabels6x/top3x/mz4x. FreshFINALFULL3x and eachbaseline/Y/mz/corner macros. 22peaks7labels15weaks;62X26Yticksnonperiodic/both0.0DOT/closedframe/noheadsgrid. FontYweightrootregularCONFIRMEDreadonlyOWNnativeY4x strongserifcontrast/hairlines/serifs. Sourceagenttentativebold retained asuncertainty/source-onlynotadmit; finalindependentregularreview accepted. NativeapproxNOTsubpixel/nointensitypercent-answerclaim.",
+    "verdict": "Đạt"
+  },
+  "readonlyRuntimeAudit": {
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ms767-native-ddh-0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10.svg 0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10\n767 { x: 0, y: 0, width: 846, height: 447 }\n\nPOSTSHOT_SHA 0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10\nCOMMAND node /workspace/scratch/agent-render430.cjs\nCONTEXT DH-11-C3-B12-I-25.hinh.0.du_lieu public de/one ref only; no answers.\n",
+    "sha256": "387a74c9e3dc2027835a4db0d62cfa8b0dbcb26e952c427c64edfa099d9889a1"
+  }
+}

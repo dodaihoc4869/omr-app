@@ -1,0 +1,29 @@
+[
+  {
+    "i": 767,
+    "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+    "fileNguon": "anh/8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6.png",
+    "svg": "ms767-native-ddh-0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10.svg",
+    "hashSvg": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10",
+    "byteSvg": 43056,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-I-25",
+        "de": "Hình sau đây là phổ khối lượng của phân tử benzene:\nPhân tử khối của benzene bằng",
+        "refs": [
+          {
+            "hash": "8f726d8daaa6bff08a532885cd45b3c7f676faa299becde90e64a361e1fd58e6",
+            "where": "DH-11-C3-B12-I-25.hinh.0.du_lieu",
+            "hashDataUrl": "35df55a8db4e88a5e337b30e7444a871eaa22d0497d08debbf6a29d55d5c48fb"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22BLACKUPpeaks7labelsONLY26-39-50-76-77-78-79/15weakUNLABELLED/62X26YtickstemsNONPERIODICinclends/7X6YlabelsBOTH0.0literalDOT/1closedframe0heads0grid/ALLregularUPRIGHTexceptm-zTRUEdamITALIC/NOaddedbenzenering-formula-intensitypercent-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "0b34e056b351584f3085ba2f9a68aaac650f6da63db373037f1d7f96b2c39d10",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
