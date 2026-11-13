@@ -464,6 +464,8 @@ await chup(em2, '4-em-dau-dat-that')
 await ngu(2400)
 if (process.env.DO_CHUYEN) { // ĐO CHUYỂN ĐỀ (thầy 13/11 «tốc độ chuyển đề trên máy học sinh bị chậm quá»): thầy bấm → ⇒ mốc từng chặng trên máy em
   const doEm = (p) => p.evaluate(() => { const t = (document.querySelector('.lv-gt, .lv-de, .lv-giay')?.textContent ?? '') + (document.querySelector('.bpu-hs')?.textContent ?? ''); return { phenol: /Phenol/.test(t), khop: !!document.querySelector('.lv-gt[data-khop]'), soi: !!document.querySelector('.lv[data-soi]') } })
+  const cpu = Number(process.env.DO_CHUYEN) || 1
+  if (cpu > 1) for (const p of [em1, em2]) { const c = await p.context().newCDPSession(p); await c.send('Emulation.setCPUThrottlingRate', { rate: cpu }) }
   const t0 = Date.now(), moc = { phong: null, em1: null, em1Khop: null, em2: null, em2Khop: null }
   await toHoc.locator('body').press('ArrowRight')
   while (Date.now() - t0 < 8000) {
@@ -472,7 +474,7 @@ if (process.env.DO_CHUYEN) { // ĐO CHUYỂN ĐỀ (thầy 13/11 «tốc độ c
     if (Object.values(moc).every((v) => v != null)) break
     await ngu(25)
   }
-  console.log('CHUYEN', JSON.stringify(moc)); await chup(em1, 'chuyen-em1'); process.exit(3)
+  console.log('CHUYEN cpu×' + cpu, JSON.stringify(moc)); await chup(em1, 'chuyen-em1'); process.exit(3)
 }
 await toHoc.locator('body').press('ArrowRight'); await ngu(3500)
 kiem('4p tờ sang câu 2 ⇒ phòng mở lượt mới của câu 2', st()?.luot?.qid === 'Q2' && !st()?.luot?.goi, JSON.stringify({ qid: st()?.luot?.qid, pha: st()?.luot?.pha }))
