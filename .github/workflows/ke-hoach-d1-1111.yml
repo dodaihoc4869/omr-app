@@ -32,6 +32,9 @@ jobs:
         run: |
           q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(x.detail??JSON.stringify(x))}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 3; }
           # 12/11 tối (đợt 2 giảm chi phí): cỡ bảng (MAX(rowid) — đọc 1 hàng) + chỉ mục hiện có, để biết dựng chỉ mục mới tốn bao lâu / bao nhiêu hàng.
-          for t in su_kien_hoc chua_loi_dot hanh_trinh_v4_canh goi_bai_7_em goi_bai_7_ngay hoc_sinh cau_meta luot danh_sach loi_giai_hoi sua_goi_ngay chua_loi_thay; do q "Cỡ $t" "SELECT MAX(rowid) n FROM $t"; done
-          q "Chỉ mục" "SELECT tbl_name,name FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','loi_giai_hoi','chua_loi_dot','hanh_trinh_v4_canh','goi_bai_7_em','cau_meta','luot','danh_sach','sua_goi_ngay','chua_loi_thay') ORDER BY tbl_name,name"
-          q "sqlite_stat1 có không" "SELECT COUNT(*) n FROM sqlite_master WHERE name='sqlite_stat1'"
+          # 14/11 00:20: kiểm lần chạy THẬT đầu tiên ảnh chụp đêm OMNI sau bản chỉ-ghi-đổi (2139cc3f7) — chỉ đọc.
+          q "Con trỏ đêm" "SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa='omni_dem_con_tro'"
+          q "omni_em theo mốc" "SELECT cap_nhat_luc,COUNT(*) n FROM omni_em GROUP BY cap_nhat_luc ORDER BY cap_nhat_luc DESC LIMIT 3"
+          q "omni_p_vkn tổng + theo mốc đổi" "SELECT COUNT(*) tong,SUM(cap_nhat_luc='2026-11-13T17:00:00.000Z') moc_14,COUNT(DISTINCT sbd) so_em FROM omni_p_vkn"
+          q "Bản gọn khớp mốc" "SELECT COUNT(*) n,SUM(g.moc=e.cap_nhat_luc) khop FROM omni_em e LEFT JOIN omni_p_gon g ON g.sbd=e.sbd"
+          q "Lỗi máy omni_dem gần đây" "SELECT * FROM loi_may WHERE ma LIKE 'omni%' ORDER BY rowid DESC LIMIT 5"
