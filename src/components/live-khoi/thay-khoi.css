@@ -130,3 +130,12 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 .lkt-dai .lkt-tay { width: auto; min-width: 232px; max-width: 320px; align-content: start; }
 .lkt-dai .lkt-tay ul { max-height: none; }
 .lkt-dai .lr-thay { width: auto; min-width: 300px; max-width: 460px; padding: 10px 12px; }
+
+/* ĐỒNG BỘ NỀN TỐI CHUẨN DUOLINGO quanh bảng viết (thầy 13/11 «đồng bộ màu chuẩn màu nền tối của doligo … cho phần bảng viết của tất cả các chỗ»): bảng viết đã
+   là xanh than Duolingo (--tr-chieu-bang / --mc-bang); cột «Tin nhắn lớp», dải đầu tờ riêng, dải «Chỉ thầy thấy» và các đường viền quanh bảng trước
+   dùng tông xám than (slate / mặt chiếu xám) ⇒ nay CÙNG bảng xanh than (--lk-*: nền = nền bảng · mặt thẻ · viền), gắn ở gốc trang suốt buổi (thay-khoi.ts). */
+html[data-live-khoi] .lop-xem-phieu { background: var(--lk-nen); }
+html[data-live-khoi] .lc-goc { --lc-nen: var(--lk-nen); --lc-mat: var(--lk-mat); --lc-mat-2: var(--lk-mat-2); --lc-vien: var(--lk-vien); --lc-nen-2: var(--lk-nen); }
+html[data-live-khoi] .lkt-cot { background: var(--lk-nen); box-shadow: inset 1.5px 0 0 var(--lk-vien); }
+html[data-live-khoi] .lkt-dai { background: var(--lk-nen); box-shadow: inset 0 1.5px 0 var(--lk-vien); }
+html[data-live-khoi] .lkt-dai-the { background: var(--lk-mat); box-shadow: inset 0 0 0 1.5px var(--lk-vien); }

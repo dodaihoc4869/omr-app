@@ -113,11 +113,11 @@ describe('tách trang bảng từ net.bin', () => {
     expect(vungTrong(ds[0]!, 20_000, 30_000)).toBeNull()
   })
   it('SVG: vectơ, nền bảng, mỗi nét một đường; bảng đen cuộn (y > 1) cao thêm; không màu lạ lọt vào', () => {
-    const s1 = svgTrang(ds[0]!), s2 = svgTrang(ds[1]!)
+    const M = { nen: 'rgb(19,31,36)', mucXanh: 'rgb(125,170,255)', macDinh: 'rgb(244,239,228)' }, s1 = svgTrang(ds[0]!, M), s2 = svgTrang(ds[1]!, M)
     expect(s1.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')).toBe(true)
     expect((s1.match(/<path /g) ?? []).length).toBe(2)
     expect(Number(/viewBox="0 0 1920 (\d+)"/.exec(s2)![1])).toBeGreaterThan(Number(/viewBox="0 0 1920 (\d+)"/.exec(s1)![1]))
-    const la = svgTrang({ ...ds[0]!, net: [{ net: net('x', 0.1, 0.1, 3, 'url(javascript:1)'), t0: 0, t1: 1 }] })
+    const la = svgTrang({ ...ds[0]!, net: [{ net: net('x', 0.1, 0.1, 3, 'url(javascript:1)'), t0: 0, t1: 1 }] }, M)
     expect(la).not.toContain('javascript')
   })
 })

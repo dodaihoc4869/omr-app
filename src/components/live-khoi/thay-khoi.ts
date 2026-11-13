@@ -87,7 +87,7 @@ function soatNgoai(): void {
   if (!henNgoai) henNgoai = setInterval(() => { if (gg?.phienDangCo()?.tamAn) gangNutKt(buoiId); else goNgoai() }, 600)
 }
 let nen: HTMLDivElement | null = null
-function go(): void { goc?.unmount(); khung?.remove(); nen?.remove(); goc = null; khung = null; nen = null; document.documentElement.removeAttribute('data-live-khoi'); goNgoai() }
+function go(): void { goc?.unmount(); khung?.remove(); nen?.remove(); goc = null; khung = null; nen = null; document.documentElement.removeAttribute('data-live-khoi'); for (const k of Object.keys(MAU_XANH_THAN)) if (k.startsWith('--lk-')) document.documentElement.style.removeProperty(k); goNgoai() }
 function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi) go() }, 15_000); phatDoi() }
 const tai = new Map<LoaiTinLop, Set<(t: TinLop) => void>>()
 export const kenh: KenhLop = {
@@ -153,6 +153,8 @@ function gan(): void {
   if (khung || view?.ketThuc || (!view?.live?.khoi && !dangMo)) return
   // Cờ ở gốc trang suốt buổi live: tờ giảng kín màn (không dải đầu, không chừa thanh bên) + tấm nền xanh than che app bên dưới (thay-khoi.css).
   document.documentElement.setAttribute('data-live-khoi', '')
+  // 13/11 đồng bộ nền tối Duolingo: bảng xanh than (--lk-*) gắn cả ở gốc trang ⇒ tờ riêng (KhungXemPhieu, ngoài gốc lớp nổi) và cột tin nhắn đọc cùng một bảng
+  for (const [k, v] of Object.entries(MAU_XANH_THAN)) if (k.startsWith('--lk-')) document.documentElement.style.setProperty(k, v)
   if (!nen) { nen = document.createElement('div'); nen.setAttribute('data-live-khoi-nen', ''); datMau(nen); document.body.appendChild(nen) }
   khung = document.createElement('div')
   khung.setAttribute('data-live-khoi-thay', '')

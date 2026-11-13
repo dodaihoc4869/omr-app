@@ -68,11 +68,14 @@ const caoTrang = (tr: TrangBang): number => {
   for (const n of tr.net) for (const d of n.net.diem) if (d[1] > yMax) yMax = d[1]
   return Math.ceil((W_SVG / (tr.tiLe > 0 ? tr.tiLe : 16 / 9)) * (yMax + 0.03))
 }
-/** Màu phấn đậm trên nền tối của ảnh (mực xanh viết lên giấy đề ⇒ sáng lên cho đọc được trên nền bảng). */
-const mauVe = (m: string): string => (/^rgb\(36,\s*86,\s*201\)$/.test(m.trim()) ? 'rgb(125,170,255)' : /^rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)$/.test(m.trim()) ? m.trim() : 'rgb(244,239,228)')
+/** Bảng màu của ảnh trang (máy chủ truyền vào — ảnh SVG rời không đọc được biến CSS của app): nền bảng · màu thay cho mực xanh viết lên giấy đề (sáng lên cho
+ *  đọc được trên nền tối) · màu khi nét mang màu lạ. */
+export interface MauAnhTrang { nen: string; mucXanh: string; macDinh: string }
+const MUC_XANH = /^rgb\(36,\s*86,\s*201\)$/, LA_RGB = /^rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)$/
+const mauVe = (m: string, mau: MauAnhTrang): string => (MUC_XANH.test(m.trim()) ? mau.mucXanh : LA_RGB.test(m.trim()) ? m.trim() : mau.macDinh)
 
 /** Một trang bảng thành SVG: nền bảng tối, mỗi nét một đường (điểm sát nhau dưới 1,5 px bỏ bớt). `den` (ms) ⇒ chỉ vẽ nét bắt đầu trước mốc ấy. */
-export function svgTrang(tr: TrangBang, den = Infinity): string {
+export function svgTrang(tr: TrangBang, mau: MauAnhTrang, den = Infinity): string {
   const H = caoTrang(tr), k = W_SVG / (tr.tiLe > 0 ? tr.tiLe : 16 / 9)
   const duong: string[] = []
   for (const n of tr.net) {
@@ -84,9 +87,9 @@ export function svgTrang(tr: TrangBang, den = Infinity): string {
       d += `${d ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`; x0 = x; y0 = y
     }
     if (n.net.diem.length === 1) d += 'l0.1 0'
-    duong.push(`<path d="${d}" stroke="${mauVe(n.net.mau)}" stroke-width="${Math.max(1, n.net.co).toFixed(1)}"/>`)
+    duong.push(`<path d="${d}" stroke="${mauVe(n.net.mau, mau)}" stroke-width="${Math.max(1, n.net.co).toFixed(1)}"/>`)
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_SVG} ${H}" width="${W_SVG}" height="${H}"><rect width="100%" height="100%" fill="rgb(23,32,42)"/>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_SVG} ${H}" width="${W_SVG}" height="${H}"><rect width="100%" height="100%" fill="${mau.nen}"/>`
     + `<g fill="none" stroke-linecap="round" stroke-linejoin="round">${duong.join('')}</g></svg>`
 }
 
