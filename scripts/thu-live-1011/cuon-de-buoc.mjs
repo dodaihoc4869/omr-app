@@ -205,6 +205,66 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
     await to.locator('body').evaluate(() => window.__mcBut.bat(false)); await ngu(300)
   }
 
+  // ── CD8. HỌC SINH VẪN ĐIỀU CHỈNH ĐƯỢC BẢNG (thầy 13/11 «Hs vẫn điều chỉnh đc bảng trên máy nhé»), điện thoại CẢM ỨNG: cầm dọc (hình xoay) + cầm ngang.
+  //        Live theo khối đã bỏ «chạm hai lần» (thầy 12/11) ⇒ còn: kéo VẠCH CHIA (bảng rộng ra, nét to theo) và VUỐT BẢNG xem phần đã trôi, thôi chạm thì về chỗ thầy.
+  if (!soLuoc) {
+    const keo = async (p, x0, y0, dx, dy, buoc = 10) => {
+      const cdp = await p.context().newCDPSession(p), d = (t) => [{ x: Math.round(x0 + dx * t), y: Math.round(y0 + dy * t), id: 1 }]
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: d(0) })
+      for (let i = 1; i <= buoc; i++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: d(i / buoc) }); await ngu(18) }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await cdp.detach()
+    }
+    /** Véc-tơ «phải» và «xuống» CỦA HÌNH trên màn + số đo khung bảng (theo trục của hình, không đổi khi xoay). */
+    const doBang = (p) => p.evaluate(() => {
+      const lv = document.querySelector('.lv'), x = lv.getAttribute('data-xoay'), xuong = x == null ? [0, 1] : x === 'nguoc' ? [1, 0] : [-1, 0], phai = [xuong[1], -xuong[0]]
+      const b = document.querySelector('.lv-bang'), c = b.querySelector('.lv-cuon'), v = document.querySelector('.lv-vach-chia'), rv = v?.getBoundingClientRect(), rb = b.getBoundingClientRect()
+      const m = /translate3d\(([-\d.]+)px,\s*([-\d.]+)px/.exec(c?.style.transform ?? '')
+      return { phai, xuong, vach: rv ? [rv.left + rv.width / 2, rv.top + rv.height / 2] : null, tam: [rb.left + rb.width / 2, rb.top + rb.height / 2], rongKhung: b.offsetWidth, caoKhung: b.offsetHeight, rongO: c?.offsetWidth ?? 0, caoO: c?.offsetHeight ?? 0, cuonY: m ? Number(m[2]) : 0 }
+    })
+    const ra = []
+    for (const [ten, p] of [EM[1], EM[3]]) {
+      const t0 = await doBang(p)
+      if (!t0.vach) { ra.push([ten.split(' ')[0], 'không có vạch chia', t0]); continue }
+      // kéo vạch về phía giấy 30 % bề ngang hình ⇒ bảng rộng ra
+      const q = -0.3 * 844
+      await keo(p, t0.vach[0], t0.vach[1], t0.phai[0] * q, t0.phai[1] * q); await ngu(900)
+      const t1 = await doBang(p)
+      ra.push([ten.split(' ')[0], { truoc: [t0.rongKhung, t0.rongO], sau: [t1.rongKhung, t1.rongO], cao: [t1.caoKhung, t1.caoO] }])
+    }
+    kiem('CD8a điện thoại cảm ứng (cầm dọc hình xoay, cầm ngang): em KÉO VẠCH CHIA về phía đề ⇒ khung bảng rộng ra, ô bảng to theo (nét to hơn)', ra.every(([, r]) => typeof r === 'object' && r.sau[0] >= r.truoc[0] + 120 && r.sau[1] >= r.truoc[1] + 100), JSON.stringify(ra))
+    await chup(em2, 'cd-8-em-doc-keo-vach-chia')
+    /** Tung độ (theo trục «xuống» của hình, tính từ mép trên khung bảng) của vạch phấn dài nhất đang thấy trong khung bảng; null = không thấy. */
+    const vachPhan = async (p) => { const anh = (await p.screenshot({ type: 'png' })).toString('base64'); return p.evaluate(async (b64) => {
+      const x = document.querySelector('.lv').getAttribute('data-xoay') != null, k = document.querySelector('.lv-bang').getBoundingClientRect()
+      const i = new Image(); i.src = 'data:image/png;base64,' + b64; await i.decode(); const cv = document.createElement('canvas'); cv.width = i.width; cv.height = i.height; const g = cv.getContext('2d'); g.drawImage(i, 0, 0)
+      const x0 = Math.round(k.left) + 2, y0 = Math.round(k.top) + 2, w = Math.round(k.width) - 4, h = Math.round(k.height) - 4, d = g.getImageData(x0, y0, w, h).data
+      const sang = (a, b) => { const q = (b * w + a) * 4; return (d[q] + d[q + 1] + d[q + 2]) / 3 > 72 && Math.abs(d[q] - d[q + 1]) < 40 }
+      let dai = 0, o = null
+      if (!x) for (let b = 0; b < h; b++) { let n = 0; for (let a = 0; a < w; a++) if (sang(a, b)) n++; if (n > dai) { dai = n; o = b } }
+      else for (let a = 0; a < w; a++) { let n = 0; for (let b = 0; b < h; b++) if (sang(a, b)) n++; if (n > dai) { dai = n; o = w - a } }
+      return dai >= 40 ? o : null
+    }, anh) }
+    const rv = []
+    for (const [ten, p] of [EM[1], EM[3]]) {
+      const t0 = await doBang(p), y0 = await vachPhan(p)
+      // ngón đi XUỐNG của hình 140 px, giữ nguyên ngón (chưa nhả) để đo lúc đang vuốt ⇒ bảng dời theo ngón
+      const cdp = await p.context().newCDPSession(p), d = (t) => [{ x: Math.round(t0.tam[0] + t0.xuong[0] * 140 * t), y: Math.round(t0.tam[1] + t0.xuong[1] * 140 * t), id: 1 }]
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: d(0) })
+      for (let n = 1; n <= 10; n++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: d(n / 10) }); await ngu(18) }
+      await ngu(250)
+      const y1 = await vachPhan(p)
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await cdp.detach()
+      await ngu(1500)
+      const yDung = await vachPhan(p) // nhả tay: bảng ĐỨNG YÊN ở chỗ em đang xem (không giật về)
+      const nut = await p.evaluate(() => { const b = document.querySelector('.lv-bang .lv-ve'), r = b?.getBoundingClientRect(); return b && getComputedStyle(b).display !== 'none' && r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null })
+      if (nut) { await keo(p, nut[0], nut[1], 0, 0, 1); await ngu(900) }
+      const y2 = await vachPhan(p)
+      rv.push([ten.split(' ')[0], { y: [y0, y1, yDung, y2], nut: !!nut, bang: [t0.rongO, t0.caoKhung] }])
+    }
+    kiem('CD8b em VUỐT BẢNG xem phần đã trôi: bảng dời theo ngón, nhả tay thì đứng yên ở chỗ em xem, hiện nút «Về chỗ thầy đang viết»; chạm nút ⇒ bảng về đúng chỗ thầy', rv.every(([, r]) => r.y[0] != null && Math.abs((r.y[1] ?? 1e9) - r.y[0]) >= 40 && r.y[2] === r.y[1] && r.nut && r.y[3] != null && Math.abs(r.y[3] - r.y[0]) <= 3), JSON.stringify(rv))
+    for (const [, p] of EM) await p.evaluate(() => { try { localStorage.removeItem('ddh.live.chia') } catch { /* chặn */ } })
+  }
+
   // ── CD6. GIẤY DỰNG THƯỜNG (câu của lượt lệch chữ trên tờ ⇒ không soi được): khối đề `.lv-de` tự cuộn ──
   const loi4 = await gv.evaluate((q) => window.__chieuCauDai(q), 'Q4'); await ngu(6500)
   const thuong = await Promise.all(EM.map(([, p]) => doGiay(p)))
