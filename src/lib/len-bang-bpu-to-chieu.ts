@@ -146,7 +146,7 @@ export const JS_LEN_BANG_BPU = `
     try { app.postMessage({ nguon: 'to-chieu', loai: 'bpu-ds', qids: ds }, '*'); } catch (x) { /* app đã đóng */ }
   }
   document.addEventListener('mc-vao-dot', baoDsCau);
-  setTimeout(baoDsCau, 0);
+  if (typeof Promise !== 'undefined') Promise.resolve().then(baoDsCau); // sau khi mã tờ chạy xong (không thêm hẹn giờ: bộ đo bố cục đếm hẹn giờ của tờ)
   function luaDoi(d, em) {
     xoaLua();
     var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\\s-]+$/i.test(mau)) return;
