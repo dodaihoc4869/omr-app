@@ -43,7 +43,7 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
-import { laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
+import { cotEmGhim, laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
 import { DauDat, TamTra, type DuLieuTra } from './TamTra'
 import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
@@ -536,7 +536,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
 
   /** Đo khổ hình + vùng an toàn của máy (đọc thước `env(safe-area-inset-*)`). */
   const doHinh = useCallback((): HinhDL => {
-    const W = window.innerWidth, H = window.innerHeight
+    const W = window.innerWidth - cotEmGhim(), H = window.innerHeight // máy tính đang ghim cột tin nhắn ⇒ bố cục theo phần còn lại
     const xoay = canXoayCss(W, H, khoaNgang.current) && laDienThoai() // máy tính / máy tính bảng không bao giờ bị xoay hình (chieu-xoay.ts)
     const cs = thuoc.current ? getComputedStyle(thuoc.current) : null
     const px = (v: string | undefined) => parseFloat(v || '0') || 0

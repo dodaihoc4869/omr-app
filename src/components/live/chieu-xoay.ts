@@ -35,3 +35,10 @@ export const thuocTinhXoay = (): '' | 'nguoc' => (xoayNguoc() ? 'nguoc' : '')
 export function toaDoXoay(e: { clientX: number; clientY: number }, r: { left: number; top: number; right: number; bottom: number }): { x: number; y: number } {
   return xoayNguoc() ? { x: r.bottom - e.clientY, y: e.clientX - r.left } : { x: e.clientY - r.top, y: r.right - e.clientX }
 }
+
+/** MÁY EM (máy tính, live theo khối 13/11): bề ngang cột tin nhắn GHIM bên phải (px) — khớp `--lke-cot` ở em-khoi.css. LopNoiEm gắn `data-lke-cot` ở gốc trang
+ *  khi cột đang ghim; màn live (LopLive `doHinh`) trừ số này khỏi bề ngang cửa sổ lúc tính bố cục ⇒ giấy đề + bảng co gọn vào phần còn lại, không bị cột che.
+ *  (Để ở tệp này — hai nơi dùng đều đã nạp nó — cho khỏi sinh thêm một mảnh mã dùng chung.) */
+export const COT_EM = 300
+export const cotEmGhim = (): number => (typeof document !== 'undefined' && document.documentElement.hasAttribute('data-lke-cot') ? COT_EM : 0)
+

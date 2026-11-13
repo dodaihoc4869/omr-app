@@ -81,8 +81,8 @@ export default function LopNoiEm() {
   useLayoutEffect(() => {
     if (!cotGhim) return
     const g = document.documentElement
-    g.setAttribute('data-lke-cot', '')
-    return () => g.removeAttribute('data-lke-cot')
+    g.setAttribute('data-lke-cot', ''); window.dispatchEvent(new Event('resize')) // màn live tính lại bố cục theo phần còn lại (LopLive `doHinh`)
+    return () => { g.removeAttribute('data-lke-cot'); window.dispatchEvent(new Event('resize')) }
   }, [cotGhim])
   // ngăn trượt đang mở: chạm ra ngoài (vào bảng) ⇒ đóng
   useEffect(() => {
