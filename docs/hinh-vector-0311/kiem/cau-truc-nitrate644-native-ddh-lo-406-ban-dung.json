@@ -1,0 +1,29 @@
+[
+  {
+    "i": 644,
+    "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+    "fileNguon": "anh/781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442.png",
+    "svg": "nitrate644-native-ddh-3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169.svg",
+    "hashSvg": "3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169",
+    "byteSvg": 31208,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B7-D2-II-4",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác $\\ce{H2SO4}$ đặc) như sau:\nKhi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm $\\ce{CO2}$, $\\ce{N2}$ và $\\ce{H2O}$.",
+        "refs": [
+          {
+            "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+            "where": "VIP27-C2-B7-D2-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "f55fff4666db25cb330367aad15bd8dcd4b65d35497355b6efff23669ccc7013"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12drawnC16O3N-EXCLreagent-water-UNKNOWNouterpolymerC/2CHAIRrings2ringO-2bareCH2branchesNOaddedCH2text/4TAPER2boldfront-as2individualCONTINUOUSfilledoutlines-NOverticaltemplate/LL6incltinyterminaldot-LR5-RL5-RR5individualcutcomponents+2ringstubs/3leftOHorHO-2productONO2-1productO2NO-LASTOanchor-SUB234/1FULLFILLEDrighthead-1tinyLEFTbelowshaftUNKNOWNfleck/EXACT+ HNO₃ (đặc)/xt H₂SO₄ đặc, tSUPsmallLatin_o-EXACT- H₂O/ALLregularUPRIGHT/NOadded3coeff-H-charge-n-bracket-caption-answer-alias",
+    "hashSvgDaSoat": "3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

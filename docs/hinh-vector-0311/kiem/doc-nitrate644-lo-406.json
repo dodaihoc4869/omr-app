@@ -1,0 +1,966 @@
+{
+  "i": 644,
+  "assetIndexProvided": 1315,
+  "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442.png",
+  "size": [
+    1080,
+    169
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B7-D2-II-4",
+      "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác $\\ce{H2SO4}$ đặc) như sau:\nKhi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm $\\ce{CO2}$, $\\ce{N2}$ và $\\ce{H2O}$.",
+      "allHinh": [
+        {
+          "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+          "where": "VIP27-C2-B7-D2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "f55fff4666db25cb330367aad15bd8dcd4b65d35497355b6efff23669ccc7013"
+        }
+      ],
+      "missingHashes": [
+        "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/406-full3x.png",
+      "/workspace/scratch/406-left4x.png",
+      "/workspace/scratch/406-right4x.png",
+      "/workspace/scratch/406-condition4x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "leftC": 6,
+      "leftO": 5,
+      "rightC": 6,
+      "rightO": 11,
+      "rightN": 3,
+      "tapers": 4,
+      "boldFronts": 2,
+      "filledRightHeads": 1,
+      "LLseparatedDashComponents": 6,
+      "LRseparatedDashComponents": 5,
+      "RLseparatedDashComponents": 5,
+      "RRseparatedDashComponents": 5,
+      "unknownOuterPolymerC": "Notcountedbeyondcutbonds"
+    },
+    "font": {
+      "chemicalLabels": "Regular upright serif OH/HO/O/ONO2/O2NO,2SUB. No chemicalboldclaim.",
+      "condition": "Uprightserif. HNO3/H2SO4 numbersSUB; smalloSUPint. Wordđặc visuallyheavier; trueboldvsserifscan uncertain, requireparentindependentstyledecision; do not blindlymakeALLbold.",
+      "captions": "NONE"
+    },
+    "left": {
+      "ringNodes": [
+        {
+          "C": [
+            54,
+            68.5
+          ]
+        },
+        {
+          "C": [
+            119.5,
+            85
+          ]
+        },
+        {
+          "OBox": [
+            195,
+            59,
+            211,
+            75
+          ]
+        },
+        {
+          "C": [
+            272.5,
+            122.5
+          ]
+        },
+        {
+          "C": [
+            185,
+            108.5
+          ]
+        },
+        {
+          "C": [
+            106,
+            127.5
+          ]
+        }
+      ],
+      "thinBackPaths": [
+        [
+          [
+            54,
+            68.5
+          ],
+          [
+            119.5,
+            85
+          ],
+          [
+            190,
+            71
+          ]
+        ],
+        [
+          [
+            215,
+            77
+          ],
+          [
+            272.5,
+            122.5
+          ]
+        ]
+      ],
+      "tapers": [
+        {
+          "tip": [
+            54,
+            68.5
+          ],
+          "broadFootApprox": [
+            [
+              103,
+              129
+            ],
+            [
+              109,
+              125
+            ]
+          ],
+          "instruction": "OBLIQUEfoot, notxconstant"
+        },
+        {
+          "tip": [
+            272.5,
+            122.5
+          ],
+          "broadFootApprox": [
+            [
+              183,
+              105
+            ],
+            [
+              188,
+              111
+            ]
+          ],
+          "instruction": "OBLIQUEindividualfoot, notverticalHaworth template"
+        }
+      ],
+      "boldFront": {
+        "from": [
+          106,
+          127.5
+        ],
+        "to": [
+          185,
+          108.5
+        ],
+        "widthApprox": 6
+      },
+      "upperBranch": [
+        [
+          119.5,
+          85
+        ],
+        [
+          93,
+          47
+        ],
+        [
+          115,
+          24
+        ]
+      ],
+      "upperOH": {
+        "literal": "OH",
+        "bbox": [
+          117,
+          3,
+          151,
+          21
+        ],
+        "anchor": "FIRST O"
+      },
+      "leftHO": {
+        "literal": "HO",
+        "bbox": [
+          24,
+          118,
+          59,
+          135
+        ],
+        "anchor": "LAST O",
+        "bond": [
+          [
+            63,
+            126.5
+          ],
+          [
+            106,
+            126.5
+          ]
+        ]
+      },
+      "lowerOH": {
+        "literal": "OH",
+        "bbox": [
+          227,
+          130,
+          261,
+          147
+        ],
+        "anchor": "FIRST O",
+        "bond": [
+          [
+            187,
+            111
+          ],
+          [
+            222,
+            130
+          ]
+        ]
+      },
+      "rightO": {
+        "literal": "O",
+        "bbox": [
+          314,
+          79,
+          330,
+          96
+        ],
+        "bond": [
+          [
+            272.5,
+            122.5
+          ],
+          [
+            310,
+            97
+          ]
+        ]
+      },
+      "cutDashes": {
+        "leftSegments": [
+          [
+            [
+              15,
+              104
+            ],
+            [
+              16,
+              105
+            ]
+          ],
+          [
+            [
+              20,
+              101
+            ],
+            [
+              22,
+              98
+            ]
+          ],
+          [
+            [
+              26,
+              95
+            ],
+            [
+              29,
+              92
+            ]
+          ],
+          [
+            [
+              32,
+              89
+            ],
+            [
+              36,
+              86
+            ]
+          ],
+          [
+            [
+              39,
+              83
+            ],
+            [
+              42,
+              79
+            ]
+          ],
+          [
+            [
+              46,
+              77
+            ],
+            [
+              49,
+              74
+            ]
+          ]
+        ],
+        "leftRingStub": [
+          [
+            52,
+            70
+          ],
+          [
+            54,
+            68.5
+          ]
+        ],
+        "rightSegments": [
+          [
+            [
+              335,
+              96
+            ],
+            [
+              338,
+              98
+            ]
+          ],
+          [
+            [
+              343,
+              101
+            ],
+            [
+              347,
+              102
+            ]
+          ],
+          [
+            [
+              350,
+              105
+            ],
+            [
+              354,
+              107
+            ]
+          ],
+          [
+            [
+              359,
+              110
+            ],
+            [
+              362,
+              112
+            ]
+          ],
+          [
+            [
+              366,
+              114
+            ],
+            [
+              370,
+              116
+            ]
+          ]
+        ]
+      }
+    },
+    "right": {
+      "ringNodes": [
+        {
+          "C": [
+            750.5,
+            76.5
+          ]
+        },
+        {
+          "C": [
+            815,
+            93
+          ]
+        },
+        {
+          "OBox": [
+            889,
+            67,
+            906,
+            84
+          ]
+        },
+        {
+          "C": [
+            966,
+            130
+          ]
+        },
+        {
+          "C": [
+            884,
+            117
+          ]
+        },
+        {
+          "C": [
+            800,
+            134
+          ]
+        }
+      ],
+      "thinBackPaths": [
+        [
+          [
+            750.5,
+            76.5
+          ],
+          [
+            815,
+            93
+          ],
+          [
+            887,
+            78
+          ]
+        ],
+        [
+          [
+            909,
+            85
+          ],
+          [
+            966,
+            130
+          ]
+        ]
+      ],
+      "tapers": [
+        {
+          "tip": [
+            750.5,
+            76.5
+          ],
+          "broadFootApprox": [
+            [
+              797,
+              136
+            ],
+            [
+              803,
+              131
+            ]
+          ]
+        },
+        {
+          "tip": [
+            966,
+            130
+          ],
+          "broadFootApprox": [
+            [
+              882,
+              113.5
+            ],
+            [
+              888,
+              120
+            ]
+          ]
+        }
+      ],
+      "boldFront": {
+        "from": [
+          800,
+          134
+        ],
+        "to": [
+          884,
+          117
+        ],
+        "widthApprox": 6
+      },
+      "upperBranch": [
+        [
+          815,
+          93
+        ],
+        [
+          788,
+          55
+        ],
+        [
+          810,
+          31
+        ]
+      ],
+      "upperGroup": {
+        "literal": "ONO₂",
+        "bbox": [
+          812,
+          11,
+          874,
+          33
+        ],
+        "anchor": "FIRST O"
+      },
+      "leftGroup": {
+        "literal": "O₂NO",
+        "bbox": [
+          696,
+          126,
+          754,
+          145
+        ],
+        "anchor": "LAST O",
+        "bond": [
+          [
+            758,
+            134
+          ],
+          [
+            800,
+            134
+          ]
+        ]
+      },
+      "lowerGroup": {
+        "literal": "ONO₂",
+        "bbox": [
+          922,
+          145,
+          983,
+          166
+        ],
+        "anchor": "FIRST O",
+        "bond": [
+          [
+            884.2995169082126,
+            118.81481481481481
+          ],
+          [
+            919,
+            143
+          ]
+        ]
+      },
+      "rightO": {
+        "literal": "O",
+        "bbox": [
+          1008,
+          88,
+          1024,
+          105
+        ],
+        "bond": [
+          [
+            966,
+            130
+          ],
+          [
+            1004,
+            105
+          ]
+        ]
+      },
+      "cutDashes": {
+        "leftSegments": [
+          [
+            [
+              708,
+              106
+            ],
+            [
+              714,
+              101
+            ]
+          ],
+          [
+            [
+              718,
+              99
+            ],
+            [
+              721,
+              96
+            ]
+          ],
+          [
+            [
+              725,
+              93
+            ],
+            [
+              729,
+              90
+            ]
+          ],
+          [
+            [
+              732,
+              88
+            ],
+            [
+              736,
+              86
+            ]
+          ],
+          [
+            [
+              740,
+              83
+            ],
+            [
+              743,
+              80
+            ]
+          ]
+        ],
+        "leftRingStub": [
+          [
+            747,
+            78
+          ],
+          [
+            750.5,
+            76.5
+          ]
+        ],
+        "rightSegments": [
+          [
+            [
+              1030,
+              103
+            ],
+            [
+              1034,
+              106
+            ]
+          ],
+          [
+            [
+              1037,
+              108
+            ],
+            [
+              1041,
+              111
+            ]
+          ],
+          [
+            [
+              1046,
+              112
+            ],
+            [
+              1049,
+              115
+            ]
+          ],
+          [
+            [
+              1053,
+              117
+            ],
+            [
+              1057,
+              119
+            ]
+          ],
+          [
+            [
+              1061,
+              122
+            ],
+            [
+              1065,
+              123
+            ]
+          ]
+        ]
+      }
+    },
+    "arrow": {
+      "shaft": [
+        [
+          402,
+          112.5
+        ],
+        [
+          665,
+          112.5
+        ]
+      ],
+      "filledHeadApprox": [
+        [
+          650,
+          108
+        ],
+        [
+          665,
+          112.5
+        ],
+        [
+          650,
+          117
+        ],
+        [
+          653,
+          112.5
+        ]
+      ],
+      "above": {
+        "literal": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, tᵒ",
+        "bboxApprox": [
+          394,
+          77,
+          672,
+          95
+        ]
+      },
+      "below": {
+        "literal": "- H₂O",
+        "bboxApprox": [
+          499,
+          129,
+          551,
+          145
+        ]
+      },
+      "tinyMark": {
+        "centerApprox": [
+          399,
+          115.5
+        ],
+        "classification": "Smallisolateddarkfleckjustleftbelowshaftstart, intentUNKNOWNretain, notpunctuationanswer"
+      }
+    },
+    "noAdded": [
+      "No HNO3coefficient3",
+      "No H2Ocoefficient3",
+      "No extra nitratecharge",
+      "No polymern/brackets",
+      "No outerchaincarbonstotal",
+      "No stereohashes"
+    ]
+  },
+  "measurementLimits": "Eachchairseparatelyopenedown4x; individualobliquefootguides ±1–2px, no reusedverticaltemplate. Dashedendcomponents visuallychecked pluspixelcomponents tolocate ink, not countchemicalunits. Source-onlystyleuncertaintyforconditionbold retainedexplicitly.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "nativeFull2xOpened": true,
+    "nativeEachChair4xOpened": true,
+    "nativeConditions5xOpened": true,
+    "independentCounts": "12drawnC16O3N EXCLreagent-water/4TAPER2boldfront/1FULLFILLEDrighthead/LL6includingtinydot-LR5-RL5-RR5+2ringstubs",
+    "fontIndependent": {
+      "nguoiSoat": "soat_nguon_3",
+      "iParent": 644,
+      "assetParent": 1315,
+      "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+      "nativeSize": [
+        1080,
+        169
+      ],
+      "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442.png",
+      "shaVerified": true,
+      "repoModified": false,
+      "SVGCreated": false,
+      "scope": "Focusedfontweight source-only; no reaction/answer normalization",
+      "ownActualViewed": [
+        "nativeFULLoriginal",
+        "/workspace/scratch/font644-full2x-406.png",
+        "/workspace/scratch/font644-condition10x-406.png",
+        "/workspace/scratch/font644-water12x-406.png"
+      ],
+      "overallVerdict": "Conditions and waterline visually regular upright Times-like serif, with strong thick/thin contrast. No conditionpiece has convincing independent TRUEbold evidence. Tiny superscript weight remains UNKNOWN.",
+      "pieces": [
+        {
+          "id": "leadingPlus",
+          "sourceLiteralDescription": "+",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Thin upright plus, visually lighter than neighboring serifs; no truebold evidence.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "reagent",
+          "sourceLiteralDescription": "HNO₃",
+          "weightVerdict": "regular",
+          "confidence": "medium-high",
+          "evidence": "Upright serif with pronounced thick/thin contrast, delicate O hairlines and thin H crossbar. Consistent regular Times-like face, not a separately boldrun.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "parenthesizedConcentration",
+          "sourceLiteralDescription": "(đặc)",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Dense Vietnamese d/a/c and stacked marks look darker locally, but serif/hairline structure and surrounding parentheses do not show a distinct weight change. Do not promote to bold from density.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "slashCatalyst",
+          "sourceLiteralDescription": "/xt",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Upright serif x/t; stroke/serif character continuous with neighboring conditionline; slash thin. No independently bold treatment observed.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "catalystFormula",
+          "sourceLiteralDescription": "H₂SO₄",
+          "weightVerdict": "regular",
+          "confidence": "medium-high",
+          "evidence": "Strong thick/thin contrast remains through H,S,O and subscripts; visually same regular conditionface as HNO₃.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "secondConcentration",
+          "sourceLiteralDescription": "đặc,",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Appears locally dark due lettershapes/diacritics, not a demonstrable switch to truebold; same upright serif face.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "temperatureMain",
+          "sourceLiteralDescription": "t",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Upright serif t, no italic slant; dark stem alone does not establish bold.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "temperatureSuperscript",
+          "sourceLiteralDescription": "small superscript o/0-like glyph",
+          "weightVerdict": "unknown",
+          "confidence": "low",
+          "evidence": "Too small for independent weight/family discrimination; appears consistent with regular context, but cannot assert true regular/bold from this native raster. No semantic correction of o/0/degree here.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "waterLeadingDash",
+          "sourceLiteralDescription": "-",
+          "weightVerdict": "regular",
+          "confidence": "medium",
+          "evidence": "Simple horizontal dash; weight consistent with waterline; an isolated dash cannot by itself establish fontweight.",
+          "TRUEboldConfirmed": false
+        },
+        {
+          "id": "waterFormula",
+          "sourceLiteralDescription": "H₂O",
+          "weightVerdict": "regular",
+          "confidence": "medium-high",
+          "evidence": "Upright strongcontrast serif H/O, thin crossbar/top-bottom strokes; regular Times-like appearance; not sufficient evidence for truebold.",
+          "TRUEboldConfirmed": false
+        }
+      ],
+      "limits": [
+        "Rasterimage does not expose originalfontfamily/weight metadata; Times-like is visualfamilydescription, not exactfontidentification.",
+        "Judgment based on whole glyph design/hairline/serif contrast and consistency across neighboringruns, not stemsize count/pixelthreshold or smallsizeappearance.",
+        "Apparentheaviness of đặc alone is insufficient for a boldrun conclusion; retain uncertainty in mediumconfidence pieces.",
+        "Temperature smallsuperscript undecided o/0/degree identity here; preserve nativeform separately from fontweight decision.",
+        "No generic conclusion that highcontrast serif can never be bold; this verdict is scoped to these actual sourcepieces."
+      ]
+    },
+    "rootFontVerdict": "Ownfull/condition5x: regularuprightserifstrongcontrast, notTRUEdam. Captionruncontinuity and hairlines support regular; DDHregular chosenforALLchemicalandconditions/smallsupLatin_o. Noexactsourcefontfamilyclaim.",
+    "sourceGeometryOldGuidesRetained": true,
+    "frontIndividualOutlinesApprox": {
+      "left": [
+        [
+          54,
+          68.5
+        ],
+        [
+          106,
+          131
+        ],
+        [
+          187,
+          111
+        ],
+        [
+          272.5,
+          122.5
+        ],
+        [
+          185,
+          105
+        ],
+        [
+          108,
+          124
+        ]
+      ],
+      "right": [
+        [
+          750.5,
+          76.5
+        ],
+        [
+          800,
+          138
+        ],
+        [
+          882,
+          118.5
+        ],
+        [
+          966,
+          130
+        ],
+        [
+          881,
+          112.5
+        ],
+        [
+          803,
+          132
+        ]
+      ]
+    },
+    "frontExplanation": "Ownnativefront: join4tapers+2bold as2continuousfilledoutlines to retainnativecorneroverlap withoutwhitegap/uprightstep. Noverticaltemplate/reusedtranslation. Sourceguideproductpeak884117 approxtooLow: uppernativeink113..118at880/882; outlinepeak881112.5/882118.5approx. PixelreadingONLYsupportsownvisualnotautomaticgate/notmeasuredsubpixel.",
+    "nativeApproxNotSubpixel": true,
+    "branchFootCorrectionAfterInitialSvg": {
+      "oldApproxFoot": [
+        886,
+        120
+      ],
+      "newCalculatedFoot": [
+        884.2995169082126,
+        118.81481481481481
+      ],
+      "endpointUnchanged": [
+        919,
+        143
+      ],
+      "method": "Intersectsamebranchslope23/33 withapproxfrontloweredge882118.5→966130. ONLYextendonebranch; noaddedbridge, noanglechange. Nativecontactvisualproof; NOTnativeSubpixel/pixelgate.",
+      "initialRejectedSha": "39a72220a718540b7a360cb5c05a96068db292148cc19e513e28994f284856e0"
+    }
+  },
+  "rootActualReview": {
+    "hashSvg": "3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169",
+    "nativeFull2x": true,
+    "nativeEachChair4xConditions5x": true,
+    "all1PublicDeRefRead": true,
+    "freshFinalChromium3xFullOpened": true,
+    "freshFinalEachChairConditionsMacrosOpened": true,
+    "verdict": "Đạt scoped exactSVG:12drawnC16O3N EXCLreagentwater/4TAPER2boldfront-as2individualcontinuousoutlines/LL6incltinydotLR5RL5RR5+2stubs/1FILLEDhead+tinyLEFTUNKNOWNfleck/ALLregularUPRIGHTconditionsandsmallsupo/EXACTO₂NO-ONO₂/HNO₃(đặc)/xtH₂SO₄đặc,tSUPo/-H₂O/noadded3coeff-H-charge-n-caption-answer-alias. Initial39afootgap rejected; finalONLYonesameanglefootextendedcalculatedcontact. Nooldpositivecarry. NativeapproxNOTsubpixel."
+  }
+}

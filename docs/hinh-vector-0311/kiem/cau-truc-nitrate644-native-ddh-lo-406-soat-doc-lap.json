@@ -1,0 +1,21 @@
+[
+  {
+    "i": 644,
+    "hashSvg": "3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, public de và ref duy nhất, fresh Chromium 3x FULL cùng macro hai chair/nhánh/điều kiện. 12C16O3N phần cấu trúc; 3 nhóm OH/HO đổi thành 2 ONO₂ và O₂NO, giữ 4 taper/2 front trong hai outline liên tục; đầu nhánh ONO₂ dưới đã tiếp xúc outline, không khe trắng. Giữ các nét cắt 6/5/5/5 kể cả dot nhỏ, hai stub, mũi tên đặc và fleck nhỏ không gán nghĩa. Literal điều kiện/chỉ số/HO-O₂NO anchor đúng, chữ regular upright phù hợp nguồn, không chạm/cắt/tràn. SHA thực đọc và sau ảnh khớp.",
+    "render": "/workspace/scratch/soat406-final-644-fresh.png",
+    "macro": [
+      "/workspace/scratch/nitrate644-final-left.png",
+      "/workspace/scratch/nitrate644-final-right.png",
+      "/workspace/scratch/nitrate644-final-conditions.png",
+      "/workspace/scratch/nitrate644-final-branch.png"
+    ],
+    "hash": "781064188438dcfcdd82a76a70fef0ebfd58137eaaf3134a54c197deedccd442",
+    "hashSvgDaSoat": "3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169",
+    "runtimeProof": {
+      "sha256": "854c9fece3615a95a07c0d51df5116b3ea847f1d0b79a1142ec85a9845a9d871",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/nitrate644-native-ddh-3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169.svg 3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169\n644 { x: 0, y: 0, width: 1080, height: 169 }\n\nPOSTSHOT_SHA 3097c22edd493341cb65e2b7c405783650e2419353ebfa5dca230423f777e169\nCOMMAND node /workspace/scratch/agent-render406-final.cjs\nCONTEXT VIP27-C2-B7-D2-II-4.hinh.0.du_lieu; de only, one public ref, no answers.\n"
+    }
+  }
+]
