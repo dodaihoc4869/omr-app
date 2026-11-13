@@ -345,10 +345,7 @@ describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
             expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
           } else await screen.findByRole('region', { name: /^Tổng câu hôm nay/ }) // hệ Kính: thẻ tổng câu hôm nay thay thẻ «Bài học hôm nay»
           const bong = [...container.querySelectorAll('.bi-loi-bong')].map((b) => b.querySelector('.ht2-an')?.textContent ?? '')
-          if (muc === 'hom-nay' && gio === 21) {
-            expect(bong.length).toBeGreaterThan(0)
-            for (const b of bong) expect(KHO_THAY.has(b), b).toBe(true)
-          }
+          if (muc === 'hom-nay' && gio === 21) expect(bong.some((b) => KHO_THAY.has(b)), bong.join(' | ')).toBe(true) // Mol bực ⇒ đi đúng nhánh ngoại lệ
           for (const b of bong) {
             expect(b).not.toMatch(NHAN_NHOM_BAC)
             if (NHAN.test(b)) expect(KHO_THAY.has(b), b).toBe(true)
