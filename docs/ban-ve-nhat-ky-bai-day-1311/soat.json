@@ -29,7 +29,7 @@
   },
   {
    "anh": "03-nhat-ky-ngang-844-sang.jpg",
-   "kb": 142,
+   "kb": 141,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -110,7 +110,7 @@
   },
   {
    "anh": "12-cho-gan-may-tinh-1366-sang.jpg",
-   "kb": 143,
+   "kb": 138,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
@@ -127,5 +127,16 @@
    "chuHocSinh": []
   }
  ],
- "video": []
+ "video": [
+  {
+   "video": "video-nhat-ky-may-tinh-1366.mp4",
+   "giay": 39,
+   "mb": 2.21
+  },
+  {
+   "video": "video-nhat-ky-dien-thoai-390.mp4",
+   "giay": 39,
+   "mb": 0.81
+  }
+ ]
 }

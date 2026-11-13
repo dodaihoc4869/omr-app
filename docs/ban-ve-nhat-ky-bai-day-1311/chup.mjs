@@ -106,7 +106,7 @@ if (!CHI_VIDEO) for (const [ten, tep, ts, w, h, nen, chuHs] of ANH) {
   await p.close()
 }
 
-// ── 3. video: chạy lần lượt các cảnh của bài liên kết ──
+// ── 3. video: chạy lần lượt các cảnh của bài liên kết (bìa ⇒ kéo co ⇒ O₂ ⇒ đoán H₂ ⇒ ion ⇒ CH₄ ⇒ thang ⇒ CO₂) ──
 const VID = []
 if (VIDEO) {
   let coFfmpeg = true
@@ -118,10 +118,10 @@ if (VIDEO) {
     await p.goto(`${GOC_URL}nhat-ky.html?toc=1.5&ghi=0`)
     await p.waitForSelector('html[data-san]', { timeout: 10000 })
     const tai = (Date.now() - batDau) / 1000
-    await p.waitForTimeout(3600)
+    await p.waitForTimeout(2600)
     const toi = async (id, them) => {
       await p.evaluate((id) => { const e = document.getElementById(id); window.scrollTo({ top: e.getBoundingClientRect().top + scrollY - (innerWidth < 900 ? 64 : 72), behavior: 'smooth' }) }, id)
-      await p.waitForTimeout(900)
+      await p.waitForTimeout(750)
       const ms = await p.evaluate((id) => window.NK_TRANG.dk[id].thoiLuong, id)
       await p.waitForTimeout(Math.min(9000, ms + (them || 300)))
     }
@@ -134,7 +134,7 @@ if (VIDEO) {
     await toi('c5')
     await toi('c7')
     await toi('c8')
-    await toi('c11', -2600)
+    await toi('c10', -300)
     const tong = (Date.now() - batDau) / 1000
     await ctx.close()
     const webm = readdirSync(tam).find((x) => x.endsWith('.webm'))
