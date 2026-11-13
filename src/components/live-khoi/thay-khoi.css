@@ -135,6 +135,9 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
    là xanh than Duolingo (--tr-chieu-bang / --mc-bang); cột «Tin nhắn lớp», dải đầu tờ riêng, dải «Chỉ thầy thấy» và các đường viền quanh bảng trước
    dùng tông xám than (slate / mặt chiếu xám) ⇒ nay CÙNG bảng xanh than (--lk-*: nền = nền bảng · mặt thẻ · viền), gắn ở gốc trang suốt buổi (thay-khoi.ts). */
 html[data-live-khoi] .lop-xem-phieu { background: var(--lk-nen); }
+/* 13/11 thầy «dòng kẻ 2 phần không khớp nhau bỏ luôn dòng kẻ trên đi»: khung tờ thu theo cột tin nhắn ⇒ mép trên iframe rơi vào nửa điểm ảnh, nền GIẤY sáng mặc
+   định của iframe lộ thành vạch xám 1 px ⇒ nền iframe = nền bảng (vạch biến mất, tờ vẫn tự vẽ nền của nó). */
+html[data-live-khoi] .lop-xem-phieu iframe { background: var(--lk-nen) !important; }
 html[data-live-khoi] .lc-goc { --lc-nen: var(--lk-nen); --lc-mat: var(--lk-mat); --lc-mat-2: var(--lk-mat-2); --lc-vien: var(--lk-vien); --lc-nen-2: var(--lk-nen); }
 html[data-live-khoi] .lkt-cot { background: var(--lk-nen); box-shadow: inset 1.5px 0 0 var(--lk-vien); }
 html[data-live-khoi] .lkt-dai { background: var(--lk-nen); box-shadow: inset 0 1.5px 0 var(--lk-vien); }
