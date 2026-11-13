@@ -23,12 +23,12 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
-      - name: Đo (chỉ SELECT)
-        working-directory: server
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # 13/11: soi 5 em ngày Sửa 11/11 đề 28 thiếu câu trả lời ngắn mà không có câu làm lại / tự luyện (scripts/soi-5-em-de28-1311.mjs — chỉ SELECT, đánh số em).
+      - name: Soi 5 em (chỉ SELECT)
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: |
-          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
-          r() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>&1 | tail -c 1500; echo; sleep 4; }
-          r "K9 em ngày Sửa 11/11 bị thầy giới hạn dạng / chặn câu (game_v2_scope)" "SELECT COUNT(*) em_sua, SUM(json_array_length(COALESCE(json_extract(s.json,'\\$.types'),'[]'))>0) gioi_han_dang, SUM(json_array_length(COALESCE(json_extract(s.json,'\\$.blocked'),'[]'))>0) co_chan_cau, SUM(COALESCE(json_extract(s.json,'\\$.enabled'),1)=0) tat FROM goi_bai_7_loai_ngay l LEFT JOIN game_v2_scope s ON s.sbd=l.sbd WHERE l.ngay='2026-11-11' AND l.loai='sua'"
+        run: node scripts/soi-5-em-de28-1311.mjs
