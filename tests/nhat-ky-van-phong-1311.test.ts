@@ -182,6 +182,8 @@ describe('lệnh của văn phòng', () => {
     expect(cat.canh.every((c: any) => !c.nguon.chep)).toBe(true)
     expect(cat.canh.filter((c: any) => c.khuon !== 'tong-ket').every((c: any) => Array.isArray(c.nguon.vung))).toBe(true)
     expect(r2.du.has('live/b1/nhat-ky-goc.json')).toBe(true)
+    // bản cất mang ngưỡng cổng đã dùng + dấu «văn phòng soạn» ⇒ máy em tin kết quả, không chạy lại cổng trên bản đã gỡ chữ chép bảng
+    expect(cat.nguon.nguoiSoan).toBe('van-phong'); expect(cat.nguong.moTa).toMatch(/Δχ/); expect(cat.nguong.vung).toHaveLength(3)
     const ds = await vp('/gv/live-nhat-ky-ds')
     expect(ds.ds[0]).toMatchObject({ buoiId: 'b1', canSoan: false, nhatKy: { ban: 2, phatHanh: true } })
   })
@@ -244,6 +246,14 @@ describe('màn học sinh xem nhật ký (trang tĩnh public/nhat-ky/)', () => {
       expect(s).not.toMatch(/\?\.[a-zA-Z_([]|\?\?=|\.at\(|replaceAll\(|structuredClone|findLast/)
     }
     expect(readFileSync('public/nhat-ky/khuon.css', 'utf8')).not.toContain('src/styles')
+  })
+  it('máy em KHÔNG chạy lại cổng trên bài máy chủ đã cất (bản đã gỡ chữ chép bảng: chạy lại thì bỏ oan cảnh) — tin kết quả, dùng ngưỡng đã cất', () => {
+    const t = readFileSync('public/nhat-ky/index.html', 'utf8')
+    expect(t).toContain("const daQuaCong = !!(kbGoc.nguon && kbGoc.nguon.nguoiSoan === 'van-phong')")
+    expect(t).toContain('kbGoc.nguong && kbGoc.nguong.vung ? kbGoc.nguong : N.nguongTuDong(kbGoc)')
+    // chứng minh vì sao: chạy lại cổng trên bản đã cất làm mất cảnh
+    const ra = quaCong(doc('kich-ban-lien-ket.json')).kb
+    expect(kiemCong(JSON.parse(JSON.stringify(ra))).dat.length).toBeLessThan(ra.canh.length)
   })
   it('ngoài precache (giữ trần 170) và service worker không trả trang app thay cho /nhat-ky/', () => {
     expect(readFileSync('vite.config.ts', 'utf8')).toContain("'**/nhat-ky/**'")

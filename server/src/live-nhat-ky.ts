@@ -198,6 +198,8 @@ export async function nhatKyGhi(env: Env, b: Row, nay = Date.now()): Promise<Row
   const luc = new Date(nay).toISOString()
   ra.buoi = { ten: str(dong.ten_thay).trim() || str(dong.ten_tu_dong), lop: str(dong.lop), ngay: str(dong.ngay), thu: thuVn(str(dong.ngay)), gioBatDau: gioVn(str(dong.bat_luc)), phutLive: Math.round(buoi.msLive / 60_000), ban }
   ra.nguon = { soTrangBang: trang.length, nguoiSoan: 'van-phong', luc, dat: cong.dat.length, soCanh: cong.soCau }
+  // ngưỡng Δχ cổng đã dùng (đọc từ chữ chép bảng — bản phát hành bỏ `chep`) ⇒ máy em dùng đúng ngưỡng này, KHÔNG chạy lại cổng trên bản đã cất
+  ra.nguong = cong.nguong
   if (!env.DE) return { ok: false, lyDo: 'khong-r2', error: 'Máy chủ chưa có kho tệp.' }
   await env.DE.put(khoaTep(id, TEP_NHAT_KY_GOC), JSON.stringify({ luc, ban, kichBan: kb }), { httpMetadata: { contentType: 'application/json;charset=utf-8' } })
   if (cong.phatHanh) await env.DE.put(khoaTep(id, TEP_NHAT_KY), JSON.stringify(ra), { httpMetadata: { contentType: 'application/json;charset=utf-8' } })

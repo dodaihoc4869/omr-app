@@ -201,7 +201,12 @@ html.che-giang .tin { bottom: calc(100px + env(safe-area-inset-bottom)); }
 
   function dung(kbGoc, trangBang) {
     // CỔNG TỰ KIỂM: cảnh sai số / không nguồn bị bỏ; không đủ cảnh tin được thì không phát hành (chỉ hiện bảng gốc như cũ)
-    const { kb, cong } = N.quaCong(kbGoc, { tenLop: kbGoc.buoi.tenLop || [] })
+    // Bài văn phòng soạn ĐÃ qua cổng tự kiểm của máy chủ (cảnh hỏng đã bỏ, chữ chép bảng đã gỡ) ⇒ tin kết quả ấy, KHÔNG chạy lại cổng ở đây: chạy lại trên bản
+    // đã gỡ `chep` thì số chỉ có trên bảng mất nguồn ⇒ bỏ oan cảnh, ngưỡng Δχ lệch. Bản không phải của máy chủ (kịch bản thô) mới qua cổng tại máy.
+    const daQuaCong = !!(kbGoc.nguon && kbGoc.nguon.nguoiSoan === 'van-phong')
+    const { kb, cong } = daQuaCong
+      ? { kb: kbGoc, cong: { phatHanh: true, dat: kbGoc.canh.map((c) => c.id), bo: [], soCau: kbGoc.canh.length, nguong: kbGoc.nguong && kbGoc.nguong.vung ? kbGoc.nguong : N.nguongTuDong(kbGoc) } }
+      : N.quaCong(kbGoc, { tenLop: kbGoc.buoi.tenLop || [] })
     const b = kb.buoi, nk = document.getElementById('nk'), ng = cong.nguong, NET = {}
     for (const t of (trangBang && trangBang.trang) || []) NET[t.stt] = t
     document.title = `Nhật ký bài dạy · ${b.ten}`

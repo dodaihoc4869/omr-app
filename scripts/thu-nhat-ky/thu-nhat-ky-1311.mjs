@@ -20,8 +20,13 @@ await new Promise((r) => may.listen(0, '127.0.0.1', r))
 const TRANG = `http://127.0.0.1:${may.address().port}`, API = 'https://may-chu.thu'
 
 // dữ liệu giả của «máy chủ»
-let kb = JSON.parse(readFileSync(join(BV, 'kich-ban-lien-ket.json'), 'utf8'))
-delete kb.mau; kb.buoi = { ten: kb.buoi.ten, lop: 'Live Khối 10', ngay: '2026-11-12', thu: 'Thứ Năm', gioBatDau: '20:18', phutLive: 39, ban: 2 }
+// nhat-ky.json = ĐÚNG bản máy chủ cất (server/src/live-nhat-ky.ts nhatKyGhi): qua cổng TS (bỏ cảnh hỏng, gỡ chữ chép bảng) + đầu tệp + ngưỡng đã dùng
+const { build: dung } = await import('esbuild'), raCong = join(ANH, 'cong.mjs')
+await dung({ entryPoints: [join(GOC, 'src/lib/nhat-ky/cong.ts')], bundle: true, format: 'esm', platform: 'node', outfile: raCong, logLevel: 'silent' })
+const CONG = await import(raCong)
+const daCat = (tho) => { const { kb: ra, cong } = CONG.quaCong(tho, { tenLop: [] }); ra.buoi = { ten: tho.buoi?.ten ?? 'Buổi live', lop: 'Live Khối 10', ngay: '2026-11-12', thu: 'Thứ Năm', gioBatDau: '20:18', phutLive: 39, ban: 2 }; delete ra.mau; delete ra.ghiChu; ra.nguon = { nguoiSoan: 'van-phong', dat: cong.dat.length, soCanh: cong.soCau }; ra.nguong = cong.nguong; return ra }
+let kb = daCat(JSON.parse(readFileSync(join(BV, 'kich-ban-lien-ket.json'), 'utf8')))
+const SO_CANH = kb.canh.length
 const hop = { window: {} }; vm.runInNewContext(readFileSync(join(BV, 'net-mau.js'), 'utf8'), hop)
 let trang = { trang: [{ stt: 1, loai: 'bang', ...hop.window.NET_MAU['lien-ket'] }] }
 // THAT=<thư mục>: bài THẬT văn phòng đã soạn (nhat-ky.json) + nét phấn thật (net.bin, buoi.json) — trang.json dựng y như máy chủ (src/lib/nhat-ky/trang-bang.ts)
@@ -55,7 +60,7 @@ for (const [kho, w, h, toi] of [['dien-thoai', 390, 844, true], ['may-tinh', 136
   await p.goto(`${TRANG}/nhat-ky/?id=b1&ve=ve-thu&goc=${encodeURIComponent(API)}`)
   await p.waitForSelector('html[data-san]', { timeout: 15000 })
   const bia = await p.evaluate(() => ({ ten: document.getElementById('bia-ten')?.textContent ?? '', canh: document.querySelectorAll('section.canh').length, nut: !!document.getElementById('nut-giang'), tieuDe: document.title }))
-  kiem(`[${kho}] mở được: bìa có tên bài, đủ cảnh, nút «Xem như Thầy giảng»`, !!bia.ten && bia.canh >= 4 && bia.nut, JSON.stringify(bia))
+  kiem(`[${kho}] mở được: bìa có tên bài, ĐỦ cảnh máy chủ đã duyệt (${SO_CANH}, không bỏ oan cảnh nào), nút «Xem như Thầy giảng»`, !!bia.ten && bia.canh === SO_CANH && bia.nut, JSON.stringify(bia))
   const vungDung = await p.evaluate(() => { const T = window.NK_TRANG; return T ? T.ds.length : 0 })
   kiem(`[${kho}] đủ cảnh dựng xong`, vungDung === bia.canh, String(vungDung))
   await p.screenshot({ path: join(ANH, `nk-${kho}-bia.jpg`), type: 'jpeg', quality: 60 })

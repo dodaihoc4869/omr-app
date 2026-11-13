@@ -80,4 +80,4 @@ Bản phát hành nằm ở `live/<buoiId>/nhat-ky.json`. Ở trang xem lại c�
 - «Xem như Thầy giảng»: phát giọng Thầy kèm phụ đề.
 - «Tự đọc»: em tự cuộn qua các cảnh.
 
-Nét phấn thật của Thầy hiện theo đúng giờ viết, vùng nét do máy điền. Cổng tự kiểm chạy lại trên máy em, cùng luật với máy chủ. Buổi chưa có bài thì trang xem lại không hiện thẻ.
+Nét phấn thật của Thầy hiện theo đúng giờ viết, vùng nét do máy điền. Máy em tin kết quả cổng của máy chủ, không chạy lại, và dùng đúng ngưỡng Δχ máy chủ đã cất. Buổi chưa có bài thì trang xem lại không hiện thẻ.
