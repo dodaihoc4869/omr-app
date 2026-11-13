@@ -5,6 +5,11 @@
 // Nay: mỗi câu dở KHÔNG có trong đề mới chiếm chỗ một câu của đề mới CÙNG Ô (phần × mức), không có thì CÙNG PHẦN — bỏ câu ưu tiên thấp nhất (cuối danh sách)
 // của ô / phần ấy. Không cùng phần ⇒ không bỏ gì (không bao giờ lấy suất của phần khác). Thuần CPU, tất định.
 
+import { oMaTran } from './ma-tran-rut-moi'
+import { tachSongSinh } from './loi-hoc-luat'
+import { NGAY_DE_28 } from './rut-28'
+import { ngayVn7 } from './goi-bai-7-loi'
+
 /** Trả đề mới đã nhường suất cho các câu dở (giữ thứ tự). `oCua(qid)` = ô `phần|mức` (ma-tran-rut-moi.ts `oMaTran`). */
 export function nhuongSuatChoCauDo<T extends { qid: string }>(cauDo: readonly { qid: string }[], deMoi: readonly T[], oCua: (qid: string) => string): T[] {
   if (!cauDo.length || !deMoi.length) return [...deMoi]
@@ -20,4 +25,13 @@ export function nhuongSuatChoCauDo<T extends { qid: string }>(cauDo: readonly { 
     if (j >= 0) bo.add(j)
   }
   return deMoi.filter((_, i) => !bo.has(i))
+}
+
+/** Nối dây cho goi-bai-7.ts (gói cả ngày + lượt mở chặng): câu ĐÃ GIAO CHƯA LÀM của phiên đang mở (`cauDo`, giao trước) chiếm suất đề 28 ⇒ đề mới bỏ câu
+ *  cùng ô / cùng phần, tổng ngày vẫn 28. Trước NGAY_DE_28 giữ nguyên. */
+export function deNhuongSuat7<T extends { qid: string }>(lap: { hs: { meta: ReadonlyMap<string, { phan?: string | null; mucDo?: string | null }> } }, cauGoi: ReadonlyMap<string, { phan?: string | null; mucDo?: string | null }>, cauDo: readonly { qid: string }[], deMoi: readonly T[], now: number): T[] {
+  if (ngayVn7(now) < NGAY_DE_28 || !cauDo.length) return [...deMoi]
+  const meta = (q: string) => lap.hs.meta.get(q) ?? cauGoi.get(q)
+  const oCua = (q: string) => { const m = meta(q) ?? meta(tachSongSinh(q).goc); return oMaTran(m?.phan, m?.mucDo) }
+  return nhuongSuatChoCauDo(cauDo, deMoi, oCua)
 }

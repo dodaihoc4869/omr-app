@@ -11,8 +11,7 @@ import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
 import { lichBaiEm7 } from './goi-bai-7-lich-bai'
 import { apSuat7, NGAY_DE_28 } from './goi-bai-7-suat'
-import { nhuongSuatChoCauDo } from './goi-bai-7-gop'
-import { oMaTran } from './ma-tran-rut-moi'
+import { deNhuongSuat7 } from './goi-bai-7-gop'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -883,12 +882,6 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
  * cùng kế hoạch, cùng thứ tự (`xepBai6`), cùng mọi cổng phát câu của `startGoi7` (câu chặn / nghi / vừa làm / khối / tự luận / chưa duyệt / dạng thầy giới hạn, bản làm lại
  * của câu sửa) — tối đa `soCau` câu, KHÔNG lưu phiên. Em đủ mức ⇒ phần «học thêm câu mới». Trả ref RIÊNG (máy chủ niêm phong trước khi gửi) + đề công khai (có tem hạn dài).
  */
-/** 13/11 (goi-bai-7-gop.ts): câu ĐÃ GIAO CHƯA LÀM của phiên đang mở (`cauDo`, giao trước) chiếm suất đề 28 ⇒ đề mới bỏ câu cùng ô / cùng phần, tổng ngày vẫn 28. */
-function deNhuongSuat7<T extends { qid: string }>(lap: { hs: { meta: Map<string, { phan?: string | null; mucDo?: string | null }> } }, cauGoi: ReadonlyMap<string, { phan?: string | null; mucDo?: string | null }>, cauDo: readonly { qid: string }[], deMoi: readonly T[], now: number): T[] {
-  if (ngayVn7(now) < NGAY_DE_28 || !cauDo.length) return [...deMoi]
-  const oCua = (q: string) => { const m = lap.hs.meta.get(q) ?? lap.hs.meta.get(tachSongSinh(q).goc) ?? cauGoi.get(q) ?? cauGoi.get(tachSongSinh(q).goc); return oMaTran(m?.phan, m?.mucDo) }
-  return nhuongSuatChoCauDo(cauDo, deMoi, oCua)
-}
 export async function xayGoiNgay7(env: Env, sbd: string, now: number, soCau: number): Promise<{ refs: RefGoi7[]; questions: Record<string, unknown>[]; goi7: unknown; goiIds: string[]; ngay: string } | null> {
   const cuSom = damBaoGoi7(env).then(async () => {
     const old = await env.DB.prepare(`SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>=? AND json_extract(json,'$.hocTap')=1 ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(now - 2 * 3600000).toISOString()).first<Row>()
