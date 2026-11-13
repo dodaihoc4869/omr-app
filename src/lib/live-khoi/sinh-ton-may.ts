@@ -1,14 +1,16 @@
 // MÁY BÙ CHỖ của trò «Sinh Tồn» (đặc tả docs/dac-ta-sinh-ton-1211.md mục 4) — LÕI THUẦN, chạy trong phòng (Durable Object) ở nhịp 250 ms sẵn có.
 // Mỗi đội luôn đủ 4 trên sân: thiếu em thật thì máy bù, em vào thì máy rời. Máy yếu hơn người: bắn chậm (sinh-ton-loi `HE_MAY`), ngắm trễ 2 nhịp,
-// súng tối đa cấp 3 (Súng Bọt — bản 2, 13/11), không nhặt hộp tiếp tế. Máy mang TÊN như học sinh (./ten-may.ts): mã `~<chỉ số tên>-<số thứ tự>`.
+// súng tối đa cấp 3 (Súng Bọt — bản 2, 13/11). Máy mang TÊN như học sinh (./ten-may.ts): mã `~<chỉ số tên>-<số thứ tự>`.
+// Hộp tiếp tế (bản 2 đợt 2): máy không đi tìm hộp, nhưng đi ngang qua mà chưa ai nhặt thì PHÒNG trao hộp và áp đúng hiệu ứng (sinh-ton-may-chu.ts, `apHop`).
 import {
-  BAT_TU_MS, BK_NV, CAP_MAY_TOI_DA, CHAY_MS, HOI_CHO_MS, HOI_SINH_MS, MAU_DAY, TOC_DO_MAY, choTrai, chonMucTieu, dangNghi, diChuyen, matChay, ngoaiVong, satThuong, timDuong,
-  trongBui, vong, type BanDo, type Diem, type NhanVat,
+  BAT_TU_MS, BK_NV, CAP_MAY_TOI_DA, CHAY_MS, HE_NHANH, HOI_CHO_MS, HOI_SINH_MS, MAU_DAY, TOC_DO_MAY, capSung, choTrai, chonMucTieu, coKhien, dangNghi, dangNhanh, diChuyen,
+  matChay, ngoaiVong, satThuong, timDuong, trongBui, vong, type BanDo, type Diem, type HieuUngHop, type NhanVat,
 } from './sinh-ton-loi'
 import { KHO_TEN, chiSoTen, khoTenGoi, maMay, soThuTuMay, tenGoi } from './ten-may'
 
 export const SO_MOI_DOI = 4
-export interface May {
+/** Hiệu ứng hộp (`khienDen` / `nhanhDen` / `saoDen`) ghi thẳng lên máy; `cap` là cấp THẬT (≤ 3), cấp đang dùng = `capSung(m, nay)` (Pháo Sao ⇒ 6). */
+export interface May extends HieuUngHop {
   id: string; doi: number; x: number; y: number; mau: number; cap: number; t: string
   chetDen: number; batTuDen: number; lucTrung: number
   /** Đang cháy (trúng Súng Lửa Màu) tới lúc này; 0 = không. `chayAi` = kẻ châm lửa gần nhất (cháy hết máu ⇒ tính lượt hạ cho kẻ này). */ chayDen: number; chayAi: string
@@ -53,7 +55,8 @@ export function khopMay(bd: BanDo, may: readonly May[], soEm: readonly number[],
   }
   return kq
 }
-export const mayThanh = (m: May): NhanVat => ({ id: m.id, x: m.x, y: m.y, mau: m.mau, doi: m.doi, cap: m.cap, t: m.t })
+/** Máy như ảnh chụp cho thấy; `nay` có ⇒ cấp ĐANG DÙNG (Pháo Sao ⇒ 6), thiếu ⇒ cấp thật (chỗ gọi cũ). */
+export const mayThanh = (m: May, nay?: number): NhanVat => ({ id: m.id, x: m.x, y: m.y, mau: m.mau, doi: m.doi, cap: nay === undefined ? m.cap : capSung(m, nay), t: m.t })
 /** Tâm các bụi của từng bản đồ (nướng một lần — sân 4 × 4 có ~250 bụi). */
 const NHO_TAM_BUI = new WeakMap<BanDo, Diem[]>()
 const tamBui = (bd: BanDo): Diem[] => {
@@ -65,10 +68,11 @@ const tamBui = (bd: BanDo): Diem[] => {
 /** Một nhịp của MỘT máy (đổi tại chỗ). `ds` = mọi nhân vật KHÁC trên sân. Trả mã kẻ vừa hạ máy này ('' = còn sống). */
 export function buocMay(bd: BanDo, m: May, ds: readonly NhanVat[], nay: number, dtMs: number, rnd: () => number): string {
   if (m.chetDen > nay) return ''
-  if (m.chetDen) { const p = choTrai(bd, m.doi, rnd(), nay); Object.assign(m, { x: p.x, y: p.y, mau: MAU_DAY, cap: 1, t: '', chetDen: 0, batTuDen: nay + BAT_TU_MS, chayDen: 0, chayAi: '', duong: [], dich: null, ungVien: '', nhipThay: 0 }) }
+  if (m.chetDen) { const p = choTrai(bd, m.doi, rnd(), nay); Object.assign(m, { x: p.x, y: p.y, mau: MAU_DAY, cap: 1, t: '', chetDen: 0, batTuDen: nay + BAT_TU_MS, chayDen: 0, chayAi: '', duong: [], dich: null, ungVien: '', nhipThay: 0, khienDen: 0, nhanhDen: 0, saoDen: 0 }) }
   const dt = dtMs / 1000, v = vong(bd, nay), nghi = dangNghi(nay)
   // 1. Trúng đạn / cháy / hồi máu / ngoài vòng. Cháy: trừ phần còn nợ của khoảng vừa trôi TRƯỚC, rồi mới châm lại từ phát trúng của nhịp này (cùng thứ tự với máy em).
-  if (!nghi && nay >= m.batTuDen) {
+  //    Khiên (hộp tiếp tế) ⇒ không mất máu vì gì cả, không bị châm lửa (cùng luật `nhanDon` / `buocToi` của máy em).
+  if (!nghi && nay >= m.batTuDen && !coKhien(m, nay)) {
     const don = satThuong(m, ds, dt)
     const chay = matChay(m.chayDen, nay, dtMs)
     let mat = don.tong + chay
@@ -76,7 +80,7 @@ export function buocMay(bd: BanDo, m: May, ds: readonly NhanVat[], nay: number, 
     if (ngoaiVong(v, m.x, m.y)) mat += 8 * dt
     if (mat > 0) {
       m.mau -= mat; m.lucTrung = nay
-      if (m.mau <= 0) { const ai = don.ai || (chay > 0 ? m.chayAi : ''); m.mau = 0; m.t = ''; m.duong = []; m.dich = null; m.chayDen = 0; m.chetDen = nay + HOI_SINH_MS; return ai }
+      if (m.mau <= 0) { const ai = don.ai || (chay > 0 ? m.chayAi : ''); m.mau = 0; m.t = ''; m.duong = []; m.dich = null; m.chayDen = 0; m.khienDen = 0; m.nhanhDen = 0; m.saoDen = 0; m.chetDen = nay + HOI_SINH_MS; return ai }
     }
   }
   if (m.mau < MAU_DAY && nay - m.lucTrung >= HOI_CHO_MS) m.mau = Math.min(MAU_DAY, m.mau + 15 * dt)
@@ -128,7 +132,7 @@ export function buocMay(bd: BanDo, m: May, ds: readonly NhanVat[], nay: number, 
     m.dich = dich; m.lucDuong = nay
     m.duong = timDuong(bd, m.x, m.y, Math.min(bd.rong - BK_NV, Math.max(BK_NV, dich.x)), Math.min(bd.cao - BK_NV, Math.max(BK_NV, dich.y)))
   }
-  let con = TOC_DO_MAY * dt
+  let con = TOC_DO_MAY * (dangNhanh(m, nay) ? HE_NHANH : 1) * dt
   while (con > 0 && m.duong.length) {
     const d = m.duong[0], kc = Math.hypot(d.x - m.x, d.y - m.y)
     if (kc <= con) { m.x = d.x; m.y = d.y; con -= kc; m.duong.shift(); continue }
