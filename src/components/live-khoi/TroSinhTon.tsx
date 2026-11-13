@@ -335,6 +335,8 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         doKhung()
       }
       if (doiSan) { dd = []; hh = { id: '', khienDen: 0, nhanhDen: 0 }; dietTk = [] }
+      // Ván mới theo PHÒNG ⇒ đếm lượt hạ lại từ 0 (máy thầy không có vòng ván riêng — số «THỦ KHOA … n lượt hạ» trên máy chiếu phải là của ván này).
+      if (typeof anh.v === 'number' && anh.v > 0 && anh.v !== vanHien) { soHa.clear(); haVan = 0 }
       // Ảnh mỏng thiếu dòng của em ⇒ giữ đội cũ.
       const dongToi = xem ? null : docDong(sbd, anh.ds[sbd])
       if (dongToi && dongToi.doi !== doiEm) { doiEm = dongToi.doi; tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap }; mucTieu = '' }

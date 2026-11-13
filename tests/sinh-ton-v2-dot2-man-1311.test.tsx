@@ -142,6 +142,18 @@ describe('màn trò đợt 2 (jsdom, không chạy vòng khung)', () => {
     expect(vv.textContent).not.toMatch(/Máy|~2/)
   })
 
+  it('máy thầy: sang ván mới (`v` đổi) ⇒ lượt hạ đếm lại — dải truy nã ván 2 ghi số của ván 2, không cộng dồn', () => {
+    const { container, anh } = moTro({ xemThoi: true })
+    const ba = [['S2', '~1-1', 0, 1, 0], ['S2', '~1-2', 0, 2, 0], ['S2', '~1-3', 0, 3, 0]]
+    anh({ ...ANH, an: ba, tk: 'S2' })
+    expect(chu(container, '.st-truy b')).toBe('THỦ KHOA Gia Huy · 3 lượt hạ')
+    anh({ ...ANH, v: 2 })
+    expect(container.querySelector('.st-truy')).toBeNull()
+    anh({ ...ANH, v: 2, an: ba, tk: 'S2' })
+    expect(chu(container, '.st-truy b')).toBe('THỦ KHOA Gia Huy · 3 lượt hạ')
+    expect(chu(container, '.st-dau b')).toBe('MỞ BÀI!')
+  })
+
   it('người mới lọt vào ảnh chụp («chỉ gửi gần») KHÔNG báo «vào đội» ở người nghe', () => {
     const { container, anh } = moTro()
     anh(ANH)
