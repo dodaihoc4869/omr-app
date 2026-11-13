@@ -1,0 +1,53 @@
+# SOI «NHẬT KÝ BÀI DẠY» TRÊN BẢN SỐNG (CHỈ ĐỌC, 14/11) — thầy báo «Nhật ký của bài live K12 chưa có». Đọc D1 bằng khoá Cloudflare (mọi buổi live 3 ngày gần
+# nhất + mọi lần văn phòng gửi nhật ký), rồi soi Pages: trang tĩnh /nhat-ky/ và bản app học sinh có thẻ «Nhật ký bài dạy» chưa. Chỉ in MÃ / SỐ ĐẾM (repo công khai).
+name: Soi nhật ký bài dạy bản sống (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  soi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: D1 (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "── $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]?' || echo "(chưa đọc được)"; }
+          q "buổi live 3 ngày" "SELECT id, lop, bat_luc, tat_luc, trang_thai, tien_do, so_cau, so_doan, ban FROM live_buoi WHERE bat_luc >= datetime('now','-3 days') ORDER BY bat_luc DESC LIMIT 12"
+          q "nhật ký đã gửi" "SELECT buoi_id, ban_buoi, luc, so_canh, so_dat, phat_hanh FROM live_nhat_ky ORDER BY luc DESC LIMIT 12"
+          # Ai MỞ được buổi (đúng điều kiện SQL_DUOC_XEM của live-xem-lai-lenh.ts): tên lớp của em = lop của buổi (quyen 'lop') HOẶC em có mặt (điểm danh). Chỉ in SỐ.
+          TL="CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.ten_lop) WHEN TRIM(COALESCE(h.lop, '')) = '12' THEN '12 - Lớp Thường' WHEN TRIM(COALESCE(h.lop, '')) = '' THEN 'Chưa xếp lớp' ELSE TRIM(h.lop) END"
+          q "ai mở được buổi" "SELECT b.id, b.lop, b.quyen, (SELECT COUNT(*) FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND $TL = b.lop) AS em_khop_lop, (SELECT COUNT(*) FROM buoi_hoc_diem_danh d WHERE d.buoi_id = b.id AND d.trang_thai = 'co_mat') AS em_co_mat FROM live_buoi b WHERE b.bat_luc >= datetime('now','-3 days')"
+          q "lớp có chữ 12 hoặc Live (tên lớp + số em)" "SELECT $TL AS ten_lop, COUNT(*) AS so_em FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND ($TL LIKE '%12%' OR $TL LIKE '%Live%') GROUP BY 1 ORDER BY 2 DESC LIMIT 15"
+          q "mã hex lop của buổi live (so với hằng số trong mã)" "SELECT DISTINCT lop, hex(lop) AS hex FROM live_buoi WHERE lop LIKE 'Live%'"
+          # Đếm ĐÚNG luật đã phát hành (emXemDuoc: khoiTuLop(lop) ?? khoiTuLop(ten_lop)) — chỉ in chuỗi lớp + số em.
+          d() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1" | jq -c '.[0].results' > "$2"; }
+          d "SELECT lop, ten_lop, COUNT(*) AS n FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa' GROUP BY 1, 2" hs.json
+          d "SELECT d.buoi_id, h.lop, h.ten_lop, COUNT(*) AS n FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.trang_thai = 'co_mat' AND d.buoi_id IN (SELECT id FROM live_buoi WHERE lop LIKE 'Live%') GROUP BY 1, 2, 3" dd.json
+          node -e '
+            const fs = require("fs"), hs = JSON.parse(fs.readFileSync("hs.json")), dd = JSON.parse(fs.readFileSync("dd.json"));
+            const khoi = (v) => { const m = /(?:^|\D)(1[0-2])(?:\D|$)/.exec(String(v ?? "")); return m ? Number(m[1]) : null };
+            const k = (r) => khoi(r.lop) ?? khoi(r.ten_lop);
+            const theoKhoi = {}; for (const r of hs) { const x = k(r) ?? "không rõ"; theoKhoi[x] = (theoKhoi[x] || 0) + r.n }
+            console.log("── em chưa khoá theo khối (luật khoiTuLop):", JSON.stringify(theoKhoi));
+            const buoi = {}; for (const r of dd) { const b = (buoi[r.buoi_id] ||= { k10: 0, k11: 0, k12: 0, khac: 0 }); const x = k(r); if (x) b["k" + x] += r.n; else b.khac += r.n }
+            console.log("── em có mặt mỗi buổi live, chia theo khối:", JSON.stringify(buoi));'
+      - name: Pages (trang tĩnh + thẻ trong bản app)
+        env:
+          P: https://omr-app-b3u.pages.dev
+        run: |
+          curl -s -L "$P/nhat-ky/" -o nk.html -w "Pages /nhat-ky/ %{http_code} %{content_type}\n"; echo "có id=nk: $(grep -c 'id=\"nk\"' nk.html)"
+          curl -s -L "$P/nhat-ky/khuon.js" -o /dev/null -w "khuon.js %{http_code} %{content_type}\n"
+          curl -s -L "$P/nhat-ky/khuon.css" -o /dev/null -w "khuon.css %{http_code} %{content_type}\n"
+          timeout 150 node scripts/soi-khuc-pages-1411.mjs "$P" xem-lai-live- xl-nk-mo nhat-ky.json "/nhat-ky/?id="
+          curl -s "$P/sw-version.json"; echo

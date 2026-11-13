@@ -12,6 +12,7 @@
 import type { Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { bpuBat, kiemVeBpu } from './phong-binh-phan-ung'
+import { SBD_THU, khoiTuLop } from './live-khoi'
 import { damBaoBangLive, khoaTep, tienToLive, xoaTienTo } from './live-xem-lai'
 import { LIVE_TOI_THIEU_MS } from '../../src/lib/live/xem-lai-dung'
 import { KHUC_TOI_DA, PHIEN_GHI, dauGon, docKhuc, khoaKhuc } from '../../src/lib/live/xem-lai-khuc'
@@ -81,6 +82,24 @@ const SQL_TEN_LOP = "CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.t
 /** Điều kiện «em ?1 được xem buổi b» (điểm quyết 3). */
 const SQL_DUOC_XEM = `((b.quyen = 'lop' AND b.lop <> '' AND b.lop = (SELECT ${SQL_TEN_LOP} FROM hoc_sinh h WHERE h.sbd = ?1 AND COALESCE(h.trang_thai, '') <> 'khoa'))
   OR EXISTS (SELECT 1 FROM buoi_hoc_diem_danh d WHERE d.buoi_id = b.id AND d.sbd = ?1 AND d.trang_thai = 'co_mat'))`
+// BUỔI LIVE THEO KHỐI (14/11, thầy báo «Nhật ký của bài live K12 chưa có»): buổi mở từ nút Live mang lớp «Live Khối N» (live-khoi.ts), KHÔNG lớp thật nào
+// tên vậy ⇒ quyền «cả lớp» trước nay chỉ còn em đã bấm «Tham gia» (K12 13/11: 0 em khớp lớp, 69 em có mặt / 126 em khối 12). Nay «cả lớp» của buổi ấy =
+// CẢ KHỐI N, khối của em tính đúng như thẻ Live máy em (`khoiTuLop` của lop rồi ten_lop) + tài khoản thử của thầy thấy mọi khối. SQL chỉ nới tới «buổi
+// Live Khối, quyền cả lớp» (cột `duoc` = luật cũ), khối lọc ở JS từ hồ sơ em đọc CÙNG lô ⇒ không thêm đợt chờ D1. Quyền «chỉ em có mặt» giữ nguyên.
+const LOP_LIVE_KHOI = 'Live Khối '
+const SQL_XEM_RONG = `(${SQL_DUOC_XEM} OR (b.quyen = 'lop' AND b.lop LIKE '${LOP_LIVE_KHOI}%'))`
+const COT_DUOC = `(${SQL_DUOC_XEM}) AS duoc`
+const hoSoEm = (env: Env, sbd: string) => env.DB.prepare("SELECT lop, ten_lop FROM hoc_sinh WHERE sbd = ? AND COALESCE(trang_thai, '') <> 'khoa' LIMIT 1").bind(sbd)
+/** Dòng buổi `r` (đã qua `SQL_XEM_RONG`, có cột `duoc`) em `sbd` xem được không. THUẦN. */
+export function emXemDuoc(r: Row, hoSo: Row | undefined, sbd: string): boolean {
+  if (so(r.duoc) === 1) return true
+  const lop = str(r.lop)
+  if (str(r.quyen) !== 'lop' || !lop.startsWith(LOP_LIVE_KHOI)) return false
+  if (SBD_THU.has(sbd)) return true
+  if (!hoSo) return false
+  const k = khoiTuLop(hoSo.lop) ?? khoiTuLop(hoSo.ten_lop)
+  return k != null && String(k) === lop.slice(LOP_LIVE_KHOI.length).trim()
+}
 
 // ── POST /bpu/live/ghi ──
 async function ghiKhucLenh(req: Request, env: Env, url: URL): Promise<Response> {
@@ -160,11 +179,14 @@ async function hsLenh(env: Env, p: string, b: Row, nay: number): Promise<Respons
   const xacThuc = buoc.xong.then(() => null, (e: unknown) => (e instanceof Error ? e.message : 'Em đăng nhập lại.'))
   if (p === '/hs/live-ds') {
     const doc = env.DB.batch([
-      env.DB.prepare(`SELECT ${COT.split(', ').map((c) => `b.${c}`).join(', ')} FROM live_buoi b WHERE (b.trang_thai = 'dang_xu_ly' OR (b.trang_thai = 'xong' AND b.so_doan > 0)) AND ${SQL_DUOC_XEM} ORDER BY b.bat_luc DESC LIMIT 80`).bind(sbd),
+      env.DB.prepare(`SELECT ${COT.split(', ').map((c) => `b.${c}`).join(', ')}, ${COT_DUOC} FROM live_buoi b WHERE (b.trang_thai = 'dang_xu_ly' OR (b.trang_thai = 'xong' AND b.so_doan > 0)) AND ${SQL_XEM_RONG} ORDER BY b.bat_luc DESC LIMIT 160`).bind(sbd),
       env.DB.prepare('SELECT buoi_id, ten FROM live_doan WHERE sbd_len_bang = ?').bind(sbd),
-    ]).then((r) => r as unknown as { results?: Row[] }[], () => [{ results: [] as Row[] }, { results: [] as Row[] }])
-    const [loi, [buoiR, doanR]] = await Promise.all([xacThuc, doc])
+      hoSoEm(env, sbd),
+    ]).then((r) => r as unknown as { results?: Row[] }[], () => [{ results: [] as Row[] }, { results: [] as Row[] }, { results: [] as Row[] }])
+    const [loi, [buoiR, doanR, hoSoR]] = await Promise.all([xacThuc, doc])
     if (loi) return json({ ok: false, error: loi }, 401)
+    const hoSo = hoSoR?.results?.[0]
+    if (buoiR) buoiR.results = (buoiR.results ?? []).filter((r) => emXemDuoc(r, hoSo, sbd)).slice(0, 80)
     const lenBang = new Map<string, number[]>()
     for (const d of doanR?.results ?? []) { const n = soCauTuTenDoan(str(d.ten)); if (!n) continue; const ds = lenBang.get(str(d.buoi_id)) ?? []; if (!ds.includes(n)) ds.push(n); lenBang.set(str(d.buoi_id), ds) }
     const buoi = await Promise.all((buoiR?.results ?? []).map(async (r) => {
@@ -175,15 +197,16 @@ async function hsLenh(env: Env, p: string, b: Row, nay: number): Promise<Respons
   }
   const id = buoiHop(b.id)
   if (!id) return json({ ok: false, lyDo: 'khong-co' }, 404)
-  const cauBuoi = () => env.DB.prepare(`SELECT b.id, b.ban FROM live_buoi b WHERE b.id = ?2 AND b.trang_thai = 'xong' AND b.so_doan > 0 AND ${SQL_DUOC_XEM}`).bind(sbd, id)
-  const doc = env.DB.batch([cauBuoi(), env.DB.prepare('SELECT luot, dung, len_bang FROM bpu_luot WHERE buoi_id = ? AND sbd = ?').bind(id, sbd)])
+  const cauBuoi = () => env.DB.prepare(`SELECT b.id, b.ban, b.lop, b.quyen, ${COT_DUOC} FROM live_buoi b WHERE b.id = ?2 AND b.trang_thai = 'xong' AND b.so_doan > 0 AND ${SQL_XEM_RONG}`).bind(sbd, id)
+  const rong = [{ results: [] as Row[] }, { results: [] as Row[] }, { results: [] as Row[] }]
+  const doc = env.DB.batch([cauBuoi(), env.DB.prepare('SELECT luot, dung, len_bang FROM bpu_luot WHERE buoi_id = ? AND sbd = ?').bind(id, sbd), hoSoEm(env, sbd)])
     .then((r) => r as unknown as { results?: Row[] }[])
-    // Bảng `bpu_luot` chưa có (chưa buổi nào kết thúc) ⇒ chỉ hỏi quyền.
-    .catch(() => cauBuoi().all<Row>().then((r) => [r as { results?: Row[] }, { results: [] as Row[] }], () => [{ results: [] as Row[] }, { results: [] as Row[] }]))
-  const [loi, [buoiR, luotR]] = await Promise.all([xacThuc, doc])
+    // Bảng `bpu_luot` chưa có (chưa buổi nào kết thúc) ⇒ chỉ hỏi quyền (+ hồ sơ em cho buổi Live Khối).
+    .catch(() => env.DB.batch([cauBuoi(), hoSoEm(env, sbd)]).then((r) => { const [a, c] = r as unknown as { results?: Row[] }[]; return [a ?? rong[0]!, rong[1]!, c ?? rong[2]!] }, () => rong))
+  const [loi, [buoiR, luotR, hoSoR]] = await Promise.all([xacThuc, doc])
   if (loi) return json({ ok: false, error: loi }, 401)
   const dong = buoiR?.results?.[0]
-  if (!dong) return json({ ok: false, lyDo: 'khong-co' }, 404)
+  if (!dong || !emXemDuoc(dong, hoSoR?.results?.[0], sbd)) return json({ ok: false, lyDo: 'khong-co' }, 404)
   const ketQua: Record<number, { dung: boolean }> = {}, lenBang: number[] = []
   for (const l of luotR?.results ?? []) { ketQua[so(l.luot)] = { dung: so(l.dung) === 1 }; if (so(l.len_bang) > 0) lenBang.push(so(l.luot)) }
   return json({ ok: true, id, ban: so(dong.ban), ve: await kyVeLive(env.MA_BI_MAT, id, sbd, han, so(dong.ban)), ketQua, lenBang: lenBang.sort((x, y) => x - y) })
