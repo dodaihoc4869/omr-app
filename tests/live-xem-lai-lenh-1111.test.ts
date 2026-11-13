@@ -10,7 +10,7 @@ import { khucGia, taoR2Gia, type R2Gia } from './_live-xem-lai-gia'
 import { gameToken } from '../server/src/game-v2-auth'
 import { kyVeBpu } from '../server/src/phong-binh-phan-ung'
 import { SQL_LIVE_XEM_LAI, damBaoCotLyDo } from '../server/src/live-xem-lai'
-import { SBD_THAY, cronLiveXemLai, docRange, hanVeLive, kiemVeLive, kyVeLive } from '../server/src/live-xem-lai-lenh'
+import { SBD_THAY, cronLiveXemLai, docRange, emXemDuoc, hanVeLive, kiemVeLive, kyVeLive } from '../server/src/live-xem-lai-lenh'
 import { tachCauLive } from '../scripts/tach-cau-live-xem-lai.mjs'
 import { docDauGon } from '../src/lib/live/xem-lai-khuc'
 import type { Env } from '../server/src/kieu'
@@ -187,6 +187,27 @@ describe('/hs/live-* — quyền xem (điểm quyết 3)', () => {
     expect(get.status).toBe(200); expect(((await get.json()) as TraLiveBuoiHs).lenBang).toEqual([1])
     d1.sql.exec('DROP TABLE bpu_luot') // chưa buổi nào kết thúc ⇒ bảng chưa có ⇒ vẫn trả quyền + vé
     expect((await hs<TraLiveBuoiHs>('/hs/live-buoi', 'A1', { id: 'b1' })).j).toMatchObject({ ok: true, ketQua: {}, lenBang: [] })
+  })
+  it('buổi LIVE THEO KHỐI («Live Khối N», 14/11 thầy báo «Nhật ký của bài live K12 chưa có»): quyền «cả lớp» = CẢ KHỐI N, kể cả em không bấm Tham gia', async () => {
+    d1.sql.exec(`INSERT INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,mat_khau,cap_nhat_luc,trang_thai) VALUES ('D1','Em D1','','12 - Nhóm 10 điểm','mk','x',NULL),
+      ('D2','Em D2','12','12 - Tinh Hoa','mk','x','khoa'),('12121212','Thử','','','mk','x',NULL)`)
+    themBuoi('lk12', { lop: 'Live Khối 12', ngay: '2026-11-12' }); themBuoi('lk10', { lop: 'Live Khối 10', ngay: '2026-11-11' })
+    themBuoi('lk12d', { lop: 'Live Khối 12', quyen: 'diem_danh', ngay: '2026-11-10' })
+    d1.sql.exec(`INSERT INTO buoi_hoc_diem_danh(buoi_id,sbd,luc,cach,trang_thai,cap_nhat_luc) VALUES ('lk10','B1','x','live','co_mat','x')`)
+    const ds = async (sbd: string) => (await hs<TraLiveDsHs>('/hs/live-ds', sbd)).j.buoi.map((b) => b.id)
+    expect(await ds('A1')).toEqual(['lk12']) // khối 12 (lop «12»), không bấm Tham gia vẫn thấy; buổi «chỉ em có mặt» vẫn chặn
+    expect(await ds('D1')).toEqual(['lk12']) // khối lấy SỐ ĐẦU của tên lớp: «12 - Nhóm 10 điểm» là khối 12, KHÔNG thấy Live Khối 10
+    expect(await ds('B1')).toEqual(['lk12', 'lk10']) // có mặt buổi khối khác ⇒ vẫn thấy buổi đó (luật cũ)
+    expect(await ds('C1')).toEqual([]) // khối 11
+    expect(await ds('12121212')).toEqual(['lk12', 'lk10']) // tài khoản thử của thầy: mọi khối
+    expect((await hs<TraLiveDsHs>('/hs/live-ds', 'A1')).j.buoi[0]!.ve).toBeTruthy()
+    const mo = async (sbd: string, id: string) => (await hs<TraLiveBuoiHs>('/hs/live-buoi', sbd, { id })).status
+    expect([await mo('A1', 'lk12'), await mo('D1', 'lk12'), await mo('12121212', 'lk10')]).toEqual([200, 200, 200])
+    expect([await mo('A1', 'lk10'), await mo('C1', 'lk12'), await mo('A1', 'lk12d'), await mo('D1', 'lk10')]).toEqual([404, 404, 404, 404])
+    d1.sql.exec('DROP TABLE bpu_luot') // nhánh dự phòng (bảng chưa có) cũng đọc hồ sơ em
+    expect([await mo('A1', 'lk12'), await mo('C1', 'lk12')]).toEqual([200, 404])
+    expect(emXemDuoc({ duoc: 0, quyen: 'lop', lop: 'Live Khối 12' }, undefined, 'X')).toBe(false) // em không có hồ sơ (bị khoá) ⇒ không
+    expect(emXemDuoc({ duoc: 0, quyen: 'lop', lop: '12A1' }, { lop: '12' }, 'X')).toBe(false) // lớp thường: chỉ luật cũ
   })
   it('một đợt chờ D1 cho mỗi lệnh của em (đọc song song với kiểm mật khẩu)', async () => {
     themBuoi('b1')

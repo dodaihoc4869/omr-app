@@ -13,7 +13,7 @@ export const KHOA_LIVE_KHOI = 'live_khoi'
 const LOP_LIVE = 'Live Khối '
 const TOI_DA_LICH = 30
 /** TÀI KHOẢN THỬ của thầy (thầy 12/11: «cho sbd này test mọi lớp»): thấy và vào được live của MỌI khối, kể cả khi hồ sơ không có lớp. */
-const SBD_THU = new Set(['12121212'])
+export const SBD_THU: ReadonlySet<string> = new Set(['12121212'])
 /** Phòng chờ / đang live quá 6 giờ không ai đụng ⇒ coi như đã xong (thầy quên bấm kết thúc). */
 const HAN_PHONG_MS = 6 * 3_600_000
 /** Lịch hẹn quá giờ 30 phút mà thầy chưa mở ⇒ máy em thôi hiện; quá 24 giờ ⇒ gỡ khỏi danh sách. */
