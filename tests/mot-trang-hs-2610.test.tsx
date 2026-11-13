@@ -11,6 +11,7 @@ const moBpuHs = vi.hoisted(() => vi.fn(() => true))
 vi.mock('../src/components/bpu/gan-hs', () => ({ moBpuHs, xinQuyenTatMan: () => {}, nenBpuHs: () => {} }))
 import { MenuDocTrong, MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
+import { KHO_DOI_PHO, KHO_GIUC_HOC } from '../src/lib/loi-mol'
 
 const traLoi = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
 const noop = () => {}
@@ -323,18 +324,42 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
 })
 
 describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
+  // SIẾT 13/11 (test đỏ 19:00–21:59 ngày 13/11): bong bóng Mol giận theo giờ (src/lib/lua-cam-xuc.ts) rơi câu NGUYÊN VĂN thầy «Học thật, nỗ lực thật thì kết quả
+  // mới thật được.» (kho src/lib/loi-mol.ts, thầy duyệt 01/11 — ngoại lệ chỉ trong bong bóng, không phải nhãn tuần). Luật 26/10 không nới: NGOÀI bong bóng vẫn cấm
+  // mọi chữ nhóm / bậc / nhãn tuần; TRONG bong bóng cấm chữ nhóm / bậc, còn «học thật / đối phó» chỉ được khi là câu nguyên văn trong kho thầy.
+  // Cố định giờ (chỉ giả Date để findBy* vẫn chạy): 21:30 ⇒ Mol bực, bong bóng BẮT BUỘC là câu kho thầy; 10:00 ⇒ lời thường.
+  const KHO_THAY = new Set([...Object.values(KHO_DOI_PHO), ...Object.values(KHO_GIUC_HOC)].flat())
+  const NHAN = /lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i
+  const NHAN_NHOM_BAC = /lười|chăm|chưa đều|bậc|bấm vội|treo|quá nhanh/i
   it('Lộ trình + Thành tích: máy chủ CŨ còn gửi nhóm Lười / bậc 1 ⇒ em chỉ thấy «Chuỗi N ngày» + việc tiếp trung tính, không chữ / màu nhóm, bậc', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 3 }, doTinCay: 80 })))
-    for (const muc of ['hom-nay', 'ket-qua']) {
-      const { container, unmount } = render(<MotTrangHs {...goc({ muc, token: 'tk', hs: HS })} />)
-      // Gộp thưởng phạt 26/10: ở Lộ trình thẻ «việc tiếp» nhường chỗ thẻ bên Giải tuần + Nhiệm vụ (bản vẽ tp-4) — Thành tích vẫn giữ.
-      if (muc === 'ket-qua') {
-        const the = await screen.findByText(/^Việc tiếp:/)
-        expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
-      } else await screen.findByRole('region', { name: /^Tổng câu hôm nay/ }) // hệ Kính: thẻ tổng câu hôm nay thay thẻ «Bài học hôm nay»
-      expect(container.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i)
-      expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
-      unmount()
+    for (const [gio, phut] of [[21, 30], [10, 0]] as const) {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(Date.UTC(2026, 10, 13, gio - 7, phut)) // Thứ Sáu 13/11/2026, giờ Việt Nam
+      try {
+        vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 3 }, doTinCay: 80 })))
+        for (const muc of ['hom-nay', 'ket-qua']) {
+          const { container, unmount } = render(<MotTrangHs {...goc({ muc, token: 'tk', hs: HS })} />)
+          // Gộp thưởng phạt 26/10: ở Lộ trình thẻ «việc tiếp» nhường chỗ thẻ bên Giải tuần + Nhiệm vụ (bản vẽ tp-4) — Thành tích vẫn giữ.
+          if (muc === 'ket-qua') {
+            const the = await screen.findByText(/^Việc tiếp:/)
+            expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
+          } else await screen.findByRole('region', { name: /^Tổng câu hôm nay/ }) // hệ Kính: thẻ tổng câu hôm nay thay thẻ «Bài học hôm nay»
+          const bong = [...container.querySelectorAll('.bi-loi-bong')].map((b) => b.querySelector('.ht2-an')?.textContent ?? '')
+          if (muc === 'hom-nay' && gio === 21) {
+            expect(bong.length).toBeGreaterThan(0)
+            for (const b of bong) expect(KHO_THAY.has(b), b).toBe(true)
+          }
+          for (const b of bong) {
+            expect(b).not.toMatch(NHAN_NHOM_BAC)
+            if (NHAN.test(b)) expect(KHO_THAY.has(b), b).toBe(true)
+          }
+          const ngoai = container.cloneNode(true) as HTMLElement
+          ngoai.querySelectorAll('.bi-loi-bong').forEach((b) => b.remove())
+          expect(ngoai.textContent).not.toMatch(NHAN)
+          expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
+          unmount()
+        }
+      } finally { vi.useRealTimers() }
     }
   })
 })
