@@ -1,0 +1,24 @@
+[
+  {
+    "i": 311,
+    "hashSvg": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref, fresh Chromium3x FULL/macro tank/ports/labels/cross và narrow nativeM. Giữ cyanliquid, hai blackrods khác chiều dài, 2graywaterlevels OVERrods; backbottom bị mask trên rods ngoại trừ đúng 1graydash mỗi rod. Graymembrane roundjoin không spike, hai wirescross không dot, hai ports/whitebatterybox/AcquytrueDAM; (+)LEFT/(-)RIGHT regular có khe với wire. Hai leader không đầu, dungdịchtip tự do trong nước; Mleader tiếp xúc cạnh M như native narrow graycontact, không suy là collision mới. Dung dịch NaCl regular không rightclip; allrestregularupright, không thêm ion/bubble/arrows/answer. ActualSHApre/post đúng.",
+    "render": "/workspace/scratch/soat417-311-fresh.png",
+    "macro": [
+      "/workspace/scratch/cell311-tank.png",
+      "/workspace/scratch/cell311-ports.png",
+      "/workspace/scratch/cell311-labels.png",
+      "/workspace/scratch/cell311-cross.png",
+      "/workspace/scratch/cell311-nativeM.png",
+      "/workspace/scratch/cell311-nativeM-narrow.png"
+    ],
+    "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+    "hashSvgDaSoat": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+    "runtimeProof": {
+      "file": "/workspace/scratch/cell311-runtime.log",
+      "sha256": "02f41deac791ba06fbbb36ed6ed6cf29cd776c462ac91ee3c92f0296f67d4235",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/cell311-native-ddh-73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad.svg 73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad\n311 { x: 0, y: 0, width: 587, height: 276 }\n\nPOSTSHOT_SHA 73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad\nCOMMAND node /workspace/scratch/agent-render417.cjs\nCONTEXT VIP27-C5-B16-II-3.hinh.0.du_lieu public de/one ref only, no answers.\n"
+    }
+  }
+]

@@ -1,0 +1,576 @@
+{
+  "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+  "native": [
+    587,
+    276
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C5-B16-II-3",
+      "de": "Một nhóm học sinh tiến hành điện phân dung dịch muối ăn (NaCl) theo các bước sau:\nBước 1: Hoà tan một lượng muối ăn vào nước sau đó cho vào một khay nhựa, nhỏ tiếp vài giọt dung dịch phenolphthalein vào dung dịch, dùng một miếng xốp ngăn dung dịch trong khay nhựa thành hai phần bằng nhau.\nBước 2: Lấy hai điện cực than chì (lõi pin điện) được nối với hai cực của acquy và nhúng vào hai phần dung dịch và nối với ắc quy như hình vẽ bên.",
+      "refs": [
+        {
+          "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+          "where": "VIP27-C5-B16-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "c5d3b070ead26f3ae15bc4c5463b365ae820204da5a78d27cb229140e100190b"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "FLATdrawn3Dcell-NOTphoto/1CYANliquid2BLACKrodsunequal115-120height1GRAYmembrane/2crossingwiresNOjunctiondot-2batteryports1whiteBLACKframe/2GRAYsurfacelevels124back154frontOVERrods-backbottom191MASKEDbyrods2tinyGRAYdashes1insideEACHretainNOTminus/EXACTAcquyTRUEdamUPRIGHT-regularUPRIGHT(+)-(-)-Màng ngăn xốp-Dung dịch NaCl/2leadersNOheads-FREEtipinsidewater315203-membranetip191215/NOaddedbubble-ion-arrow-voltage-anodecathode-reaction-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/tank4x/ports4x/labels4x/allpublicde. OwnPILcolorscyan153217234/membrane195195195/topfill235235235/rodsBLACKnotteal;watergraylinesOVERrods. BackbottommaskedexcepttinygraydashEACHrod. NativeapproxNOTsubpixel.",
+  "independentSourceAudit": {
+    "i": 311,
+    "assetIndexProvided": 1361,
+    "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19.png",
+    "size": [
+      587,
+      276
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C5-B16-II-3",
+        "de": "Một nhóm học sinh tiến hành điện phân dung dịch muối ăn (NaCl) theo các bước sau:\nBước 1: Hoà tan một lượng muối ăn vào nước sau đó cho vào một khay nhựa, nhỏ tiếp vài giọt dung dịch phenolphthalein vào dung dịch, dùng một miếng xốp ngăn dung dịch trong khay nhựa thành hai phần bằng nhau.\nBước 2: Lấy hai điện cực than chì (lõi pin điện) được nối với hai cực của acquy và nhúng vào hai phần dung dịch và nối với ắc quy như hình vẽ bên.",
+        "allHinh": [
+          {
+            "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+            "where": "VIP27-C5-B16-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "c5d3b070ead26f3ae15bc4c5463b365ae820204da5a78d27cb229140e100190b"
+          }
+        ],
+        "missingHashes": [
+          "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/417-full3x.png",
+        "/workspace/scratch/417-tank3x.png",
+        "/workspace/scratch/417-battery3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "classification": "Flatvector-like3Dtechnicalillustration, NOT photograph/realmaterialscene. Black/grayedgeswithuniformcyanliquid, retaindrawngeometry.",
+    "geometry": {
+      "counts": {
+        "rods": 2,
+        "membranes": 1,
+        "batteryBoxes": 1,
+        "terminalTabs": 2,
+        "wires": 2,
+        "leaderLines": 2,
+        "leaderHeads": 0,
+        "bubbles": 0,
+        "particleDots": 0,
+        "chargeGlyphs": [
+          "(+)",
+          "(-)"
+        ]
+      },
+      "font": {
+        "Acquy": "TRUEBOLD UPRIGHT serif, exactnoSpace/accent",
+        "polarityAndLabels": "Regular upright serif; literal(-)notcircledminus; (+)notcircledplus"
+      },
+      "tank": {
+        "frontTopLeft": [
+          25,
+          118
+        ],
+        "frontTopRight": [
+          294,
+          118
+        ],
+        "frontBottomRight": [
+          294,
+          235
+        ],
+        "frontBottomLeft": [
+          25,
+          235
+        ],
+        "backTopLeft": [
+          70,
+          80
+        ],
+        "backTopRight": [
+          349,
+          80
+        ],
+        "backBottomRight": [
+          349,
+          190
+        ],
+        "backBottomLeft": [
+          70,
+          190
+        ],
+        "frontBlackEdges": [
+          [
+            [
+              25,
+              118
+            ],
+            [
+              294,
+              118
+            ],
+            [
+              294,
+              235
+            ],
+            [
+              25,
+              235
+            ],
+            [
+              25,
+              118
+            ]
+          ]
+        ],
+        "grayBackAndDepthEdges": [
+          [
+            [
+              25,
+              118
+            ],
+            [
+              70,
+              80
+            ],
+            [
+              349,
+              80
+            ],
+            [
+              349,
+              190
+            ],
+            [
+              294,
+              235
+            ]
+          ],
+          [
+            [
+              70,
+              80
+            ],
+            [
+              70,
+              190
+            ],
+            [
+              25,
+              235
+            ]
+          ],
+          [
+            [
+              70,
+              190
+            ],
+            [
+              349,
+              190
+            ]
+          ],
+          [
+            [
+              294,
+              118
+            ],
+            [
+              349,
+              80
+            ]
+          ]
+        ],
+        "blackWidthApprox": 1.3,
+        "grayWidthApprox": 1,
+        "warning": "Transparentcontaineroutline, notfilledopaque3Dfaces. Backbottomlineoccludedbyrods; retain2tinygraydashesinsidepositionsseparately."
+      },
+      "liquid": {
+        "fillApprox": "#98d8e7",
+        "visibleBodyPolygon": [
+          [
+            25,
+            154
+          ],
+          [
+            70,
+            124
+          ],
+          [
+            349,
+            124
+          ],
+          [
+            349,
+            190
+          ],
+          [
+            294,
+            235
+          ],
+          [
+            25,
+            235
+          ]
+        ],
+        "surfaceGrayLines": [
+          [
+            [
+              25,
+              154
+            ],
+            [
+              294,
+              154
+            ],
+            [
+              349,
+              124
+            ],
+            [
+              70,
+              124
+            ],
+            [
+              25,
+              154
+            ]
+          ],
+          [
+            [
+              70,
+              124
+            ],
+            [
+              349,
+              124
+            ]
+          ]
+        ],
+        "overRods": "Grayhorizontalwaterline y154 andbacksurfacey124 drawnOVERblackrods, do notmaskthese byrods.",
+        "noWave": "Sourceflatliquidsurface, no wave/bubbles/pinkregion."
+      },
+      "rods": [
+        {
+          "rect": [
+            86,
+            95,
+            102,
+            210
+          ],
+          "fill": "#000000",
+          "tinyInternalGrayDash": [
+            [
+              91,
+              191
+            ],
+            [
+              97,
+              191
+            ]
+          ]
+        },
+        {
+          "rect": [
+            244,
+            95,
+            259,
+            214
+          ],
+          "fill": "#000000",
+          "tinyInternalGrayDash": [
+            [
+              249,
+              191
+            ],
+            [
+              255,
+              191
+            ]
+          ]
+        }
+      ],
+      "membrane": {
+        "quad": [
+          [
+            165,
+            118
+          ],
+          [
+            216,
+            80
+          ],
+          [
+            216,
+            191
+          ],
+          [
+            165,
+            235
+          ]
+        ],
+        "borderWidthApprox": 4.5,
+        "borderColorApprox": "#bfbfbf",
+        "aboveLiquidFillApprox": "#ededed",
+        "aboveLiquidPolygon": [
+          [
+            165,
+            118
+          ],
+          [
+            216,
+            80
+          ],
+          [
+            216,
+            124
+          ],
+          [
+            165,
+            154
+          ]
+        ],
+        "belowLiquid": "Cyanliquidvisiblethroughmembraneinterior; do notfillsolidgraybelowwater",
+        "occlusion": "Graymembraneborderoverfronttopblackedgeandfrontbottomedge atx165, surfacegraylinesjointomembrane. Backvertical216 endsat191."
+      },
+      "battery": {
+        "outerRect": [
+          396,
+          100,
+          576,
+          185
+        ],
+        "fill": "white",
+        "strokeWidthApprox": 4.5,
+        "tabs": [
+          {
+            "rect": [
+              412,
+              88,
+              425,
+              100
+            ],
+            "whiteInner": [
+              416,
+              92,
+              421,
+              97
+            ]
+          },
+          {
+            "rect": [
+              545,
+              85,
+              558,
+              100
+            ],
+            "whiteInner": [
+              549,
+              89,
+              554,
+              97
+            ]
+          }
+        ],
+        "label": {
+          "literal": "Acquy",
+          "bbox": [
+            452,
+            132,
+            514,
+            151
+          ]
+        },
+        "plus": {
+          "literal": "(+)",
+          "bbox": [
+            389,
+            70,
+            412,
+            88
+          ]
+        },
+        "minus": {
+          "literal": "(-)",
+          "bbox": [
+            553,
+            67,
+            573,
+            85
+          ]
+        }
+      },
+      "wires": [
+        {
+          "from": "leftrod",
+          "to": "plusbattery",
+          "vertices": [
+            [
+              94.5,
+              95
+            ],
+            [
+              94.5,
+              30
+            ],
+            [
+              418,
+              30
+            ],
+            [
+              418,
+              88
+            ]
+          ],
+          "strokeApprox": 1.2
+        },
+        {
+          "from": "rightrod",
+          "to": "minusbattery",
+          "vertices": [
+            [
+              254,
+              95
+            ],
+            [
+              254,
+              7
+            ],
+            [
+              550,
+              7
+            ],
+            [
+              550,
+              85
+            ]
+          ],
+          "strokeApprox": 1.2
+        }
+      ],
+      "wireCrossing": {
+        "at": [
+          254,
+          30
+        ],
+        "junctionDot": false,
+        "noBridgeArc": true
+      },
+      "labels": [
+        {
+          "literal": "Màng ngăn xốp",
+          "bbox": [
+            222,
+            247,
+            369,
+            269
+          ],
+          "leader": [
+            [
+              223,
+              257
+            ],
+            [
+              191,
+              216
+            ]
+          ],
+          "leaderHead": "NONE"
+        },
+        {
+          "literal": "Dung dịch NaCl",
+          "bbox": [
+            410,
+            221,
+            564,
+            242
+          ],
+          "leader": [
+            [
+              410,
+              230
+            ],
+            [
+              315,
+              202
+            ]
+          ],
+          "leaderHead": "NONE"
+        }
+      ],
+      "layerOrderGuide": [
+        "whitebackground",
+        "cyanliquidbody/topvisibleface",
+        "grayback/depthcontainerlines",
+        "blackrods",
+        "grayliquidsurfacelinesOVERrods",
+        "tinyinternalgraydashes191",
+        "frontblackcontaineredges",
+        "graymembranebordersoverfrontedges",
+        "battery/tabs/wires",
+        "plainleaderlines/text"
+      ],
+      "noAdded": [
+        "No gasbubbles",
+        "No ionsorquantities",
+        "No arrowsonelectrons",
+        "No electrodeanode/cathodelabel",
+        "No newvoltage",
+        "No plus/minusonrods",
+        "No photographtexture"
+      ]
+    },
+    "measurementLimits": "Nativeapproxcoords ±1–2px, colorfillsvisualapproxparentmayindependentlysample. Flat3Dgeometryseparatefromrealphoto. Everyvisiblegrayline/dash intentnotinferredchemicalcharge. OwnnativeFULLandmacrosoverlapchecked.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "sourceFull2xTankPortsLabels4x": true,
+    "allPublicDe": true,
+    "freshFinalChromiumFull3xEachTankPortsLabels3x": true,
+    "exactHash": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+    "verdict": "Đạt root; cần readonly riêng",
+    "cyan153217234BlackRodsGraySurfaceOver": true,
+    "oneTinyGrayDashEachRodTwoTotal": true,
+    "noArrowsBubblesIonsAdded": true,
+    "nativeMembraneLeaderMContactRetained": true,
+    "negativeInitialAndIntermediateKept": true,
+    "finalOnlyNaCl24to21MembraneJoinRoundMinusCenterPlus4": true,
+    "xmlAudit": [
+      {
+        "oldHash": "e0629a08062072cb970af41cc20939604e821a56570faf61a467ccaa6f36266b",
+        "newHash": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+        "children": 32,
+        "changedDirectChildren": [
+          16,
+          26,
+          31
+        ],
+        "otherChildrenExact": true
+      },
+      {
+        "oldHash": "64aa75d40f520f6735c4641a1b5f7f22f4901cc99b51f4c6ff4c52a6795cd615",
+        "newHash": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+        "children": 32,
+        "changedDirectChildren": [
+          26
+        ],
+        "otherChildrenExact": true
+      }
+    ]
+  }
+}

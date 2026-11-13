@@ -1,0 +1,29 @@
+[
+  {
+    "i": 311,
+    "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+    "fileNguon": "anh/35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19.png",
+    "svg": "cell311-native-ddh-73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad.svg",
+    "hashSvg": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+    "byteSvg": 23892,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B16-II-3",
+        "de": "Một nhóm học sinh tiến hành điện phân dung dịch muối ăn (NaCl) theo các bước sau:\nBước 1: Hoà tan một lượng muối ăn vào nước sau đó cho vào một khay nhựa, nhỏ tiếp vài giọt dung dịch phenolphthalein vào dung dịch, dùng một miếng xốp ngăn dung dịch trong khay nhựa thành hai phần bằng nhau.\nBước 2: Lấy hai điện cực than chì (lõi pin điện) được nối với hai cực của acquy và nhúng vào hai phần dung dịch và nối với ắc quy như hình vẽ bên.",
+        "refs": [
+          {
+            "hash": "35b53e6f91508180895ee38919ed62d9d4c433a6f4cee5d7b5f10c37c135db19",
+            "where": "VIP27-C5-B16-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "c5d3b070ead26f3ae15bc4c5463b365ae820204da5a78d27cb229140e100190b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "FLATdrawn3Dcell-NOTphoto/1CYANliquid2BLACKrodsunequal115-120height1GRAYmembrane/2crossingwiresNOjunctiondot-2batteryports1whiteBLACKframe/2GRAYsurfacelevels124back154frontOVERrods-backbottom191MASKEDbyrods2tinyGRAYdashes1insideEACHretainNOTminus/EXACTAcquyTRUEdamUPRIGHT-regularUPRIGHT(+)-(-)-Màng ngăn xốp-Dung dịch NaCl/2leadersNOheads-FREEtipinsidewater315203-membranetip191215/NOaddedbubble-ion-arrow-voltage-anodecathode-reaction-answer-alias/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "73b1954dc373b3ba7bc7f9e3849f331bb1e50866433dee9c50ce6b682f61afad",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
