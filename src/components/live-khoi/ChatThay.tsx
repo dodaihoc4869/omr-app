@@ -6,7 +6,7 @@ import { CHAT_DAI, type ChatGui, type KenhLop } from '../../lib/live-khoi/kieu'
 import { BieuTuongChat, DanhSachTin, useChatLop } from './ChatEm'
 import './chat.css'
 
-export function CotChatThay({ kenh }: { kenh: KenhLop | null }) {
+export function CotChatThay({ kenh, coDinh }: { kenh: KenhLop | null; /** cột LUÔN HIỆN bên phải màn live (13/11): có đầu cột + dòng tin gọn hai dòng theo màu đội */ coDinh?: boolean }) {
   const { ds, khoa, danhDauDoc } = useChatLop(kenh)
   const [chiHoi, setChiHoi] = useState(false)
   // Thầy 12/11: «ẩn tin nhắn lớp, tắt tin nhắn, tất cả, câu hỏi vào 1 thẻ nhỏ» ⇒ cột chỉ còn danh sách + ô nhập; ba lựa chọn nằm trong thẻ nhỏ mở từ nút ba chấm.
@@ -28,8 +28,13 @@ export function CotChatThay({ kenh }: { kenh: KenhLop | null }) {
   const doiKhoa = () => kenh?.gui('chat', { tat: !khoa } satisfies ChatGui)
 
   return (
-    <section className="lc-goc lc-khung lc-cot" aria-label="Tin nhắn lớp">
-      <DanhSachTin ds={chiHoi ? dsHoi : ds} rong={chiHoi ? 'Chưa có câu hỏi nào' : 'Chưa có tin nhắn nào'} veCuoi={veCuoi} />
+    <section className={coDinh ? 'lc-goc lc-khung lc-cot lc-co-dinh' : 'lc-goc lc-khung lc-cot'} aria-label="Tin nhắn lớp">
+      {coDinh ? (
+        <div className="lc-dau"><span className="lc-dau-ten">Tin nhắn lớp</span>
+          {dsHoi.length ? <button type="button" className="lc-dau-hoi" aria-pressed={chiHoi} title={chiHoi ? 'Hiện tất cả tin' : 'Chỉ hiện câu hỏi'} onClick={() => setChiHoi((c) => !c)}>{dsHoi.length} câu hỏi</button> : null}
+        </div>
+      ) : null}
+      <DanhSachTin ds={chiHoi ? dsHoi : ds} rong={chiHoi ? 'Chưa có câu hỏi nào' : 'Chưa có tin nhắn nào'} veCuoi={veCuoi} gon={coDinh} />
       {khoa && <p className="lc-bao" role="status" data-loai="khoa">Đang tắt nhắn tin của các em</p>}
       {moThe ? (
         <div className="lc-the-nho" role="menu" aria-label="Tuỳ chọn tin nhắn">

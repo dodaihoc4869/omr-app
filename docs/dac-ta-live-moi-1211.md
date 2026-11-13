@@ -205,3 +205,11 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Mô phỏng 60 giây, giờ tiếng cập nhật 4–10 lần/giây lệch ±25 ms — 1×: khung khựng 161 → 0, khung nhảy 112 → 0; 2×: 1050 → 0, 251 → 0; lệch tiếng lớn nhất 21 ms. CHƯA đo trên điện thoại thật.
     - Vạch 2/3: khung (`KhungDocLap`) đã vẽ thẻ vạch ở chế độ Bảng, trình phát (lớp `xp`) thiếu CSS ⇒ thêm `.xp-bang .xp-ke` (phat.css).
 49. **SỔ CHO VĂN PHÒNG TRỰC LIVE** (yêu cầu Javis DDH 13/11): `/gv/bpu/moi-ra` (từng việc mời ra / từ chối / vào lại) và `/gv/bpu/live-thong-ke` (có mặt, vắng, số lần rời màn từng em, em bị mời ra). Hợp đồng: `docs/hop-dong-live-moi-ra-van-phong-1311.md`.
+50. **KHUNG CHAT LUÔN HIỆN BÊN PHẢI MÁY THẦY** (thầy 13/11 «thêm một khung chat bên phải luôn hiện để đọc tin nhắn của học sinh … không làm ảnh hưởng tới bố cục phần chiếu cho hs», duyệt bản vẽ `docs/ban-ve-live-moi-1211/55–59` «chốt duyệt build»):
+    - **Khi nào:** buổi live theo khối đang chạy, phần chiếu (tờ Bảng / Học) đang ở trên cùng, cửa sổ từ 1024 × 600. Ở bảng danh sách, bảng chọn bài, tấm hoạt động: các màn đó kín cửa sổ như cũ, không có cột. Cửa sổ nhỏ hơn: giữ cột nổi cũ.
+    - **Hình học** (`src/components/live-khoi/cot-chat-hinh.ts`): cột rộng 20 % cửa sổ (248–340 px) ở mép phải; lớp phủ tờ THU ĐỀU bằng `transform: scale` về góc trên-trái ⇒ khung tờ bên trong vẫn nguyên cỡ cửa sổ ⇒ tỉ lệ bảng tờ gửi máy em không đổi ⇒ máy em thấy y như không có cột. Đổi lại phần chiếu trên máy thầy nhỏ đi ~20 %.
+    - **Dải «Chỉ thầy thấy»** dưới phần chiếu (phần dư do thu đều): số em trong lớp, thẻ giơ tay, thẻ luật rời màn (Duyệt / Từ chối) nằm ở đây, không còn nổi đè lên bảng. Viên «Rời màn hình», lớp «Hiểu chưa», máy tính nổi dời theo vùng phần chiếu.
+    - **Dòng tin** (`ChatEm.tsx` `DongTinGon`, `chat.css` `.lc-g*`): dòng trên HỌ TÊN ĐẦY ĐỦ in đậm 14,5 px màu theo đội (+ nhãn «Câu hỏi», giờ); dòng dưới nội dung 13 px nhạt hơn; vạch màu đội mép trái, nền ám nhẹ màu đội; tin của thầy màu trung tính. Đầu cột có nút «N câu hỏi» (bấm = chỉ hiện câu hỏi).
+    - **Phím M / nút «Tin nhắn»**: cất cột (phần chiếu về kín cửa sổ) và hiện lại. Cột cố định không tự thu khi bấm ra ngoài / mở khay / Esc.
+    - Chưa làm: nhớ lựa chọn cất cột qua lần tải lại; chỉnh bề ngang cột bằng tay.
+

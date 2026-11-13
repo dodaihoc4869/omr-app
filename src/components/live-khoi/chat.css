@@ -105,3 +105,21 @@ html.may-yeu .lc-cua { animation: none; }
 .lc-the-nho button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--lc-chu); font: inherit; font-size: 13.5px; font-weight: 700; text-align: left; white-space: nowrap; cursor: pointer; }
 .lc-the-nho button[aria-checked='true'] { background: color-mix(in srgb, var(--lc-nhan) 26%, transparent); }
 .lc-the-nho button[data-canh] { color: var(--lc-chu-y); }
+
+/* ── CỘT CỐ ĐỊNH MÁY THẦY (13/11, bản vẽ 55–59): luôn hiện bên phải màn live; mỗi tin HAI DÒNG — họ tên đầy đủ in đậm màu đội, nội dung chữ nhỏ hơn ── */
+.lc-co-dinh { font-size: 14px; }
+.lc-co-dinh .lc-dau { min-height: 46px; padding: 0 10px 0 14px; border-bottom-width: 1.5px; font-size: 14.5px; }
+.lc-co-dinh .lc-dau .lc-dau-hoi { flex: none; min-height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; background: color-mix(in srgb, var(--lc-chu-y) 15%, transparent); color: var(--lc-chu-y); }
+.lc-co-dinh .lc-dau .lc-dau-hoi[aria-pressed="true"] { background: var(--lc-chu-y); color: var(--lc-nen); }
+.lc-ds-gon { gap: 5px; padding: 8px; }
+.lc-g { position: relative; flex: none; padding: 6px 10px 7px 13px; border-radius: 10px; background: color-mix(in srgb, var(--lc-doi) 9%, var(--lc-mat)); }
+.lc-g::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 999px; background: var(--lc-doi); }
+.lc-g-ten { display: flex; align-items: baseline; gap: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.25; color: color-mix(in srgb, var(--lc-doi) 78%, var(--lc-chu)); }
+.lc-g-ten > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-g-ten > em { flex: none; padding: 1px 7px; border-radius: 999px; font-style: normal; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; background: color-mix(in srgb, var(--lc-chu-y) 16%, transparent); color: var(--lc-chu-y); }
+.lc-g-ten > time { flex: none; margin-left: auto; font-size: 11px; font-weight: 700; color: var(--lc-chu-3); font-variant-numeric: tabular-nums; }
+.lc-g-chu { margin-top: 2px; font-size: 13px; font-weight: 500; line-height: 1.38; color: var(--lc-chu-2); overflow-wrap: anywhere; }
+.lc-g[data-hoi] { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lc-chu-y) 50%, transparent); }
+.lc-g[data-thay] { --lc-doi: var(--lc-chu-2); background: var(--lc-mat-2); }
+.lc-g[data-thay] .lc-g-ten { color: var(--lc-chu); }
+

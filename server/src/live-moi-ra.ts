@@ -46,6 +46,16 @@ export async function gvLiveMoiRa(env: Env, b: Row, nowMs = Date.now()): Promise
 }
 
 // ───────────────────────── THỐNG KÊ BUỔI LIVE (tin kết thúc của văn phòng) ─────────────────────────
+/** TÊN GỌI cho tin nhắn của văn phòng (Javis DDH 13/11: «tên trong các danh sách chỉ ghi tên gọi (Hà, Quang, Ngọc…); hai em trùng tên gọi thì ghi thêm tên đệm
+ *  (Lan Anh, Minh Anh)»): chữ cuối của họ tên; trùng trong buổi ⇒ hai chữ cuối; vẫn trùng ⇒ cả họ tên. THUẦN. */
+export function tenGoiTheoBuoi(hoTen: readonly string[]): Map<string, string> {
+  const tu = (t: string): string[] => t.trim().split(/\s+/).filter(Boolean), ds = [...new Set(hoTen.map((t) => t.trim()).filter(Boolean))]
+  const dem = (lay: (t: string) => string): Map<string, number> => { const m = new Map<string, number>(); for (const t of ds) m.set(lay(t), (m.get(lay(t)) ?? 0) + 1); return m }
+  const mot = (t: string): string => tu(t).slice(-1).join(' '), hai = (t: string): string => tu(t).slice(-2).join(' ')
+  const d1 = dem(mot), d2 = dem(hai), ra = new Map<string, string>()
+  for (const t of ds) ra.set(t, d1.get(mot(t)) === 1 ? mot(t) : d2.get(hai(t)) === 1 ? hai(t) : t)
+  return ra
+}
 const khoiCua = (lop: unknown): number => Number(/(?:^|\D)(1[0-2])(?:\D|$)/.exec(str(lop))?.[1] ?? 0)
 /** `POST /gv/bpu/live-thong-ke { buoiId? }` — số liệu MỘT buổi live theo khối cho tin kết thúc của văn phòng: sĩ số khối, em có mặt, em KHÔNG vào live, số lần
  *  rời màn của từng em, em bị mời ra (đang chờ / bị từ chối / đã vào lại). Bỏ `buoiId` ⇒ buổi live mở gần nhất. Đọc-chỉ: một đợt D1 + một lượt hỏi phòng.
@@ -78,11 +88,13 @@ export async function gvLiveThongKe(env: Env, b: Row, hoiPhong: (buoiId: string)
     if (loai === 'ra') moiRa.set(sbd, { sbd, ten: ten(sbd, str(r.ten)), lop: lop(sbd), soLan: (cu?.soLan ?? 0) + 1, lan: num(r.lan), gio: gioVn(num(r.luc)), trangThai: 'cho' })
     else if (cu) cu.trangThai = loai === 'tu' ? 'tu-choi' : 'da-vao-lai'
   }
+  // tên gọi ngắn, không trùng trong buổi (em có mặt + em vắng) — văn phòng dùng thẳng trong tin
+  const goi = tenGoiTheoBuoi([...coMat.map((e) => e.ten), ...vang.map((e) => e.ten), ...[...moiRa.values()].map((e) => e.ten)]), tg = (t: string): string => goi.get(t.trim()) ?? t
   return {
     ok: true, buoiId: id, ten: str(buoi.ten), khoi, moLuc: str(buoi.mo_luc), dongLuc: str(buoi.dong_luc) || null, coPhong: tk.ok === true, dangLive: tk.dangLive === true, ketThuc: tk.ketThuc === true || !!str(buoi.dong_luc),
     siSo: khoi ? coMat.length + vang.length : coMat.length, soCoMat: coMat.length, soVang: vang.length,
-    coMat: coMat.map((e) => ({ sbd: e.sbd, ten: e.ten, lop: e.lop, roi: e.roi })).sort((x, y) => y.roi - x.roi || x.ten.localeCompare(y.ten, 'vi')),
-    roiMan: coMat.filter((e) => e.roi > 0).map((e) => ({ sbd: e.sbd, ten: e.ten, lop: e.lop, lan: e.roi })).sort((x, y) => y.lan - x.lan),
-    moiRa: [...moiRa.values()], vang: vang.sort((x, y) => x.lop.localeCompare(y.lop, 'vi') || x.ten.localeCompare(y.ten, 'vi')),
+    coMat: coMat.map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, roi: e.roi })).sort((x, y) => y.roi - x.roi || x.ten.localeCompare(y.ten, 'vi')),
+    roiMan: coMat.filter((e) => e.roi > 0).map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, lan: e.roi })).sort((x, y) => y.lan - x.lan),
+    moiRa: [...moiRa.values()].map((e) => ({ ...e, tenGoi: tg(e.ten) })), vang: vang.map((e) => ({ ...e, tenGoi: tg(e.ten) })).sort((x, y) => x.lop.localeCompare(y.lop, 'vi') || x.ten.localeCompare(y.ten, 'vi')),
   }
 }

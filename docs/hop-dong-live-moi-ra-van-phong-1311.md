@@ -40,10 +40,12 @@ Trả về:
 | `buoiId`, `ten`, `khoi`, `moLuc`, `dongLuc` | buổi nào, khối mấy, giờ mở / đóng (ISO, `dongLuc` null = chưa đóng) |
 | `coPhong`, `dangLive`, `ketThuc` | phòng có trả lời không, đang live không, buổi đã kết thúc chưa |
 | `siSo`, `soCoMat`, `soVang` | sĩ số khối (em chưa khoá), số em đã vào live, số em KHÔNG vào live |
-| `coMat[]` | `{ sbd, ten, lop, roi }` — em đã vào, `roi` = số lần rời màn hình (xếp nhiều → ít) |
-| `roiMan[]` | `{ sbd, ten, lop, lan }` — chỉ các em có rời màn hình |
-| `moiRa[]` | `{ sbd, ten, lop, soLan, lan, gio, trangThai }` — em bị mời ra; `soLan` = số lượt bị mời ra trong buổi, `lan` = số lần rời ở lượt cuối, `trangThai`: `cho` (chưa được vào lại) · `tu-choi` · `da-vao-lai` |
-| `vang[]` | `{ sbd, ten, lop }` — em thuộc khối nhưng không vào live |
+| `coMat[]` | `{ sbd, ten, tenGoi, lop, roi }` — em đã vào, `roi` = số lần rời màn hình (xếp nhiều → ít) |
+| `roiMan[]` | `{ sbd, ten, tenGoi, lop, lan }` — chỉ các em có rời màn hình |
+| `moiRa[]` | `{ sbd, ten, tenGoi, lop, soLan, lan, gio, trangThai }` — em bị mời ra; `soLan` = số lượt bị mời ra trong buổi, `lan` = số lần rời ở lượt cuối, `trangThai`: `cho` (chưa được vào lại) · `tu-choi` · `da-vao-lai` |
+| `vang[]` | `{ sbd, ten, tenGoi, lop }` — em thuộc khối nhưng không vào live |
+
+`tenGoi` = tên gọi dùng thẳng trong tin: chữ cuối của họ tên (Hà, Quang); hai em trùng tên gọi trong buổi thì thêm tên đệm (Lan Anh); vẫn trùng thì cả họ tên.
 
 Lưu ý: `roi` chỉ đếm lúc đang live (Học / Bảng), không đếm ở phòng chờ. `coPhong: false` (phòng chưa mở / không trả lời) ⇒ `coMat` rỗng, `vang` = cả khối: đừng gửi tin dựa trên số đó.
 

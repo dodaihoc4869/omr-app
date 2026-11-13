@@ -103,7 +103,17 @@ const DongTin = memo(function DongTin({ tin, toi = false }: { tin: TinChat; toi?
 })
 
 /** Danh sách tin tự cuộn xuống tin mới; người xem đang kéo lên đọc thì giữ nguyên vị trí. `rong` hiện khi chưa có tin. */
-export function DanhSachTin({ ds, toiSbd, rong, veCuoi }: { ds: TinChat[]; toiSbd?: string; rong: string; /** Đổi số này ⇒ ép cuộn về cuối (vừa gửi tin). */ veCuoi?: number }) {
+/** DÒNG TIN GỌN của cột cố định máy thầy (bản vẽ 59): dòng trên HỌ TÊN ĐẦY ĐỦ in đậm màu theo đội (+ nhãn «Câu hỏi», giờ); dòng dưới nội dung chữ nhỏ hơn.
+ *  Vạch màu đội ở mép trái, nền ám nhẹ màu đội. Tin của thầy: màu trung tính. */
+const DongTinGon = memo(function DongTinGon({ tin }: { tin: TinChat }) {
+  return (
+    <div className="lc-g" style={mauDoi(tin.doi)} data-thay={tin.thay || undefined} data-hoi={tin.hoi || undefined}>
+      <div className="lc-g-ten"><span>{tin.thay ? 'Thầy' : tin.ten}</span>{tin.hoi ? <em>Câu hỏi</em> : null}<time>{gioHien(tin.luc)}</time></div>
+      <div className="lc-g-chu"><ChuTin chu={tin.chu} /></div>
+    </div>
+  )
+})
+export function DanhSachTin({ ds, toiSbd, rong, veCuoi, gon }: { ds: TinChat[]; toiSbd?: string; rong: string; /** Đổi số này ⇒ ép cuộn về cuối (vừa gửi tin). */ veCuoi?: number; /** dòng tin gọn hai dòng (cột cố định máy thầy) */ gon?: boolean }) {
   const khung = useRef<HTMLDivElement>(null), oDay = useRef(true)
   useLayoutEffect(() => { oDay.current = true }, [veCuoi])
   useLayoutEffect(() => { const el = khung.current; if (el && oDay.current) el.scrollTop = el.scrollHeight }, [ds, veCuoi])
@@ -117,8 +127,8 @@ export function DanhSachTin({ ds, toiSbd, rong, veCuoi }: { ds: TinChat[]; toiSb
   }, [])
   const khiCuon = () => { const el = khung.current; if (el) oDay.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48 }
   return (
-    <div className="lc-ds" ref={khung} onScroll={khiCuon} role="log" aria-label="Tin nhắn lớp" tabIndex={0}>
-      {ds.length ? ds.map((t) => <DongTin key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} />) : <p className="lc-rong">{rong}</p>}
+    <div className={gon ? 'lc-ds lc-ds-gon' : 'lc-ds'} ref={khung} onScroll={khiCuon} role="log" aria-label="Tin nhắn lớp" tabIndex={0}>
+      {ds.length ? ds.map((t) => (gon ? <DongTinGon key={t.id} tin={t} /> : <DongTin key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} />)) : <p className="lc-rong">{rong}</p>}
     </div>
   )
 }

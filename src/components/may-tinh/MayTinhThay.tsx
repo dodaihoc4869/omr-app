@@ -6,10 +6,11 @@ import type { KenhLop } from '../../lib/live-khoi/kieu'
 import { bam, manHinh, taoMay, type TrangThai } from '../../lib/may-tinh/may'
 import { MT_CAO, MT_RONG, MatMay } from './MatMay'
 import { NHAC_MS, type TinMayTinh } from './dong-bo'
+import { SK_COT, vungChieu } from '../live-khoi/cot-chat-hinh'
 
 let nho: { tt: TrangThai; x: number; y: number } | null = null
 const kep = (v: number, tu: number, den: number): number => Math.min(Math.max(v, tu), Math.max(tu, den))
-const coMan = (): { w: number; h: number; u: number } => { const w = window.innerWidth, h = window.innerHeight; return { w, h, u: Math.max(0.5, Math.min(2.2, (h * 0.7) / MT_CAO, (w * 0.26) / MT_RONG)) } }
+const coMan = (): { w: number; h: number; u: number } => { const { w, h } = vungChieu(); return { w, h, u: Math.max(0.5, Math.min(2.2, (h * 0.7) / MT_CAO, (w * 0.26) / MT_RONG)) } }
 
 export default function MayTinhThay({ kenh }: { kenh: KenhLop }) {
   const [man, setMan] = useState(coMan)
@@ -18,7 +19,8 @@ export default function MayTinhThay({ kenh }: { kenh: KenhLop }) {
   const [sang, setSang] = useState<{ p: string; n: number }>({ p: '', n: 0 })
   const [cao, setCao] = useState(MT_CAO)
   const keo = useRef<{ id: number; dx: number; dy: number } | null>(null)
-  useEffect(() => { const f = () => setMan(coMan()); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
+  // cỡ màn = VÙNG PHẦN CHIẾU (có cột tin nhắn cố định thì phần chiếu thu lại — cot-chat-hinh.ts) ⇒ vị trí tương đối gửi máy em vẫn khớp
+  useEffect(() => { const f = () => setMan(coMan()); window.addEventListener('resize', f); window.addEventListener(SK_COT, f); return () => { window.removeEventListener('resize', f); window.removeEventListener(SK_COT, f) } }, [])
   const rong = MT_RONG * man.u, caoPx = cao * man.u
   // tâm máy (phần của màn); lần đầu: sát mép phải, ngay trên thanh đáy của tờ (không che nút máy tính / ống nghiệm / nút bốn ô)
   const cx = kep(vt.x < 0 ? 1 - (rong / 2 + 26) / man.w : vt.x, rong / 2 / man.w, 1 - rong / 2 / man.w), cy = kep(vt.y < 0 ? 1 - (caoPx / 2 + Math.max(64, man.h * 0.095)) / man.h : vt.y, caoPx / 2 / man.h, 1 - caoPx / 2 / man.h)
