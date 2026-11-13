@@ -39,3 +39,9 @@ html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt
 .lke-moi p b { display: block; font-size: 15px; color: var(--tr-chu); }
 .lke-moi button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 13px; background: var(--tr-mat-3); color: var(--tr-chu); font: inherit; font-weight: 800; }
 .lke-moi button.chinh { background: var(--tr-dung); color: var(--tr-nen); }
+/* CỘT TIN NHẮN GHIM (máy tính, 13/11): gốc trang mang `data-lke-cot` ⇒ màn live bên dưới và lớp nổi co sang trái đúng bề ngang cột; cột nằm ở phần vừa nhường. */
+:root[data-lke-cot] { --lke-cot: 300px; }
+:root[data-lke-cot] .bpu-hs, :root[data-lke-cot] .hh-lop { right: var(--lke-cot); }
+.lke.co-cot { right: var(--lke-cot, 300px); }
+.lke.co-cot > .lc-ngan.lc-ghim { right: calc(-1 * var(--lke-cot, 300px)); width: var(--lke-cot, 300px); }
+
