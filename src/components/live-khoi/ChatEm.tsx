@@ -4,6 +4,8 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { chuCongThuc, chuanGui, docKhoa, docTin, duocGui, gioHien, nhanTin, tenTat, type TinChat } from '../../lib/live-khoi/chat-loi'
 import { CHAT_DAI, CHAT_NHIP_MS, type ChatGui, type KenhLop } from '../../lib/live-khoi/kieu'
+import { goTelex, xoaLui } from '../../lib/telex'
+import BanPhimNgang from './BanPhimNgang'
 import './chat.css'
 
 type KetQuaGui = 'ok' | 'nhanh-qua' | 'rong' | 'khoa'
@@ -237,11 +239,14 @@ function useBanPhim(): number {
   }, [])
   return px
 }
-export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong, onGhim }: {
+export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong, onGhim, banPhimRieng = false }: {
   chat: ChatLop; toiSbd: string; soEm: number
   /** đang ghim thành cột (máy tính) */ ghim: boolean; /** máy này ghim được (máy tính màn rộng) */ coGhim: boolean
   /** đổi số ⇒ đưa con trỏ vào ô nhập (phím Enter) */ tieuDiem: number
   onDong: () => void; onGhim: (b: boolean) => void
+  /** BÀN PHÍM TRONG APP (thầy 13/11 «ép bàn phím xoay ngang»): hình đang xoay 90° trên điện thoại ⇒ bàn phím hệ thống nằm ngang chữ, không gõ được ⇒
+   *  ô nhập không gọi bàn phím hệ thống, ngăn tự vẽ bàn phím (nằm ngang theo hình), chữ gõ đi qua bộ gõ Telex. */
+  banPhimRieng?: boolean
 }) {
   const [chu, setChu] = useState('')
   const [nhanhQua, setNhanhQua] = useState(false)
@@ -271,9 +276,11 @@ export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong,
   }, [nhanhQua])
   const gui = (c: string) => { const kq = chat.gui(c); setNhanhQua(kq === 'nhanh-qua'); if (kq === 'ok') setVeCuoi((n) => n + 1); return kq === 'ok' }
   const khiGui = (e: FormEvent) => { e.preventDefault(); if (gui(chu)) setChu('') }
+  const goPhim = useCallback((p: string) => setChu((c) => { const m = goTelex(c, p); return m.length > CHAT_DAI ? c : m }), [])
+  const xoaPhim = useCallback(() => setChu(xoaLui), [])
   const go = banPhim > 80
   return (
-    <div className={`lc-goc lc-khung lc-ngan${ghim ? ' lc-ghim' : ''}${go ? ' go' : ''}`} role="dialog" aria-label="Tin nhắn lớp" style={banPhim > 0 ? { bottom: banPhim } : undefined}>
+    <div className={`lc-goc lc-khung lc-ngan${ghim ? ' lc-ghim' : ''}${go ? ' go' : ''}${banPhimRieng ? ' lc-bpr' : ''}`} role="dialog" aria-label="Tin nhắn lớp" style={banPhim > 0 ? { bottom: banPhim } : undefined}>
       <div className="lc-dau">
         <span className="lc-dau-ten">Tin nhắn lớp<small>{soEm} em</small></span>
         {coGhim && !ghim ? <button type="button" className="lc-o44" onClick={() => onGhim(true)} aria-label="Ghim tin nhắn thành cột bên phải" title="Ghim thành cột"><BieuTuongChat ten="ghim" co={18} /></button> : null}
@@ -284,10 +291,14 @@ export function NganChatEm({ chat, toiSbd, soEm, ghim, coGhim, tieuDiem, onDong,
         {NHAN_NHANH_NGAN.map((c) => <button key={c} type="button" className="lc-vien-bam" disabled={khoa} onClick={() => gui(c)}><span>{c}</span></button>)}
       </div>
       <p className="lc-bao" role="status" data-loai={khoa ? 'khoa' : 'nhanh'}>{khoa ? 'Thầy đang tắt nhắn tin' : nhanhQua ? 'Chờ 2 giây rồi gửi tiếp' : ''}</p>
-      <form className="lc-nhap" onSubmit={khiGui}>
-        <input ref={o} value={chu} onChange={(e) => setChu(e.target.value)} maxLength={CHAT_DAI} disabled={khoa} placeholder="Nhắn thầy và cả lớp…" aria-label="Nhắn thầy và cả lớp" enterKeyHint="send" autoComplete="off" />
+      <form className={banPhimRieng ? 'lc-nhap lc-bp-o' : 'lc-nhap'} onSubmit={khiGui}>
+        {/* ô chỉ-đọc không có con trỏ của hệ thống ⇒ vẽ lại chữ + con trỏ nháy ở cuối (chữ dài thì thấy phần đuôi đang gõ) */}
+        {banPhimRieng ? <div className="lc-bp-hien" aria-hidden="true"><span>{chu}{khoa ? null : <i />}</span></div> : null}
+        <input ref={o} value={chu} onChange={(e) => setChu(e.target.value)} maxLength={CHAT_DAI} disabled={khoa} placeholder="Nhắn thầy và cả lớp…" aria-label="Nhắn thầy và cả lớp" enterKeyHint="send" autoComplete="off"
+          readOnly={banPhimRieng} inputMode={banPhimRieng ? 'none' : undefined} />
         <button type="submit" className="lc-gui" disabled={khoa || !chu.trim()} aria-label="Gửi tin"><BieuTuongChat ten="gui" co={18} /></button>
       </form>
+      {banPhimRieng ? <BanPhimNgang onPhim={goPhim} onXoa={xoaPhim} onGui={() => { if (gui(chu)) setChu('') }} khoa={khoa} /> : null}
       {coGhim ? <p className="lc-phim" aria-hidden="true"><kbd>Enter</kbd> gõ ngay · <kbd>Esc</kbd> về bài</p> : null}
     </div>
   )

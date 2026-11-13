@@ -147,7 +147,7 @@ export default function LopNoiEm() {
         {!choi && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
         {!choi && (sanh || !bonDoi) ? (
           <>
-            {chatMo || cotGhim ? <NganChatEm chat={chat} toiSbd={s.toi.sbd} soEm={s.ds.length} ghim={cotGhim} coGhim={coGhim} tieuDiem={tieuDiem} onDong={dongChat} onGhim={datGhim} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
+            {chatMo || cotGhim ? <NganChatEm chat={chat} toiSbd={s.toi.sbd} soEm={s.ds.length} ghim={cotGhim} coGhim={coGhim} tieuDiem={tieuDiem} onDong={dongChat} onGhim={datGhim} banPhimRieng={xoay} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
             {sanh && (mic.moi || mic.mic) ? (
               <div className="lke-moi" role="dialog" aria-label="Mic của em">
                 {mic.mic === 'mo' ? <><p><b>Mic của em đang bật</b>Thầy và cả lớp đang nghe em.</p><button type="button" onClick={() => lenhLk('mic-tat')}>Tắt mic</button></>
