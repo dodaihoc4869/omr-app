@@ -1,196 +1,131 @@
 {
  "tong": {
-  "anh": 23,
+  "anh": 13,
   "loiTrang": 0,
   "tranNgang": 0,
   "dichNho": 0,
   "chuBiCat": 0,
+  "chuHocSinh": 0,
   "anhQua150KB": 0
  },
  "anh": [
   {
    "anh": "01-nhat-ky-may-tinh-1366-sang.jpg",
-   "kb": 146,
+   "kb": 140,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "02-nhat-ky-may-tinh-1366-toi.jpg",
-   "kb": 144,
+   "anh": "02-nhat-ky-may-tinh-1366-toi-vi-du-va-thang.jpg",
+   "kb": 148,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "03-nhat-ky-may-tinh-1366-sang-tung-trang.jpg",
-   "kb": 143,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "04-nhat-ky-may-tinh-1366-toi-tung-trang.jpg",
-   "kb": 141,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "05-nhat-ky-may-tinh-1366-sang-bang-cuoi-buoi.jpg",
-   "kb": 143,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "06-nhat-ky-ngang-844-sang.jpg",
+   "anh": "03-nhat-ky-ngang-844-sang.jpg",
    "kb": 142,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "07-nhat-ky-ngang-844-toi.jpg",
-   "kb": 141,
+   "anh": "04-nhat-ky-ngang-844-toi-cong-thuc-electron.jpg",
+   "kb": 106,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "08-nhat-ky-ngang-844-sang-tung-trang.jpg",
-   "kb": 115,
+   "anh": "05-nhat-ky-doc-390-sang.jpg",
+   "kb": 140,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "09-nhat-ky-doc-390-sang.jpg",
-   "kb": 137,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "10-nhat-ky-doc-390-toi.jpg",
-   "kb": 135,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "11-nhat-ky-doc-390-sang-y-dong-khung.jpg",
-   "kb": 116,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "12-nhat-ky-doc-390-toi-tung-trang.jpg",
-   "kb": 112,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "13-hoat-hoa-tua-nhanh-dang-viet-1366-sang.jpg",
-   "kb": 147,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "14-hoat-hoa-trang-dang-ve-do-1366-toi.jpg",
-   "kb": 147,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "15-hoat-hoa-trang-dang-ve-do-390-sang.jpg",
-   "kb": 98,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "16-tuy-chon-ten-goi-y-1366-sang.jpg",
-   "kb": 144,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "17-cho-gan-may-tinh-1366-sang.jpg",
-   "kb": 146,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "18-cho-gan-may-tinh-1366-toi.jpg",
-   "kb": 144,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "19-cho-gan-ngang-844-sang.jpg",
-   "kb": 83,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "20-cho-gan-ngang-844-toi.jpg",
-   "kb": 78,
-   "loiTrang": [],
-   "tranNgang": 0,
-   "dichNho": [],
-   "chuBiCat": []
-  },
-  {
-   "anh": "21-cho-gan-doc-390-sang.jpg",
+   "anh": "06-nhat-ky-doc-390-toi-doan-nhanh-da-cham.jpg",
    "kb": 129,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "22-cho-gan-doc-390-toi.jpg",
-   "kb": 124,
+   "anh": "07-khung-giua-keo-co-dang-thanh-ion-1366-toi.jpg",
+   "kb": 145,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
   },
   {
-   "anh": "23-cho-gan-phuong-an-phu-duoi-dong-thoi-gian-1440x900-sang.jpg",
-   "kb": 144,
+   "anh": "08-khung-giua-lewis-dang-ve-cap-chung-390-sang.jpg",
+   "kb": 96,
    "loiTrang": [],
    "tranNgang": 0,
    "dichNho": [],
-   "chuBiCat": []
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "09-khung-giua-thang-kim-dang-chay-844-sang.jpg",
+   "kb": 83,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "10-bai-fes2-vi-du-cot-doc-1366-sang.jpg",
+   "kb": 146,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "11-duyet-thay-1366-sang.jpg",
+   "kb": 146,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "12-cho-gan-may-tinh-1366-sang.jpg",
+   "kb": 143,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "13-cho-gan-doc-390-sang.jpg",
+   "kb": 127,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
   }
- ]
+ ],
+ "video": []
 }

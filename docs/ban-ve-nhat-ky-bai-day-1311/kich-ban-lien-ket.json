@@ -1,0 +1,155 @@
+{
+  "phienBan": 1,
+  "ghiChu": "Kịch bản bài 12/11, dựng theo đúng nội dung bảng Thầy viết. Phần A.I sinh: canh[].khuon, tieuDe, duLieu, nguon.trang/cot/chep, may.chuaChac, deXuat. Phần APP điền: nguon.giay (từ giờ của nét trong vùng đó), kết quả kiểm số. Phần THẦY: duyet.",
+  "buoi": { "ten": "Liên kết cộng hoá trị phân cực và không phân cực", "tenBang": "K10 · Liên kết CHT phân cực, không phân cực", "lop": "Live Khối 10", "ngay": "2026-11-12", "thu": "Thứ Năm", "gioBatDau": "20:18", "phutLive": 39, "giayDoanChua": 2280 },
+  "nguon": { "soTrangBang": 2, "moHinh": "claude-opus-5-5", "luc": "2026-11-12T20:59:10+07:00", "token": { "vao": 12100, "ra": 10400 }, "uocUsd": 0.26 },
+  "trangThai": "cho-duyet",
+  "nguongDangDung": "sgk",
+  "canChot": [
+    { "ma": "nguong", "hoi": "Ngưỡng Δχ hiện cho học sinh", "lyDo": "Bảng Thầy viết «Δχ > 1,7 ⇒ liên kết ion» và kết luận CH₄ không phân cực, nhưng không ghi mốc 0,4. SGK Hoá 10 (2018): 0 ≤ Δχ < 0,4 không phân cực; 0,4 ≤ Δχ < 1,7 phân cực; Δχ ≥ 1,7 ion.", "phuongAn": [ { "ma": "sgk", "chu": "Theo SGK: ba vùng, mốc 0,4 và 1,7 (ion từ 1,7 trở lên)" }, { "ma": "thay", "chu": "Giữ đúng bảng: chỉ ghi Δχ > 1,7 là ion, không vẽ mốc 0,4" } ], "macDinh": "sgk", "canh": ["c5", "c6", "c8", "c11"] },
+    { "ma": "in-ten", "hoi": "Tên hai bạn Thầy ví trên bảng", "lyDo": "Bảng ghi «Hùng … (Δ1) = Kiên … (Δ2)». Có thể là tên học sinh thật trong lớp.", "phuongAn": [ { "ma": "khong", "chu": "Không in tên: ghi «Bên trái», «Bên phải»" }, { "ma": "co", "chu": "In đúng tên Thầy viết trên bảng" } ], "macDinh": "khong", "canh": ["c1"], "tenTrenBang": { "trai": "Hùng", "phai": "Kiên" } }
+  ],
+  "bia": {
+    "loi": "Thầy giảng lại bài trên bảng thành 11 cảnh, khoảng 4 phút. Mỗi cảnh tự chạy khi em cuộn tới.",
+    "hoatHoa": { "khuon": "keo-co", "duLieu": { "anSo": true, "thanhPha": true, "trai": { "nhan": "Bên trái" }, "phai": { "nhan": "Bên phải" }, "pha": [
+      { "chiTrai": 1, "chiPhai": 1, "loai": "khong-phan-cuc", "chu": "Ngang sức" },
+      { "chiTrai": 1, "chiPhai": 1.8, "loai": "phan-cuc", "chu": "Lệch sức" },
+      { "chiTrai": 1, "chiPhai": 3, "loai": "ion", "chu": "Chênh lệch lớn" }
+    ] } }
+  },
+  "canh": [
+    {
+      "id": "c1", "khuon": "keo-co", "tieuDe": "Kéo co ngang sức: cặp electron đứng giữa",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "Đường kẻ ngang, dấu x ở giữa · Hùng Angola (Δ1) = Kiên Angola (Δ2) · khung «LK CHT ko phân cực»", "giay": 190 },
+      "may": { "chuaChac": "Chữ «Angola» đọc chưa chắc (chữ nhỏ, sát mép khung)." },
+      "duLieu": { "anSo": true, "trai": { "nhan": "Bên trái" }, "phai": { "nhan": "Bên phải" }, "pha": [
+        { "chiTrai": 1, "chiPhai": 1, "loai": "khong-phan-cuc", "chu": "Lực kéo bên trái = lực kéo bên phải",
+          "loi": ["Thầy ví liên kết như hai bạn kéo co. Cặp electron dùng chung là vạch đánh dấu giữa sợi dây.", "Hai bạn ngang sức, lực kéo bằng nhau, nên cặp electron đứng yên ở chính giữa."],
+          "ketLuan": "Liên kết cộng hoá trị không phân cực" }
+      ] }
+    },
+    {
+      "id": "c2", "khuon": "quy-tac", "tieuDe": "Cách nhận định nhanh",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "↳ Cách nhận định tính → 2 ntố giống nhau 100 % ⇒ LK CHT kpc", "giay": 455 },
+      "duLieu": { "nhan": "Cách nhận định", "mau": "ngoc",
+        "dong": ["Hai nguyên tố **giống nhau 100 %**", "⇒ liên kết cộng hoá trị **không phân cực**"],
+        "viDu": ["O₂"],
+        "loi": ["Muốn biết nhanh, em nhìn hai nguyên tố ở hai đầu liên kết.", "Giống nhau hoàn toàn thì lực kéo bằng nhau, cặp electron nằm giữa."] }
+    },
+    {
+      "id": "c3", "khuon": "lewis", "tieuDe": "O₂: công thức electron",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "O₂ ⇒ O ⁘ O ⇒ LK CHT kpc", "giay": 610 },
+      "duLieu": { "congThuc": "O₂",
+        "nguyenTu": [ { "ky": "O", "kieu": "cham" }, { "ky": "O", "kieu": "x" } ],
+        "lienKet": [ { "a": 0, "b": 1, "cap": 2 } ],
+        "capRieng": [2, 2],
+        "nhanChung": "2 cặp electron dùng chung nằm giữa",
+        "loi": ["Mỗi nguyên tử O có 6 electron lớp ngoài cùng. Chấm là electron của O bên trái, dấu x của O bên phải.", "Mỗi O góp 2 electron, thành 2 cặp electron dùng chung nằm giữa.", "Quanh mỗi O đủ 8 electron. Hai O giống nhau 100 %, liên kết không phân cực."] }
+    },
+    {
+      "id": "c4", "khuon": "doan-nhanh", "tieuDe": "Đoán nhanh: H₂",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "H₂ → (bỏ dở)", "giay": 742 },
+      "may": { "chuaChac": "Thầy viết dở «H₂ →». App soạn câu đoán từ quy tắc ngay trên bảng (hai nguyên tố giống nhau 100 %)." },
+      "duLieu": {
+        "hoi": "Thầy mới viết «H₂ →» rồi dừng. Em đoán: liên kết trong H₂ thuộc loại nào?",
+        "luaChon": [ { "chu": "Cộng hoá trị **không phân cực**", "dung": true }, { "chu": "Cộng hoá trị **phân cực**", "dung": false }, { "chu": "Liên kết **ion**", "dung": false } ],
+        "giai": "Hai nguyên tử H giống nhau 100 %, lực kéo bằng nhau. Cặp electron dùng chung nằm chính giữa.",
+        "mo": { "khuon": "keo-co", "duLieu": { "trai": { "nhan": "Bên trái", "ky": "H" }, "phai": { "nhan": "Bên phải", "ky": "H" }, "pha": [ { "loai": "khong-phan-cuc", "chu": "Hai bên cùng χ = 2,20" } ] } }
+      }
+    },
+    {
+      "id": "c5", "khuon": "keo-co", "tieuDe": "Lệch sức: cặp electron bị kéo lệch",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "Khung «LK CHT PC» · QT₃ → Δχ > 1,7 → lực kéo chênh lệch hơn ⇒ LK Ion", "giay": 1010 },
+      "duLieu": { "anSo": true, "trai": { "nhan": "Bên trái" }, "phai": { "nhan": "Bên phải" }, "pha": [
+        { "chiTrai": 1, "chiPhai": 1.8, "loai": "phan-cuc", "chu": "Bên phải kéo mạnh hơn",
+          "loi": ["Nếu một bên kéo mạnh hơn, cặp electron bị kéo lệch về bên đó."], "ketLuan": "Liên kết cộng hoá trị phân cực" },
+        { "chiTrai": 1, "chiPhai": 3, "loai": "ion", "chu": "Lực kéo chênh lệch hơn nữa",
+          "loi": ["Lực kéo chênh lệch hơn nữa thì bên mạnh giữ hẳn electron về mình.", "Bên mất electron thành ion dương, bên nhận electron thành ion âm."], "ketLuan": "Liên kết ion" }
+      ] }
+    },
+    {
+      "id": "c6", "khuon": "quy-tac", "tieuDe": "Quy tắc: khi nào là liên kết ion",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "QT₃ → Δχ > 1,7 → lực kéo chênh lệch hơn ⇒ LK Ion", "giay": 1105 },
+      "may": { "chuaChac": "«QT₃» đọc chưa chắc: có thể là «Quy tắc 3». Trên trang học sinh app ghi «Quy tắc», không đánh số." },
+      "duLieu": { "nhan": "Quy tắc", "mau": "hong",
+        "dong": ["Δχ ≥ 1,7: lực kéo **chênh lệch hơn**", "⇒ **liên kết ion**"],
+        "loi": ["Độ âm điện χ chính là lực kéo electron của mỗi nguyên tử.", "Δχ là hiệu độ âm điện hai nguyên tố, lấy số lớn trừ số nhỏ."] }
+    },
+    {
+      "id": "c7", "khuon": "vi-du-cot-doc", "tieuDe": "Ví dụ 1: CH₄",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "VD1: CH₄ | C : 2,55 ; H : 2,2 ⇒ Δχ = 0,35 → LK CHT KPC", "giay": 1390 },
+      "duLieu": {
+        "de": "Liên kết giữa C và H trong **CH₄** thuộc loại nào?",
+        "soDo": { "chat": [ { "ct": "C", "so": [ { "hien": "χ = 2,55", "chi": "C" } ] }, { "ct": "H", "so": [ { "hien": "χ = 2,20", "chi": "H" } ] } ], "muiTen": null },
+        "tinh": { "ten": "Δχ",
+          "thuaSo": [
+            { "hien": "2,55", "gt": 2.55, "noi": "Lấy độ âm điện lớn hơn: của C là 2,55.", "tro": [0, 0] },
+            { "dau": "−", "hien": "2,20", "gt": 2.2, "noi": "Trừ độ âm điện của H là 2,20.", "tro": [1, 0] }
+          ],
+          "ketQua": { "hien": "0,35", "gt": 0.35, "noi": "Δχ = 0,35, rất nhỏ. Thầy kết luận: liên kết cộng hoá trị không phân cực." } }
+      }
+    },
+    {
+      "id": "c8", "khuon": "thang-delta", "tieuDe": "Đặt Δχ lên thang",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "Δχ = 0,35 → LK CHT KPC · Δχ > 1,7 ⇒ LK Ion", "giay": 1452 },
+      "may": { "ngoaiBang": "Mốc 0,4 không có trên bảng, app lấy theo SGK." },
+      "duLieu": { "max": 3,
+        "loiMo": ["Thang chia theo Δχ. Càng sang phải, lực kéo hai bên càng chênh lệch."],
+        "kim": [
+          { "nhan": "O₂", "a": "O", "b": "O", "delta": 0, "loai": "khong-phan-cuc", "chu": "O₂: hai O giống nhau, Δχ = 0." },
+          { "nhan": "CH₄", "a": "C", "b": "H", "delta": 0.35, "loai": "khong-phan-cuc", "chu": "CH₄: Δχ = 0,35, cùng vùng không phân cực." }
+        ],
+        "loi": ["Từ 1,7 trở lên là vùng liên kết ion."] }
+    },
+    {
+      "id": "c9", "khuon": "doan-nhanh", "tieuDe": "Đoán nhanh: Δχ của O₂",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "O₂ ⇒ O ⁘ O ⇒ LK CHT kpc", "giay": 610 },
+      "duLieu": {
+        "hoi": "Δχ của liên kết trong **O₂** bằng bao nhiêu?",
+        "luaChon": [ { "chu": "**0**", "dung": true }, { "chu": "**3,44**", "dung": false }, { "chu": "**6,88**", "dung": false } ],
+        "giai": "Hai nguyên tử O cùng độ âm điện 3,44. Lấy 3,44 trừ 3,44 được 0.",
+        "mo": { "khuon": "thang-delta", "duLieu": { "max": 3, "kim": [ { "nhan": "O₂", "a": "O", "b": "O", "delta": 0, "loai": "khong-phan-cuc" } ] } }
+      }
+    },
+    {
+      "id": "c10", "khuon": "lewis", "tieuDe": "Ví dụ 2: CO₂",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "VD2: CO₂ — O ⁘ C ⁘ O → (dừng)", "giay": 1880 },
+      "may": { "chuaChac": "Thầy dừng ở mũi tên sau công thức. App không tự viết kết luận vào bài; phần kết luận để ở đề xuất P1." },
+      "duLieu": { "congThuc": "CO₂",
+        "nguyenTu": [ { "ky": "O", "kieu": "cham" }, { "ky": "C", "kieu": "x" }, { "ky": "O", "kieu": "cham" } ],
+        "lienKet": [ { "a": 0, "b": 1, "cap": 2 }, { "a": 1, "b": 2, "cap": 2 } ],
+        "capRieng": [2, 0, 2],
+        "nhanChung": "Mỗi bên 2 cặp electron dùng chung",
+        "loi": ["C có 4 electron lớp ngoài cùng, mỗi O có 6.", "C góp 2 electron với mỗi O, thành 2 cặp dùng chung ở mỗi bên.", "Quanh C và quanh mỗi O đều đủ 8 electron. Phần kết luận, em nghe Thầy giảng ở mục tổng kết."] }
+    },
+    {
+      "id": "c11", "khuon": "tong-ket", "tieuDe": "Tổng kết bài",
+      "nguon": { "trang": 1, "cot": "ca-bang", "chep": "(cả bảng)" },
+      "duLieu": { "y": [
+        { "chu": "Ngang sức thì cặp electron nằm giữa: **liên kết cộng hoá trị không phân cực**.", "canh": "c1", "giay": 190 },
+        { "chu": "Hai nguyên tố giống nhau 100 %, như O₂, thì liên kết **không phân cực**.", "canh": "c2", "giay": 455 },
+        { "chu": "Lực kéo chênh lệch hơn, Δχ ≥ 1,7: **liên kết ion**.", "canh": "c6", "giay": 1105 },
+        { "chu": "CH₄: Δχ = 2,55 − 2,20 = 0,35, liên kết **cộng hoá trị không phân cực**.", "canh": "c7", "giay": 1390 },
+        { "chu": "Công thức electron: cặp dùng chung nằm giữa hai nguyên tử, như O₂ và CO₂.", "canh": "c10", "giay": 1880 }
+      ] }
+    },
+    {
+      "id": "p1", "khuon": "thang-delta", "deXuat": true, "tieuDe": "Đề xuất: kết luận cho CO₂",
+      "nguon": null,
+      "may": { "ngoaiBang": "Không có trên bảng: Thầy dừng ở «→». App đề xuất kết luận theo SGK, chỉ đưa vào bài khi Thầy chọn." },
+      "duLieu": { "max": 3,
+        "kim": [ { "nhan": "C=O trong CO₂", "a": "O", "b": "C", "delta": 0.89, "loai": "phan-cuc", "chu": "Liên kết C=O: Δχ = 3,44 − 2,55 = 0,89, liên kết phân cực." } ],
+        "loi": ["Phân tử CO₂ thẳng, hai liên kết kéo ngược chiều nhau nên cả phân tử không phân cực."] }
+    },
+    {
+      "id": "p2", "khuon": "thang-delta", "deXuat": true, "tieuDe": "Đề xuất: thêm ví dụ NaCl và HCl",
+      "nguon": null,
+      "may": { "ngoaiBang": "Không có trên bảng. Ví dụ thêm để em thấy đủ ba vùng của thang." },
+      "duLieu": { "max": 3,
+        "kim": [
+          { "nhan": "HCl", "a": "Cl", "b": "H", "delta": 0.96, "loai": "phan-cuc", "chu": "HCl: Δχ = 3,16 − 2,20 = 0,96, liên kết cộng hoá trị phân cực." },
+          { "nhan": "NaCl", "a": "Cl", "b": "Na", "delta": 2.23, "loai": "ion", "chu": "NaCl: Δχ = 3,16 − 0,93 = 2,23, liên kết ion." }
+        ] }
+    }
+  ]
+}

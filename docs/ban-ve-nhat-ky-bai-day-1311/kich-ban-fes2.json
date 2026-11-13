@@ -1,0 +1,77 @@
+{
+  "phienBan": 1,
+  "ghiChu": "KỊCH BẢN MẪU, không phải buổi thật: chứng minh cùng thư viện khuôn dựng được một bài TÍNH TOÁN khác hẳn chủ đề. Ví dụ và lời nói từng thừa số chép đúng docs/tu-duy-day-hoa-thay-2610.md.",
+  "mau": true,
+  "buoi": { "ten": "Tính theo sơ đồ: từ quặng FeS₂ ra SO₂", "tenBang": "Hiệu suất · quặng FeS₂", "lop": "Live Khối 11", "ngay": "2026-11-10", "thu": "Thứ Ba", "gioBatDau": "20:15", "phutLive": 31, "giayDoanChua": 1800 },
+  "nguon": { "soTrangBang": 1, "moHinh": "claude-opus-5-5", "luc": "2026-11-10T20:48:00+07:00" },
+  "trangThai": "cho-duyet",
+  "nguongDangDung": "sgk",
+  "canChot": [],
+  "bia": {
+    "loi": "Thầy giảng lại bài trên bảng thành 5 cảnh, khoảng 3 phút. Mỗi cảnh tự chạy khi em cuộn tới.",
+    "hoatHoa": { "khuon": "quy-tac", "duLieu": { "nhan": "Cách tính của Thầy", "mau": "vang", "dong": ["Số liệu ghi **theo cột dọc**", "Bảo toàn nguyên tố ⇒ **một phép tính**"] } }
+  },
+  "canh": [
+    {
+      "id": "f1", "khuon": "quy-tac", "tieuDe": "Sơ đồ cột dọc của Thầy",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "Sơ đồ: FeS₂ → SO₂ (H ghi trên mũi tên)", "giay": 95 },
+      "duLieu": { "nhan": "Sơ đồ hoá", "mau": "vang",
+        "dong": ["Đề cho số liệu ở chất nào, **ghi theo cột dọc** dưới chất đó.", "Hiệu suất ghi **trên mũi tên**."],
+        "loi": ["Bài này chỉ cần sơ đồ FeS₂ ra SO₂ và bảo toàn nguyên tố S.", "Bảo toàn nguyên tố thì chỉ cần một phép tính."] }
+    },
+    {
+      "id": "f2", "khuon": "vi-du-cot-doc", "tieuDe": "Ví dụ: 1 tấn quặng ra bao nhiêu kg SO₂",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "1 tấn quặng 8 % FeS₂, H = 90 % · m = 10⁶ · 8/100 · 1/120 · 2 · 64 · 90/100 · 1/1000 = 76,8", "giay": 240 },
+      "duLieu": {
+        "de": "Đốt **1 tấn quặng chứa 8 % FeS₂** để điều chế SO₂, hiệu suất **90 %**. Tính khối lượng SO₂ thu được (kg).",
+        "soDo": {
+          "chat": [
+            { "ct": "FeS₂", "so": [ { "hien": "m quặng = 10⁶ g" }, { "hien": "8 % FeS₂" }, { "hien": "M = 120", "M": 120 } ] },
+            { "ct": "SO₂", "heSo": 2, "so": [ { "hien": "M = 64", "M": 64 }, { "hien": "m = ? kg" } ] }
+          ],
+          "muiTen": [ { "tren": "H = 90 %" } ]
+        },
+        "tinh": { "ten": "m SO₂",
+          "thuaSo": [
+            { "hien": "10⁶", "gt": 1000000, "noi": "Khối lượng quặng: 1 tấn = 10⁶ g.", "tro": [0, 0] },
+            { "dau": "·", "hien": "8/100", "tu": 8, "mau": 100, "noi": "Nhân 8/100 ra khối lượng FeS₂.", "tro": [0, 1] },
+            { "dau": "·", "hien": "1/120", "tu": 1, "mau": 120, "noi": "Chia M = 120 ra **số mol** FeS₂.", "tro": [0, 2], "loai": "chia-M", "ct": "FeS₂" },
+            { "dau": "·", "hien": "2", "gt": 2, "noi": "**Bảo toàn nguyên tố** S: 1 FeS₂ có 2 S, ra 2 SO₂, số mol nhân 2.", "tro": [1, "heSo"], "loai": "bao-toan", "nt": "S", "tuCt": "FeS₂", "denCt": "SO₂" },
+            { "dau": "·", "hien": "64", "gt": 64, "noi": "Nhân M = 64 ra **khối lượng** SO₂.", "tro": [1, 0], "loai": "nhan-M", "ct": "SO₂" },
+            { "dau": "·", "hien": "90/100", "tu": 90, "mau": 100, "noi": "Tính xuôi nên nhân **H/100** = 90/100.", "tro": ["muiTen", 0], "loai": "hieu-suat-xuoi", "H": 90 },
+            { "dau": "·", "hien": "1/1000", "tu": 1, "mau": 1000, "noi": "Đổi gam ra kg: nhân 1/1000.", "tro": [1, 1] }
+          ],
+          "ketQua": { "hien": "76,8", "gt": 76.8, "donVi": "kg", "noi": "Vậy khối lượng SO₂ là 76,8 kg." } }
+      }
+    },
+    {
+      "id": "f3", "khuon": "doan-nhanh", "tieuDe": "Đoán nhanh: thừa số 2",
+      "nguon": { "trang": 1, "cot": "trai", "chep": "· 2 (bảo toàn S)", "giay": 312 },
+      "duLieu": {
+        "hoi": "Thừa số **· 2** trong phép tính đến từ đâu?",
+        "luaChon": [ { "chu": "1 FeS₂ có **2 nguyên tử S**", "dung": true }, { "chu": "Hiệu suất 90 %", "dung": false }, { "chu": "Khối lượng mol của O₂", "dung": false } ],
+        "giai": "Bảo toàn nguyên tố S: 1 FeS₂ có 2 S nên ra 2 SO₂, số mol nhân 2.",
+        "mo": { "khuon": "quy-tac", "duLieu": { "nhan": "Bảo toàn nguyên tố S", "mau": "ngoc", "dong": ["1 FeS₂ có **2 S** ⇒ ra **2 SO₂**", "⇒ số mol × 2"] } }
+      }
+    },
+    {
+      "id": "f4", "khuon": "doan-nhanh", "tieuDe": "Đoán nhanh: tính ngược",
+      "nguon": { "trang": 1, "cot": "phai", "chep": "Xuôi × H/100 · Ngược × 100/H", "giay": 455 },
+      "duLieu": {
+        "hoi": "Đề hỏi ngược: cần bao nhiêu quặng để thu 76,8 kg SO₂, H = 90 %. Hiệu suất nhân thế nào?",
+        "luaChon": [ { "chu": "Nhân **100/90**", "dung": true }, { "chu": "Nhân **90/100**", "dung": false }, { "chu": "Không cần hiệu suất", "dung": false } ],
+        "giai": "Tính ngược từ sản phẩm về nguyên liệu thì nhân 100/H.",
+        "mo": { "khuon": "quy-tac", "duLieu": { "nhan": "Hiệu suất", "mau": "hong", "dong": ["Tính xuôi: × **H/100**", "Tính ngược: × **100/H**"] } }
+      }
+    },
+    {
+      "id": "f5", "khuon": "tong-ket", "tieuDe": "Tổng kết bài",
+      "nguon": { "trang": 1, "cot": "ca-bang", "chep": "(cả bảng)" },
+      "duLieu": { "y": [
+        { "chu": "Ghi số liệu **theo cột dọc** dưới đúng chất đề cho, hiệu suất ghi trên mũi tên.", "canh": "f1", "giay": 95 },
+        { "chu": "Chia M ra số mol, **bảo toàn nguyên tố** ra tỉ lệ, nhân M ra khối lượng.", "canh": "f2", "giay": 240 },
+        { "chu": "Tính xuôi × **H/100**, tính ngược × **100/H**.", "canh": "f4", "giay": 455 }
+      ] }
+    }
+  ]
+}
