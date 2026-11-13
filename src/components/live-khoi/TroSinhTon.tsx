@@ -1,19 +1,22 @@
-// TRÒ «SINH TỒN» ở phòng chờ Live theo khối (thầy chốt 12/11 «chốt build đẩy luôn lên»; bản vẽ docs/ban-ve-sinh-ton-1211/, đặc tả docs/dac-ta-sinh-ton-1211.md).
-// Bốn đội, mỗi em một bé ma đeo súng tự bắn đối thủ gần nhất; KHÔNG có nút điều khiển: vuốt ở đâu cũng chạy, chạm một điểm thì tự chạy tới. Luật nằm cả ở
-// LÕI THUẦN src/lib/live-khoi/sinh-ton-loi.ts; tệp này chỉ lo: MỘT canvas (vòng requestAnimationFrame, tab ẩn ⇒ dừng), cử chỉ, kênh lớp, vài lớp DOM phủ.
-// Máy yếu / giảm chuyển động ⇒ 30 khung / giây, bỏ quầng sáng. Màu đọc từ biến CSS của app. Lượt hạ trong trò KHÔNG cộng vào kJ buổi học.
+// TRÒ «SINH TỒN · TRANG VỞ» (bản 2 — thầy duyệt bản vẽ 13/11: docs/ban-ve-sinh-ton-v2-1311/, đặc tả docs/dac-ta-sinh-ton-v2-1311.md) ở phòng chờ Live theo khối
+// và phòng chờ ca kiểm tra (bản ÊM). Bốn đội, mỗi em một bé ma vẽ tay đeo súng tự bắn đối thủ gần nhất; KHÔNG có nút điều khiển: vuốt ở đâu cũng chạy, chạm một
+// điểm thì tự chạy tới. Luật nằm cả ở LÕI THUẦN src/lib/live-khoi/sinh-ton-loi.ts; tệp này chỉ lo: MỘT canvas (vòng requestAnimationFrame, tab ẩn ⇒ dừng),
+// cử chỉ, kênh lớp, vài lớp DOM phủ (băng dính điểm, tin hạ, con dấu câu hô, giấy nhớ bản đồ). Nền LUÔN TỐI (--st-*), máy bù mang tên như học sinh (tenMay).
+// Máy yếu / giảm chuyển động ⇒ 30 khung / giây + kiểu phẳng. Lượt hạ trong trò KHÔNG cộng vào kJ buổi học.
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { toaDoXoay } from '../live/chieu-xoay'
 import type { KenhLop, NguoiLop, SinhTonAnh, SinhTonGui, TinLop } from '../../lib/live-khoi/kieu'
 import {
-  ANH_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_BAN_MS, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong, hopSo, laMay, ngoaiVong,
-  nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type BanDo, type Diem, type NhanVat, type Toi,
+  ANH_MS, BAT_TU_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_BAN_MS, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, VAN_MS, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong,
+  hopSo, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type BanDo, type Diem, type NhanVat, type Toi,
 } from '../../lib/live-khoi/sinh-ton-loi'
+import { tenMay } from '../../lib/live-khoi/ten-may'
+import { MAU_SINH_TON } from '../../lib/live-khoi/mau'
 import { datTat, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
-import { pha, taoBoHinh, type BangMau, type BoHinh, type Rgb } from './sinh-ton-hinh'
-import { taoBoSan, type BoSan } from './sinh-ton-san'
-import { K_NV, veBanDoNho, veKhung, type NvVe, type SoBay } from './sinh-ton-ve'
+import { BoHinh, taoBangMau, type BangMau, type Rgb } from './sinh-ton-hinh'
+import { lamTronTi, taoBoSan, type BoSan } from './sinh-ton-san'
+import { BoTen, HIEN_MS, MUC_MS, XEP_DOI, bamSo, cauChuoi, duoiBiHa, veBanDoNho, veKhung, type Hieu, type NvVe } from './sinh-ton-ve'
 import './tro-giu-lua.css'
 import './tro-sinh-ton.css'
 
@@ -26,15 +29,18 @@ export interface TroSinhTonProps {
   /** Khung cha đang bị XOAY HÌNH bằng CSS (điện thoại cầm dọc; chiều xoay theo src/components/live/chieu-xoay.ts) ⇒ đổi toạ độ con trỏ về hệ của khung. */ xoay?: boolean
   /** Máy thầy xem trận: thấy CẢ sân, không có bé ma của mình, không gửi gì. */ xemThoi?: boolean
   /** Phòng chờ CA KIỂM TRA: tiếng trò mặc định TẮT (thầy 27/10: màn kiểm tra tự tắt âm thanh); em bấm nút loa thì bật cho lượt chơi này. */ imLang?: boolean
+  /** BẢN ÊM phòng chờ ca kiểm tra (đặc tả: ngay trước giờ kiểm tra thật): không con dấu câu hô, không rung, không chớp, KHÔNG chữ «trượt». Khác `imLang` (chỉ là tiếng). */ banEm?: boolean
 }
 
-interface ManhTin { c: string; doi?: number }
+interface ManhTin { c: string; doi?: number; noi?: boolean }
 interface TinTran { id: number; het: number; manh: ManhTin[] }
 interface Bao { kieu: 'meo' | 'an' | 'canh' | 'vui'; chu: string }
 interface BiHa { ai: string; doi: number; giay: number }
-interface KetQua { van: number; hang: { doi: number; diem: number; nhat: string }[] }
-/** Nhân vật khác đang nội suy giữa hai ảnh chụp. */
-interface NoiSuy { nv: NhanVat; tx: number; ty: number; luc: number; goc: number }
+interface KetQua { van: number; hang: { doi: number; diem: number; nhat: string; xep: number }[] }
+/** Câu hô dạng con dấu đỏ (vàng cho câu mừng). */
+interface Dau { id: number; chu: string; phu: string; vang: boolean }
+/** Nhân vật khác đang nội suy giữa hai ảnh chụp; `hl` = lúc bắt đầu hiện ra (0 = không), `hs` = hiện kiểu sống lại. */
+interface NoiSuy { nv: NhanVat; tx: number; ty: number; luc: number; goc: number; hl: number; hs: boolean }
 
 /** Bán kính «cần ảo» vô hình (px): kéo xa chừng này là chạy hết tốc. */
 const BK_CAN = 46
@@ -43,18 +49,17 @@ const VUNG_CHET = 0.14
 const NGUONG_KEO = 12
 const CHAM_MS = 350
 const TIN_SONG_MS = 6000
-const BIEN_DOI = DOI_BPU.map((d) => d.mau)
+const DAU_MS = 1900
 const PHIM: Record<string, [number, number]> = {
   KeyW: [0, -1], ArrowUp: [0, -1], KeyS: [0, 1], ArrowDown: [0, 1], KeyA: [-1, 0], ArrowLeft: [-1, 0], KeyD: [1, 0], ArrowRight: [1, 0],
 }
-const TRANG: Rgb = [255, 255, 255]
 
 const kepDoi = (d: number): number => (d >= 0 && d < 4 ? Math.floor(d) : 0)
-/** Hai chữ cuối của tên (tên gọi của người Việt) cho gọn trên sân. */
-const tenNgan = (ten: string): string => ten.trim().split(/\s+/).slice(-2).join(' ')
-const bamSo = (id: string): number => { let h = 0; for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 997; return h }
+/** Hai chữ cuối của tên (tên gọi của người Việt), cắt ở 16 ký tự cho gọn trên sân. */
+const tenNgan = (ten: string): string => { const s = ten.trim().split(/\s+/).slice(-2).join(' '); return s.length > 16 ? `${s.slice(0, 15)}…` : s }
 const chuGio = (ms: number): string => { const s = Math.ceil(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
 const bienDoi = (d: number): CSSProperties => ({ ['--doi' as string]: `var(${DOI_BPU[kepDoi(d)].mau})` }) as CSSProperties
+const hoa = (s: string): string => s.toLocaleUpperCase('vi')
 
 /** Đổi chuỗi màu trình duyệt đã tính (`rgb(…)` hoặc `color(srgb …)`) thành ba số 0..255. */
 function tachMau(chuoi: string, macDinh: Rgb): Rgb {
@@ -64,28 +69,22 @@ function tachMau(chuoi: string, macDinh: Rgb): Rgb {
   const v = so.slice(0, 3).map((x) => Math.max(0, Math.min(255, Math.round(Number(x) * he))))
   return [v[0], v[1], v[2]]
 }
-/** Đọc bảng màu từ biến CSS tại đúng chỗ trò đang đứng (phòng chờ luôn nền xanh than). */
+/** Đọc bảng màu từ biến CSS tại đúng chỗ trò đang đứng: nền / chữ từ --st-* (luôn tối), đội + trạng thái từ token. */
 function docBangMau(goc: HTMLElement): BangMau {
   const que = document.createElement('span')
   que.style.display = 'none'
   goc.appendChild(que)
-  const kieuGoc = getComputedStyle(goc)
-  const chuGoc = tachMau(kieuGoc.color, [128, 128, 128])
   const doc = (bien: string, macDinh: Rgb): Rgb => {
     que.style.color = ''
     que.style.color = `var(${bien})`
     return que.style.color ? tachMau(getComputedStyle(que).color, macDinh) : macDinh
   }
-  const chu = doc('--tr-chu', chuGoc), nen = doc('--tr-nen', [255 - chu[0], 255 - chu[1], 255 - chu[2]]), muc = doc('--p-muc', pha(nen, [0, 0, 0], 0.4))
-  const bang: BangMau = {
-    doi: BIEN_DOI.map((b) => doc(b, chu)), nen, nen2: pha(nen, [0, 0, 0], 0.26), vien: doc('--tr-vien', pha(nen, chu, 0.2)), chu, chu2: doc('--tr-chu-2', chu), chu3: doc('--tr-chu-3', chu),
-    sao: doc('--tr-sao', chu), tin: doc('--tr-tin', chu), dung: doc('--tr-dung', chu), sai: doc('--tr-sai', chu), muc, trang: TRANG, phong: kieuGoc.fontFamily || 'sans-serif',
-  }
+  const bang = taoBangMau(doc, tachMau(getComputedStyle(goc).color, [128, 128, 128]))
   que.remove()
   return bang
 }
 
-/** Máy này vừa vẽ không kịp bản có bóng + ánh sáng ⇒ nhớ 1 ngày để lần sau vào là kiểu phẳng ngay (không phải chịu vài giây đầu giật); hết hạn thì thử lại. */
+/** Máy này vừa vẽ không kịp ⇒ nhớ 1 ngày để lần sau vào là kiểu phẳng ngay (không phải chịu vài giây đầu giật); hết hạn thì thử lại. */
 const KHOA_PHANG = 'ddh.sinhton.phang'
 function docPhang(): boolean {
   try { const luc = Number(localStorage.getItem(KHOA_PHANG)); return luc > 0 && Date.now() - luc < 86_400_000 } catch { return false }
@@ -98,34 +97,36 @@ function AnhMa({ bang, doi }: { bang: BangMau; doi: number }) {
   useEffect(() => {
     const cv = ref.current, g = cv?.getContext('2d')
     if (!cv || !g) return
-    const dpr = Math.min(2, window.devicePixelRatio || 1), k = 0.32
+    const dpr = Math.min(2, window.devicePixelRatio || 1), k = 0.44
     cv.width = Math.round(30 * dpr); cv.height = Math.round(38 * dpr)
-    const a = taoBoHinh(bang, k * dpr).than(doi, false)
+    const a = new BoHinh(bang, k * dpr, false).ma(doi, false, 0)
     g.setTransform(dpr, 0, 0, dpr, 0, 0)
     g.clearRect(0, 0, 30, 38)
-    g.drawImage(a.cv, 15 + a.x * k, 37 + a.y * k, a.w * k, a.h * k)
+    g.drawImage(a.c, 15 - a.ox * k, 36 - a.oy * k, a.w * k, a.h * k)
   }, [bang, doi])
   return <canvas ref={ref} className="st-ma" aria-hidden="true" />
 }
 
-export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay = false, xemThoi = false, imLang = false }: TroSinhTonProps) {
+export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay = false, xemThoi = false, imLang = false, banEm = false }: TroSinhTonProps) {
   const xem = xemThoi || !toi
   const sbd = toi?.sbd ?? ''
   const doiToi = kepDoi(toi?.doi ?? 0)
   const gocRef = useRef<HTMLDivElement>(null)
+  const rungRef = useRef<HTMLDivElement>(null)
   const vaiRef = useRef<HTMLCanvasElement>(null)
   const nhoRef = useRef<HTMLCanvasElement>(null)
   /** Đầu vào đang giữ: hướng vuốt, bàn phím, và một lần CHẠM chờ khung kế tiếp đổi ra toạ độ sân. */
   const vao = useRef({ cx: 0, cy: 0, phim: {} as Record<string, boolean>, id: -1, gx: 0, gy: 0, t0: 0, keo: false, cham: null as Diem | null, daDung: false })
   const dsRef = useRef(ds)
   const [diem, setDiem] = useState<[number, number, number, number]>([0, 0, 0, 0])
-  const [gio, setGio] = useState({ van: 1, con: '1:30' })
+  const [gio, setGio] = useState({ van: 1, con: '2:00' })
   const [tin, setTin] = useState<TinTran[]>([])
   const [bao, setBao] = useState<Bao | null>(null)
   const [cap, setCap] = useState(1)
   const [biHa, setBiHa] = useState<BiHa | null>(null)
   const [ketQua, setKetQua] = useState<KetQua | null>(null)
   const [bang, setBang] = useState<BangMau | null>(null)
+  const [dau, setDau] = useState<Dau | null>(null)
   const [tatTieng, setTatTieng] = useState(() => { if (!imLang) return docTat(); datTat(true, false); return true })
 
   useEffect(() => { dsRef.current = ds }, [ds])
@@ -138,6 +139,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     const nhe = mayYeu || giam
     const nhipKhung = nhe ? 1000 / 30 : 0
     const hat = bamSo(sbd) / 997
+    let conSong = true
     /** Đội của em THEO PHÒNG (dòng của chính em trong ảnh chụp là chuẩn): phòng vừa chia lại đội mà máy chưa kịp nhận thì vẫn không bắn nhầm đồng đội. */
     let doiEm = doiToi
 
@@ -156,8 +158,14 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     let lucGui = 0, khoaGui = ''
     let chetCu = false, nghiCu = false, vanKq = -1
     const soHa = new Map<string, number>()
-    let so: SoBay[] = []
-    let dsTin: TinTran[] = [], soTin = 0
+    /** Chuỗi hạ liên tiếp (chưa bị hạ) của từng người trong ván — câu hô + dòng tin «… chuỗi 3 · Đỗ đại học!». */
+    const chuoi = new Map<string, number>()
+    let haVan = 0, vanThuBai = -1
+    let hieu: Hieu[] = []
+    const lucMuc = new Map<string, number>()
+    /** Bé ma của em đang hiện ra (vào trận / sống lại) từ lúc này (đồng hồ khung hình); 0 = không. Em vào giữa ván ⇒ hiện kiểu sống lại. */
+    let hienEm = performance.now(), hienSong = true
+    let dsTin: TinTran[] = [], soTin = 0, soDau = 0, henDau = 0
     let vui: { chu: string; het: number } | null = null
     let baoCu = '', diemCu = '', gioCu = '', capCu = 1, haCu = ''
     const lucMo = performance.now()
@@ -170,11 +178,12 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     // ── Khung vẽ ──
     let W = 0, H = 0, ti = 1, dpr = 1
     let bm = docBangMau(goc)
-    let hinh: BoHinh = taoBoHinh(bm, 1, nhe)
-    let san: BoSan = taoBoSan(bm, 1)
-    /** KIỂU PHẲNG: máy yếu ngay từ đầu, hoặc TỰ HẠ khi máy vẽ không kịp (xem `doNhip`) ⇒ bỏ bóng đổ + ánh sáng, về đúng mức vẽ của bản trước. */
+    /** KIỂU PHẲNG: máy yếu ngay từ đầu, hoặc TỰ HẠ khi máy vẽ không kịp (xem vòng khung) ⇒ bé ma 1 khung, không khối 3D / bóng đổ, không nhún. */
     let phang = nhe || docPhang()
     if (phang) goc.setAttribute('data-phang', '1')
+    let hinh = new BoHinh(bm, 1, phang)
+    let san: BoSan = taoBoSan(g, bm, 1)
+    let bangTen = new BoTen(bm, 1, 13)
     /** Đo theo từng cửa sổ 0,6 giây (bỏ 1 giây đầu lúc còn nướng ảnh, app còn bận việc mở phòng): `cuaXau` = số cửa sổ liền nhau dưới 48 khung / giây. */
     let lucDauVe = 0, cuaTu = 0, cuaKhung = 0, cuaXau = 0
     setBang(bm)
@@ -183,19 +192,23 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       if (!W || !H) return
       dpr = Math.min(nhe ? 1.5 : 2, window.devicePixelRatio || 1)
       vai.width = Math.round(W * dpr); vai.height = Math.round(H * dpr)
-      // Mọi máy thấy CÙNG diện tích sân (máy to không nhìn xa hơn máy nhỏ); máy thầy thấy cả sân.
-      ti = xem ? Math.min(W / (bd.rong + 40), H / (bd.cao + 40)) : Math.max(0.5, Math.min(1.7, Math.sqrt((W * H) / (1000 * 520))))
-      hinh = taoBoHinh(bm, K_NV * ti * dpr, phang)
-      // Ảnh vật trên sân nướng ở đúng độ nét màn (máy thầy xem cả sân ⇒ tỉ lệ nhỏ, ảnh nhỏ theo).
-      san = taoBoSan(bm, ti * dpr)
+      // Mọi máy thấy CÙNG diện tích sân (máy to không nhìn xa hơn máy nhỏ); máy thầy thấy cả sân. Làm tròn để ô mẫu nền = số nguyên điểm ảnh thiết bị.
+      ti = lamTronTi(xem ? Math.min(W / (bd.rong + 40), H / (bd.cao + 40)) : Math.max(0.5, Math.min(1.7, Math.sqrt((W * H) / (1000 * 520)))), dpr)
+      // Ảnh nướng sẵn: trần 2,4 điểm ảnh / đơn vị sân (máy tính bảng 1180 × 820 dpr 2 cần 2,73 ⇒ 13,8 MB; trần này giữ bộ nhớ ảnh ≤ 12 MB, mắt không thấy khác).
+      hinh = new BoHinh(bm, Math.min(2.4, ti * dpr), phang)
+      san = taoBoSan(g, bm, ti * dpr)
+      bangTen = new BoTen(bm, dpr, Math.round(Math.max(12, Math.min(16, 17 * ti))))
     }
     const doiMau = () => { bm = docBangMau(goc); setBang(bm); doKhung() }
+    // Phông viết tay về muộn ⇒ nướng lại chữ (công thức, tên trại, bảng tên) bằng đúng phông.
+    const phong = (document as Document & { fonts?: FontFaceSet }).fonts
+    void phong?.load?.('16px "Patrick Hand"', 'Đỗ đại học ạ').then(() => { if (conSong) doKhung() }).catch(() => { /* không tải được phông: giữ phông dự phòng */ })
 
-    // ── Tin trận, dòng chữ nhỏ (DOM, chỉ đặt lại khi đổi) ──
-    const tenCua = (id: string): string => (laMay(id) ? 'Máy' : !xem && id === sbd ? 'Em' : tenNgan(dsRef.current.find((n) => n.sbd === id)?.ten ?? `Bạn ${id}`))
+    // ── Tin trận, câu hô, dòng chữ nhỏ (DOM, chỉ đặt lại khi đổi) ──
+    const tenCua = (id: string): string => (laMay(id) ? tenMay(id) ?? 'Bạn cùng lớp' : !xem && id === sbd ? 'Em' : tenNgan(dsRef.current.find((n) => n.sbd === id)?.ten ?? `Bạn ${id}`))
     const doiCua = (id: string): number => (!xem && id === sbd ? doiEm : noi[id]?.nv.doi ?? dsRef.current.find((n) => n.sbd === id)?.doi ?? 0)
     const themTin = (manh: ManhTin[], luc: number) => {
-      dsTin = [...dsTin, { id: ++soTin, het: luc + TIN_SONG_MS, manh }].slice(-2)
+      dsTin = [...dsTin, { id: ++soTin, het: luc + TIN_SONG_MS, manh }].slice(-3)
       setTin(dsTin)
     }
     const datBao = (b: Bao | null) => {
@@ -204,12 +217,27 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       baoCu = khoa; setBao(b)
     }
     const baoVui = (chu: string, luc: number) => { vui = { chu, het: luc + 2600 } }
-    const lenCap = (luc: number) => {
-      if (tt.cap >= CAP_TOI_DA) return
+    /** Con dấu câu hô (bản êm: không có). */
+    const hoDau = (chu: string, phu = '', vang = false) => {
+      if (banEm) return
+      setDau({ id: ++soDau, chu, phu, vang })
+      window.clearTimeout(henDau)
+      henDau = window.setTimeout(() => { if (conSong) setDau(null) }, DAU_MS)
+    }
+    /** Rung nhẹ màn khi em hạ được bạn (≤ 120 ms, transform trên lớp bọc canvas); tắt khi giảm chuyển động / bản êm. */
+    const rung = () => {
+      const r = rungRef.current
+      if (giam || banEm || !r || typeof r.animate !== 'function') return
+      r.animate([{ transform: 'translate(0, 0)' }, { transform: 'translate(-3px, 2px)' }, { transform: 'translate(2px, -2px)' }, { transform: 'translate(0, 0)' }], { duration: 110, easing: 'ease-out' })
+    }
+    const lenCap = (luc: number): boolean => {
+      if (tt.cap >= CAP_TOI_DA) return false
       tt = { ...tt, cap: tt.cap + 1 }
       tieng('lenCap')
       baoVui(`Súng lên cấp ${tt.cap} · ${SUNG_TEN[tt.cap - 1]}`, luc)
+      return true
     }
+    const themHieu = (e: Hieu) => { hieu.push(e); if (hieu.length > 24) hieu = hieu.slice(-24) }
 
     // ── Kênh lớp: ảnh chụp mỗi 250 ms ──
     const boNghe = kenh.nghe('tro', (t: TinLop) => {
@@ -233,9 +261,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       }
       const dongToi = xem ? null : docDong(sbd, anh.ds[sbd])
       if (dongToi && dongToi.doi !== doiEm) { doiEm = dongToi.doi; tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap }; mucTieu = '' }
+      const dauVan = ((nay % VAN_MS) + VAN_MS) % VAN_MS < 3000
       const moi: Record<string, NoiSuy> = {}
-      const emThatCu = [0, 0, 0, 0]
-      for (const id in noi) if (!laMay(id)) emThatCu[noi[id].nv.doi]++
+      const matMau: string[] = []
       for (const id in anh.ds) {
         if (!xem && id === sbd) continue
         const nv = docDong(id, anh.ds[id])
@@ -243,24 +271,51 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         const cu = noi[id]
         if (cu) {
           const f = Math.min(1, (luc - cu.luc) / ANH_MS)
-          // Vừa hồi sinh (nhảy về trại) thì không trượt ngang sân.
+          // Vừa hồi sinh (nhảy về trại) thì không trượt ngang sân; sống lại / đầu ván ⇒ hiệu ứng hiện ra.
           const nhay = Math.hypot(nv.x - cu.nv.x, nv.y - cu.nv.y) > 260
-          moi[id] = { nv, tx: nhay ? nv.x : cu.tx + (cu.nv.x - cu.tx) * f, ty: nhay ? nv.y : cu.ty + (cu.nv.y - cu.ty) * f, luc, goc: cu.goc }
-          if (!xem && id === mucTieu && nv.mau < cu.nv.mau && cu.nv.mau > 0) so.push({ x: nv.x + 34, y: nv.y - 70, chu: `−${Math.round(cu.nv.mau - nv.mau)} máu`, luc })
+          const song = cu.nv.mau <= 0 && nv.mau > 0, vaoVan = dauVan && (nhay || song)
+          moi[id] = { nv, tx: nhay ? nv.x : cu.tx + (cu.nv.x - cu.tx) * f, ty: nhay ? nv.y : cu.ty + (cu.nv.y - cu.ty) * f, luc, goc: cu.goc, hl: song || vaoVan ? luc : cu.hl, hs: vaoVan ? false : song ? true : cu.hs }
+          if (nv.mau < cu.nv.mau && cu.nv.mau > 0) {
+            matMau.push(id)
+            if (!xem && id === mucTieu) themHieu({ k: 'so', x: nv.x + 20, y: nv.y - 66, doi: doiEm, luc, chu: `−${Math.round(cu.nv.mau - nv.mau)}`, mau: 'sai' })
+          }
         } else {
-          moi[id] = { nv, tx: nv.x, ty: nv.y, luc, goc: nv.x > bd.rong / 2 ? Math.PI : 0 }
-          // Em mới vào giữa trận: đội còn thiếu người thì em thay một máy.
-          if (soAnh > 1 && !laMay(id)) baoVui(`${tenCua(id)} vào ${DOI_BPU[nv.doi].ten}${emThatCu[nv.doi] + (!xem && nv.doi === doiEm ? 1 : 0) < 4 ? ' · thay một máy' : ''}`, luc)
+          // Em mới vào giữa trận ⇒ hiện ra kiểu sống lại.
+          moi[id] = { nv, tx: nv.x, ty: nv.y, luc, goc: nv.x > bd.rong / 2 ? Math.PI : 0, hl: soAnh > 1 ? luc : 0, hs: true }
+          if (soAnh > 1 && !laMay(id)) baoVui(`${tenCua(id)} vào ${DOI_BPU[nv.doi].ten}`, luc)
         }
       }
       noi = moi
-      if (so.length > 6) so = so.slice(-6)
+      // Vết mực màu đội của kẻ đang bắn lên người vừa mất máu (mỗi người tối đa ~3 vết / giây).
+      for (const id of matMau) {
+        if (luc - (lucMuc.get(id) ?? -1e9) < 350) continue
+        let doiBan = !xem && mucTieu === id ? doiEm : -1
+        if (doiBan < 0) for (const k in moi) if (moi[k].nv.t === id) { doiBan = moi[k].nv.doi; break }
+        if (doiBan < 0) continue
+        lucMuc.set(id, luc)
+        const n = moi[id].nv
+        themHieu({ k: 'muc', x: n.x + ((luc % 17) - 8), y: n.y - 30 + ((luc % 11) - 5), doi: doiBan, luc, chu: '', mau: 'sai' })
+      }
       for (const dong of Array.isArray(anh.an) ? anh.an : []) {
         if (!Array.isArray(dong) || typeof dong[0] !== 'string' || typeof dong[1] !== 'string') continue
-        soHa.set(dong[0], (soHa.get(dong[0]) ?? 0) + 1)
+        const [ai, bi] = dong
+        soHa.set(ai, (soHa.get(ai) ?? 0) + 1)
+        chuoi.set(bi, 0)
+        const ch = (chuoi.get(ai) ?? 0) + 1
+        chuoi.set(ai, ch)
+        haVan++
         // Máy hạ máy thì không báo (đỡ rối tin trận); có em thật ở một trong hai phía mới hiện.
-        if (!laMay(dong[0]) || !laMay(dong[1])) themTin([{ c: tenCua(dong[0]), doi: doiCua(dong[0]) }, { c: ' hạ ' }, { c: tenCua(dong[1]), doi: doiCua(dong[1]) }], luc)
-        if (!xem && dong[0] === sbd) { tieng('ha'); if (!dangChet(tt, nay)) lenCap(luc) }
+        const coEm = !laMay(ai) || !laMay(bi)
+        if (coEm) themTin([{ c: tenCua(ai), doi: doiCua(ai) }, { c: ' hạ ' }, { c: tenCua(bi), doi: doiCua(bi) }], luc)
+        if (coEm && ch >= 2) themTin([{ c: tenCua(ai), doi: doiCua(ai), noi: true }, { c: ` chuỗi ${ch} · ${cauChuoi(ch)}`, noi: true }], luc)
+        if (!xem && ai === sbd) {
+          tieng('ha'); rung()
+          const len = !dangChet(tt, nay) && lenCap(luc)
+          const n = noi[bi]?.nv
+          if (n) themHieu({ k: 'so', x: n.x, y: n.y - 70, doi: doiEm, luc, chu: '+1', mau: 'sao' })
+          if (ch >= 2) hoDau(hoa(cauChuoi(ch)), `Hạ ${ch} bạn liên tiếp${len ? ` · súng lên ${SUNG_TEN[tt.cap - 1]}` : ''}`)
+          else if (haVan === 1) hoDau('MỞ BÀI!', 'Em hạ được bạn đầu tiên của ván')
+        } else if (haVan === 1) hoDau('MỞ BÀI!', `${tenCua(ai)} hạ được bạn đầu tiên của ván`)
       }
       if (typeof anh.v === 'number' && anh.v > 0) vanHien = anh.v
       if (Array.isArray(anh.d) && anh.d.length === 4 && anh.d.join() !== diemCu) { diemCu = anh.d.join(); setDiem([anh.d[0], anh.d[1], anh.d[2], anh.d[3]]) }
@@ -272,13 +327,17 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         }
       }
       if (xem) return
-      // Em bị bắn: tự tính từ ảnh chụp (ai khai đang bắn em).
+      // Em bị bắn: tự tính từ ảnh chụp (ai khai đang bắn em); Súng Lửa Màu bắn thẳng ⇒ châm lửa.
       const quanh: NhanVat[] = []
       for (const id in noi) quanh.push(noi[id].nv)
       const don = satThuong({ id: sbd, x: tt.x, y: tt.y, doi: doiEm }, quanh, ANH_MS / 1000)
-      const song = !dangChet(tt, nay)
-      tt = nhanDon(tt, don.tong, nay)
-      if (song && dangChet(tt, nay)) { choA = don.ai; keHa = don.ai; tieng('biHa') }
+      const song = !dangChet(tt, nay), mauTruoc = tt.mau
+      tt = nhanDon(tt, don.tong, nay, don.chay)
+      if (song && tt.mau < mauTruoc) {
+        themHieu({ k: 'so', x: tt.x + 18, y: tt.y - 66, doi: doiEm, luc, chu: `−${Math.max(1, Math.round(mauTruoc - tt.mau))}`, mau: 'sai' })
+        if (don.ai && luc - (lucMuc.get(sbd) ?? -1e9) >= 350) { lucMuc.set(sbd, luc); themHieu({ k: 'muc', x: tt.x, y: tt.y - 30, doi: doiCua(don.ai), luc, chu: '', mau: 'sai' }) }
+      }
+      if (song && dangChet(tt, nay)) { choA = don.ai; keHa = don.ai; chuoi.set(sbd, 0); tieng('biHa') }
       else if (don.tong > 0 && song && luc - lucTrungTieng > 240 && nay >= tt.batTuDen) { lucTrungTieng = luc; tieng('trung') }
     })
 
@@ -291,8 +350,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       const dt = luc - lucTruoc
       if (nhipKhung && dt < nhipKhung - 3) return
       lucTruoc = luc
-      // TỰ HẠ (tác tử tốc độ 13/11: màn lớn trên máy yếu tụt 27 khung / giây suốt 4 giây đầu ⇒ phát hiện nhanh hơn + nhớ lại): HAI cửa sổ 0,6 giây liền nhau
-      // dưới 48 khung / giây ⇒ chuyển hẳn sang kiểu phẳng (≈ 2,2 giây kể từ khung đầu) và GHI NHỚ ở máy 1 ngày ⇒ lần sau phẳng ngay từ khung đầu.
+      // TỰ HẠ: HAI cửa sổ 0,6 giây liền nhau dưới 48 khung / giây ⇒ chuyển hẳn sang kiểu phẳng và GHI NHỚ ở máy 1 ngày.
       if (!phang) {
         if (!lucDauVe) lucDauVe = luc
         if (luc - lucDauVe > 1000) {
@@ -317,22 +375,31 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         n++
       }
       khac.length = n
+      // 10 giây cuối ván: SẮP THU BÀI! (một lần mỗi ván).
+      if (!nghi && vanThuBai !== van && conLai(nay) <= 10_000) { vanThuBai = van; if (soAnh > 0) hoDau('SẮP THU BÀI!', 'Còn 10 giây') }
       if (!xem) {
-        if (van !== tt.van) { tt = taoToi(bd, doiEm, nay, hat); soHa.clear(); mucTieu = ''; vao.current.cham = null }
+        if (van !== tt.van) {
+          tt = taoToi(bd, doiEm, nay, hat); soHa.clear(); chuoi.clear(); haVan = 0; mucTieu = ''; vao.current.cham = null
+          hienEm = luc; hienSong = false
+          hoDau('VÀO TRẬN!', 'Cả đội được vẽ ra ở trại', true)
+        }
         const i = vao.current
         let dx = i.cx, dy = i.cy
         for (const ma in PHIM) if (i.phim[ma]) { dx += PHIM[ma][0]; dy += PHIM[ma][1] }
         if (dx || dy) i.daDung = true
-        // Chạm một điểm ⇒ tự chạy tới, vòng qua tường.
+        // Chạm một điểm ⇒ tự chạy tới, vòng qua vật chặn.
         if (i.cham && !dangChet(tt, nay)) {
           const camX = Math.max(W / 2 / ti - 40, Math.min(bd.rong + 40 - W / 2 / ti, tt.x)), camY = Math.max(H / 2 / ti - 40, Math.min(bd.cao + 40 - H / 2 / ti, tt.y - 34))
           tt = { ...tt, duong: timDuong(bd, tt.x, tt.y, camX + (i.cham.x - W / 2) / ti, camY + (i.cham.y - H / 2) / ti) }
           i.daDung = true
         }
         i.cham = null
-        const xCu = tt.x, yCu = tt.y, songTruoc = !dangChet(tt, nay)
+        // `vuaSong`: hết 3 giây bị hạ ⇒ bước này `buocToi` hồi sinh em ở trại (hoặc mép vòng).
+        const xCu = tt.x, yCu = tt.y, songTruoc = !dangChet(tt, nay), vuaSong = tt.chetDen > 0 && songTruoc
         tt = buocToi(bd, tt, { dx, dy }, dt, nay, hat)
-        if (songTruoc && dangChet(tt, nay)) { keHa = ''; tieng('biHa') }
+        // Chết vì CHÁY (Súng Lửa Màu) ⇒ kẻ châm lửa là kẻ hạ em; chết ngoài vòng ⇒ ''.
+        if (songTruoc && dangChet(tt, nay)) { keHa = tt.chayAi; if (tt.chayAi) choA = tt.chayAi; chuoi.set(sbd, 0); tieng('biHa') }
+        if (vuaSong && !dangChet(tt, nay)) { hienEm = luc; hienSong = true; hoDau('THI LẠI!', 'Bất tử 2 giây · súng về cấp 1', true) }
         if (tt.x !== xCu || tt.y !== yCu) huong = Math.atan2(tt.y - yCu, tt.x - xCu)
         const chet = dangChet(tt, nay)
         // Súng bắn đối thủ gần nhất ĐANG HIỆN TRÊN MÀN của em (lùi mép 24 px để thấy rõ bé ma, không chỉ thấy mép áo).
@@ -342,7 +409,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
           let tx = Math.max(W / 2 / ti - 40, Math.min(bd.rong + 40 - W / 2 / ti, tt.x)), ty = Math.max(H / 2 / ti - 40, Math.min(bd.cao + 40 - H / 2 / ti, tt.y - 34))
           if (W / ti >= bd.rong + 80) tx = bd.rong / 2
           if (H / ti >= bd.cao + 80) ty = bd.cao / 2
-          // Bé ma cao chừng 70 đơn vị: lấy thân (chân + 34) làm điểm «đang thấy».
+          // Bé ma cao chừng 60 đơn vị: lấy thân (chân + 34) làm điểm «đang thấy».
           mucTieu = chet || nghi || dangAn(bd, tt, nay) ? '' : chonMucTieu(bd, tt, khac, { x0: tx - nx, y0: ty - ny + 34, x1: tx + nx, y1: ty + ny + 34 })
         }
         // Hộp tiếp tế: chạm là xin phòng (em chạm đầu tiên được nhận).
@@ -371,7 +438,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         if (chet || nghi) datBao(null)
         else if (matMang) datBao({ kieu: 'canh', chu: 'Mất kết nối · đang nối lại · em vẫn chạy được, các bạn tạm đứng yên' })
         else if (vui) datBao({ kieu: 'vui', chu: vui.chu })
-        else if (ngoaiVong(v, tt.x, tt.y)) datBao({ kieu: 'canh', chu: 'Ngoài vòng an toàn · đang mất máu · chạy vào trong vòng' })
+        else if (ngoaiVong(v, tt.x, tt.y)) datBao({ kieu: 'canh', chu: 'Ra khỏi phòng thi · đang mất máu' })
         else if (an) datBao({ kieu: 'an', chu: `Đang ẩn trong bụi · đội khác không thấy em${tt.mau < MAU_DAY ? ' · máu đang hồi' : ''}` })
         else if (!i.daDung && luc - lucMo < 9000) datBao({ kieu: 'meo', chu: 'Vuốt để chạy · Chạm để tới · Súng tự bắn đối thủ gần nhất' })
         else datBao(null)
@@ -379,7 +446,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         if (vui && vui.het <= luc) vui = null
         datBao(vui ? { kieu: 'vui', chu: vui.chu } : null)
       }
-      // Hết ván: bảng xếp hạng bốn đội (một lần mỗi ván).
+      // Hết ván: xếp hạng bốn đội «Đỗ thủ khoa · Đỗ á khoa · Đỗ vớt · Thi lại ván sau» (một lần mỗi ván).
       if (nghi !== nghiCu) {
         nghiCu = nghi
         if (nghi && vanKq !== van) {
@@ -388,8 +455,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
           const d = diemCu ? diemCu.split(',').map(Number) : [0, 0, 0, 0]
           const hang = [0, 1, 2, 3].map((doi) => {
             let nhat = '', nhieu = 0
+            // Máy bù không bao giờ được vinh danh (không có thật).
             for (const [id, soLan] of soHa) if (soLan > nhieu && !laMay(id) && doiCua(id) === doi) { nhieu = soLan; nhat = `${tenCua(id)} ${soLan} lượt hạ · nhiều nhất đội` }
-            return { doi, diem: d[doi] ?? 0, nhat }
+            return { doi, diem: d[doi] ?? 0, nhat, xep: d.filter((x) => x > (d[doi] ?? 0)).length }
           }).sort((a, b) => b.diem - a.diem)
           setKetQua({ van: vanHien, hang })
         } else if (!nghi) setKetQua(null)
@@ -399,33 +467,38 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         const chu = chuGio(conLai(nay)), khoa = `${vanHien}|${chu}`
         if (khoa !== gioCu) { gioCu = khoa; setGio({ van: vanHien, con: chu }) }
         if (dsTin.length && dsTin[0].het <= luc) { dsTin = dsTin.filter((t) => t.het > luc); setTin(dsTin) }
-        so = so.filter((s) => luc - s.luc < 700)
+        if (hieu.length) hieu = hieu.filter((e) => luc - e.luc < MUC_MS)
       }
       // ── Dựng danh sách vẽ ──
       let m = 0
-      const them = (): NvVe => nvVe[m] ?? (nvVe[m] = { id: '', x: 0, y: 0, mau: 0, doi: 0, cap: 1, goc: 0, ban: false, dx: 0, dy: 0, may: false, toi: false, mo: 1, ten: '', an: false })
+      const them = (): NvVe => nvVe[m] ?? (nvVe[m] = { id: '', x: 0, y: 0, mau: 0, doi: 0, cap: 1, goc: 0, ban: false, dx: 0, dy: 0, toi: false, dong: false, mo: 1, ten: '', an: false, hien: -1, song: false, batTu: false })
       const viTri = (id: string): NhanVat | undefined => (!xem && id === sbd ? { id, x: tt.x, y: tt.y, mau: tt.mau, doi: doiEm, cap: tt.cap, t: mucTieu } : khac.find((k) => k.id === id))
       for (const k of khac) {
-        // Đối thủ ẩn trong bụi: em không thấy (máy thầy thấy hết, vẽ mờ).
-        const an = !k.t && trongBui(bd, k.x, k.y)
+        // Đối thủ ẩn trong bụi: em không thấy (máy thầy thấy hết).
         if (!xem && k.mau > 0 && anVoi(bd, k, tt.x, tt.y, doiEm)) continue
         const o = noi[k.id], mt = k.t ? viTri(k.t) : undefined, e = them()
-        if (mt) o.goc = Math.atan2(mt.y - 34 - (k.y - 25), mt.x - k.x)
+        if (mt) o.goc = Math.atan2(mt.y - k.y, mt.x - k.x)
         else if (Math.hypot(o.nv.x - o.tx, o.nv.y - o.ty) > 4) o.goc = Math.atan2(o.nv.y - o.ty, o.nv.x - o.tx)
+        const tuoi = o.hl ? luc - o.hl : 1e9
         e.id = k.id; e.x = k.x; e.y = k.y; e.mau = k.mau; e.doi = k.doi; e.cap = k.cap; e.goc = o.goc
         e.ban = !!mt && !nghi && k.mau > 0; e.dx = mt?.x ?? 0; e.dy = mt?.y ?? 0
-        e.may = laMay(k.id); e.toi = false; e.an = an && k.mau > 0
-        e.mo = k.mau <= 0 ? 0.25 : matMang ? 0.45 : e.an ? 0.6 : 1
-        e.ten = e.may ? 'Máy' : tenCua(k.id)
+        e.toi = false; e.dong = !xem && k.doi === doiEm
+        // Đứng trong bụi mà vẫn thấy (đồng đội, đang bắn, máy thầy) ⇒ vẽ sau bụi; không bắn thì mờ.
+        e.an = k.mau > 0 && trongBui(bd, k.x, k.y)
+        e.mo = matMang ? 0.45 : e.an && !k.t ? 0.6 : 1
+        e.ten = tenCua(k.id)
+        e.hien = tuoi < HIEN_MS ? tuoi / HIEN_MS : -1; e.song = o.hs; e.batTu = tuoi >= HIEN_MS && tuoi < BAT_TU_MS
         m++
       }
       let camX = bd.rong / 2, camY = bd.cao / 2, duong: Diem[] | null = null
       if (!xem) {
         const chet = dangChet(tt, nay), mt = mucTieu ? khac.find((k) => k.id === mucTieu) : undefined, e = them()
-        if (mt) huong = Math.atan2(mt.y - 34 - (tt.y - 25), mt.x - tt.x)
+        if (mt) huong = Math.atan2(mt.y - tt.y, mt.x - tt.x)
+        const tuoi = hienEm ? luc - hienEm : 1e9
         e.id = sbd; e.x = tt.x; e.y = tt.y; e.mau = chet ? 0 : tt.mau; e.doi = doiEm; e.cap = tt.cap; e.goc = huong
-        e.ban = !!mt; e.dx = mt?.x ?? 0; e.dy = mt?.y ?? 0; e.may = false; e.toi = true
-        e.an = !chet && dangAn(bd, tt, nay); e.mo = chet ? 0.25 : e.an ? 0.6 : 1; e.ten = `${tenNgan(toi?.ten ?? '')} (em)`
+        e.ban = !!mt; e.dx = mt?.x ?? 0; e.dy = mt?.y ?? 0; e.toi = true; e.dong = true
+        e.an = !chet && trongBui(bd, tt.x, tt.y); e.mo = !chet && dangAn(bd, tt, nay) ? 0.6 : 1; e.ten = `${tenNgan(toi?.ten ?? '')} (em)`
+        e.hien = !chet && tuoi < HIEN_MS ? tuoi / HIEN_MS : -1; e.song = hienSong; e.batTu = !chet && tuoi >= HIEN_MS && nay < tt.batTuDen
         m++
         camX = Math.max(W / 2 / ti - 40, Math.min(bd.rong + 40 - W / 2 / ti, tt.x)); camY = Math.max(H / 2 / ti - 40, Math.min(bd.cao + 40 - H / 2 / ti, tt.y - 34))
         if (W / ti >= bd.rong + 80) camX = bd.rong / 2
@@ -442,12 +515,12 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         tiengBan(e.cap, e.toi, e.toi ? 1 : Math.max(0, 1 - Math.hypot(e.x - tt.x, e.y - tt.y) / 620))
       }
       if (nhipBan.size > 160) nhipBan.clear()
-      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, san, nhe: phang, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, so })
+      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, san, ten: bangTen, phang, em: banEm, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, hieu })
       const nho = nhoRef.current, gn = nho?.getContext('2d')
       if (nho && gn && luc - lucNho >= 500) {
         lucNho = luc
         const r = 130, c = Math.round((r * bd.cao) / bd.rong), d2 = Math.min(2, window.devicePixelRatio || 1)
-        if (nho.width !== Math.round(r * d2)) { nho.width = Math.round(r * d2); nho.height = Math.round(c * d2) }
+        if (nho.width !== Math.round(r * d2) || nho.height !== Math.round(c * d2)) { nho.width = Math.round(r * d2); nho.height = Math.round(c * d2) }
         veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm)
       }
     }
@@ -482,7 +555,8 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     document.addEventListener('visibilitychange', doiHien)
     chay()
     return () => {
-      dung(); boNghe(); quanSat?.disconnect()
+      conSong = false
+      dung(); boNghe(); quanSat?.disconnect(); window.clearTimeout(henDau)
       nenToi?.removeEventListener?.('change', doiMau)
       window.removeEventListener('resize', doKhung)
       window.removeEventListener('keydown', phimXuong)
@@ -490,7 +564,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       window.removeEventListener('blur', buongPhim)
       document.removeEventListener('visibilitychange', doiHien)
     }
-  }, [kenh, sbd, doiToi, mayYeu, xem]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [kenh, sbd, doiToi, mayYeu, xem, banEm]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cử chỉ: VUỐT ở đâu cũng là cần ảo vô hình; CHẠM nhanh một điểm = chạy tới đó. Toạ độ đổi về hệ của KHUNG (lớp live có thể xoay 90° bằng CSS). ──
   const toaDo = (e: SuKienTro) => {
@@ -527,10 +601,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   }
 
   const tenToi = toi ? DOI_BPU[doiToi].ten : ''
+  const nhat = ketQua && ketQua.hang[0].diem > (ketQua.hang[1]?.diem ?? 0) ? ketQua.hang[0] : null
+  const hangEm = ketQua && !xem ? ketQua.hang.find((h) => h.doi === doiToi) : undefined
   return (
-    <div className="gl st" ref={gocRef} style={bienDoi(doiToi)} data-xem={xem ? '1' : undefined} data-phang={mayYeu ? '1' : undefined}>
-      <canvas className="gl-san" ref={vaiRef} aria-hidden="true" />
-      <div className="st-phu" aria-hidden="true" />
+    <div className="gl st" ref={gocRef} style={{ ...MAU_SINH_TON, ...bienDoi(doiToi) } as CSSProperties} data-xem={xem ? '1' : undefined} data-phang={mayYeu ? '1' : undefined} data-em={banEm ? '1' : undefined}>
+      <div className="st-rung" ref={rungRef}><canvas className="gl-san" ref={vaiRef} aria-hidden="true" /></div>
       {xem ? null : <div className="st-vung" onPointerDown={xuong} onPointerMove={di} onPointerUp={buong} onPointerCancel={buong} onLostPointerCapture={buong} />}
       <div className="gl-bang st-bang" role="group" aria-label={`Lượt hạ ván ${gio.van}: ${DOI_BPU.map((d, i) => `${d.ten} ${diem[i]}`).join(', ')}. Còn ${gio.con}`}>
         {DOI_BPU.map((d, i) => (
@@ -541,13 +616,14 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       </div>
       <ul className="gl-tin st-tin" aria-live="off">
         {tin.map((t) => (
-          <li key={t.id}>{t.manh.map((m, i) => (m.doi !== undefined && m.doi >= 0 && m.doi < 4 ? <b key={i} style={bienDoi(m.doi)}>{m.c}</b> : <span key={i}>{m.c}</span>))}</li>
+          <li key={t.id} data-noi={t.manh.some((m) => m.noi) ? '1' : undefined}>{t.manh.map((m, i) => (m.doi !== undefined && m.doi >= 0 && m.doi < 4 ? <b key={i} style={bienDoi(m.doi)}>{m.c}</b> : <span key={i}>{m.c}</span>))}</li>
         ))}
       </ul>
       {bao ? <div className="st-bao" data-kieu={bao.kieu} role="status">{bao.chu}</div> : null}
       {xem ? null : (
         <div className="st-sung" aria-label={`Súng của em: cấp ${cap} trên ${CAP_TOI_DA}, ${SUNG_TEN[cap - 1]}`}>
-          {[1, 2, 3, 4].map((i) => <i key={i} data-co={i <= cap ? '1' : undefined} />)}Súng cấp {cap} · {SUNG_TEN[cap - 1]}
+          <span className="st-vach" aria-hidden="true">{SUNG_TEN.map((_, i) => <i key={i} data-co={i < cap ? '1' : undefined} />)}</span>
+          <span className="st-cap">Súng cấp {cap} · </span>{SUNG_TEN[cap - 1]}
         </div>
       )}
       {xem ? null : (
@@ -556,27 +632,30 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         </button>
       )}
       {xem ? null : <div className="st-bd"><canvas ref={nhoRef} aria-hidden="true" /><span>Bản đồ · vòng an toàn</span></div>}
-      {xem ? null : <div className="st-cho"><i />Phòng chờ · {soEm} em đã vào · chờ thầy bấm Bắt đầu</div>}
+      {xem ? null : <div className="st-cho"><i />{banEm ? 'Phòng chờ ca · thầy bấm Bắt đầu là vào bài ngay' : `Phòng chờ · ${soEm} em đã vào · chờ thầy bấm Bắt đầu`}</div>}
+      {dau && !banEm && !biHa && !ketQua ? (
+        <div key={dau.id} className="st-dau" data-vang={dau.vang ? '1' : undefined} role="status"><b>{dau.chu}</b>{dau.phu ? <small>{dau.phu}</small> : null}</div>
+      ) : null}
       {biHa && !ketQua ? (
         <div className="st-ha" role="status">
-          <h2>{biHa.ai ? <><b style={bienDoi(biHa.doi)}>{biHa.ai} · {DOI_BPU[kepDoi(biHa.doi)].ten}</b> vừa hạ em</> : 'Em hết máu ngoài vòng an toàn'}</h2>
-          <p>Em hồi sinh ở phía trại {tenToi}</p>
+          {banEm ? null : <div className="st-dau st-dau-ha"><b>TRƯỢT ĐẠI HỌC RỒI!</b></div>}
+          <h2>{biHa.ai ? <><b style={bienDoi(biHa.doi)}>{biHa.ai}</b> {duoiBiHa(banEm)}</> : 'Em hết máu ngoài phòng thi'}</h2>
           <div className="st-dem">{biHa.giay}</div>
-          <small>giây nữa</small>
+          <p>Thi lại ở phía trại {tenToi} sau {biHa.giay} giây</p>
         </div>
       ) : null}
       {ketQua ? (
         <div className="st-kq" role="status" style={bienDoi(ketQua.hang[0].doi)}>
-          <h2>Hết ván {ketQua.van} · {ketQua.hang[0].diem > (ketQua.hang[1]?.diem ?? 0) ? <><b>{DOI_BPU[ketQua.hang[0].doi].ten}</b> thắng</> : 'hoà'}</h2>
-          {ketQua.hang.map((h, i) => (
-            <div key={h.doi} className="st-dong" data-nhat={i === 0 && h.diem > (ketQua.hang[1]?.diem ?? 0) ? '1' : undefined} style={bienDoi(h.doi)}>
-              <span className="st-hang">{i + 1}</span>
+          <h2>{nhat ? <><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van}!</> : `Hết ván ${ketQua.van} · hoà`}</h2>
+          {ketQua.hang.map((h) => (
+            <div key={h.doi} className="st-dong" data-nhat={nhat && h.doi === nhat.doi ? '1' : undefined} data-toi={hangEm && h.doi === doiToi ? '1' : undefined} style={bienDoi(h.doi)}>
+              <span className="st-hang">{h.xep + 1}</span>
               {bang ? <AnhMa bang={bang} doi={h.doi} /> : null}
-              <span className="st-t">{DOI_BPU[h.doi].ten}{h.nhat ? <small>{h.nhat}</small> : null}</span>
+              <span className="st-t">{DOI_BPU[h.doi].ten} · {XEP_DOI[h.xep]}{h.nhat ? <small>{h.nhat}</small> : null}</span>
               <span className="st-d">{h.diem}<small>lượt hạ</small></span>
             </div>
           ))}
-          <p>Ván mới bắt đầu sau vài giây · mọi người về trại đội mình</p>
+          <p>{hangEm ? `Đội em: ${XEP_DOI[hangEm.xep]} · ` : ''}Ván mới bắt đầu sau vài giây · mọi người về trại đội mình</p>
         </div>
       ) : null}
     </div>

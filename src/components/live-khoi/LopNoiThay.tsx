@@ -366,12 +366,13 @@ function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang 
       <div className="lkt-doi">
         {DOI_BPU.map((d, i) => {
           const em = vao.filter((e) => e.doi === i)
-          // Trò Sinh Tồn: mỗi đội luôn đủ 4 trên sân — thiếu em thì máy bù (cùng luật với phòng: src/lib/live-khoi/sinh-ton-may.ts).
+          // Trò Sinh Tồn: mỗi đội luôn đủ 4 trên sân — thiếu em thì máy bù (cùng luật với phòng: src/lib/live-khoi/sinh-ton-may.ts). Màn này CHIẾU lên lớp ⇒ máy bù
+          // không mang nhãn «Máy» (bản 2, thầy 13/11 «máy thì ko ghi là máy nữa»): chỉ đếm chung «N bạn đang chơi», danh sách chỉ ghi em thật.
           const soMay = vao.length ? Math.max(0, 4 - em.length) : 0
           return (
             <section key={d.ky} style={{ ['--doi' as string]: `var(${d.mau})` }}>
-              <h3><b>{d.ky}</b>{d.ten}<small>{em.length} em{soMay ? ` · ${soMay} máy` : ''}</small></h3>
-              <ul>{em.map((e) => <li key={e.sbd}>{e.ten}</li>)}{Array.from({ length: soMay }, (_, k) => <li key={`may-${k}`} className="may">Máy</li>)}{em.length || soMay ? null : <li className="rong">Chưa có em nào</li>}</ul>
+              <h3><b>{d.ky}</b>{d.ten}<small>{em.length + soMay} bạn đang chơi</small></h3>
+              <ul>{em.map((e) => <li key={e.sbd}>{e.ten}</li>)}{em.length ? null : <li className="rong">Chưa có em nào</li>}</ul>
             </section>
           )
         })}

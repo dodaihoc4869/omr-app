@@ -66,7 +66,8 @@ function useXoay(): { xoay: boolean; style: CSSProperties } {
 }
 
 interface ManTroProps { toi: NguoiLop; ds: NguoiLop[]; kenh: KenhLop; onThoat: () => void }
-/** Màn trò phủ kín (ở document.body): khung xanh than cố định + màn Sinh Tồn dùng chung + nút «Thoát trò». Esc cũng thoát. */
+/** Màn trò phủ kín (ở document.body): khung xanh than cố định + màn Sinh Tồn dùng chung (BẢN ÊM: không con dấu, không rung, không chữ «trượt» — ngay
+ *  trước giờ kiểm tra thật) + nút «Thoát trò». Esc cũng thoát. */
 function ManTro({ toi, ds, kenh, onThoat }: ManTroProps) {
   const { xoay, style } = useXoay()
   useEffect(() => {
@@ -77,7 +78,7 @@ function ManTro({ toi, ds, kenh, onThoat }: ManTroProps) {
   return createPortal(
     <div className="sst-man" role="dialog" aria-modal="true" aria-label="Trò Sinh Tồn bốn đội" data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>
       <Suspense fallback={<p className="sst-tai" role="status">Đang mở trò…</p>}>
-        <TroSinhTon toi={toi} ds={ds} kenh={kenh} soEm={Math.max(1, ds.length)} mayYeu={mayYeu()} xoay={xoay} imLang />
+        <TroSinhTon toi={toi} ds={ds} kenh={kenh} soEm={Math.max(1, ds.length)} mayYeu={mayYeu()} xoay={xoay} imLang banEm />
       </Suspense>
       <button type="button" className="sst-thoat" onClick={onThoat}>Thoát trò</button>
     </div>,
@@ -184,7 +185,7 @@ export default function SanhSinhTon({ maCa, veDau, batDau, onBatDau }: SanhSinhT
 
   return <section className="sst-the" aria-label="Trò chơi trong lúc chờ">
     <div><div className="sst-mat">CHƠI MỘT CHÚT TRONG LÚC CHỜ</div><h2>Sinh Tồn bốn đội</h2></div>
-    <p className="sst-ta">Mỗi em một bé ma đeo súng tự bắn. Vuốt để chạy, hạ đối thủ để súng lên cấp; thiếu bạn thì Máy vào thay.</p>
+    <p className="sst-ta">Mỗi em một bé ma đeo súng tự bắn. Vuốt để chạy, hạ đối thủ để súng lên cấp; đội thiếu người thì có bạn chơi cùng cho đủ.</p>
     <ul className="sst-doi" aria-label="Bốn đội">
       {DOI_SANH.map(([ky, ten, mau]) => <li key={ky} style={{ ['--d' as string]: `var(${mau})` } as CSSProperties}><i aria-hidden="true" />{ky} · Đội {ten}</li>)}
     </ul>

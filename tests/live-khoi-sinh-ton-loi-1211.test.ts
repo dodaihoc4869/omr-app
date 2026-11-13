@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   AN_YEN_MS, BAT_TU_MS, BK_NV, DAN_BAY_MS, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, NHIP_BAN_MS, TAM_NHIN_X, TAM_NHIN_Y, TAM_XA, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
-  SO_CO_SAN, dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
+  SO_CO_SAN, choTrai, dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
 } from '../src/lib/live-khoi/sinh-ton-loi'
 
 /** Giây thứ 10 của một ván (đang chơi, vòng an toàn còn rộng). */
@@ -11,25 +11,26 @@ const bd = taoBanDo(0)
 const nv = (o: Partial<NhanVat> & { id: string }): NhanVat => ({ x: 0, y: 0, mau: 100, doi: 1, cap: 1, t: '', ...o })
 
 describe('bản đồ', () => {
-  it('cỡ 0 = 1600 × 1000, đối xứng bốn góc ⇒ bốn đội công bằng', () => {
-    expect([bd.rong, bd.cao]).toEqual([1600, 1000])
+  it('cỡ 0 = 3200 × 2000 (bản 2: ghép 2 × 2 trang), đối xứng bốn góc ⇒ bốn đội công bằng', () => {
+    expect([bd.rong, bd.cao, bd.ngang, bd.doc]).toEqual([3200, 2000, 2, 2])
     const guong = (ds: { x: number; y: number; w: number; h: number }[]) => ds.every((t) =>
       ds.some((u) => u.x === bd.rong - t.x - t.w && u.y === t.y && u.w === t.w) && ds.some((u) => u.y === bd.cao - t.y - t.h && u.x === t.x && u.h === t.h))
     expect(guong(bd.tuong)).toBe(true); expect(guong(bd.thung)).toBe(true); expect(guong(bd.bui)).toBe(true)
-    expect(bd.trai).toEqual([{ x: 130, y: 122 }, { x: 1470, y: 122 }, { x: 130, y: 878 }, { x: 1470, y: 878 }])
+    expect(bd.trai).toEqual([{ x: 130, y: 122 }, { x: 3070, y: 122 }, { x: 130, y: 1878 }, { x: 3070, y: 1878 }])
     // Trại và giữa sân (hộp tiếp tế) không bị vật chặn đè.
-    for (const p of [...bd.trai, { x: 800, y: 500 }]) expect(diChuyen(bd, p.x, p.y, 1, 0).x).toBe(p.x + 1)
+    for (const p of [...bd.trai, { x: 1600, y: 1000 }]) expect(diChuyen(bd, p.x, p.y, 1, 0).x).toBe(p.x + 1)
   })
   // Thầy 13/11: «Tùy theo số lượng hs thì bản đồ được mở rộng ra hơn để chơi cho thú vị».
-  it('sĩ số lớn ⇒ sân mở rộng theo năm cỡ; sân lớn GHÉP thêm khu (thêm chỗ nấp), không chỉ phóng to', () => {
+  it('sĩ số lớn ⇒ sân mở rộng theo năm cỡ; mọi cỡ GHÉP trang 1600 × 1000 (thêm chỗ nấp), không phóng to', () => {
     expect([16, 20, 21, 36, 37, 64, 65, 96, 97, 300].map(capBanDo)).toEqual([0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
     expect(SO_CO_SAN).toBe(5)
-    expect([0, 1, 2, 3, 4].map((c) => { const b = taoBanDo(c); return [b.cap, b.rong, b.cao] })).toEqual([[0, 1600, 1000], [1, 2400, 1500], [2, 3200, 2000], [3, 4800, 2000], [4, 4800, 3000]])
-    // Cỡ 1 = cùng một khu phóng 1,5 lần; cỡ 2–4 = ghép 4 · 6 · 9 khu, vật chặn giữ nguyên cỡ ⇒ số tường / thùng / bụi nhân theo số khu.
-    expect(taoBanDo(1).tuong.length).toBe(bd.tuong.length)
-    for (const [c, khu] of [[2, 4], [3, 6], [4, 9]] as const) {
+    expect([0, 1, 2, 3, 4].map((c) => { const b = taoBanDo(c); return [b.cap, b.rong, b.cao, b.ngang, b.doc] }))
+      .toEqual([[0, 3200, 2000, 2, 2], [1, 4800, 2000, 3, 2], [2, 4800, 3000, 3, 3], [3, 6400, 3000, 4, 3], [4, 6400, 4000, 4, 4]])
+    // Cỡ 0..4 = ghép 4 · 6 · 9 · 12 · 16 trang, vật chặn giữ nguyên cỡ ⇒ số tường / thùng / bụi nhân theo số trang.
+    const mot = [bd.tuong.length / 4, bd.thung.length / 4, bd.bui.length / 4]
+    for (const [c, trang] of [[0, 4], [1, 6], [2, 9], [3, 12], [4, 16]] as const) {
       const b = taoBanDo(c)
-      expect([b.tuong.length, b.thung.length, b.bui.length]).toEqual([bd.tuong.length * khu, bd.thung.length * khu, bd.bui.length * khu])
+      expect([b.tuong.length, b.thung.length, b.bui.length]).toEqual(mot.map((n) => n * trang))
       expect(b.tuong[0].w).toBe(bd.tuong[0].w)
     }
     for (const c of [7, -1, 1.5, Number.NaN]) expect(taoBanDo(c).cap).toBe(0)
@@ -91,7 +92,7 @@ describe('bản đồ', () => {
     expect(ngoaiVong(dau, 20, 20)).toBe(false)
     expect(cuoi.rx).toBeLessThan(dau.rx * 0.4)
     expect(ngoaiVong(cuoi, bd.trai[0].x, bd.trai[0].y)).toBe(true)
-    expect(ngoaiVong(cuoi, 800, 500)).toBe(false)
+    expect(ngoaiVong(cuoi, bd.rong / 2, bd.cao / 2)).toBe(false)
   })
 })
 
@@ -146,12 +147,12 @@ describe('sát thương (bên bị bắn tự tính từ ảnh chụp)', () => {
   const toi = { id: 'T', x: 800, y: 700, doi: 0 }
   it('cấp súng càng cao càng mất nhiều máu; máy bắn yếu hơn người; đồng đội và kẻ đã bị hạ không gây sát thương', () => {
     const mat = (o: Partial<NhanVat> & { id: string }) => satThuong(toi, [nv({ x: 900, y: 700, t: 'T', ...o })], 1).tong
-    expect([mat({ id: 'A', cap: 1 }), mat({ id: 'A', cap: 2 }), mat({ id: 'A', cap: 3 }), mat({ id: 'A', cap: 4 })]).toEqual([36, 48, 60, 72])
-    expect(mat({ id: '~3', cap: 1 })).toBeCloseTo(24.12, 1)
-    // Nhịp bắn nhanh (thầy 13/11): ba cấp đầu 4 phát / giây, Pháo Sao 0,7 giây một phát; đạn tới đích trước phát kế.
-    expect([...NHIP_BAN_MS]).toEqual([250, 250, 250, 700])
-    for (let i = 0; i < 4; i++) expect(DAN_BAY_MS[i]).toBeLessThan(NHIP_BAN_MS[i])
-    expect(laMay('~3')).toBe(true); expect(laMay('S3')).toBe(false)
+    expect([1, 2, 3, 4, 5, 6].map((cap) => mat({ id: 'A', cap }))).toEqual([34, 42, 50, 58, 66, 74])
+    expect(mat({ id: '~3-0', cap: 1 })).toBeCloseTo(22.78, 1)
+    // Nhịp bắn: Hạt / Đôi / Sấm 4 phát / giây, Bọt và Lửa Màu thưa hơn, Pháo Sao 0,7 giây một phát; đạn tới đích trước phát kế.
+    expect([...NHIP_BAN_MS]).toEqual([250, 250, 340, 250, 280, 700])
+    for (let i = 0; i < 6; i++) expect(DAN_BAY_MS[i]).toBeLessThan(NHIP_BAN_MS[i])
+    expect(laMay('~3-0')).toBe(true); expect(laMay('S3')).toBe(false)
     expect(mat({ id: 'A', doi: 0 })).toBe(0); expect(mat({ id: 'A', mau: 0 })).toBe(0); expect(mat({ id: 'A', t: 'nguoi-khac' })).toBe(0)
   })
   it('ĐỒNG ĐỘI KHÔNG HẠ ĐƯỢC NHAU (thầy 12/11): không ngắm, không trúng đạn thẳng, không dính tia nảy hay nổ lan của đồng đội', () => {
@@ -159,24 +160,24 @@ describe('sát thương (bên bị bắn tự tính từ ảnh chụp)', () => {
     // Súng không bao giờ chọn đồng đội, kể cả khi đứng sát và không có ai khác.
     expect(chonMucTieu(bd, toi, [nv({ id: 'D', x: 820, y: 700, doi: 0 })])).toBe('')
     // Đồng đội có khai nhầm đang bắn mình (gói sai / máy lệch đội) thì vẫn không mất máu, ở mọi cấp súng.
-    for (const cap of [1, 2, 3, 4]) expect(satThuong(toi, [dongDoi(cap, 'T')], 1)).toEqual({ tong: 0, ai: '' })
-    // Đồng đội bắn Súng Sấm / Pháo Sao vào đối thủ đứng sát mình: tia nảy và nổ lan không chạm mình.
+    for (const cap of [1, 2, 3, 4, 5, 6]) expect(satThuong(toi, [dongDoi(cap, 'T')], 1)).toEqual({ tong: 0, ai: '', chay: '' })
+    // Đồng đội bắn Súng Bọt / Sấm / Lửa Màu / Pháo Sao vào đối thủ đứng sát mình: bọt vỡ, tia nảy, lửa và nổ lan không chạm mình.
     const doiThu = nv({ id: 'X', x: 830, y: 700, doi: 2 })
-    expect(satThuong(toi, [dongDoi(3, 'X'), doiThu], 1).tong).toBe(0)
-    expect(satThuong(toi, [dongDoi(4, 'X'), doiThu], 1).tong).toBe(0)
+    for (const cap of [3, 4, 5, 6]) expect(satThuong(toi, [dongDoi(cap, 'X'), doiThu], 1), `cấp ${cap}`).toEqual({ tong: 0, ai: '', chay: '' })
   })
   it('nhiều kẻ cùng bắn ⇒ cộng dồn; `ai` = kẻ gây nhiều nhất', () => {
     const kq = satThuong(toi, [nv({ id: 'A', x: 900, y: 700, t: 'T', cap: 1 }), nv({ id: 'B', x: 700, y: 700, t: 'T', cap: 3, doi: 2 })], 0.25)
-    expect(kq.tong).toBeCloseTo((36 + 60) * 0.25); expect(kq.ai).toBe('B')
+    expect(kq.tong).toBeCloseTo((34 + 50) * 0.25); expect(kq.ai).toBe('B')
   })
-  it('Súng Sấm nảy sang MỘT đối thủ gần mục tiêu nhất; Pháo Sao nổ lan quanh mục tiêu — đều nửa sát thương', () => {
+  it('Súng Sấm (cấp 4) nảy sang MỘT đối thủ gần mục tiêu nhất; Pháo Sao (cấp 6) nổ lan quanh mục tiêu — đều nửa sát thương', () => {
     const mt = nv({ id: 'M', x: 865, y: 700, doi: 0 }) // đồng đội của T đang bị bắn, cách T 65
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 3 }), mt], 1).tong).toBe(30)
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), mt], 1).tong).toBe(29)
     // Có đồng đội khác đứng gần mục tiêu hơn ⇒ tia nảy sang bạn ấy, không sang T.
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 3 }), mt, nv({ id: 'N', x: 885, y: 700, doi: 0 })], 1).tong).toBe(0)
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), mt], 1).tong).toBe(0) // phải trong 60 mới dính nổ lan
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), { ...mt, x: 850 }], 1).tong).toBe(36)
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 2 }), mt], 1).tong).toBe(0)
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), mt, nv({ id: 'N', x: 885, y: 700, doi: 0 })], 1).tong).toBe(0)
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 6 }), mt], 1).tong).toBe(0) // phải trong 60 mới dính nổ lan
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 6 }), { ...mt, x: 850 }], 1).tong).toBe(37)
+    // Cấp 1, 2 và Lửa Màu (5) không lan.
+    for (const cap of [1, 2, 5]) expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap }), { ...mt, x: 830 }], 1).tong, `cấp ${cap}`).toBe(0)
   })
 })
 
@@ -194,7 +195,9 @@ describe('bé ma của em', () => {
     expect(buocToi(bd, tt, { dx: 1, dy: 0 }, 16, lucSong - 1)).toBe(tt)
     const song = buocToi(bd, tt, { dx: 0, dy: 0 }, 16, lucSong, 0)
     expect([song.mau, song.cap, dangChet(song, lucSong)]).toEqual([MAU_DAY, 1, false])
-    expect(Math.hypot(song.x - bd.trai[3].x, song.y - bd.trai[3].y)).toBeLessThan(70)
+    // Về phía trại đội (sân bản 2 lớn hơn: giây thứ 15 trại góc đã ngoài vòng ⇒ hồi sinh ở mép trong vòng, phía trại mình — luật `choTrai(…, nay)`).
+    expect({ x: song.x, y: song.y }).toEqual(choTrai(bd, 3, 0, lucSong))
+    expect(song.x > bd.rong / 2 && song.y > bd.cao / 2).toBe(true)
   })
   it('vuốt ⇒ chạy đúng tốc độ; 3 giây không trúng đạn ⇒ máu hồi dần; ngoài vòng ⇒ mất máu', () => {
     let tt = { ...taoToi(bd, 0, T0), x: 800, y: 700, mau: 40, lucTrung: T0, batTuDen: 0 }
@@ -227,7 +230,8 @@ describe('bé ma của em', () => {
     expect(buocToi(bd, { ...tt, duong }, { dx: 1, dy: 0 }, 16, T0).duong).toEqual([])
   })
   it('đọc dòng ảnh chụp: dòng hỏng ⇒ bỏ; kẹp đội và cấp', () => {
-    expect(docDong('A', [10, 20, 55, 9, 7, 'B'])).toEqual({ id: 'A', x: 10, y: 20, mau: 55, doi: 3, cap: 4, t: 'B' })
+    expect(docDong('A', [10, 20, 55, 9, 7, 'B'])).toEqual({ id: 'A', x: 10, y: 20, mau: 55, doi: 3, cap: 6, t: 'B' })
+    expect(docDong('A', [10, 20, 55, 1, 0, ''])?.cap).toBe(1); expect(docDong('A', [10, 20, 55, 1, 5, ''])?.cap).toBe(5)
     expect(docDong('A', [10, 20, 55, 1, 2] as never)?.t).toBe('')
     expect(docDong('A', [10, 'x', 55, 1, 2, ''] as never)).toBeNull(); expect(docDong('A', undefined)).toBeNull()
   })

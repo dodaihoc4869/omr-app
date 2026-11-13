@@ -105,8 +105,8 @@ describe('Phòng Sinh Tồn của ca — nhịp trò', () => {
     const tin = cuoi(a, 'lop')!
     expect(tin).toMatchObject({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: T0 + 60 + TRO_NHIP_MS })
     const x = anh(a)
-    // Toạ độ kẹp trong sân 1000, cấp kẹp về 4; đội do PHÒNG đóng dấu (S1 đội 0, S2 đội 1).
-    expect(x.ds.S1).toEqual([100, 1000, 50, 0, 4, ''])
+    // Toạ độ kẹp trong sân 2000 (cỡ 0 = 3200 × 2000), cấp kẹp về 6; đội do PHÒNG đóng dấu (S1 đội 0, S2 đội 1).
+    expect(x.ds.S1).toEqual([100, 2000, 50, 0, 6, ''])
     expect(x.ds.S2).toEqual([300, 300, 0, 1, 2, ''])
     expect(x.ds.S3).toBeUndefined() // S3 mới ở phòng, chưa gửi gói ⇒ chưa lên sân
     expect(x.an).toEqual([['S1', 'S2']]); expect(x.d).toEqual([1, 0, 0, 0]); expect(x.v).toBe(1); expect(x.c).toBe(0)
