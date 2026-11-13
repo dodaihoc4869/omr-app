@@ -426,7 +426,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         const e = anh.bc[id]
         if (!Number.isInteger(e) || e < 0 || e >= BIEU_CAM.length) continue
         bcMoi[id] = e
-        if (bc[id] !== e && id !== sbd && !laMay(id) && (xem || doiCua(id) === doiEm)) themTin([{ c: tenCua(id), doi: doiCua(id) }, { c: `: ${BIEU_CAM[e]}` }], luc)
+        if (bc[id] !== e && id !== sbd && !laMay(id) && !xem && doiCua(id) === doiEm) themTin([{ c: tenCua(id), doi: doiCua(id) }, { c: `: ${BIEU_CAM[e]}` }], luc)
       }
       bc = bcMoi
       if (Array.isArray(anh.h) && typeof anh.h[0] === 'number') {
@@ -563,7 +563,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         if ((luc - lucGui >= NHIP_GUI_MS && (khoa !== khoaGui || choA || choH === soHop || i.e >= 0)) || luc - lucGui >= NHIP_NHAC_MS) {
           if (choA) { goi.a = choA; choA = '' }
           if (choH === soHop && hop[0] !== soHop) goi.h = soHop
-          if (i.e >= 0) { goi.e = i.e; i.e = -1 }
+          if (i.e >= 0) {
+            // Bong bóng của em hiện ngay (phòng nhận 1 lần / 2 giây — lần dư thì không hiện, như phòng).
+            if (luc - lucBcEm >= 2000) { lucBcEm = luc; bcEm = { chu: BIEU_CAM[i.e] ?? '', het: luc + 2000 } }
+            goi.e = i.e; i.e = -1
+          }
           lucGui = luc; khoaGui = khoa
           kenh.gui('tro', goi)
         }
