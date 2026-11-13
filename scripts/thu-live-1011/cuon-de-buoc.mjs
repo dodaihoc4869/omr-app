@@ -139,7 +139,11 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
     await thayLat(true)
     const t1 = await Promise.all([doGiay(em1), doGiay(em2)]), y1 = yDe(), D1 = y0 - y1
     const theo = (a, b) => b.soi && b.du > 0 && Math.abs(b.cuon.top - b.du) <= 1 && Math.abs(b.deTren - (a.deTren - D1 * a.tiLe)) <= 2
-    kiem('CD4a thầy lật giấy sang trang 2 (khối đề của giấy thầy sang toạ độ âm): máy em không tự cuộn gần đây ĐI THEO như trước (chữ dời đúng quãng thầy lật × phép co), giấy vẫn soi khớp', y1 < 0 && D1 > 100 && theo(t0[0], t1[0]) && theo(t0[1], t1[1]), JSON.stringify({ yDe: [y0, y1], em1: [t0[0].deTren, t1[0].deTren, t1[0].du, t1[0].cuon.top], em2: [t0[1].deTren, t1[1].deTren, t1[1].du, t1[1].cuon.top] }))
+    // (13/11, phiên chính) tờ của buổi live CUỘN LIỀN từ 10/11 (`S.bpuCuon`, len-bang-bpu-to-chieu.ts) — lệnh ↓ / ↑ không lật trang nên khối đề của giấy thầy
+    // không sang toạ độ âm. Khi đó CD4a / CD4c không áp dụng: in một dòng «–», không tính đạt / trượt (phần đề ngoài ô giấy vẫn được CD1b đo).
+    const khongLat = y1 === y0
+    if (khongLat) console.log(`– CD4a / CD4c không áp dụng: tờ live cuộn liền, lệnh ↓ không lật trang (yDe ${y0} → ${y1})`)
+    else     kiem('CD4a thầy lật giấy sang trang 2 (khối đề của giấy thầy sang toạ độ âm): máy em không tự cuộn gần đây ĐI THEO như trước (chữ dời đúng quãng thầy lật × phép co), giấy vẫn soi khớp', y1 < 0 && D1 > 100 && theo(t0[0], t1[0]) && theo(t0[1], t1[1]), JSON.stringify({ yDe: [y0, y1], em1: [t0[0].deTren, t1[0].deTren, t1[0].du, t1[0].cuon.top], em2: [t0[1].deTren, t1[1].deTren, t1[1].du, t1[1].cuon.top] }))
     // em kéo ngược về xem lại ĐẦU đề (phần thầy đã lật qua)
     for (const [, p, cham] of [EM[0], EM[1]]) for (let i = 0; i < 8; i++) { const d = await doGiay(p); if (d.cuon.top <= 0) break; await cuonEm(p, cham, -200) }
     const t2 = await Promise.all([doGiay(em1), doGiay(em2)])
@@ -150,7 +154,7 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
     const t3 = await doGiay(em1)
     await thayLat(true)
     const t4 = await doGiay(em1), y2 = yDe()
-    kiem('CD4c em VỪA tự cuộn (dưới 4 giây) mà thầy lật tiếp sang trang 3 ⇒ chữ em đang đọc ĐỨNG YÊN trên màn (không bị giật theo thầy)', y2 < y1 - 100 && t4.du > t3.du + 40 && Math.abs(t4.deTren - t3.deTren) <= 1.5, JSON.stringify({ yDe: [y1, y2], truoc: [t3.deTren, t3.du, t3.cuon.top], sau: [t4.deTren, t4.du, t4.cuon.top] }))
+    if (!khongLat)     kiem('CD4c em VỪA tự cuộn (dưới 4 giây) mà thầy lật tiếp sang trang 3 ⇒ chữ em đang đọc ĐỨNG YÊN trên màn (không bị giật theo thầy)', y2 < y1 - 100 && t4.du > t3.du + 40 && Math.abs(t4.deTren - t3.deTren) <= 1.5, JSON.stringify({ yDe: [y1, y2], truoc: [t3.deTren, t3.du, t3.cuon.top], sau: [t4.deTren, t4.du, t4.cuon.top] }))
     await thayLat(false); await thayLat(false)
     const t5 = await doGiay(em1)
     kiem('CD4d thầy lật về trang đầu: máy em hết phần dư phía trên, giấy vẫn soi khớp', yDe() === y0 && t5.soi && t5.du === 0, JSON.stringify({ yDe: yDe(), du: t5.du, top: t5.cuon.top }))

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // THỬ RIÊNG «CUỘN ĐỀ» TRÊN MÁY EM (13/11 — thầy, buổi Live theo khối: «Đề trên máy học sinh không vuốt cuộn xuống được»). Chromium thật, phòng THẬT
-// trong Node; ≈ 2 phút — dò lỗi cuộn đề không cần chạy cả bộ lớn (thu-gv-that-1211.mjs chạy CÙNG nhóm bước này ở cuối). Các bước: cuon-de-buoc.mjs.
+// trong Node; ≈ 2 phút — CHẠY RIÊNG, cạnh bộ lớn thu-gv-that-1211.mjs (bộ lớn KHÔNG gồm nhóm bước này). Các bước: cuon-de-buoc.mjs.
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu-cuon-de-1311.mjs <thư mục tạm> [thư mục ảnh] [--so-luoc]
 // `--so-luoc`: chỉ đo cuộn tới cuối / về đầu ở bốn máy em (lấy số đo trên bản CHƯA sửa — các bước còn lại cần bản đã sửa).

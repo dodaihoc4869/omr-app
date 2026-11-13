@@ -11,14 +11,16 @@ export const CSS_LIVE_KHOI = `
 body.mc-lk.mc-co-but canvas.mc-but:not(.mc-viet){cursor:none}
 /* ẨN MỌI THANH CUỘN CỦA TỜ TRONG BUỔI LIVE (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): vẫn cuộn bằng bánh xe / bàn di /
    kéo chạm / phím như cũ; mép mờ «còn nữa ↓» của đề dài vẫn báo còn nội dung. */
-html:has(body.mc-lk),body.mc-lk,body.mc-lk *{scrollbar-width:none!important}
-html:has(body.mc-lk)::-webkit-scrollbar,body.mc-lk::-webkit-scrollbar,body.mc-lk *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+body.mc-lk,body.mc-lk *{scrollbar-width:none!important}
+body.mc-lk::-webkit-scrollbar,body.mc-lk *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 /* THẺ TÊN EM LÊN BẢNG TRONG BUỔI LIVE (thầy 13/11: «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»): một viên nhỏ ôm sát
    tên, đứng giữa đầu cột bảng; chỉ còn TÊN (+ dấu Đạt / Không đạt). Nhãn «Dự kiến làm được…», số báo danh, «Chi tiết ›», ảnh linh thú ẩn — phần chỗ trả cho
-   bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng (thẻ «Cả lớp» của đợt chưa có em) — ép là thẻ ấy hiện đè lên tên. */
+   bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng. Một ô có hơn một thẻ ⇒ chỉ hiện thẻ ĐẦU (lệnh gọi lên bảng ghi tên vào thẻ đầu,
+   len-bang-bpu-to-chieu.ts) — thẻ to đặc cũ che kín nhau, thẻ gọn thì lộ cả hai chồng lên nhau. */
 body.mc-lk .mc-em:not([hidden]){grid-template-columns:minmax(0,1fr)!important;justify-items:center;align-items:center;justify-self:center;align-self:start;width:fit-content!important;max-width:100%!important;min-width:0!important;min-height:0!important;box-sizing:border-box;margin:0 auto!important;padding:clamp(3px,.3vw,6px) clamp(12px,1.1vw,20px)!important;border-radius:999px!important;text-align:center;cursor:default}
 body.mc-lk .mc-em:not([hidden]) .mc-em-trai,body.mc-lk .mc-em:not([hidden]) .mc-em-hang1,body.mc-lk .mc-em:not([hidden]) .mc-ten-hang{display:flex!important;align-items:center;justify-content:center;gap:.5em;flex:0 1 auto!important;min-width:0!important;max-width:100%;width:auto!important}
 body.mc-lk .mc-em:not([hidden]) .mc-ten{display:block;flex:0 1 auto;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important;font-size:clamp(14px,1.3vw,24px)!important;font-weight:800!important;line-height:1.25!important;letter-spacing:0}
+body.mc-lk .mc-em:not([hidden])~.mc-em{display:none!important}
 body.mc-lk .mc-em:not([hidden]) .mc-phu,body.mc-lk .mc-em:not([hidden]) .mc-xem-ct,body.mc-lk .mc-em:not([hidden]) .mc-thu,body.mc-lk .mc-em:not([hidden]) .mc-ls,body.mc-lk .mc-em:not([hidden]) .mc-em-phu,body.mc-lk .mc-em:not([hidden]) .mc-btvn{display:none!important}
 .mc-lv-dau{position:fixed;left:50%;top:47%;z-index:60;padding:.16em .55em;border:.11em solid currentColor;border-radius:.3em;outline:.04em solid currentColor;outline-offset:.12em;background:color-mix(in srgb,color-mix(in srgb,currentColor 12%,var(--mc-bang-chu)) 92%,transparent);color:var(--mc-do);font:900 clamp(48px,15vmin,150px)/1.05 var(--mc-sans);letter-spacing:.06em;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%) rotate(-10deg);animation:mc-lv-dau 3s cubic-bezier(.2,.9,.3,1) both}
 .mc-lv-dau.dat{color:var(--mc-luc)}
