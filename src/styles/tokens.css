@@ -632,13 +632,3 @@
   --v2-xanh-than: #0f3d3a;
   --v2-vang: #f7a800;
 }
-
-/* TRÒ «SINH TỒN · TRANG VỞ» (thầy 13/11: «tối là #131f24 mặc định là nền này luôn nhé») — nền LUÔN TỐI, không theo máy sáng / tối: đúng bảng Duolingo tối
- * của app học sinh (nền · thẻ · viền · viền sẫm · chữ). Chỉ trò Sinh Tồn đọc --st-*; sắc dẫn xuất pha bằng color-mix / hàm pha trong mã vẽ. */
-:root {
-  --st-nen: #131f24;
-  --st-mat: #202f36;
-  --st-vien: #37464f;
-  --st-vien-2: #1a282e;
-  --st-chu: #f1f7fb;
-}

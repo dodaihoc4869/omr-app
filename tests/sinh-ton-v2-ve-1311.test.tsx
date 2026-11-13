@@ -14,9 +14,11 @@ import type { KenhLop, NguoiLop, TinLop } from '../src/lib/live-khoi/kieu'
 const doc = (p: string) => readFileSync(p, 'utf8')
 
 describe('nền luôn tối — trò đọc --st-*', () => {
-  it('tokens.css khai đúng năm biến nền Duolingo tối', () => {
-    const t = doc('src/styles/tokens.css')
-    for (const [bien, gt] of [['--st-nen', '#131f24'], ['--st-mat', '#202f36'], ['--st-vien', '#37464f'], ['--st-vien-2', '#1a282e'], ['--st-chu', '#f1f7fb']]) expect(t).toContain(`${bien}: ${gt};`)
+  it('năm biến nền Duolingo tối nằm ở bảng màu nạp lười (mau.ts) và gắn ở gốc màn trò — KHÔNG ở tokens.css (lượt mở ba app không nặng thêm)', async () => {
+    const { MAU_SINH_TON } = await import('../src/lib/live-khoi/mau')
+    expect(MAU_SINH_TON).toEqual({ '--st-nen': '#131f24', '--st-mat': '#202f36', '--st-vien': '#37464f', '--st-vien-2': '#1a282e', '--st-chu': '#f1f7fb' })
+    expect(doc('src/styles/tokens.css')).not.toContain('--st-nen')
+    expect(doc('src/components/live-khoi/TroSinhTon.tsx')).toMatch(/style=\{\{ \.\.\.MAU_SINH_TON/)
   })
   it('bảng màu đọc nền / thẻ / kẻ / chữ từ --st-* và KHÔNG đọc --tr-nen (máy để sáng vẫn tối)', () => {
     const da: string[] = []

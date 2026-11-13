@@ -12,6 +12,7 @@ import {
   hopSo, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type BanDo, type Diem, type NhanVat, type Toi,
 } from '../../lib/live-khoi/sinh-ton-loi'
 import { tenMay } from '../../lib/live-khoi/ten-may'
+import { MAU_SINH_TON } from '../../lib/live-khoi/mau'
 import { datTat, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
 import { BoHinh, taoBangMau, type BangMau, type Rgb } from './sinh-ton-hinh'
 import { lamTronTi, taoBoSan, type BoSan } from './sinh-ton-san'
@@ -603,7 +604,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   const nhat = ketQua && ketQua.hang[0].diem > (ketQua.hang[1]?.diem ?? 0) ? ketQua.hang[0] : null
   const hangEm = ketQua && !xem ? ketQua.hang.find((h) => h.doi === doiToi) : undefined
   return (
-    <div className="gl st" ref={gocRef} style={bienDoi(doiToi)} data-xem={xem ? '1' : undefined} data-phang={mayYeu ? '1' : undefined} data-em={banEm ? '1' : undefined}>
+    <div className="gl st" ref={gocRef} style={{ ...MAU_SINH_TON, ...bienDoi(doiToi) } as CSSProperties} data-xem={xem ? '1' : undefined} data-phang={mayYeu ? '1' : undefined} data-em={banEm ? '1' : undefined}>
       <div className="st-rung" ref={rungRef}><canvas className="gl-san" ref={vaiRef} aria-hidden="true" /></div>
       {xem ? null : <div className="st-vung" onPointerDown={xuong} onPointerMove={di} onPointerUp={buong} onPointerCancel={buong} onLostPointerCapture={buong} />}
       <div className="gl-bang st-bang" role="group" aria-label={`Lượt hạ ván ${gio.van}: ${DOI_BPU.map((d, i) => `${d.ten} ${diem[i]}`).join(', ')}. Còn ${gio.con}`}>
