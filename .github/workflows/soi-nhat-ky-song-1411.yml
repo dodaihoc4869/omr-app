@@ -32,7 +32,5 @@ jobs:
           curl -s -L "$P/nhat-ky/" -o nk.html -w "Pages /nhat-ky/ %{http_code} %{content_type}\n"; echo "có id=nk: $(grep -c 'id=\"nk\"' nk.html)"
           curl -s -L "$P/nhat-ky/khuon.js" -o /dev/null -w "khuon.js %{http_code} %{content_type}\n"
           curl -s -L "$P/nhat-ky/khuon.css" -o /dev/null -w "khuon.css %{http_code} %{content_type}\n"
-          curl -s "$P/sw.js" -o sw.js -w "sw.js %{http_code}\n"
-          grep -oE 'assets/[A-Za-z0-9_.-]+\.js' sw.js | sort -u > ds.txt; echo "số tệp js trong sw: $(wc -l < ds.txt)"
-          n=0; while read -r f; do curl -s "$P/$f" -o t.js; if grep -q 'xl-nk-mo' t.js; then n=$((n+1)); echo "thẻ nhật ký trong: $f"; grep -c 'nhat-ky.json' t.js; fi; done < ds.txt; echo "số tệp có thẻ: $n"
+          timeout 150 node scripts/soi-khuc-pages-1411.mjs "$P" xem-lai-live- xl-nk-mo nhat-ky.json "/nhat-ky/?id="
           curl -s "$P/sw-version.json"; echo
