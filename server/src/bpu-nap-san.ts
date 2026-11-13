@@ -22,8 +22,9 @@ const str = (v: unknown): string => (v == null ? '' : String(v))
 /** Số câu tối đa một lần nạp · ảnh chụp an toàn sống bao lâu · làm mới ngầm không dày hơn ngần này (ms). */
 export const NAP_TOI_DA = 80, NAP_TUOI_MS = 60_000, NAP_LAM_MOI_MS = 20_000
 
-/** Một câu đã nạp: đúng các trường đường cũ gửi vào `/luot` (đề công khai, đáp án, lời giải — đáp án / lời giải KHÔNG ra máy em trước khi mở). */
-export interface CauNap { qid: string; phan: 'I' | 'II' | 'III'; tuLuan: boolean; cau: Row; dung: string; giai: Row; baoVe: boolean }
+/** Một câu đã nạp: đúng các trường đường cũ gửi vào `/luot` (đề công khai, đáp án, lời giải — đáp án / lời giải KHÔNG ra máy em trước khi mở).
+ *  `ban` = phiên bản tờ trong kho (`de_kho.cap_nhat_luc`) lúc đọc: thầy sửa đáp án / đẩy lại tờ ⇒ phiên bản đổi ⇒ lần làm mới kế tiếp đọc lại câu. */
+export interface CauNap { qid: string; phan: 'I' | 'II' | 'III'; tuLuan: boolean; cau: Row; dung: string; giai: Row; baoVe: boolean; ban: string }
 /** Ảnh chụp an toàn: có ca thi nào đang mở không · đọc được phạm vi đề bảo vệ không · lúc chụp (ms). */
 export interface AnToanNap { coCaMo: boolean; kiemDuocBaoVe: boolean; luc: number }
 
@@ -53,7 +54,7 @@ export async function chupAnToan(env: Env, qids: string[]): Promise<{ an: AnToan
 export async function docNap(env: Env, qids: string[]): Promise<{ cau: CauNap[]; an: AnToanNap }> {
   if (!qids.length) return { cau: [], an: { coCaMo: true, kiemDuocBaoVe: false, luc: Date.now() } }
   const [rc, at] = await Promise.all([
-    env.DB.prepare(`SELECT q.qid AS qid, q.json AS json ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(qids)).all<{ qid: string; json: string }>(),
+    env.DB.prepare(`SELECT q.qid AS qid, q.json AS json, d.cap_nhat_luc AS ban ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(qids)).all<{ qid: string; json: string; ban: unknown }>(),
     chupAnToan(env, qids),
   ])
   const cau: CauNap[] = [], co = new Set<string>()
@@ -69,10 +70,20 @@ export async function docNap(env: Env, qids: string[]): Promise<{ cau: CauNap[];
       // Lời giải + ảnh lời giải giữ trong PHÒNG (chỉ ra máy em sau khi mở đáp án — viewEm), y như đường cũ `gvBpuLuot`.
       giai: { solution: (q as { solution?: unknown }).solution ?? null, anh: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai') },
       baoVe: at.biBaoVe.has(qid),
+      ban: str(d.ban),
     })
   }
   return { cau, an: at.an }
 }
+
+/** Phiên bản hiện tại của từng câu (một lệnh nhẹ, không đọc nội dung câu). Câu không còn phục vụ được (tờ bị xoá / chỉ mục đang dựng lại) ⇒ vắng. */
+export async function docBan(env: Env, qids: string[]): Promise<Map<string, string>> {
+  const r = await env.DB.prepare(`SELECT q.qid AS qid, d.cap_nhat_luc AS ban ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(qids)).all<{ qid: unknown; ban: unknown }>()
+  return new Map((r.results ?? []).map((x) => [str(x.qid), str(x.ban)]))
+}
+
+/** Câu đã nạp có còn khớp kho không (cùng phiên bản, chưa bị gỡ). */
+export const conKhop = (cau: Iterable<CauNap>, ban: ReadonlyMap<string, string>): boolean => { for (const c of cau) if (ban.get(c.qid) !== c.ban) return false; return true }
 
 /** Sang câu `qid` theo đường nhanh được không (và vì sao không). `nay` = giờ phòng. */
 export function duocNhanh(an: AnToanNap | null, c: CauNap | undefined, nay: number): '' | 'chua-nap' | 'cu' | 'ca-mo' | 'bao-ve' {

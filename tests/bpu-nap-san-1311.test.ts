@@ -104,6 +104,30 @@ describe('phòng thật trên D1 thật', () => {
     expect(await ph.post('/nap', { qids: ['Q1'] })).toMatchObject({ ok: true, coCaMo: true })
     expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ nhanh: false, vi: 'ca-mo' })
   })
+  it('THẦY SỬA ĐÁP ÁN SAU KHI NẠP (tờ đổi phiên bản) ⇒ lần làm mới kế tiếp đọc lại câu; sang câu mở lượt bằng ĐÁP ÁN MỚI', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(3_000_000)
+    const m = moiD1(), ph = taoPhongGia(null, { DB: m.DB })
+    await ph.khoi([{ sbd: 'S1' }])
+    const gv = await ph.noi('gv')
+    await ph.post('/nap', { qids: ['Q1', 'Q2'] })
+    // sửa đáp án Q1 B ⇒ D như sua-dap-an-kho.ts: ghi gói mới, đặt cap_nhat_luc mới, dựng lại chỉ mục tờ
+    m.d.sql.prepare("UPDATE game_v2_question SET json = ?, version = 'v2' WHERE qid = 'Q1'").run(cauJson('Q1', 'Câu một: chất nào là amine bậc hai?', 'D'))
+    m.d.sql.prepare("UPDATE game_v2_question SET version = 'v2' WHERE qid = 'Q2'").run()
+    m.d.sql.prepare("UPDATE de_kho SET cap_nhat_luc = 'v2' WHERE ma_de = 'DE1'").run()
+    m.d.sql.prepare("UPDATE game_v2_index SET source_version = 'v2' WHERE ma_de = 'DE1'").run()
+    vi.setSystemTime(Date.now() + NAP_LAM_MOI_MS)
+    await ph.gui(gv, { t: 'ping' }); await ph.choNen()
+    expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ ok: true, nhanh: true })
+    expect((ph.kho.du.get('st') as { luot?: { dung?: string } }).luot?.dung).toBe('D')
+  })
+  it('tờ riêng mở sau tờ của bảng ⇒ GỘP: câu của cả hai tờ đều đi nhanh', async () => {
+    const m = moiD1(), ph = taoPhongGia(null, { DB: m.DB })
+    await ph.khoi([{ sbd: 'S1' }])
+    await ph.post('/nap', { qids: ['Q1'] })
+    expect(await ph.post('/nap', { qids: ['Q2'] })).toMatchObject({ ok: true, so: 2 })
+    expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ nhanh: true })
+    expect(await ph.post('/luot-nhanh', { qid: 'Q2', hanGiay: 0 })).toMatchObject({ nhanh: true })
+  })
   it('phòng ngủ rồi thức lại (đối tượng mới, cùng kho) ⇒ câu đã nạp vẫn còn, sang câu vẫn đi nhanh', async () => {
     const m = moiD1(), ph = taoPhongGia(null, { DB: m.DB })
     await ph.khoi([{ sbd: 'S1' }])
@@ -112,7 +136,8 @@ describe('phòng thật trên D1 thật', () => {
     m.datLai()
     expect(await ph2.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ ok: true, nhanh: true })
     expect(m.demD1()).toBe(0)
-    // nạp bài khác ⇒ câu cũ không còn trong kho của phòng
+    // nạp tờ khác ⇒ GỘP, câu đã bị gỡ khỏi kho (không còn phục vụ được) thì rời bộ nạp
+    m.d.sql.prepare("DELETE FROM game_v2_question WHERE qid = 'Q1'").run()
     await ph2.post('/nap', { qids: ['Q2'] })
     expect([...ph.kho.du.keys()].filter((k) => k.startsWith('nap:q:'))).toEqual(['nap:q:Q2'])
   })

@@ -20,7 +20,7 @@ import { LiveMay, type KemBpu } from './phong-live'
 import { GIAO_DIEN_DOT_2, datCoLive, duocPhatMic, laEmXaDangLive, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 import { KHOA_CH_XEM_LAI, NhatKyXl, xemLaiBat } from './live-xem-lai'
 import { KenhLopMay } from './kenh-lop-may'
-import { NAP_LAM_MOI_MS, chupAnToan, docNap, duocNhanh, locMaCau, type AnToanNap, type CauNap } from './bpu-nap-san'
+import { NAP_LAM_MOI_MS, chupAnToan, conKhop, docBan, docNap, duocNhanh, locMaCau, type AnToanNap, type CauNap } from './bpu-nap-san'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -376,7 +376,10 @@ export class PhongBinhPhanUng {
     if (!n || this.napDang || (!ep && Date.now() - n.an.luc < NAP_LAM_MOI_MS)) return
     this.napDang = (async () => {
       try {
-        const k = await chupAnToan(this.env, [...n.cau.keys()])
+        const qids = [...n.cau.keys()]
+        const [k, ban] = await Promise.all([chupAnToan(this.env, qids), docBan(this.env, qids)])
+        // thầy sửa đáp án / đẩy lại tờ / xoá tờ sau khi nạp ⇒ đọc lại cả bài (đáp án mới), không mở lượt bằng đáp án cũ
+        if (!conKhop(n.cau.values(), ban)) { const d = await docNap(this.env, qids); await this.datNap(d.cau, d.an); return }
         for (const c of n.cau.values()) c.baoVe = k.biBaoVe.has(c.qid)
         n.an = k.an
         await this.ctx.storage.put('nap:m', { qids: [...n.cau.keys()], an: k.an })
@@ -509,8 +512,12 @@ export class PhongBinhPhanUng {
     if (u.pathname === '/luot') return json(await this.moLuotMoi(st, b, nay))
     // NẠP SẴN (13/11, bpu-nap-san.ts): tờ vừa mở ⇒ phòng tự đọc D1 MỘT lần cho cả bài; thầy sang câu ⇒ `/luot-nhanh` mở lượt từ bộ nhớ (0 D1) khi an toàn.
     if (u.pathname === '/nap') {
-      const qids = locMaCau(b.qids)
-      if (!qids.length) return json({ ok: false, error: 'Thiếu mã câu.' })
+      const moi = locMaCau(b.qids)
+      if (!moi.length) return json({ ok: false, error: 'Thiếu mã câu.' })
+      // GỘP với câu đã nạp (tờ của bảng + tờ riêng của tấm hoạt động cùng sống): tờ mới đứng trước, giữ tối đa NAP_TOI_DA; đọc lại CẢ danh sách một lần
+      // ⇒ ảnh chụp an toàn phủ đúng mọi câu đang giữ.
+      const cu = await this.layNap()
+      const qids = locMaCau([...moi, ...(cu ? cu.cau.keys() : [])])
       const d = await docNap(this.env, qids)
       await this.datNap(d.cau, d.an)
       return json({ ok: true, so: d.cau.length, coCaMo: d.an.coCaMo })
