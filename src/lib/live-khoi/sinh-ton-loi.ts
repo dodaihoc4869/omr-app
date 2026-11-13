@@ -65,6 +65,9 @@ export const HE_NHANH = 1.35
 /** Loại của hộp số `soHop` (`hopSo(nay)`) — hàm thuần DÙNG CHUNG máy chủ / máy em / máy bù, không đi qua giao thức. Băm nhân Fibonacci (dãy Weyl ⇒ bốn loại
  *  đều nhau, không lặp vòng 4); 2 bit cao của Math.imul ⇒ cùng kết quả mọi máy. Đổi hàm này = đổi giao thức (test khoá giá trị cố định). */
 export const loaiHop = (soHop: number): LoaiHop => LOAI_HOP[Math.imul(Number.isFinite(soHop) ? Math.floor(soHop) | 0 : 0, 0x9e3779b1) >>> 30]
+/** Loại của hộp thứ `k` trong lượt hộp `soHop` (đợt 3: mỗi trang một hộp — `viTriHop`): k = 0 (hộp tâm sân) đúng bằng `loaiHop(soHop)` cũ; k ≥ 1 băm
+ *  `soHop × 64 + k` (k < 64 ⇒ không đụng nhau giữa các hộp). Hàm thuần dùng chung ba nơi, không đi qua giao thức (test khoá giá trị). */
+export const loaiHopO = (soHop: number, k: number): LoaiHop => (k > 0 ? loaiHop((Number.isFinite(soHop) ? Math.floor(soHop) : 0) * 64 + Math.floor(k)) : loaiHop(soHop))
 /** Trạng thái hiệu ứng hộp (mốc giờ phòng, ms; thiếu / 0 = không có) — chung cho `Toi` (máy em) và `May` (máy bù). */
 export interface HieuUngHop { khienDen?: number; nhanhDen?: number; saoDen?: number }
 export const coKhien = (h: HieuUngHop, nay: number): boolean => (h.khienDen ?? 0) > nay
@@ -73,13 +76,44 @@ export const dangNhanh = (h: HieuUngHop, nay: number): boolean => (h.nhanhDen ??
 export const capSung = (h: HieuUngHop & { cap: number }, nay: number): number => ((h.saoDen ?? 0) > nay ? CAP_TOI_DA : h.cap)
 /** Áp hiệu ứng hộp lên trạng thái (trả bản mới; `mau` về MAU_DAY). Dùng cho cả máy em (`Toi`) và máy bù (`May`, phòng gán lại tại chỗ). */
 export function apHop<T extends HieuUngHop & { mau: number }>(tt: T, loai: LoaiHop, nay: number): T {
-  if (loai === 'mau') return { ...tt, mau: MAU_DAY }
+  if (loai === 'mau') return { ...tt, mau: Math.max(tt.mau, MAU_DAY) }
   if (loai === 'khien') return { ...tt, khienDen: nay + KHIEN_MS }
   if (loai === 'nhanh') return { ...tt, nhanhDen: nay + NHANH_MS }
   return { ...tt, saoDen: nay + SAO_MS }
 }
 /** Bị hạ ⇒ mất mọi hiệu ứng hộp. */
 const HET_HOP: Required<HieuUngHop> = { khienDen: 0, nhanhDen: 0, saoDen: 0 }
+// ── THẦY VÀO TRẬN + MA MỰC (bản 2 đợt 3, thầy duyệt bản vẽ 10 · 11 · 12 ngày 13/11) ──
+/** Bé ma Thầy: mã cố định, «đội» 4 = KHÔNG thuộc đội nào (khác đội với mọi người ⇒ ai cũng bắn được Thầy, Thầy bắn được mọi người). Chỉ phòng chờ LIVE —
+ *  phòng nhận vai Thầy theo VAI KẾT NỐI (`gv`), không theo gói máy em gửi. Máu 2000 (dòng ảnh chụp mang máu THẬT 0..2000), to ×2,2, chạy 165 / giây
+ *  (em 190), bị hạ ⇒ 5 giây sau quay lại. Súng «bút đỏ» = LUẬT SÚNG ĐÔI (cấp 2: 42 máu / giây, không lan) cố định — phòng ép cấp 2, Thầy không lên cấp. */
+export const THAY = 'THAY'
+export const DOI_THAY = 4
+export const MAU_THAY = 2000
+export const TOC_DO_THAY = 165
+export const HOI_SINH_THAY_MS = 5000
+export const CAP_THAY = 2
+export const TO_THAY = 2.2
+/** Ma Mực (boss giữa ván): THỰC THỂ MÁY CHỦ, mã 'MM', «đội» 5 (đối thủ của tất cả, kể cả Thầy). Trồi lên ở tâm sân khi ván chơi được 60 giây; máu =
+ *  1500 + 40 × số nhân vật trên sân lúc trồi (em thật + máy bù + Thầy); bay 55 / giây về tâm đám đông (là ma mực ⇒ đi xuyên vật chặn); phun mực vào nhân vật
+ *  gần nhất trong 420: 30 máu / giây (bên bị bắn tự trừ như mọi phát bắn — `satThuong`). Máu boss do MÁY CHỦ trừ: ai khai `t = 'MM'` và cách boss ≤ TAM_XA ⇒
+ *  trừ đúng sát thương / giây súng của người đó (không tính lan). Hạ được ⇒ đội gây nhiều sát thương nhất +5 lượt hạ đội. Hết ván chưa hạ ⇒ không thưởng. */
+export const MA_MUC = 'MM'
+export const DOI_BOSS = 5
+export const MM_TROI_MS = 60_000
+export const MM_MAU_GOC = 1500
+export const MM_MAU_MOI = 40
+export const MM_TOC_DO = 55
+export const MM_TAM = 420
+export const MM_SAT_GIAY = 30
+export const MM_THUONG = 5
+/** Máu đầy theo «đội» (Thầy 2000, còn lại 100). */
+export const mauDay = (doi: number): number => (doi === DOI_THAY ? MAU_THAY : MAU_DAY)
+/** Ma Mực như một nhân vật cho `satThuong` / `chonMucTieu` / máy bù: luôn đặt CUỐI danh sách (thế hoà như nhau ở ảnh đủ và ảnh lọc). bx = [x, y, máu, mục tiêu?]. */
+export function nvBoss(bx: unknown): NhanVat | null {
+  if (!Array.isArray(bx) || bx.length < 3 || ![bx[0], bx[1], bx[2]].every((v) => typeof v === 'number' && Number.isFinite(v)) || bx[2] <= 0) return null
+  return { id: MA_MUC, x: bx[0], y: bx[1], mau: bx[2], doi: DOI_BOSS, cap: 1, t: typeof bx[3] === 'string' ? bx[3] : '' }
+}
 export const ANH_MS = 250
 export const NHIP_GUI_MS = 250
 export const NHIP_NHAC_MS = 2000
@@ -215,10 +249,27 @@ export function trongBui(bd: BanDo, x: number, y: number): boolean {
   for (let j = J0; j <= J1; j++) for (let i = I0; i <= I1; i++) { const t = bd.buiTrang[j * bd.ngang + i]; for (let k = 0; k < t.length; k++) if (trongBauDuc(t[k], x, y)) return true }
   return false
 }
-/** Vòng an toàn co dần suốt thời gian chơi của ván: từ kín sân về 42% bán trục. */
+/** Hệ số bán trục cuối ván: sân nhỏ (2 × 2, 3 × 2) 0,42; sân từ 3 × 3 trang trở lên 0,32 (đợt 3 — co nhanh hơn để cuối ván vẫn chạm trán). */
+export const heVongCuoi = (bd: BanDo): number => (bd.ngang >= 3 && bd.doc >= 3 ? 0.32 : 0.42)
+/** HỘP TIẾP TẾ (đợt 3): hộp 0 ở tâm sân (như cũ) + mỗi trang 1600 × 1000 một hộp ở giữa trang (trang trùng tâm sân thì bỏ — sân 3 × 3). Chỉ số = thứ tự
+ *  trong mảng này (k); mọi máy dựng cùng mảng từ cùng bản đồ. Nhớ theo bản đồ. */
+const NHO_HOP = new WeakMap<BanDo, Diem[]>()
+export function viTriHop(bd: BanDo): Diem[] {
+  let kq = NHO_HOP.get(bd)
+  if (kq) return kq
+  const rk = bd.rong / bd.ngang, ck = bd.cao / bd.doc, tam = { x: bd.rong / 2, y: bd.cao / 2 }
+  kq = [tam]
+  for (let j = 0; j < bd.doc; j++) for (let i = 0; i < bd.ngang; i++) {
+    const p = { x: rk * (i + 0.5), y: ck * (j + 0.5) }
+    if (Math.hypot(p.x - tam.x, p.y - tam.y) >= HOP_BK * 4) kq.push(p)
+  }
+  NHO_HOP.set(bd, kq)
+  return kq
+}
+/** Vòng an toàn co dần suốt thời gian chơi của ván: từ kín sân về `heVongCuoi` bán trục. */
 export function vong(bd: BanDo, nay: number): Vong {
   const t = kep((((nay % VAN_MS) + VAN_MS) % VAN_MS) / VAN_CHOI_MS, 0, 1)
-  const he = Math.SQRT2 + (0.42 - Math.SQRT2) * t
+  const he = Math.SQRT2 + (heVongCuoi(bd) - Math.SQRT2) * t
   return { cx: bd.rong / 2, cy: bd.cao / 2, rx: (bd.rong / 2) * he, ry: (bd.cao / 2) * he }
 }
 export function ngoaiVong(v: Vong, x: number, y: number): boolean {
@@ -386,7 +437,8 @@ export function chonMucTieu(bd: BanDo, toi: { x: number; y: number; doi: number 
   }
   return id
 }
-const satThuongCua = (nv: NhanVat): number => SAT_THUONG_GIAY[kep(Math.round(nv.cap), 1, CAP_TOI_DA) - 1] * (laMay(nv.id) ? HE_MAY : 1)
+/** Máu / giây một phát bắn THẲNG của `nv` (Ma Mực: MM_SAT_GIAY; máy bù ×0,67). Máy chủ dùng cùng hàm để trừ máu Ma Mực. */
+export const satThuongCua = (nv: NhanVat): number => (nv.id === MA_MUC ? MM_SAT_GIAY : SAT_THUONG_GIAY[kep(Math.round(nv.cap), 1, CAP_TOI_DA) - 1] * (laMay(nv.id) ? HE_MAY : 1))
 /** Máu `toi` mất trong `giay` giây theo ảnh chụp `ds` (những nhân vật KHÁC). `ai` = mã kẻ gây nhiều nhất (để báo lượt hạ). `chay` = mã kẻ cầm
  *  Súng Lửa Màu (cấp 5) đang bắn THẲNG vào `toi` ('' = không) — đưa vào `nhanDon(…, chay)` để châm lửa. Đồng đội không bao giờ gây sát thương. */
 export function satThuong(toi: { id: string; x: number; y: number; doi: number }, ds: readonly NhanVat[], giay: number): { tong: number; ai: string; chay: string } {
@@ -421,6 +473,12 @@ export const matChay = (chayDen: number, nay: number, dtMs: number): number => (
 /** Chỗ hồi sinh quanh trại đội, lệch theo `hat` (0..1) để cả đội không chồng lên nhau. Có `nay` và trại đã nằm NGOÀI vòng an toàn (nửa sau ván — sân lớn
  *  thì đường về vòng dài gấp mấy lần) ⇒ hồi sinh ngay mép trong của vòng, trên đường từ trại về giữa sân, né vật chặn. */
 export function choTrai(bd: BanDo, doi: number, hat: number, nay?: number): Diem {
+  // Thầy (không đội) xuất hiện quanh tâm sân, lệch xuống dưới (tránh đè hộp tâm), né vật chặn.
+  if (doi === DOI_THAY) {
+    let x = bd.rong / 2 + Math.cos(hat * Math.PI * 2) * 60, y = bd.cao / 2 + 140
+    for (let i = 0; i < 24 && bi(bd, x, y); i++) { x += 23; y += 11 }
+    return { x, y }
+  }
   const t = bd.trai[kep(Math.floor(doi), 0, 3)], goc = hat * Math.PI * 2
   let x = t.x + Math.cos(goc) * 66, y = t.y + Math.sin(goc) * 44
   if (nay === undefined) return { x, y }
@@ -433,9 +491,12 @@ export function choTrai(bd: BanDo, doi: number, hat: number, nay?: number): Diem
 }
 export function taoToi(bd: BanDo, doi: number, nay: number, hat = 0): Toi {
   const p = choTrai(bd, doi, hat, nay)
-  return { x: p.x, y: p.y, mau: MAU_DAY, doi: kep(Math.floor(doi), 0, 3), cap: 1, chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, lucDong: nay, van: vanSo(nay), duong: [], chayDen: 0, chayAi: '' }
+  const d = doi === DOI_THAY ? DOI_THAY : kep(Math.floor(doi), 0, 3)
+  return { x: p.x, y: p.y, mau: mauDay(d), doi: d, cap: d === DOI_THAY ? CAP_THAY : 1, chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, lucDong: nay, van: vanSo(nay), duong: [], chayDen: 0, chayAi: '' }
 }
 export const dangChet = (tt: Toi, nay: number): boolean => tt.chetDen > nay
+/** Thầy bị hạ ⇒ 5 giây sau quay lại; em 3 giây. */
+export const hoiSinhMs = (doi: number): number => (doi === DOI_THAY ? HOI_SINH_THAY_MS : HOI_SINH_MS)
 /** Một khung hình: hồi sinh, đi (theo tay hoặc theo đường chạm), hồi máu, mất máu ngoài vòng. `dx, dy` trong [-1, 1]. */
 export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtMs: number, nay: number, hat = 0): Toi {
   if (tt.chetDen > nay) return tt
@@ -443,7 +504,7 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
   if (tt.chetDen) kq = { ...taoToi(bd, tt.doi, nay, hat), van: tt.van }
   const dt = Math.min(dtMs, 100) / 1000
   let { x, y, mau, duong } = kq, lucDong = kq.lucDong
-  const dai = Math.hypot(vao.dx, vao.dy), tocDo = dangNhanh(kq, nay) ? TOC_DO * HE_NHANH : TOC_DO
+  const dai = Math.hypot(vao.dx, vao.dy), goc = kq.doi === DOI_THAY ? TOC_DO_THAY : TOC_DO, tocDo = dangNhanh(kq, nay) ? goc * HE_NHANH : goc, day = mauDay(kq.doi)
   if (dai > 0.01) {
     const he = (Math.min(1, dai) / dai) * tocDo * dt, p = diChuyen(bd, x, y, vao.dx * he, vao.dy * he)
     if (p.x !== x || p.y !== y) lucDong = nay
@@ -456,17 +517,17 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
   let lucTrung = kq.lucTrung, chayAi = kq.chayAi
   // Khiên (hộp tiếp tế): không mất máu vì gì cả — kể cả cháy và ngoài vòng; vẫn hồi máu như thường.
   if (!dangNghi(nay) && coKhien(kq, nay)) {
-    if (mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
+    if (mau < day && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(day, mau + HOI_MOI_GIAY * dt)
   } else if (!dangNghi(nay)) {
     // Cháy (Súng Lửa Màu): trừ theo đúng khoảng thời gian đã trôi (không kẹp 100 ms như bước đi ⇒ tab chậm vẫn đủ 16 máu); bất tử thì không cháy.
     const chay = nay >= kq.batTuDen ? matChay(kq.chayDen, nay, dtMs) : 0
     if (chay > 0) { mau -= chay; lucTrung = nay }
     const vongMat = ngoaiVong(vong(bd, nay), x, y) && nay >= kq.batTuDen
     if (vongMat) { mau -= NGOAI_VONG_MOI_GIAY * dt; lucTrung = nay }
-    else if (!chay && mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
+    else if (!chay && mau < day && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(day, mau + HOI_MOI_GIAY * dt)
     if (mau <= 0 && !chay) chayAi = ''
   }
-  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + HOI_SINH_MS, chayDen: 0, chayAi, ...HET_HOP }
+  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + hoiSinhMs(kq.doi), chayDen: 0, chayAi, ...HET_HOP }
   return { ...kq, x, y, mau, duong, lucDong, lucTrung }
 }
 /** Trúng đạn `mat` máu; `chay` = mã kẻ cầm Súng Lửa Màu bắn thẳng (từ `satThuong`) ⇒ châm lửa 2 giây kể từ lúc này. Đang bị hạ / vừa hồi sinh / đang nghỉ
@@ -474,7 +535,7 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
 export function nhanDon(tt: Toi, mat: number, nay: number, chay = ''): Toi {
   if (mat <= 0 || tt.chetDen > nay || nay < tt.batTuDen || dangNghi(nay) || coKhien(tt, nay)) return tt
   const mau = tt.mau - mat
-  if (mau <= 0) return { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + HOI_SINH_MS, chayDen: 0, ...HET_HOP }
+  if (mau <= 0) return { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + hoiSinhMs(tt.doi), chayDen: 0, ...HET_HOP }
   return chay ? { ...tt, mau, lucTrung: nay, chayDen: nay + CHAY_MS, chayAi: chay } : { ...tt, mau, lucTrung: nay }
 }
 /** Súng của em đang ngừng bắn để ẩn: đứng yên trong bụi. */
@@ -482,5 +543,6 @@ export const dangAn = (bd: BanDo, tt: Toi, nay: number): boolean => nay - tt.luc
 /** Đọc một dòng ảnh chụp thành nhân vật (dòng hỏng ⇒ null). Bản 4: dòng không bắn ai chỉ có 5 phần tử (mục tiêu thiếu ⇒ ''). */
 export function docDong(id: string, d: SinhTonDong | readonly number[] | undefined): NhanVat | null {
   if (!Array.isArray(d) || d.length < 5 || !d.slice(0, 5).every((v) => typeof v === 'number' && Number.isFinite(v))) return null
-  return { id, x: d[0], y: d[1], mau: d[2], doi: kep(Math.floor(d[3]), 0, 3), cap: kep(Math.round(d[4]), 1, CAP_TOI_DA), t: typeof d[5] === 'string' ? d[5] : '' }
+  // «Đội» 4 chỉ dành cho bé ma Thầy (mã THAY); dòng khác mang 4 ⇒ kẹp về 3 như cũ.
+  return { id, x: d[0], y: d[1], mau: d[2], doi: id === THAY && d[3] === DOI_THAY ? DOI_THAY : kep(Math.floor(d[3]), 0, 3), cap: kep(Math.round(d[4]), 1, CAP_TOI_DA), t: typeof d[5] === 'string' ? d[5] : '' }
 }

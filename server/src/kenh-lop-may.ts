@@ -92,7 +92,9 @@ export class KenhLopMay {
       return true
     }
     if (j.k === 'tro') {
-      if (thay || !(st.live.khoi.gd === 'cho' || st.live.khoi.giaiLao)) return true
+      if (!(st.live.khoi.gd === 'cho' || st.live.khoi.giaiLao)) return true
+      // THẦY VÀO TRẬN (đợt 3): vai Thầy theo VAI KẾT NỐI (`gv`), không theo cờ trong gói ⇒ máy em không giả làm Thầy được. Chỉ có ở phòng live.
+      if (thay) { this.tro.nhanThay(x, nay); if (!this.hen && this.tro.soEm) this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS); return true }
       this.sbdWs.set(ws, a.s)
       this.tro.nhan(a.s, e!.doi, x, nay)
       if (!this.hen && this.tro.soEm) this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)

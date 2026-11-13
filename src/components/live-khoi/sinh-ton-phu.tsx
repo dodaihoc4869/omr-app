@@ -3,23 +3,31 @@
 // Chỉ TroSinhTon.tsx nhập (tĩnh) ⇒ nằm chung mảnh lười TroSinhTon. Khoá (`key`) để hiện lại hoạt hoạ đặt ở chỗ gọi, như cũ.
 import { useEffect, useRef } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
-import { CAP_TOI_DA, SUNG_TEN, type Diem, type LoaiHop } from '../../lib/live-khoi/sinh-ton-loi'
+import { CAP_TOI_DA, MAU_THAY, SUNG_TEN, type Diem, type LoaiHop } from '../../lib/live-khoi/sinh-ton-loi'
 import { BoHinh, type BangMau } from './sinh-ton-hinh'
-import { BIEU_CAM, KY_BIEU_CAM, THE_HOP, XEP_DOI, duoiBiHa } from './sinh-ton-ve'
+import { BIEU_CAM, KY_BIEU_CAM, THE_HOP, chuXep, duoiBiHa } from './sinh-ton-ve'
 import { bienDoi } from './sinh-ton-tien-ich'
 
 export interface ManhTin { c: string; doi?: number; noi?: boolean }
 export interface TinTran { id: number; het: number; manh: ManhTin[] }
 export interface Bao { kieu: 'meo' | 'an' | 'canh' | 'vui'; chu: string }
-export interface BiHa { ai: string; doi: number; giay: number }
-export interface KetQua { van: number; hang: { doi: number; diem: number; nhat: string; xep: number }[] }
+/** `thay` (đợt 3) = em bị bé ma Thầy hạ («BỊ THẦY GẠCH TÊN!»). */
+export interface BiHa { ai: string; doi: number; giay: number; thay?: boolean }
+/** `hoa` (đợt 3) = có đội khác cùng điểm ⇒ cùng hạng, chữ «Cùng …» (`chuXep`). */
+export interface KetQua { van: number; hang: { doi: number; diem: number; nhat: string; xep: number; hoa?: boolean }[] }
 /** Câu hô dạng con dấu đỏ (vàng cho câu mừng). */
 export interface Dau { id: number; chu: string; phu: string; vang: boolean }
 /** Dải báo truy nã thủ khoa (ảnh 07). */
 export interface TruyNa { id: number; ten: string; ha: number; em: boolean }
 /** Bảng vàng (5 giây nghỉ): top 3 em thật (`bv`), hạng của em (`hg`), ai đã diệt thủ khoa trong ván. */
 export interface DongVang { ten: string; ha: number; doi: number; em: boolean; tk: boolean }
-export interface Vang { top: DongVang[]; hg: number; haEm: number; dietTk: string[] }
+/** `haThay` (đợt 3) = em thật đã hạ gục Thầy trong ván (dòng «Đã hạ gục Thầy: …»). */
+export interface Vang { top: DongVang[]; hg: number; haEm: number; dietTk: string[]; haThay?: string[] }
+/** Thanh máu lớn (đợt 3, ảnh 10 · 11): Thầy (`mau` 0..2000) và / hoặc Ma Mực (`mau` / `max` + phần trăm sát thương bốn đội). */
+export interface ThanhLon { thay: number | null; boss: { mau: number; max: number; p: number[] } | null }
+/** Dải báo «THẦY ĐÃ VÀO TRẬN!» / «MA MỰC TRỒI LÊN GIỮA SÂN!» (dùng khung dải truy nã; bản êm: không nhấp nháy). */
+export interface DaiBao { id: number; chu: string; phu: string }
+const so = (n: number): string => Math.max(0, Math.round(n)).toLocaleString('vi').replace(/\./g, ' ')
 
 /** Hình bé ma của một đội (bảng hết ván; `to` = phóng — bục bảng vàng máy thầy; `vuong` = đội vương miện thủ khoa). Hình hộp (`hop`) = thẻ báo nhặt hộp. */
 function AnhMa({ bang, doi, to = 1, vuong = false, hop }: { bang: BangMau; doi: number; to?: number; vuong?: boolean; hop?: LoaiHop }) {
@@ -73,6 +81,44 @@ export function DaiTruyNa({ truyNa }: { truyNa: TruyNa }) {
   )
 }
 
+/** Thanh máu Thầy / Ma Mực ở đầu màn (cả lớp cùng thấy). */
+export function ThanhMau({ t }: { t: ThanhLon }) {
+  return (
+    <div className="st-hp" data-hai={t.thay !== null && t.boss ? '1' : undefined}>
+      {t.thay !== null ? (
+        <div className="st-hp-dong" role="meter" aria-label="Máu của Thầy" aria-valuemin={0} aria-valuemax={MAU_THAY} aria-valuenow={Math.round(t.thay)}>
+          <span className="st-hp-ten">Thầy · {so(t.thay)} / {so(MAU_THAY)} máu</span>
+          <span className="st-hp-vach"><i style={{ width: `${Math.max(0, Math.min(100, (100 * t.thay) / MAU_THAY))}%` }} /></span>
+        </div>
+      ) : null}
+      {t.boss ? (
+        <div className="st-hp-dong" role="meter" aria-label="Máu của Ma Mực" aria-valuemin={0} aria-valuemax={t.boss.max} aria-valuenow={Math.round(t.boss.mau)}>
+          <span className="st-hp-ten">Ma Mực · {so(t.boss.mau)} / {so(t.boss.max)} máu</span>
+          <span className="st-hp-vach"><i style={{ width: `${Math.max(0, Math.min(100, (100 * t.boss.mau) / Math.max(1, t.boss.max)))}%` }} /></span>
+          <span className="st-hp-doi" aria-label={`Sát thương bốn đội: ${DOI_BPU.map((d, i) => `${d.ky} ${t.boss!.p[i] ?? 0}%`).join(', ')}`}>
+            {DOI_BPU.map((d, i) => <i key={d.ky} style={{ ...bienDoi(i), flexGrow: t.boss!.p[i] ?? 0 }}><small>{d.ky} {t.boss!.p[i] ?? 0}%</small></i>)}
+          </span>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+export function DaiThongBao({ dai }: { dai: DaiBao }) {
+  return <div className="st-truy st-dai" role="status"><b>{dai.chu}</b><span>{dai.phu}</span></div>
+}
+/** Máy thầy (chỉ phòng chờ live): nút «Thầy vào trận / Rời trận» (≥ 44 px) + trạng thái máu + gợi ý điều khiển. */
+export function NutThay({ trong, mau, bam }: { trong: boolean; mau: number; bam: () => void }) {
+  return (
+    <div className="st-thay">
+      {trong ? <p className="st-thay-goi">Thầy chạm vào sân để bé ma Thầy chạy tới · bút đỏ tự bắn · bị hạ thì 5 giây sau quay lại</p> : null}
+      <div className="st-thay-hang">
+        {trong ? <span className="st-thay-the" role="status"><i aria-hidden="true" />Thầy đang trong trận · máu {so(mau)} / {so(MAU_THAY)}</span> : null}
+        <button type="button" className="st-thay-nut" data-trong={trong ? '1' : undefined} onClick={bam}>{trong ? 'Rời trận' : 'Thầy vào trận'}</button>
+      </div>
+    </div>
+  )
+}
+
 /** Thanh cấp súng của em (Pháo Sao tạm ⇒ cấp 6 đếm giây). */
 export function ThanhSung({ cap, sao }: { cap: number; sao: number }) {
   return (
@@ -106,8 +152,8 @@ export function DauHo({ dau }: { dau: Dau }) {
 export function TheBiHa({ biHa, banEm, tenToi }: { biHa: BiHa; banEm: boolean; tenToi: string }) {
   return (
     <div className="st-ha" role="status">
-      {banEm ? null : <div className="st-dau st-dau-ha"><b>TRƯỢT ĐẠI HỌC RỒI!</b></div>}
-      <h2>{biHa.ai ? <><b style={bienDoi(biHa.doi)}>{biHa.ai}</b> {duoiBiHa(banEm)}</> : 'Em hết máu ngoài phòng thi'}</h2>
+      {banEm ? null : <div className="st-dau st-dau-ha"><b>{biHa.thay ? 'BỊ THẦY GẠCH TÊN!' : 'TRƯỢT ĐẠI HỌC RỒI!'}</b></div>}
+      <h2>{biHa.thay ? 'Thầy gạch tên em' : biHa.ai ? <><b style={biHa.doi >= 0 && biHa.doi < 4 ? bienDoi(biHa.doi) : undefined}>{biHa.ai}</b> {duoiBiHa(banEm)}</> : 'Em hết máu ngoài phòng thi'}</h2>
       <div className="st-dem">{biHa.giay}</div>
       <p>Thi lại ở phía trại {tenToi} sau {biHa.giay} giây</p>
     </div>
@@ -117,6 +163,10 @@ export function TheBiHa({ biHa, banEm, tenToi }: { biHa: BiHa; banEm: boolean; t
 /** Hết ván: bục bảng vàng máy thầy (ảnh 13) · thẻ cuối ván máy em có bảng vàng (ảnh 14) · thẻ bốn đội (đợt 1). */
 export function TheCuoiVan({ ketQua, vang, xem, bang, doiToi, banEm }: { ketQua: KetQua; vang: Vang | null; xem: boolean; bang: BangMau | null; doiToi: number; banEm: boolean }) {
   const nhat = ketQua.hang[0].diem > (ketQua.hang[1]?.diem ?? 0) ? ketQua.hang[0] : null
+  // Hoà NHẤT (đợt 3): hai – ba đội cùng điểm cao nhất (> 0, không phải cả bốn) ⇒ «Natri, Kali cùng đỗ thủ khoa», không ghi «hoà».
+  const dongNhat = ketQua.hang.filter((h) => h.xep === 0)
+  const tieuDe = nhat ? <><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van}!</> : dongNhat.length > 1 && dongNhat.length < ketQua.hang.length && dongNhat[0].diem > 0
+    ? <><b>{dongNhat.map((h) => DOI_BPU[h.doi].ten).join(', ')}</b> cùng đỗ thủ khoa ván {ketQua.van}!</> : `Hết ván ${ketQua.van} · hoà`
   const hangEm = !xem ? ketQua.hang.find((h) => h.doi === doiToi) : undefined
   // Bảng vàng có ít nhất một dòng (hoặc hạng của em) ⇒ thẻ cuối ván kiểu ảnh 14 / bục lớn máy thầy kiểu ảnh 13; không thì thẻ bốn đội như đợt 1.
   const coVang = !!vang && (vang.top.length > 0 || (!xem && vang.hg > 0))
@@ -138,34 +188,36 @@ export function TheCuoiVan({ ketQua, vang, xem, bang, doiToi, banEm }: { ketQua:
         })}
       </div>
       <div className="st-vv-ben">
-        {nhat ? <p style={bienDoi(nhat.doi)}><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van} · {nhat.diem} lượt hạ</p> : <p>Hết ván {ketQua.van} · hoà</p>}
-        <p>{ketQua.hang.filter((h) => h !== nhat).map((h) => <span key={h.doi}>{XEP_DOI[h.xep]}: <b style={bienDoi(h.doi)}>{DOI_BPU[h.doi].ten}</b> · {h.diem}</span>)}</p>
+        {nhat ? <p style={bienDoi(nhat.doi)}><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van} · {nhat.diem} lượt hạ</p> : <p>{tieuDe}</p>}
+        <p>{ketQua.hang.filter((h) => h !== nhat).map((h) => <span key={h.doi}>{chuXep(h.xep, !!h.hoa)}: <b style={bienDoi(h.doi)}>{DOI_BPU[h.doi].ten}</b> · {h.diem}</span>)}</p>
         {vang.dietTk.length ? <p><em>Đã tiêu diệt thủ khoa:</em> {vang.dietTk.join(', ')}</p> : null}
+        {vang.haThay?.length ? <p><em>Đã hạ gục Thầy:</em> {vang.haThay.join(', ')}</p> : null}
         <small>Ván mới sau vài giây</small>
       </div>
     </div>
   ) : coVang && vang ? (
     // Thẻ cuối ván máy em (ảnh 14): đội thắng · hạng đội em · lượt hạ + hạng của em · top 3 lớp.
     <div className="st-kq" data-vang="1" role="status" style={bienDoi(ketQua.hang[0].doi)}>
-      <h2>{nhat ? <><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van}!</> : `Hết ván ${ketQua.van} · hoà`}</h2>
-      {hangEm && !banEm ? <span className="st-kq-dau">{XEP_DOI[hangEm.xep]}</span> : null}
-      {hangEm ? <p>Đội em (<b style={bienDoi(hangEm.doi)}>{DOI_BPU[hangEm.doi].ten}</b>): {XEP_DOI[hangEm.xep].toLocaleLowerCase('vi')} · {hangEm.diem} lượt hạ</p> : null}
+      <h2>{tieuDe}</h2>
+      {hangEm && !banEm ? <span className="st-kq-dau">{chuXep(hangEm.xep, !!hangEm.hoa)}</span> : null}
+      {hangEm ? <p>Đội em (<b style={bienDoi(hangEm.doi)}>{DOI_BPU[hangEm.doi].ten}</b>): {chuXep(hangEm.xep, !!hangEm.hoa).toLocaleLowerCase('vi')} · {hangEm.diem} lượt hạ</p> : null}
       <p>Em: <b>{vang.haEm} lượt hạ</b>{vang.hg ? ` · hạng ${vang.hg} trong lớp` : ''}</p>
       {vang.top.length ? <ol>{vang.top.map((r, k) => <li key={k} data-toi={r.em ? '1' : undefined}>{r.ten} · {r.ha} lượt hạ{r.tk ? ' · thủ khoa' : ''}</li>)}</ol> : null}
+      {vang.haThay?.length ? <p>Đã hạ gục Thầy: <b>{vang.haThay.join(', ')}</b></p> : null}
       <p className="st-sau">Ván mới bắt đầu sau vài giây</p>
     </div>
   ) : (
     <div className="st-kq" role="status" style={bienDoi(ketQua.hang[0].doi)}>
-      <h2>{nhat ? <><b>{DOI_BPU[nhat.doi].ten}</b> đỗ thủ khoa ván {ketQua.van}!</> : `Hết ván ${ketQua.van} · hoà`}</h2>
+      <h2>{tieuDe}</h2>
       {ketQua.hang.map((h) => (
         <div key={h.doi} className="st-dong" data-nhat={nhat && h.doi === nhat.doi ? '1' : undefined} data-toi={hangEm && h.doi === doiToi ? '1' : undefined} style={bienDoi(h.doi)}>
           <span className="st-hang">{h.xep + 1}</span>
           {bang ? <AnhMa bang={bang} doi={h.doi} /> : null}
-          <span className="st-t">{DOI_BPU[h.doi].ten} · {XEP_DOI[h.xep]}{h.nhat ? <small>{h.nhat}</small> : null}</span>
+          <span className="st-t">{DOI_BPU[h.doi].ten} · {chuXep(h.xep, !!h.hoa)}{h.nhat ? <small>{h.nhat}</small> : null}</span>
           <span className="st-d">{h.diem}<small>lượt hạ</small></span>
         </div>
       ))}
-      <p>{hangEm ? `Đội em: ${XEP_DOI[hangEm.xep]} · ` : ''}Ván mới bắt đầu sau vài giây · mọi người về trại đội mình</p>
+      <p>{hangEm ? `Đội em: ${chuXep(hangEm.xep, !!hangEm.hoa)} · ` : ''}Ván mới bắt đầu sau vài giây · mọi người về trại đội mình</p>
     </div>
   )
 }
