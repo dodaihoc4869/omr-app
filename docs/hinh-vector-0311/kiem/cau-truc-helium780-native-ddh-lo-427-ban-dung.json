@@ -1,0 +1,40 @@
+[
+  {
+    "i": 780,
+    "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+    "fileNguon": "anh/91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9.png",
+    "svg": "helium780-native-ddh-0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1.svg",
+    "hashSvg": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+    "byteSvg": 1176,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-1",
+        "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+        "refs": [
+          {
+            "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+            "where": "10-C1-B3-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-97",
+        "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+        "refs": [
+          {
+            "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+            "where": "DB-10-B1-D1-II-97.hinh.0.du_lieu",
+            "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1GRAYorbit-2GRAYelectrons-4GRAYnucleons/6individualshadedellipsesOVERorbit/0glyph-charge-arrows-caption/NOaddedproton-neutron-colors-signs-numbers/scanGrainNOTextraParticles/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

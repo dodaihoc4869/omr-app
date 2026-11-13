@@ -1,0 +1,13 @@
+{
+  "lo": 427,
+  "main": "1ca269c3dfe097d0446c311810e9561b7829b285",
+  "previousMain": "904fc77bd648075910241ea5db55ad4379734a15",
+  "diffStat": " .github/workflows/soi-18-4-6-1211.yml |  5 +++++\n DIEU-PHOI.md                          |  1 +\n scripts/soi-5-em-de28-1311.mjs        | 10 ++++++++++\n 3 files changed, 16 insertions(+)\n",
+  "notMerged": true,
+  "changedPaths": [
+    ".github/workflows/soi-18-4-6-1211.yml",
+    "DIEU-PHOI.md",
+    "scripts/soi-5-em-de28-1311.mjs"
+  ],
+  "note": "Main mới chỉ workflow/script chẩn đoán và nhật ký; không app/server/Vite/DDHfont/mốc. Không gộp. Latestmainbuild-speed/fullTHEOTÊN/cathi/nooverlap trướcmerge-release vẫn bắtbuộc."
+}

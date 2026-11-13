@@ -1,0 +1,293 @@
+{
+  "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+  "native": [
+    334,
+    307
+  ],
+  "questions": [
+    {
+      "qid": "10-C1-B3-D2-II-1",
+      "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+      "refs": [
+        {
+          "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+          "where": "10-C1-B3-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-97",
+      "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+      "refs": [
+        {
+          "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+          "where": "DB-10-B1-D1-II-97.hinh.0.du_lieu",
+          "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "1GRAYorbit-2GRAYelectrons-4GRAYnucleons/6individualshadedellipsesOVERorbit/0glyph-charge-arrows-caption/NOaddedproton-neutron-colors-signs-numbers/scanGrainNOTextraParticles/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all2publicde10-C1-B3-D2-II-1/DB-10-B1-D1-II-97; OWNnucleus10x/electron20x. One orbit gray, two foreground electrons, four overlapping shaded central particles. No particle species inferred from shade. No text, arrows or signs. NativeapproxNOTsubpixel; scanner grain not traced as extra dots.",
+  "sourceIndependentAudit": {
+    "i": 780,
+    "assetIndexProvided": 34,
+    "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9.png",
+    "size": [
+      334,
+      307
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "10-C1-B3-D2-II-1",
+        "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+        "allHinh": [
+          {
+            "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+            "where": "10-C1-B3-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+          }
+        ],
+        "missingHashes": [
+          "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9"
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-97",
+        "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+        "allHinh": [
+          {
+            "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+            "where": "DB-10-B1-D1-II-97.hinh.0.du_lieu",
+            "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7"
+          }
+        ],
+        "missingHashes": [
+          "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 2,
+      "eachAffectedQuestionOnlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/427-780-full4x.png",
+        "/workspace/scratch/427-780-nucleus8x.png",
+        "/workspace/scratch/427-780-dot18x.png",
+        "/workspace/scratch/427-780-dot28x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "classification": "Grayscaleillustratedatomicmodelwithsimpleorbitandshadedspheres, NOT realphotograph. Rasterpixelation/printgrainnotparticledata; drawmanualgradientcircles/ellipses, notautotrace.",
+    "geometry": {
+      "counts": {
+        "orbit": 1,
+        "electronSpheres": 2,
+        "visibleNucleusLobes": 4,
+        "totalVisibleSpheres": 6,
+        "labels": 0,
+        "charges": 0,
+        "arrows": 0
+      },
+      "orbit": {
+        "centerApprox": [
+          169.5,
+          149.5
+        ],
+        "rxApprox": 121,
+        "ryApprox": 121,
+        "bboxApprox": [
+          48.5,
+          28.5,
+          290.5,
+          270.5
+        ],
+        "strokeWidthApprox": 1.2,
+        "colorApprox": "#929292",
+        "continuousBehindDots": true
+      },
+      "electronSpheres": [
+        {
+          "centerApprox": [
+            79,
+            71
+          ],
+          "radiusApprox": 8.5,
+          "bboxApprox": [
+            70.5,
+            62.5,
+            87.5,
+            79.5
+          ],
+          "highlightCenterApprox": [
+            82.5,
+            69
+          ],
+          "highlightRadiusApprox": 2.2
+        },
+        {
+          "centerApprox": [
+            261,
+            228
+          ],
+          "radiusApprox": 8.5,
+          "bboxApprox": [
+            252.5,
+            219.5,
+            269.5,
+            236.5
+          ],
+          "highlightCenterApprox": [
+            264,
+            225.5
+          ],
+          "highlightRadiusApprox": 2.1
+        }
+      ],
+      "nucleus": [
+        {
+          "id": "upperLeft",
+          "centerApprox": [
+            159,
+            139
+          ],
+          "radiusApprox": [
+            13,
+            13.5
+          ],
+          "visibleBBoxApprox": [
+            146,
+            126,
+            172,
+            152.5
+          ],
+          "highlightCenterApprox": [
+            164,
+            136.5
+          ],
+          "highlightRadiusApprox": 3.5
+        },
+        {
+          "id": "upperRight",
+          "centerApprox": [
+            179,
+            139
+          ],
+          "radiusApprox": [
+            12,
+            12.5
+          ],
+          "visibleBBoxApprox": [
+            167,
+            126.5,
+            191,
+            151.5
+          ],
+          "highlightCenterApprox": [
+            183,
+            138
+          ],
+          "highlightRadiusApprox": 3.3
+        },
+        {
+          "id": "lowerLeft",
+          "centerApprox": [
+            158,
+            159
+          ],
+          "radiusApprox": [
+            12,
+            12.5
+          ],
+          "visibleBBoxApprox": [
+            146,
+            146.5,
+            170,
+            171.5
+          ],
+          "highlightCenterApprox": [
+            161,
+            161
+          ],
+          "highlightRadiusApprox": 3.0
+        },
+        {
+          "id": "lowerRight",
+          "centerApprox": [
+            178,
+            158
+          ],
+          "radiusApprox": [
+            12.5,
+            13
+          ],
+          "visibleBBoxApprox": [
+            165.5,
+            145,
+            190.5,
+            171
+          ],
+          "highlightCenterApprox": [
+            181,
+            154.5
+          ],
+          "highlightRadiusApprox": 3.5
+        }
+      ],
+      "nucleusOcclusion": "Fourlobes2×2cluster. Lowerleftpartlybehindupperleft; rightlowerpartlyoverupperright/leftlower. Do notseparatespheresbywhitespaceoraddhiddenparticles. ApproxmanualorderlowerLeft,upperRight,upperLeft,lowerRight; adjusttoactualvisibleoverlap.",
+      "shading": {
+        "palette": "GRAYONLY, noelementcolorcoding",
+        "bodyApprox": "#929292",
+        "shadowApprox": "#777777",
+        "highlightApprox": "#bebebe",
+        "outline": "Softdarkgrayedge, notblackharduniformring",
+        "style": "Subtlesphericalradialhighlightupperright; preservegrayscaleillustration, no photorealisticmetal/gloss."
+      },
+      "noAdded": [
+        "No +/−signs",
+        "No proton/neutronnames",
+        "No atomicnumber/mass",
+        "No nucleuslabels",
+        "No motionarrow",
+        "No extraorbits",
+        "No electronnegativeglyphs",
+        "No colorcodingfromheliumtheory"
+      ]
+    },
+    "measurementLimits": "Nativeapproxgeometry±1–2px, shadedsphereocclusionnotexactdisksegmentation. Ownnucleus8x shows4visiblelobes; particlelabels/typesnotinferredfrompublicheliumname. Orbitnearcircleactualapproxradii, no science-valueinference.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "hashSvg": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+    "ownNativeFull": true,
+    "allPublicRefs": 2,
+    "ownFreshChromiumFull3x": true,
+    "ownMacros": [
+      "root780-final-center.png",
+      "root780-final-electron.png"
+    ],
+    "verdict": "Đạt",
+    "detail": "Root opened FINALFULL3x and freshcenter/electron macros:4central visiblelobes continuous shadow-center/2electrons OVERonegrayorbit, correctnativeapproxspace/palette. No text/charge/arrows; no interpretationparticletypes. First601tooheavystroke/highlight/anchornegative; 7edecentralwhiteslitnegative; FINALonlyinnerunderfillversus7ede preservesotherSVGXMLchildrenEXACT."
+  },
+  "rootOldNewXmlAudit": {
+    "intermediateHash": "7ede5da6e15fcf71b4a30660b565143510f41241902c86e1cc953cf88fffc233",
+    "finalHash": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+    "change": "Only add quadrilateralshadowunderfill inside4centersbefore6ellipses; 4visiblelobesremain. No5thparticle. AllpreviousXMLchildrenEXACT.",
+    "oldChildren": 10,
+    "newChildren": 11,
+    "onlyInsertedZeroBasedChild": 4,
+    "allPreviousChildrenExact": true
+  },
+  "readonlyRuntimeAudit": {
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/helium780-native-ddh-0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1.svg 0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1\n780 { x: 0, y: 0, width: 334, height: 307 }\n\nPOSTSHOT_SHA 0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1\nCOMMAND node /workspace/scratch/agent-render427.cjs\nCONTEXT 10-C1-B3-D2-II-1.hinh.0_du_lieu and DB-10-B1-D1-II-97.hinh.0.du_lieu public de/all2refs only; no answers.\n",
+    "sha256": "67f7fb51675d9f7c655fc27bc471204256120c07ab64499da83a0adde8f20434"
+  }
+}

@@ -3565,6 +3565,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9": {
+      "tep": "helium780-native-ddh-0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1.svg",
+      "hashSvg": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+      "byteSvg": 1176,
+      "byteGzip": 435,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce": {
       "tep": "ms437-native-ddh-ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7.svg",
       "hashSvg": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7",
@@ -9959,6 +9968,20 @@
           "where": "10-C1-B3-D2-I-22.hinh.0.du_lieu",
           "hashDataUrl": "76179f28f056d5ac027b05d8893f522c76debc293f3b067495d8377c10e0394b",
           "vector": "hydrogen-ao-ddh-de03a0752d568dee0a10e9f6b03184ef7f3d4c2e48752dfb195b36b188d43485.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D2-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+          "where": "10-C1-B3-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7",
+          "vector": "helium780-native-ddh-0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1.svg"
         }
       ]
     },
@@ -17445,6 +17468,20 @@
           "where": "DB-10-B1-D1-I-96.hinh.0.du_lieu",
           "hashDataUrl": "76179f28f056d5ac027b05d8893f522c76debc293f3b067495d8377c10e0394b",
           "vector": "hydrogen-ao-ddh-de03a0752d568dee0a10e9f6b03184ef7f3d4c2e48752dfb195b36b188d43485.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-97",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+          "where": "DB-10-B1-D1-II-97.hinh.0.du_lieu",
+          "hashDataUrl": "3cb1eb2283e251a877ed89a108a407ac0b4461ba157a043ecc14e3dca6449fa7",
+          "vector": "helium780-native-ddh-0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1.svg"
         }
       ]
     },
@@ -32124,6 +32161,7 @@
     "10-C1-B3-D2-I-2",
     "10-C1-B3-D2-I-8",
     "10-C1-B3-D2-I-22",
+    "10-C1-B3-D2-II-1",
     "10-C1-B3-D2-II-3",
     "10-C1-B3-D2-II-5",
     "10-C1-B3-D2-II-11",
@@ -32606,6 +32644,7 @@
     "DB-10-B1-D1-I-87",
     "DB-10-B1-D1-I-95",
     "DB-10-B1-D1-I-96",
+    "DB-10-B1-D1-II-97",
     "DB-10-B1-D1-II-99",
     "DB-10-B1-D1-II-101",
     "DB-10-B1-D1-II-102",

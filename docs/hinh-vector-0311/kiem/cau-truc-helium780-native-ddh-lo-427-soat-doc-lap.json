@@ -1,0 +1,17 @@
+[
+  {
+    "i": 780,
+    "hashSvg": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/all2publicde-refs và fresh Chromium3x FULL/macro nucleus/electrons/nativecore. Đúng1grayorbit,2gray shaded electron đè orbit và4visible overlapping corelobes; upperleft/lowerleft cùng hướng highlight về upperRIGHT/lowerRIGHT tương ứng native. Central vùng liền gray không white slit, underfill không tạo lobe thứ5; không suy grain thành particles. Occlusion/positions/shape phù hợp nguồn ở mức nativeapprox, không coi là subpixel; không thêm glyph/charge/orbit/arrow/caption. Bounds sạch, actualSHApre/post đúng FINAL không carry initial/intermediate.",
+    "render": "/workspace/scratch/soat427-780-fresh.png",
+    "macro": [
+      "/workspace/scratch/helium780-core.png",
+      "/workspace/scratch/helium780-electronL.png",
+      "/workspace/scratch/helium780-electronR.png",
+      "/workspace/scratch/helium780-nativecore.png"
+    ],
+    "hash": "91d2bc19d2a6ea61b0cfe27f3d01d035780d61b9ecca0ce3dd1e3a4a54a933f9",
+    "hashSvgDaSoat": "0a49c04489c28999d96b2b85879e3cdf6ffe27cde8fc92c31ed7b394475c0cf1"
+  }
+]
