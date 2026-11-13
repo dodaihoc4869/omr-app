@@ -1,0 +1,29 @@
+[
+  {
+    "i": 722,
+    "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+    "fileNguon": "anh/87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4.png",
+    "svg": "poly722-native-ddh-e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e.svg",
+    "hashSvg": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "byteSvg": 15934,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D1-I-14",
+        "de": "Polymer X được dùng để sản xuất một loại chất dẻo an toàn thực phẩm, được sử dụng để chế tạo chai lọ đựng nước, bao bì đựng thực phẩm.\nCho cấu tạo của một đoạn mạch trong phân tử polymer X như hình dưới.\nTên của X là",
+        "refs": [
+          {
+            "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+            "where": "12-KT-C1234-D1-I-14.hinh.0.du_lieu",
+            "hashDataUrl": "c8ee9c2cba971cb95d5b5c11378fe27e402dcdcb94770eff39e95450673820a7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C24Hliteral/8backboneCH2-CH-CH-CH2-CH2-CH-CH2-CH/4CH3branches2DOWN3UP6DOWN8UP/FIRSTCanchors-SUB23/ALLregularUPRIGHTBLACK/0internalhorizontalbonds-2freeends-2ellipsis3dotsEACH/0bracket-n-caption-name-answer/NOalias714874/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

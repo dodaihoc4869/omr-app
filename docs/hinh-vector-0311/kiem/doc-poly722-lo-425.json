@@ -1,0 +1,403 @@
+{
+  "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+  "native": [
+    632,
+    251
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C1234-D1-I-14",
+      "de": "Polymer X được dùng để sản xuất một loại chất dẻo an toàn thực phẩm, được sử dụng để chế tạo chai lọ đựng nước, bao bì đựng thực phẩm.\nCho cấu tạo của một đoạn mạch trong phân tử polymer X như hình dưới.\nTên của X là",
+      "refs": [
+        {
+          "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+          "where": "12-KT-C1234-D1-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "c8ee9c2cba971cb95d5b5c11378fe27e402dcdcb94770eff39e95450673820a7"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "12C24Hliteral/8backboneCH2-CH-CH-CH2-CH2-CH-CH2-CH/4CH3branches2DOWN3UP6DOWN8UP/FIRSTCanchors-SUB23/ALLregularUPRIGHTBLACK/0internalhorizontalbonds-2freeends-2ellipsis3dotsEACH/0bracket-n-caption-name-answer/NOalias714874/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL1x2x/all1publicde12-KT-C1234-D1-I-14. 8backboneC4CH3=12C24Hliteral. 4individualbranches2down3up6down8up; NOinternalhorizontalbonds. 2freeends6dots. Noalias714874/noanswer.",
+  "independentSourceAudit": {
+    "i": 722,
+    "assetIndexProvided": 607,
+    "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4.png",
+    "size": [
+      632,
+      251
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C1234-D1-I-14",
+        "de": "Polymer X được dùng để sản xuất một loại chất dẻo an toàn thực phẩm, được sử dụng để chế tạo chai lọ đựng nước, bao bì đựng thực phẩm.\nCho cấu tạo của một đoạn mạch trong phân tử polymer X như hình dưới.\nTên của X là",
+        "allHinh": [
+          {
+            "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+            "where": "12-KT-C1234-D1-I-14.hinh.0.du_lieu",
+            "hashDataUrl": "c8ee9c2cba971cb95d5b5c11378fe27e402dcdcb94770eff39e95450673820a7"
+          }
+        ],
+        "missingHashes": [
+          "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/425-native722-4x.png",
+        "/workspace/scratch/425-722-body3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "selectionAudit": {
+      "candidate944": "Openednative944hashaa7a943…cc82: chemical+REALflowerphoto composite, rejectedforpurevectorbatch; no photoimitated/noCount.",
+      "selected722": "Cleanreadableprintedchainnoedgefragment/charges/missingglyph; independentlyverifiedhashabsentmanifest."
+    },
+    "geometry": {
+      "counts": {
+        "backboneC": 8,
+        "backboneCH2": 4,
+        "backboneCH": 4,
+        "methylBranches": 4,
+        "visibleC": 12,
+        "visibleHFromLabels": 24,
+        "ellipsisGroups": 2,
+        "dotsEach": 3,
+        "externalFreeBondStrokes": 2,
+        "internalHorizontalBondStrokes": 0,
+        "verticalBranchStrokes": 4,
+        "brackets": 0,
+        "repeatN": 0
+      },
+      "font": "Regularuprightserif CH/CH2/CH3, noactualboldclaim; sourceblur/graystrokevariationnotintentionalweight/colorchange.2/3SUB. No captions.",
+      "backboneLiteral": "CH₂CHCHCH₂CH₂CHCH₂CH",
+      "backboneTokens": [
+        {
+          "text": "CH₂",
+          "bbox": [
+            110,
+            113,
+            168,
+            143
+          ],
+          "firstCcenterApprox": [
+            121,
+            125
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            170,
+            113,
+            214,
+            137
+          ],
+          "firstCcenterApprox": [
+            179,
+            125
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            215,
+            113,
+            260,
+            137
+          ],
+          "firstCcenterApprox": [
+            221,
+            125
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            262,
+            113,
+            319,
+            143
+          ],
+          "firstCcenterApprox": [
+            273,
+            125
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            321,
+            113,
+            377,
+            143
+          ],
+          "firstCcenterApprox": [
+            332,
+            125
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            379,
+            113,
+            425,
+            137
+          ],
+          "firstCcenterApprox": [
+            389,
+            125
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            426,
+            113,
+            484,
+            143
+          ],
+          "firstCcenterApprox": [
+            437,
+            125
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            485,
+            113,
+            529,
+            137
+          ],
+          "firstCcenterApprox": [
+            491,
+            125
+          ]
+        }
+      ],
+      "mainBaselineApprox": 136,
+      "branches": [
+        {
+          "backboneToken": 2,
+          "direction": "DOWN",
+          "vertical": [
+            [
+              179,
+              141
+            ],
+            [
+              179,
+              166
+            ]
+          ],
+          "label": {
+            "literal": "CH₃",
+            "bbox": [
+              170,
+              170,
+              226,
+              198
+            ],
+            "baselineApprox": 193,
+            "firstCcenterApprox": [
+              179,
+              183
+            ]
+          }
+        },
+        {
+          "backboneToken": 3,
+          "direction": "UP",
+          "vertical": [
+            [
+              220,
+              84
+            ],
+            [
+              220,
+              109
+            ]
+          ],
+          "label": {
+            "literal": "CH₃",
+            "bbox": [
+              212,
+              56,
+              269,
+              86
+            ],
+            "baselineApprox": 80,
+            "firstCcenterApprox": [
+              221,
+              69
+            ]
+          }
+        },
+        {
+          "backboneToken": 6,
+          "direction": "DOWN",
+          "vertical": [
+            [
+              389,
+              141
+            ],
+            [
+              389,
+              165
+            ]
+          ],
+          "label": {
+            "literal": "CH₃",
+            "bbox": [
+              380,
+              170,
+              437,
+              198
+            ],
+            "baselineApprox": 193,
+            "firstCcenterApprox": [
+              389,
+              183
+            ]
+          }
+        },
+        {
+          "backboneToken": 8,
+          "direction": "UP",
+          "vertical": [
+            [
+              491,
+              83
+            ],
+            [
+              491,
+              108
+            ]
+          ],
+          "label": {
+            "literal": "CH₃",
+            "bbox": [
+              482,
+              55,
+              539,
+              85
+            ],
+            "baselineApprox": 80,
+            "firstCcenterApprox": [
+              491,
+              68
+            ]
+          }
+        }
+      ],
+      "branchAnchors": "All4stemsalignFIRST C ofCHnotHglyph; preserveglyphgapsatbothends, notdrawthroughletter.",
+      "leftEnd": {
+        "ellipsisCenters": [
+          [
+            58,
+            126
+          ],
+          [
+            67,
+            126
+          ],
+          [
+            76,
+            126
+          ]
+        ],
+        "radiusApprox": 2,
+        "bond": [
+          [
+            80,
+            126
+          ],
+          [
+            104,
+            126
+          ]
+        ]
+      },
+      "rightEnd": {
+        "bond": [
+          [
+            530,
+            125
+          ],
+          [
+            554,
+            125
+          ]
+        ],
+        "ellipsisCenters": [
+          [
+            560,
+            125
+          ],
+          [
+            569,
+            125
+          ],
+          [
+            577,
+            125
+          ]
+        ],
+        "radiusApprox": 2
+      },
+      "spacing": "AdjacentbackbonetokenswithNO internaldrawnhyphen/bond. Keepnativecompactletterspacing; allbranchplacementliteral2/3/6/8.",
+      "crop": "No chemicalglyphcropped, native632×251 includeswhitemargins. No textfragmentrestore. Backgroundfaintirregulargrayscanflecksnotinterpretedasradicaldots; only6stronginlineellipsiscounted.",
+      "noAdded": [
+        "No polymernameanswer",
+        "No bracketsn",
+        "No internalhorizontalbonds",
+        "No bareC atfreeends/ellipsis",
+        "No stereochemistry",
+        "No extraHlabels"
+      ]
+    },
+    "measurementLimits": "OwnnativeFULL4xandfreshbody3xopened. Coordinatesnativeapprox±1–2px; useFIRSTCanchorcentersratherthanH/subscript. Visible12C24HfromliteralCH2/CH/CH3, unknownpolymeroutsideellipsisnotcounted.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootOldNewXmlAudit": {
+    "children": 21,
+    "changed": [
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "oldHash": "2f7ab7e4209917a886a521b0ce8c4417dfb7d5655352dfc5cc3bb54e6b31d7f4",
+    "newHash": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "reason": "ONLYglyphanchors-main3/4/5/7/8-top2CH3,3branchendpoints,leftfreeend,ellipsiscenters; ALL12glyphgroupsPATHdataEXACT/literalsEXACT. Noinkcollisionclaim."
+  },
+  "rootActualReview": {
+    "hashSvg": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "ketQua": "Đạtrootactual",
+    "source": "RootOWNnativeFULL1x2x/all1publicde. NativeapproxNOTsubpixel.",
+    "actual": "FreshChromiumFULL3x/root425-722.png opened; EACHhalfmacro plus narrowLASTsub2-C8 gap18x opened. All8tokens4CH3/12C24H directions2DOWN3UP6DOWN8UP/stemsFIRSTC; 0internalbonds2freeends6dots; noaddedanswer. ThinWHITEgap lastsub2-C8 confirmed noinkcollision."
+  }
+}

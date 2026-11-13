@@ -1,0 +1,23 @@
+[
+  {
+    "i": 722,
+    "hashSvg": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và fresh FINALChromium3x FULL/macro main/4stems/2ends/CH-CH/sub2C8nearestzoom. Giữ8backboneCH₂CHCHCH₂CH₂CHCH₂CH và4CH₃branches2DOWN3UP6DOWN8UP=12C24H literal. Không internalhorizontalbonds, hai freeends/hai ellipsis3dotsEACH. FIRSTCanchors của từng nhóm/stem giữ native; chữ allregularupright/sub23black. Narrow actual sub2-C8 có khe trắng mảnh, CH-CH và stemglyph cũng không đen nối, không tràn/cắt mới. Không thêm n/bracket/name/answer; SHApre/post đúng finale2169, không carry initial2f7.",
+    "render": "/workspace/scratch/soat425-final-722-fresh.png",
+    "macro": [
+      "/workspace/scratch/poly722-final-left.png",
+      "/workspace/scratch/poly722-final-right.png",
+      "/workspace/scratch/poly722-final-main.png",
+      "/workspace/scratch/poly722-final-CHCH.png",
+      "/workspace/scratch/poly722-final-sub2C8.png",
+      "/workspace/scratch/poly722-final-sub2C8-narrow.png"
+    ],
+    "hash": "87294414104b6383d4b8e1f3772442edb5c53b8cb51c588903d8b4c4dbc484a4",
+    "hashSvgDaSoat": "e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e",
+    "runtimeAudit": {
+      "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/poly722-native-ddh-e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e.svg e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e\n722 { x: 0, y: 0, width: 632, height: 251 }\n\nPOSTSHOT_SHA e2169a2078396c8bdc51ae67426d778241a15cb4c6c1aa009d3de20c20e8584e\nCOMMAND node /workspace/scratch/agent-render425-final.cjs\nCONTEXT 12-KT-C1234-D1-I-14.hinh.0.du_lieu public de/one ref only; no answers.\n",
+      "sha256": "8657b8383ec428d288ec3875334682e56524870e9ab96b20e50eb28c14de3beb"
+    }
+  }
+]
