@@ -546,7 +546,8 @@ export class PhongBinhPhanUng {
   }
 
   async webSocketMessage(ws: WsMayChu, goi: string | ArrayBuffer): Promise<void> {
-    // NẠP SẴN: mọi tin trong phòng (nét bút, nhịp giữ kết nối 45 giây của máy thầy…) ⇒ làm mới ngầm ảnh chụp an toàn (tối đa 20 giây một lần)
+    // NẠP SẴN: mọi tin trong phòng (nét bút, câu trả lời, nhịp «nhip» 45 giây của bảng máy thầy — «ping» thì phòng tự trả, không vào đây) ⇒ làm mới ngầm ảnh
+    // chụp an toàn (tối đa 20 giây một lần)
     if (this.nap && Date.now() - this.nap.an.luc >= NAP_LAM_MOI_MS) this.lamMoiNap()
     // LIVE (10/11): tin NHỊ PHÂN = mục sổ nét / lô điểm đang viết của máy thầy — đường riêng, không đụng luật lượt.
     if (typeof goi !== 'string') { await this.live.nhiPhan(ws, goi); return }

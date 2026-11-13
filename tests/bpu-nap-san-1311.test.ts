@@ -84,10 +84,10 @@ describe('phòng thật trên D1 thật', () => {
     expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ ok: true, nhanh: true })
     // tin trong phòng trước 20 giây ⇒ không đọc D1; sau 20 giây ⇒ làm mới ngầm
     m.datLai()
-    await ph.gui(gv, { t: 'ping' }); await ph.choNen()
+    await ph.gui(gv, { t: 'nhip' }); await ph.choNen()
     expect(m.demD1()).toBe(0)
     vi.setSystemTime(Date.now() + NAP_LAM_MOI_MS)
-    await ph.gui(gv, { t: 'ping' }); await ph.choNen()
+    await ph.gui(gv, { t: 'nhip' }); await ph.choNen()
     expect(m.demD1()).toBeGreaterThan(0)
   })
   it('CỔNG CA THI: có ca thi mở (ở bất kỳ lớp nào) ⇒ lần làm mới kế tiếp chặn đường nhanh; Worker đi đường cũ', async () => {
@@ -98,7 +98,7 @@ describe('phòng thật trên D1 thật', () => {
     await ph.post('/nap', { qids: ['Q1', 'Q2'] })
     moCa(m.d)
     vi.setSystemTime(Date.now() + NAP_LAM_MOI_MS)
-    await ph.gui(gv, { t: 'ping' }); await ph.choNen()
+    await ph.gui(gv, { t: 'nhip' }); await ph.choNen()
     expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ ok: false, nhanh: false, vi: 'ca-mo' })
     // nạp lại khi đang có ca mở ⇒ ảnh chụp mang cờ ca mở ngay
     expect(await ph.post('/nap', { qids: ['Q1'] })).toMatchObject({ ok: true, coCaMo: true })
@@ -116,7 +116,7 @@ describe('phòng thật trên D1 thật', () => {
     m.d.sql.prepare("UPDATE de_kho SET cap_nhat_luc = 'v2' WHERE ma_de = 'DE1'").run()
     m.d.sql.prepare("UPDATE game_v2_index SET source_version = 'v2' WHERE ma_de = 'DE1'").run()
     vi.setSystemTime(Date.now() + NAP_LAM_MOI_MS)
-    await ph.gui(gv, { t: 'ping' }); await ph.choNen()
+    await ph.gui(gv, { t: 'nhip' }); await ph.choNen()
     expect(await ph.post('/luot-nhanh', { qid: 'Q1', hanGiay: 0 })).toMatchObject({ ok: true, nhanh: true })
     expect((ph.kho.du.get('st') as { luot?: { dung?: string } }).luot?.dung).toBe('D')
   })
@@ -140,6 +140,15 @@ describe('phòng thật trên D1 thật', () => {
     m.d.sql.prepare("DELETE FROM game_v2_question WHERE qid = 'Q1'").run()
     await ph2.post('/nap', { qids: ['Q2'] })
     expect([...ph.kho.du.keys()].filter((k) => k.startsWith('nap:q:'))).toEqual(['nap:q:Q2'])
+  })
+})
+
+describe('nhịp của bảng máy thầy đánh thức phòng', () => {
+  it('bảng gửi «nhip» (không phải «ping» phòng tự trả lời mà không thức) ⇒ phòng làm mới nạp sẵn được khi lớp im', async () => {
+    const { readFileSync } = await import('node:fs')
+    const bang = readFileSync('src/components/bpu/BangBinhPhanUng.tsx', 'utf8'), phong = readFileSync('server/src/phong-binh-phan-ung.ts', 'utf8')
+    expect(bang).toContain(`w.send('{"t":"nhip"}')`)
+    expect(phong).toContain(`new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')`)
   })
 })
 
