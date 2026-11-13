@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1255,
+    "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+    "fileNguon": "anh/e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281.png",
+    "svg": "tri1255-native-ddh-45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e.svg",
+    "hashSvg": "45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e",
+    "byteSvg": 20170,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-23",
+        "de": "Cho công thức cấu tạo của hai chất X, Y như hình.",
+        "refs": [
+          {
+            "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+            "where": "VIP27-CDK-ESTER-TN-II-23.hinh.0.du_lieu",
+            "hashDataUrl": "4ded3ccd52d8da3ec9fcf9d38a309de71a5eb32c38d4285068bb143d176b19ab"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2individualtriesterpanelsX-Y/57C6OEACH114C12Ototal/LEFT0CCdouble-RIGHT3CCdouble1EACH/4drawnCOdouble2splitfeetCONTACTrespectivearms/2literalCH-OOC-middleNOexpandedCO/4H2C-LASTCanchors/ALLchemicalregularUPRIGHT-ONLYXYtrueDAMUPRIGHT/6individualnonperiodicchains-FREECCinnerends/NOaddedH-formula-caption-stereo-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+    "hashSvgDaSoat": "45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

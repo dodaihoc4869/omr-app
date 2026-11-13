@@ -1,0 +1,22 @@
+[
+  {
+    "i": 1255,
+    "hashSvg": "45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất và fresh Chromium3x FULL/macros riêng hai panel/glycerol. Đếm mỗi panel57C6O=3glycerol+3acyl18C, tổng114C12O; trái no/right3CCdouble với innerends tự do. Bốn COsplitfeet tiếp xúc arm tương ứng, hai CH-OOC middle giữ condensed; 4H₂C-lastC đúng, khe leftupperbond-centralC sạch. Hóa học regular upright, ONLYX/YtrueDAM, không thêm caption/H/stereo. Toàn geometry phù hợp native ở mức tọa độ xấp xỉ, không coi guide hay calculatedfeet là đo native subpixel; không chuẩn hóa periodic. ActualSHApre/post khớp45d81, không thấy clipping/overlap.",
+    "render": "/workspace/scratch/soat413-1255-fresh.png",
+    "macro": [
+      "/workspace/scratch/tri1255-left.png",
+      "/workspace/scratch/tri1255-right.png",
+      "/workspace/scratch/tri1255-glycerolL.png",
+      "/workspace/scratch/tri1255-glycerolR.png"
+    ],
+    "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+    "hashSvgDaSoat": "45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e",
+    "runtimeProof": {
+      "file": "/workspace/scratch/tri1255-runtime.log",
+      "sha256": "048835dde4b1f78d829071871e7ab880e1d6ecf38386e8f1153f2b42ed8a844f",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/tri1255-native-ddh-45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e.svg 45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e\n1255 { x: 0, y: 0, width: 1482, height: 218 }\n\nPOSTSHOT_SHA 45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e\nCOMMAND node /workspace/scratch/agent-render413.cjs\nCONTEXT VIP27-CDK-ESTER-TN-II-23.hinh.0.du_lieu public de/one ref only; no answers.\n"
+    }
+  }
+]

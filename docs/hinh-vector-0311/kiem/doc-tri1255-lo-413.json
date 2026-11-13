@@ -1,0 +1,1030 @@
+{
+  "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+  "native": [
+    1482,
+    218
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-23",
+      "de": "Cho công thức cấu tạo của hai chất X, Y như hình.",
+      "refs": [
+        {
+          "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+          "where": "VIP27-CDK-ESTER-TN-II-23.hinh.0.du_lieu",
+          "hashDataUrl": "4ded3ccd52d8da3ec9fcf9d38a309de71a5eb32c38d4285068bb143d176b19ab"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "2individualtriesterpanelsX-Y/57C6OEACH114C12Ototal/LEFT0CCdouble-RIGHT3CCdouble1EACH/4drawnCOdouble2splitfeetCONTACTrespectivearms/2literalCH-OOC-middleNOexpandedCO/4H2C-LASTCanchors/ALLchemicalregularUPRIGHT-ONLYXYtrueDAMUPRIGHT/6individualnonperiodicchains-FREECCinnerends/NOaddedH-formula-caption-stereo-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+  "rootSourceAudit": "Root OWNnativeFULL/eachpanel3x/LEFTCO3x/allpublicde. LiteralOOC notexpanded; ownindividualchainvertices. NativeapproxNOTsubpixel/COfeetCALCULATEDfromapproxarms.",
+  "independentSourceAudit": {
+    "i": 1255,
+    "assetIndexProvided": 1398,
+    "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281.png",
+    "size": [
+      1482,
+      218
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-23",
+        "de": "Cho công thức cấu tạo của hai chất X, Y như hình.",
+        "allHinh": [
+          {
+            "hash": "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281",
+            "where": "VIP27-CDK-ESTER-TN-II-23.hinh.0.du_lieu",
+            "hashDataUrl": "4ded3ccd52d8da3ec9fcf9d38a309de71a5eb32c38d4285068bb143d176b19ab"
+          }
+        ],
+        "missingHashes": [
+          "e3f5e5924fce8a8e1c3f051b77bfc0ac1652d46045288f57859cb9ed99aee281"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/413-full2x.png",
+        "/workspace/scratch/413-X3x.png",
+        "/workspace/scratch/413-Y3x.png",
+        "/workspace/scratch/413-Xtop10x.png",
+        "/workspace/scratch/413-Xbottom10x.png",
+        "/workspace/scratch/413-Ytop10x.png",
+        "/workspace/scratch/413-Ybottom10x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": {
+        "chem": "Regular upright sans, sub2H2C. No actualbold",
+        "labels": "X andY TRUEBOLD UPRIGHT serif"
+      },
+      "counts": {
+        "X": {
+          "topC": 18,
+          "middleC": 18,
+          "bottomC": 18,
+          "glycerolC": 3,
+          "totalC": 57,
+          "O": 6,
+          "CCDouble": 0,
+          "expandedCODouble": 2,
+          "condensedCOO": 1
+        },
+        "Y": {
+          "topC": 18,
+          "middleC": 18,
+          "bottomC": 18,
+          "glycerolC": 3,
+          "totalC": 57,
+          "O": 6,
+          "CCDouble": 3,
+          "expandedCODouble": 2,
+          "condensedCOO": 1
+        },
+        "printedUnitTotalC": 114,
+        "O": 12
+      },
+      "X": {
+        "topVerticesFromBareCO": [
+          [
+            95,
+            33
+          ],
+          [
+            122,
+            48
+          ],
+          [
+            148,
+            33
+          ],
+          [
+            174,
+            48
+          ],
+          [
+            201,
+            33
+          ],
+          [
+            227,
+            48
+          ],
+          [
+            253,
+            33
+          ],
+          [
+            280,
+            48
+          ],
+          [
+            306,
+            33
+          ],
+          [
+            332,
+            48
+          ],
+          [
+            358,
+            33
+          ],
+          [
+            385,
+            48
+          ],
+          [
+            411,
+            33
+          ],
+          [
+            437,
+            48
+          ],
+          [
+            463,
+            33
+          ],
+          [
+            489,
+            48
+          ],
+          [
+            516,
+            33
+          ],
+          [
+            541,
+            48
+          ]
+        ],
+        "middleBareVerticesAfterTextCarbonyl": [
+          [
+            146,
+            113
+          ],
+          [
+            172,
+            98
+          ],
+          [
+            199,
+            113
+          ],
+          [
+            225,
+            98
+          ],
+          [
+            251,
+            113
+          ],
+          [
+            278,
+            98
+          ],
+          [
+            304,
+            113
+          ],
+          [
+            330,
+            98
+          ],
+          [
+            356,
+            113
+          ],
+          [
+            383,
+            98
+          ],
+          [
+            409,
+            113
+          ],
+          [
+            435,
+            98
+          ],
+          [
+            461,
+            113
+          ],
+          [
+            488,
+            98
+          ],
+          [
+            514,
+            113
+          ],
+          [
+            540,
+            98
+          ],
+          [
+            566,
+            113
+          ]
+        ],
+        "middleTextCarbonylC": {
+          "inLiteral": "CH–OOC",
+          "atApprox": [
+            132,
+            99
+          ],
+          "count": 1
+        },
+        "bottomVerticesFromBareCO": [
+          [
+            95,
+            164
+          ],
+          [
+            122,
+            148
+          ],
+          [
+            148,
+            164
+          ],
+          [
+            174,
+            148
+          ],
+          [
+            201,
+            164
+          ],
+          [
+            227,
+            148
+          ],
+          [
+            253,
+            164
+          ],
+          [
+            280,
+            148
+          ],
+          [
+            306,
+            164
+          ],
+          [
+            332,
+            148
+          ],
+          [
+            358,
+            164
+          ],
+          [
+            385,
+            148
+          ],
+          [
+            411,
+            164
+          ],
+          [
+            437,
+            148
+          ],
+          [
+            463,
+            164
+          ],
+          [
+            489,
+            148
+          ],
+          [
+            516,
+            164
+          ],
+          [
+            541,
+            148
+          ]
+        ],
+        "glycerolLabels": [
+          {
+            "literal": "H₂C",
+            "bbox": [
+              25,
+              69,
+              61,
+              88
+            ],
+            "anchor": "LAST C"
+          },
+          {
+            "literal": "CH–OOC",
+            "bbox": [
+              60,
+              91,
+              137,
+              109
+            ],
+            "anchor": "FIRST C at68 forbackbone; LAST C at132 ismiddlecarbonyl"
+          },
+          {
+            "literal": "H₂C",
+            "bbox": [
+              25,
+              113,
+              61,
+              132
+            ],
+            "anchor": "LAST C"
+          }
+        ],
+        "glycerolBonds": [
+          [
+            [
+              60,
+              89
+            ],
+            [
+              67,
+              95
+            ]
+          ],
+          [
+            [
+              66,
+              108
+            ],
+            [
+              60,
+              115
+            ]
+          ]
+        ],
+        "esterOtop": {
+          "bbox": [
+            67,
+            48,
+            80,
+            63
+          ],
+          "fromGlycerol": [
+            [
+              59,
+              69
+            ],
+            [
+              66,
+              62
+            ]
+          ],
+          "toCO": [
+            [
+              81,
+              48
+            ],
+            [
+              93,
+              35
+            ]
+          ]
+        },
+        "esterObottom": {
+          "bbox": [
+            67,
+            135,
+            80,
+            150
+          ],
+          "fromGlycerol": [
+            [
+              59,
+              129
+            ],
+            [
+              66,
+              136
+            ]
+          ],
+          "toCO": [
+            [
+              81,
+              149
+            ],
+            [
+              93,
+              163
+            ]
+          ]
+        },
+        "COtop": {
+          "rays": [
+            [
+              [
+                93,
+                15
+              ],
+              [
+                93,
+                34
+              ]
+            ],
+            [
+              [
+                97,
+                15
+              ],
+              [
+                97,
+                34
+              ]
+            ]
+          ],
+          "Obox": [
+            89,
+            0,
+            102,
+            13
+          ],
+          "contact": "BothfeetcontactnativeincomingesterOarm/outgoingchainarm, shortnativejoin."
+        },
+        "CObottom": {
+          "rays": [
+            [
+              [
+                93,
+                164
+              ],
+              [
+                93,
+                183
+              ]
+            ],
+            [
+              [
+                97,
+                164
+              ],
+              [
+                97,
+                183
+              ]
+            ]
+          ],
+          "Obox": [
+            89,
+            185,
+            102,
+            198
+          ],
+          "contact": "BothupperfeetcontactnativeOarm/chainarmshortjoin, no fullwhitegap."
+        },
+        "middleTextArm": [
+          [
+            138,
+            105
+          ],
+          [
+            146,
+            113
+          ]
+        ],
+        "label": {
+          "literal": "X",
+          "bbox": [
+            273,
+            181,
+            291,
+            200
+          ]
+        }
+      },
+      "Y": {
+        "topVerticesFromBareCO": [
+          [
+            791,
+            38
+          ],
+          [
+            817,
+            53
+          ],
+          [
+            844,
+            38
+          ],
+          [
+            871,
+            53
+          ],
+          [
+            897,
+            38
+          ],
+          [
+            924,
+            53
+          ],
+          [
+            950,
+            38
+          ],
+          [
+            977,
+            53
+          ],
+          [
+            1003,
+            38
+          ],
+          [
+            1033,
+            38
+          ],
+          [
+            1060,
+            53
+          ],
+          [
+            1087,
+            38
+          ],
+          [
+            1114,
+            53
+          ],
+          [
+            1140,
+            38
+          ],
+          [
+            1167,
+            53
+          ],
+          [
+            1193,
+            38
+          ],
+          [
+            1220,
+            53
+          ],
+          [
+            1246,
+            38
+          ]
+        ],
+        "middleBareVerticesAfterTextCarbonyl": [
+          [
+            842,
+            119
+          ],
+          [
+            869,
+            104
+          ],
+          [
+            895,
+            119
+          ],
+          [
+            922,
+            104
+          ],
+          [
+            948,
+            119
+          ],
+          [
+            975,
+            104
+          ],
+          [
+            1001,
+            119
+          ],
+          [
+            1028,
+            104
+          ],
+          [
+            1060,
+            104
+          ],
+          [
+            1087,
+            119
+          ],
+          [
+            1113,
+            104
+          ],
+          [
+            1140,
+            119
+          ],
+          [
+            1166,
+            104
+          ],
+          [
+            1193,
+            119
+          ],
+          [
+            1219,
+            104
+          ],
+          [
+            1246,
+            119
+          ],
+          [
+            1272,
+            104
+          ]
+        ],
+        "middleTextCarbonylC": {
+          "inLiteral": "CH–OOC",
+          "atApprox": [
+            828,
+            105
+          ],
+          "count": 1
+        },
+        "bottomVerticesFromBareCO": [
+          [
+            791,
+            168
+          ],
+          [
+            817,
+            153
+          ],
+          [
+            844,
+            168
+          ],
+          [
+            871,
+            153
+          ],
+          [
+            897,
+            168
+          ],
+          [
+            924,
+            153
+          ],
+          [
+            950,
+            168
+          ],
+          [
+            977,
+            153
+          ],
+          [
+            1003,
+            168
+          ],
+          [
+            1033,
+            168
+          ],
+          [
+            1060,
+            153
+          ],
+          [
+            1087,
+            168
+          ],
+          [
+            1114,
+            153
+          ],
+          [
+            1140,
+            168
+          ],
+          [
+            1167,
+            153
+          ],
+          [
+            1193,
+            168
+          ],
+          [
+            1220,
+            153
+          ],
+          [
+            1246,
+            168
+          ]
+        ],
+        "CCdoubleRays": {
+          "topMain": [
+            [
+              1003,
+              38
+            ],
+            [
+              1033,
+              38
+            ]
+          ],
+          "topInner": [
+            [
+              1005,
+              41.5
+            ],
+            [
+              1031,
+              41.5
+            ]
+          ],
+          "middleMain": [
+            [
+              1028,
+              104
+            ],
+            [
+              1060,
+              104
+            ]
+          ],
+          "middleInner": [
+            [
+              1030,
+              107.5
+            ],
+            [
+              1058,
+              107.5
+            ]
+          ],
+          "bottomMain": [
+            [
+              1003,
+              168
+            ],
+            [
+              1033,
+              168
+            ]
+          ],
+          "bottomInner": [
+            [
+              1005,
+              164.5
+            ],
+            [
+              1031,
+              164.5
+            ]
+          ]
+        },
+        "glycerolLabels": [
+          {
+            "literal": "H₂C",
+            "bbox": [
+              722,
+              75,
+              757,
+              94
+            ],
+            "anchor": "LAST C"
+          },
+          {
+            "literal": "CH–OOC",
+            "bbox": [
+              756,
+              97,
+              833,
+              115
+            ],
+            "anchor": "FIRST C near764backbone;LAST C near828middlecarbonyl"
+          },
+          {
+            "literal": "H₂C",
+            "bbox": [
+              722,
+              119,
+              757,
+              138
+            ],
+            "anchor": "LAST C"
+          }
+        ],
+        "glycerolBonds": [
+          [
+            [
+              756,
+              95
+            ],
+            [
+              763,
+              101
+            ]
+          ],
+          [
+            [
+              762,
+              114
+            ],
+            [
+              756,
+              121
+            ]
+          ]
+        ],
+        "esterOtop": {
+          "bbox": [
+            763,
+            54,
+            777,
+            69
+          ],
+          "fromGlycerol": [
+            [
+              756,
+              75
+            ],
+            [
+              763,
+              68
+            ]
+          ],
+          "toCO": [
+            [
+              778,
+              54
+            ],
+            [
+              789,
+              40
+            ]
+          ]
+        },
+        "esterObottom": {
+          "bbox": [
+            763,
+            141,
+            777,
+            156
+          ],
+          "fromGlycerol": [
+            [
+              756,
+              135
+            ],
+            [
+              763,
+              142
+            ]
+          ],
+          "toCO": [
+            [
+              778,
+              155
+            ],
+            [
+              789,
+              167
+            ]
+          ]
+        },
+        "COtop": {
+          "rays": [
+            [
+              [
+                789,
+                20
+              ],
+              [
+                789,
+                39
+              ]
+            ],
+            [
+              [
+                793,
+                20
+              ],
+              [
+                793,
+                39
+              ]
+            ]
+          ],
+          "Obox": [
+            784,
+            5,
+            798,
+            18
+          ],
+          "contact": "EachfootactualcontacttoesterOarm/chainarm, nativejoin, no gap."
+        },
+        "CObottom": {
+          "rays": [
+            [
+              [
+                789,
+                168
+              ],
+              [
+                789,
+                188
+              ]
+            ],
+            [
+              [
+                793,
+                168
+              ],
+              [
+                793,
+                188
+              ]
+            ]
+          ],
+          "Obox": [
+            784,
+            190,
+            798,
+            203
+          ],
+          "contact": "EachfootactualcontacttoOarm/chainarm, source smallhorizontaljoin."
+        },
+        "middleTextArm": [
+          [
+            834,
+            111
+          ],
+          [
+            842,
+            119
+          ]
+        ],
+        "label": {
+          "literal": "Y",
+          "bbox": [
+            965,
+            188,
+            984,
+            208
+          ]
+        }
+      },
+      "noAdded": [
+        "No expandedCOatmiddleOOCtext",
+        "No reactionarrow",
+        "No wholeformula/captiontristearinortriolein",
+        "No chirality",
+        "No extraCafterfreeends",
+        "No addedHlabels"
+      ]
+    },
+    "measurementLimits": "Eachpanelopenedseparately3x andeach4CO10x. Sixorderedchains countedfromvisiblevertices; middle17bare+1textC, top/bottom18bare each. Approxcoords±1–2px; nativechartwideblankrightretained, no stretch.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootSourceGuideAudit": {
+    "limits": "AllnativecenterlinesapproxNOTsubpixel; pixelbandsONLYsupportownvisualNOTautomaticgate. Sourceagentguides±1–2px, notmeasuredcenters.",
+    "sourceGuideCorrections": "LEFTtopguide385 atlowerturn vsrootnativeownrow48darkx383→keepbuilder383.5; Ymidguide1087valley vsrootnativeownrow118band1083..1087→keepbuilder1085. NoSVGchangesfromtheseapproxsourceguides.",
+    "rootNativeFullAndEachPanel3x": true,
+    "allPublicDe": true
+  },
+  "rootActualReview": {
+    "initialHash": "5990b9ade05d93df35e52a25e37897e60575cbcf0ec6b9c44d7278a0d6e74bd0",
+    "finalHash": "45d81ffbc72316695b20122d69d999b70d5f33ce0177d6f42e121db5d1ee884e",
+    "freshFinalFull3x": true,
+    "freshFinalGlycerol8x": true,
+    "finalOnlySameAngleUpperLeftBondEndpoint": true,
+    "changedChildrenOnly": [
+      15
+    ],
+    "allOtherGlyphGeometryExact": true,
+    "noOldCarry": true,
+    "feetCalculatedApproxNotNativeSubpixel": true,
+    "verdict": "Đạt root+readonly OWNnativeFULL-allrefs/freshFINALFULL3x/macros/exactSHA"
+  }
+}
