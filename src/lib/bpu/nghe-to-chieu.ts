@@ -25,6 +25,8 @@ export function ngheBpuToChieu(): void {
       else { choLive.push([e.data, nguon]); if (choLive.length === 1) void import('../../components/live/thay-noi').then((m) => { liveThay = m.nhanTinTo; for (const [x, n] of choLive.splice(0)) m.nhanTinTo(x, n) }).catch(() => { choLive.length = 0 }) }
       return
     }
+    // 13/11 NẠP SẴN: tờ báo danh sách mã câu ⇒ app nạp sẵn vào phòng (chuyển đề tức thì).
+    if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-ds') { const q = (e.data as { qids?: unknown }).qids; if (Array.isArray(q)) void import('../../components/bpu/gan-gv').then((m) => m.napCauTo(q.filter((x): x is string => typeof x === 'string'))).catch(() => {}); return }
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-het') { void import('../../components/bpu/gan-gv').then((m) => m.baoHetCau(d.d === -1 ? -1 : 1)).catch(() => {}); return }
     // Lời giải thu gọn của đợt đang chiếu (bảng hỏi khi thầy bấm G — hiện ngay trên bảng, không về tờ).
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-giai') { const h = (e.data as { html?: unknown }).html; void import('../../components/bpu/gan-gv').then((m) => m.nhanGiai(typeof h === 'string' ? h : '')).catch(() => {}); return }

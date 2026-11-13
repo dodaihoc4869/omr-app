@@ -11,6 +11,7 @@ import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
 import { hienKetQua, tatTheKq } from './TheKetQuaLenBang'
 import { layPhong } from './cau-live'
+import { goiLenh } from '../../lib/goi-lenh-thay'
 import type { LichLive } from '../../lib/live-khoi/kieu'
 
 let goc: Root | null = null
@@ -201,6 +202,19 @@ function veBang(): void {
     />,
   )
 }
+/** NẠP SẴN (13/11, thầy «chuyển đề … làm cho tức thì»): tờ báo danh sách mã câu ⇒ phòng của buổi đọc sẵn một lần (server/src/bpu-nap-san.ts). Nạp hỏng
+ *  (phòng chưa mở…) thì lần sang câu kế nạp lại; nạp không được cũng không sao — sang câu vẫn đi đường cũ. */
+let dsNap: string[] = [], napXong = ''
+export function napCauTo(qids: string[]): void { dsNap = qids.slice(0, 80); napXong = ''; void napLai() }
+async function napLai(): Promise<void> {
+  if (!dsNap.length) return
+  const buoiId = hien?.buoiId ?? (await layBuoi(true))
+  const khoa = `${buoiId}|${dsNap.join('|')}`
+  if (!buoiId || napXong === khoa) return
+  napXong = khoa
+  const r = await goiLenh('/gv/bpu/nap', { buoiId, qids: dsNap }, '')
+  if (!r.ok || r.du.ok === false) napXong = ''
+}
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
   if (tuDong && Date.now() < nghiDen) return
@@ -217,6 +231,7 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const bo = !!boQid && boQid === qid
   if (bo) boQid = ''
   hien = { ...(cung ? { ma: hien!.ma, linkQr: hien!.linkQr } : {}), buoiId, qid, luot: dem, giay: o.giay, tuDong, bo }
+  void napLai() // tờ đã báo danh sách mà lần trước chưa nạp được (phòng chưa mở) ⇒ nạp ngay cho các câu kế
   veBang()
   // Màn Hành trình (bước «Chọn câu & chiếu») nghe để sang bước «Đang chiếu».
   try { window.dispatchEvent(new CustomEvent('bpu-dang-chieu', { detail: { buoiId } })) } catch { /* trình duyệt cũ */ }

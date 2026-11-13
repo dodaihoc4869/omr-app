@@ -474,7 +474,7 @@ if (process.env.DO_CHUYEN) { // ĐO CHUYỂN ĐỀ (thầy 13/11 «tốc độ c
     if (Object.values(moc).every((v) => v != null)) break
     await ngu(25)
   }
-  console.log('CHUYEN cpu×' + cpu, JSON.stringify(moc)); await chup(em1, 'chuyen-em1'); process.exit(3)
+  console.log('CHUYEN cpu×' + cpu + (process.env.TRE_D1 ? ' · D1 chậm ' + process.env.TRE_D1 + ' ms' : '') + (process.env.KHONG_NAP ? ' · KHÔNG nạp sẵn' : ' · có nạp sẵn'), JSON.stringify(moc)); await chup(em1, 'chuyen-em1'); process.exit(3)
 }
 await toHoc.locator('body').press('ArrowRight'); await ngu(3500)
 kiem('4p tờ sang câu 2 ⇒ phòng mở lượt mới của câu 2', st()?.luot?.qid === 'Q2' && !st()?.luot?.goi, JSON.stringify({ qid: st()?.luot?.qid, pha: st()?.luot?.pha }))
