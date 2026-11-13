@@ -478,7 +478,8 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       dungHinhLaze()
       px = Math.round(hb.x * dd); py = Math.round(hb.y * dd)
       if (butDich?.sat && !yeu) { px = Math.round(hb.x * dd * 8) / 8; py = Math.round(hb.y * dd * 8) / 8 }
-      khoa = `L|${px}|${py}|${hb.mo}|${hinhLaze}`
+      // khoá theo ĐỘ RÕ THẬT của chấm (min(1, mo·8)), không theo `mo` thô: thầy giữ yên chuột thì `mo` trôi 0,58 → 0,14 (~36 khung) mà chấm vẫn rõ hết cỡ ⇒ khỏi vẽ lại
+      khoa = `L|${px}|${py}|${Math.min(1, hb.mo * 8)}|${hinhLaze}`
       if (!ve.length && khoa === tayVe) return 0
       const r = LAZE_R + 4
       if (hb.x - r < h[0]) h[0] = hb.x - r; if (hb.y - r < h[1]) h[1] = hb.y - r; if (hb.x + r > h[2]) h[2] = hb.x + r; if (hb.y + r > h[3]) h[3] = hb.y + r
