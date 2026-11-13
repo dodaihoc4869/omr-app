@@ -8,6 +8,8 @@
 (function () {
   'use strict'
   const NS = 'http://www.w3.org/2000/svg'
+  /** Bảng tra khuôn: khai báo trước (khuôn «đoán nhanh» dựng lại một khuôn khác bên trong), điền sau khi các khuôn đã định nghĩa. */
+  const DUNG = {}
   const q = new URLSearchParams(location.search)
   const GIAM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const yeu = () => document.documentElement.classList.contains('may-yeu')
@@ -529,7 +531,7 @@
     goc.addEventListener('click', (e) => { const b = e.target.closest('.tk-nghe'); if (b && ctx.khiNghe) ctx.khiNghe(+b.dataset.giay) })
   }
 
-  const DUNG = { 'keo-co': keoCo, 'thang-delta': thangDelta, lewis, 'quy-tac': quyTac, 'vi-du-cot-doc': viDuCotDoc, 'doan-nhanh': doanNhanh, 'tong-ket': tongKet }
+  Object.assign(DUNG, { 'keo-co': keoCo, 'thang-delta': thangDelta, lewis, 'quy-tac': quyTac, 'vi-du-cot-doc': viDuCotDoc, 'doan-nhanh': doanNhanh, 'tong-ket': tongKet })
 
   // ═══════════ ĐỒNG HỒ TIẾNG ═══════════
   // Bản thật: <audio> phát tieng.mp3 của buổi; giờ trong JSON (tu, den, giờ nét) là giây trên TRỤC TIẾNG của tieng.mp3 (0 = đầu tệp,
