@@ -31,7 +31,7 @@ export type SuKienBut =
   | { loai: 'xoa'; trang: string; id: string[] }
   | { loai: 'trang'; trang: string; net: NetBut[]; tiLe: number }
   /** Con trỏ lơ lửng. QUY ƯỚC 11/11: `x > 1,5` ⇒ không phải con trỏ mà là ĐỘ CUỘN của bảng đen (`y`, số lần bề dọc vùng viết) — máy nhận cuộn bảng theo. */
-  | { loai: 'tro'; trang: string; x: number; y: number }
+  | { loai: 'tro'; trang: string; x: number; y: number; lz?: 1 }
 /** Khung quy chiếu của vùng viết W × H px: k = dvi / 1920; rw × rh = vùng viết tính bằng «px ở màn 1920». */
 export interface KhungBut { W: number; H: number; k: number; rw: number; rh: number }
 /** Trạng thái xử lý dần một nét: X / Y / R / L = đường tâm ĐÃ CHỐT (chia dày) + bán kính + độ dài cộng dồn; px, py = mẫu thật mới nhất. */
@@ -48,8 +48,8 @@ export interface SoBut {
   batDau(mo: { cong?: 'but' | 'tay'; mau: string; co: number; diem?: DiemBut; bang?: boolean }): NetBut
   themDiem(ds: DiemBut[]): void
   ketThuc(huy?: boolean): NetBut | null
-  /** Con trỏ bút lơ lửng (chưa chạm): chỉ phát sự kiện `tro`, không đổi nét. */
-  tro(x: number, y: number): void
+  /** Con trỏ bút lơ lửng (chưa chạm): chỉ phát sự kiện `tro`, không đổi nét. `lz` = 1 khi thầy đang bật chấm laze (13/11). */
+  tro(x: number, y: number, lz?: number): void
   /** Báo ĐỘ CUỘN của bảng đen (11/11): phát sự kiện `tro` có `x = 2` (ngoài màn), `y` = độ cuộn. Không thêm loại sự kiện / khung mạng nào. */
   cuon(v: number): void
   xoa(ids: string[], gop?: boolean): number
@@ -413,7 +413,7 @@ var LoiBut = (function () {
       batDau: function (mo) { dang = { id: (mo.bang ? 'b_' : '') + id(), cong: mo.cong === 'tay' ? 'tay' : 'but', mau: mo.mau, co: mo.co, diem: mo.diem ? [mo.diem] : [] }; phat({ loai: 'net-moi', net: { id: dang.id, cong: dang.cong, mau: dang.mau, co: dang.co, diem: dang.diem.slice() } }); return dang; },
       themDiem: function (ds) { var i; if (!dang || !ds.length) return; for (i = 0; i < ds.length; i++) dang.diem.push(ds[i]); phat({ loai: 'them-diem', id: dang.id, diem: ds }); },
       ketThuc: ketThuc,
-      tro: function (x, y) { if (tai.length) phat({ loai: 'tro', x: tron(kep(x, 0, 1), 1e4), y: tron(kep(y, 0, YMAX), 1e4) }); },
+      tro: function (x, y, lz) { var e; if (!tai.length) return; e = { loai: 'tro', x: tron(kep(x, 0, 1), 1e4), y: tron(kep(y, 0, YMAX), 1e4) }; if (lz) e.lz = 1; phat(e); },
       cuon: function (v) { if (tai.length) phat({ loai: 'tro', x: 2, y: tron(kep(v, 0, YMAX), 1e4) }); },
       xoa: xoa,
       dongGop: function () { var b = T.lui[T.lui.length - 1]; if (b) b.mo = false; },

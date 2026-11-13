@@ -166,7 +166,7 @@ describe('«Hiểu chưa?» — gói tin, chỗ đốm, phím /', () => {
     expect(lop).toContain("else if (v === 'hieu') setHieu((c) => !c);")
     expect(lop).toContain("lenhTo.current(e.key === '/' ? 'hieu' :")
     expect(lop).toContain("const HoiHieuThay = lazy(() => import('./HoiHieuThay'))")
-    expect(em).toContain('{!cho ? <HoiHieuEm kenh={kenh} /> : null}')
+    expect(em).toContain('{!choi ? <HoiHieuEm kenh={kenh} /> : null}') // 13/11: màn chơi trò (phòng chờ / nghỉ giải lao) không hỏi «Hiểu chưa»
     expect(doc('src/components/live-khoi/hoi-hieu.css')).not.toMatch(/#[0-9a-f]{3,8}\b/i)
   })
 })

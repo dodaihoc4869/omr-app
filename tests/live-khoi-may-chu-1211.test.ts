@@ -6,6 +6,7 @@ import { chuanKhoi, liveDat, viewLiveBang, viewLiveEm } from '../src/lib/bpu/pho
 import { taoPhong, vaoLop, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { saoBuoi, xepHangDoi } from '../src/lib/live-khoi/vinh-danh'
 import { VAN_MS } from '../src/lib/live-khoi/sinh-ton-loi'
+import { tenMay } from '../src/lib/live-khoi/ten-may'
 
 const NAY = Date.UTC(2026, 10, 12, 12, 0, 0)
 const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDau: NAY, ten: '', trangThai: 'hen', luc: NAY, ...o })
@@ -145,16 +146,28 @@ describe('kênh lớp', () => {
       em(hs2, 'S2', { t: 'lop', k: 'tro', x: { p: [300, 300, 0, 2], a: 'S1', t: 'khong-co' } }, T0 + 60)
       expect(gv.tin).toHaveLength(0)
       vi.advanceTimersByTime(260)
-      const anh = doc(hs1).at(-1)!.x as { ds: Record<string, [number, number, number, number, number, string]>; an: unknown[]; d: number[]; v: number; c: number }
-      // S1: y kẹp trong sân 1000, cấp kẹp về 4; mục tiêu S2 chưa có lúc gói S1 tới ⇒ bỏ. S2: mục tiêu không có thật ⇒ bỏ.
-      expect(anh.ds.S1).toEqual([100, 1000, 50, doi('S1'), 4, ''])
-      expect(anh.ds.S2).toEqual([300, 300, 0, doi('S2'), 2, ''])
-      expect(anh.an).toEqual([['S1', 'S2']])
+      // Máy THẦY nhận ảnh ĐỦ; máy em nhận ảnh lọc «chỉ gửi gần» (S1 ở góc dưới-trái, S2 cách 1700 theo dọc ⇒ ngoài hộp của S1).
+      const anh = doc(gv).at(-1)!.x as { ds: Record<string, [number, number, number, number, number, string]>; an: unknown[]; d: number[]; v: number; c: number }
+      const loc = doc(hs1).at(-1)!.x as typeof anh
+      expect(loc.ds.S1).toEqual(anh.ds.S1); expect(loc.ds.S2).toBeUndefined()
+      expect(loc.an).toEqual(anh.an); expect(loc.d).toEqual(anh.d)
+      expect(Object.keys(loc.ds).length).toBeLessThan(Object.keys(anh.ds).length)
+      expect((doc(hs2).at(-1)!.x as typeof anh).ds.S2).toEqual(anh.ds.S2)
+      // S1: y kẹp trong sân 2000 (cỡ 0 = 3200 × 2000), cấp kẹp về 6; mục tiêu S2 chưa có lúc gói S1 tới ⇒ bỏ. S2: mục tiêu không có thật ⇒ bỏ.
+      // Dòng trên dây (bản 4): không bắn ai ⇒ 5 phần tử.
+      expect(anh.ds.S1).toEqual([100, 2000, 50, doi('S1'), 6])
+      expect(anh.ds.S2).toEqual([300, 300, 0, doi('S2'), 2])
+      // Lượt hạ (bản 4): [kẻ hạ, bị hạ, chuỗi người bị hạ, chuỗi kẻ hạ sau lượt này, người bị hạ là thủ khoa].
+      expect(anh.an).toEqual([['S1', 'S2', 0, 1, 0]])
       expect(anh.d[doi('S1')]).toBe(1)
       expect(anh.v).toBe(1); expect(anh.c).toBe(0)
       // Hai em thật ở hai đội ⇒ 3 + 3 + 4 + 4 máy; mã máy bắt đầu bằng '~'; 0 lượt D1 (phòng giả không có D1).
       const may = Object.keys(anh.ds).filter((id) => id.startsWith('~'))
       expect(may).toHaveLength(14)
+      // Máy bù mang tên như học sinh: mỗi máy một tên khác nhau, không trùng tên gọi em nào trong DANH SÁCH LỚP (kể cả em chưa vào).
+      const ten = may.map(tenMay)
+      expect(ten.every((t) => typeof t === 'string')).toBe(true); expect(new Set(ten).size).toBe(14)
+      for (const e of st.ds) expect(ten).not.toContain(e.ten)
       expect([0, 1, 2, 3].map((d) => Object.values(anh.ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
       expect(doc(gv)).toHaveLength(1)
       // báo «bị hạ» lặp trong 2,5 giây ⇒ chỉ tính một lượt

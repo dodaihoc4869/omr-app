@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: cổ vũ bạn lên bảng — tinh thể lửa theo màu đội bay vào thẻ tên</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --chu: #f1f7fb; --chu2: #cfdae0; --chu3: #8fa1ab; --na: #f59e0b; --k: #8b5cf6; --cu: #10b981; --ca: #ef4444; --z: 1px; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+.bang { position: fixed; inset: calc(5 * var(--z)); border-radius: calc(14 * var(--z)); border: calc(2 * var(--z)) solid #33434c; background: radial-gradient(120% 90% at 50% 0%, #17272e, #101a1f 70%); overflow: hidden; }
+.ke { position: absolute; left: 66.667%; top: 0; bottom: 0; width: calc(2 * var(--z)); background: #26353d; }
+svg.viet { position: absolute; overflow: visible; } svg.viet text { font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; fill: #dfe9ee; font-style: italic; opacity: .82; }
+/* THẺ TÊN bạn đang lên bảng */
+.the { z-index: 5; position: fixed; left: 50%; top: calc(14 * var(--z)); transform: translateX(-50%); display: flex; align-items: center; gap: calc(12 * var(--z)); padding: calc(9 * var(--z)) calc(18 * var(--z)) calc(9 * var(--z)) calc(10 * var(--z)); border-radius: calc(22 * var(--z)); background: linear-gradient(160deg, rgba(38,52,60,.96), rgba(20,31,37,.96)); border: calc(1.5 * var(--z)) solid color-mix(in srgb, var(--d) 70%, transparent);
+  box-shadow: 0 0 calc(28 * var(--z)) color-mix(in srgb, var(--d) 55%, transparent), 0 0 calc(80 * var(--z)) color-mix(in srgb, var(--d) 30%, transparent), 0 calc(14 * var(--z)) calc(40 * var(--z)) rgba(0,0,0,.5); }
+.the .av { width: calc(46 * var(--z)); height: calc(46 * var(--z)); border-radius: 50%; display: grid; place-items: center; font-size: calc(17 * var(--z)); font-weight: 800; color: #16222a; background: radial-gradient(circle at 35% 30%, #fff, var(--d) 60%); box-shadow: 0 0 0 calc(3 * var(--z)) color-mix(in srgb, var(--d) 35%, transparent); }
+.the .ten b { display: block; font-size: calc(18 * var(--z)); font-weight: 800; color: color-mix(in srgb, var(--d) 75%, #fff); white-space: nowrap; }
+.the .ten small { display: block; margin-top: calc(1 * var(--z)); font-size: calc(12.5 * var(--z)); font-weight: 700; color: var(--chu2); white-space: nowrap; }
+.the .dem { display: flex; align-items: center; gap: calc(6 * var(--z)); margin-left: calc(6 * var(--z)); padding: calc(5 * var(--z)) calc(12 * var(--z)) calc(5 * var(--z)) calc(6 * var(--z)); border-radius: 99px; background: rgba(255,255,255,.08); font-size: calc(19 * var(--z)); font-weight: 800; font-variant-numeric: tabular-nums; }
+.the .dem svg { width: calc(24 * var(--z)); height: calc(28 * var(--z)); }
+.doi { z-index: 5; position: fixed; left: 50%; transform: translateX(-50%); display: flex; gap: calc(8 * var(--z)); white-space: nowrap; }
+.doi span { display: flex; align-items: center; gap: calc(5 * var(--z)); padding: calc(3 * var(--z)) calc(10 * var(--z)); border-radius: 99px; background: color-mix(in srgb, var(--d) 14%, rgba(20,31,37,.9)); border: calc(1 * var(--z)) solid color-mix(in srgb, var(--d) 45%, transparent); font-size: calc(12.5 * var(--z)); font-weight: 800; color: color-mix(in srgb, var(--d) 75%, #fff); }
+.doi span i { width: calc(8 * var(--z)); height: calc(8 * var(--z)); border-radius: 50%; background: var(--d); box-shadow: 0 0 calc(8 * var(--z)) var(--d); }
+/* TINH THỂ LỬA */
+.tt { position: fixed; pointer-events: none; }
+.tt svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 calc(6 * var(--z)) var(--d)) drop-shadow(0 0 calc(16 * var(--z)) color-mix(in srgb, var(--d) 70%, transparent)); }
+.hat { position: fixed; border-radius: 50%; background: radial-gradient(circle, #fff, var(--d) 45%, transparent 70%); pointer-events: none; }
+.sao { position: fixed; width: calc(3 * var(--z)); height: calc(3 * var(--z)); border-radius: 50%; background: #fff; box-shadow: 0 0 calc(8 * var(--z)) #fff; }
+/* NÚT CỔ VŨ (máy em) */
+.co-vu { z-index: 6; position: fixed; right: calc(26 * var(--z)); bottom: calc(22 * var(--z)); width: calc(78 * var(--z)); height: calc(78 * var(--z)); border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--d) 55%, #fff), var(--d) 55%, color-mix(in srgb, var(--d) 60%, #000)); box-shadow: 0 calc(5 * var(--z)) 0 color-mix(in srgb, var(--d) 55%, #000), 0 0 calc(34 * var(--z)) color-mix(in srgb, var(--d) 70%, transparent), 0 0 0 calc(7 * var(--z)) color-mix(in srgb, var(--d) 22%, transparent); }
+.co-vu svg { width: calc(34 * var(--z)); height: calc(40 * var(--z)); filter: drop-shadow(0 0 calc(6 * var(--z)) #fff); }
+.co-vu b { position: absolute; left: 50%; bottom: calc(-22 * var(--z)); transform: translateX(-50%); font-size: calc(13 * var(--z)); font-weight: 800; white-space: nowrap; }
+.co-vu em { position: absolute; right: calc(-6 * var(--z)); top: calc(-8 * var(--z)); font-style: normal; padding: calc(2 * var(--z)) calc(8 * var(--z)); border-radius: 99px; background: #fff; color: #16222a; font-size: calc(12.5 * var(--z)); font-weight: 800; box-shadow: 0 calc(4 * var(--z)) calc(12 * var(--z)) rgba(0,0,0,.4); }
+.vong { position: fixed; border-radius: 50%; border: calc(2 * var(--z)) solid color-mix(in srgb, var(--d) 70%, transparent); pointer-events: none; }
+.day { position: fixed; left: calc(8 * var(--z)); right: calc(8 * var(--z)); bottom: calc(6 * var(--z)); height: calc(50 * var(--z)); border-radius: calc(16 * var(--z)); background: #1a262c; display: flex; align-items: center; gap: calc(12 * var(--z)); padding: 0 calc(12 * var(--z)); font-size: calc(14 * var(--z)); font-weight: 800; }
+.day .live { display: inline-flex; align-items: center; gap: calc(7 * var(--z)); height: calc(32 * var(--z)); padding: 0 calc(13 * var(--z)); border-radius: 99px; background: #c8262b; } .day .live u { width: calc(7 * var(--z)); height: calc(7 * var(--z)); border-radius: 50%; background: #fff; }
+.day .nut { margin-left: auto; padding: calc(7 * var(--z)) calc(16 * var(--z)); border-radius: 99px; background: #bfe9d6; color: #0d2b20; }
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="tt" viewBox="0 0 40 48">
+    <path d="M20 1 34 15 29 38 20 47 11 38 6 15Z" fill="currentColor"/>
+    <path d="M20 1 34 15 20 20Z" fill="#fff" opacity=".55"/><path d="M20 1 6 15 20 20Z" fill="#fff" opacity=".28"/>
+    <path d="M34 15 29 38 20 20Z" fill="#000" opacity=".12"/><path d="M6 15 11 38 20 20Z" fill="#000" opacity=".28"/>
+    <path d="M11 38 20 47 29 38 20 20Z" fill="#000" opacity=".4"/>
+    <path d="M20 12c1 5 6 7 6 13a6 6 0 0 1-12 0c0-3 1.5-4 2.5-6 .8 2 2 2.5 2 2.5 .2-3.5-.2-6 1.5-9.500Z" fill="#fff" opacity=".92"/>
+    <path d="M20 22c.6 2 2.6 3 2.6 5.200a2.600 2.600 0 0 1-5.200 0c0-1.600 1-2.300 1.500-3.300.5 1 1.100 1.200 1.100 1.200Z" fill="currentColor"/>
+  </symbol>
+</defs></svg>
+<script>
+const q = new URLSearchParams(location.search), k = q.get('k') || 'em', W = innerWidth, H = innerHeight, thay = k === 'thay', z = thay ? W / 1366 : W / 844
+document.documentElement.style.setProperty('--z', z + 'px')
+const them = (h) => document.body.insertAdjacentHTML('beforeend', h)
+const viet = (x, y, co, dong, mau) => `<svg class="viet" style="left:${x}%;top:${y}%"><g>${dong.map((d, i) => `<text x="0" y="${i * co * 1.55}" font-size="${co}" ${mau && mau[i] ? `style="fill:${mau[i]}"` : ''}>${d}</text>`).join('')}</g></svg>`
+them(`<div class="bang"><i class="ke"></i>${viet(6, thay ? 30 : 38, 22 * z, ['n CO₂ = 8,8 : 44 = 0,2 mol', 'Số C = 0,2 : 0,1 = 2', '⇒ C₂H₄O₂'], [0, 0, '#f5c84a'])}</div>`)
+// thẻ tên bạn lên bảng: Đội Kali (tím)
+const tx = W / 2, ty = (14 + 32) * z
+them(`<div class="the" style="--d:var(--k)"><span class="av">TH</span><span class="ten"><b>Nguyễn Thị Thu Hà</b><small>Đội Kali · đang lên bảng</small></span><span class="dem" style="color:#fff"><svg style="color:var(--k)"><use href="#tt"/></svg>128</span></div>`)
+them(`<div class="doi" style="top:${78 * z}px"><span style="--d:var(--na)"><i></i>Na 34</span><span style="--d:var(--k)"><i></i>K 41</span><span style="--d:var(--cu)"><i></i>Cu 28</span><span style="--d:var(--ca)"><i></i>Ca 25</span></div>`)
+// các tinh thể đang bay: đường cong Bézier từ mép dưới lên thẻ tên
+let hat = 7
+const ngau = () => { hat = (hat * 16807) % 2147483647; return hat / 2147483647 }
+const MAU = ['--na', '--k', '--cu', '--ca'], n = thay ? 34 : 22
+const bez = (p0, p1, p2, t) => ({ x: (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * p1.x + t * t * p2.x, y: (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * p1.y + t * t * p2.y })
+for (let i = 0; i < n; i++) {
+  const d = MAU[i % 4], cua = k === 'em' && i < 5
+  const p0 = cua ? { x: W - 65 * z, y: H - 61 * z } : { x: W * (0.06 + ngau() * 0.88), y: H + 10 * z }
+  const p1 = { x: p0.x + (tx - p0.x) * 0.35 + (ngau() - 0.5) * W * 0.3, y: H * (0.25 + ngau() * 0.3) }
+  const t = cua ? 0.12 + i * 0.19 : 0.08 + ngau() * 0.86, p = bez(p0, p1, { x: tx, y: ty }, t), co = (30 - 14 * t) * z * (0.8 + ngau() * 0.5), goc = (ngau() - 0.5) * 50
+  for (let j = 1; j <= 9; j++) { const tj = t - j * 0.022; if (tj <= 0) break; const pj = bez(p0, p1, { x: tx, y: ty }, tj), c = co * (0.42 - j * 0.036); them(`<i class="hat" style="--d:var(${cua ? '--k' : d});left:${pj.x - c / 2}px;top:${pj.y - c / 2}px;width:${c}px;height:${c}px;opacity:${0.75 - j * 0.075}"></i>`) }
+  them(`<div class="tt" style="--d:var(${cua ? '--k' : d});color:var(${cua ? '--k' : d});left:${p.x - co / 2}px;top:${p.y - co * 0.6}px;width:${co}px;height:${co * 1.2}px;transform:rotate(${goc}deg);opacity:${0.55 + 0.45 * (1 - t * 0.5)}"><svg viewBox="0 0 40 48"><use href="#tt"/></svg></div>`)
+}
+for (let i = 0; i < 26; i++) them(`<i class="sao" style="left:${tx + (ngau() - 0.5) * 330 * z}px;top:${ty + (ngau() - 0.3) * 80 * z}px;opacity:${0.35 + ngau() * 0.65};transform:scale(${0.6 + ngau() * 1.4})"></i>`)
+if (thay) them(`<div class="day"><span class="live"><u></u>LIVE 24:16</span><span style="color:#8fa1ab">62 em · 128 lượt cổ vũ</span><span class="nut">Đạt</span></div>`)
+else {
+  them(`<i class="vong" style="--d:var(--k);right:${(26 - 16) * z}px;bottom:${(22 - 16) * z}px;width:${110 * z}px;height:${110 * z}px;opacity:.5"></i><i class="vong" style="--d:var(--k);right:${(26 - 34) * z}px;bottom:${(22 - 34) * z}px;width:${146 * z}px;height:${146 * z}px;opacity:.22"></i>`)
+  them(`<div class="co-vu" style="--d:var(--k);bottom:${40 * z}px"><svg style="color:#fff" viewBox="0 0 40 48"><use href="#tt"/></svg><em>+5</em><b>Cổ vũ</b></div>`)
+}
+</script>
+</body></html>

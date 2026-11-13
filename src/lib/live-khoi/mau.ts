@@ -9,3 +9,7 @@ export const MAU_XANH_THAN: Record<string, string> = {
   '--lk-nen': XT.nen, '--lk-mat': XT.mat, '--lk-mat-2': XT.mat2, '--lk-vien': XT.vien, '--lk-chu': XT.chu, '--lk-chu-2': XT.chu2, '--lk-chu-3': XT.chu3, '--lk-nhan': XT.hs, '--lk-nhan-go': XT.hsGo,
   '--lk-dung': XT.dung, '--lk-dung-day': XT.dungDay, '--lk-sai': XT.sai, '--lk-chu-y': XT.chuY,
 }
+
+/** NỀN LUÔN TỐI của trò «Sinh Tồn · Trang vở» (thầy 13/11 «tối là #131f24 mặc định là nền này luôn nhé»): đúng bảng xanh than trên + viền sẫm. Gắn nội tuyến
+ *  ở gốc màn trò (TroSinhTon.tsx) — không khai trong tokens.css để lượt mở ba app không nặng thêm byte nào (luật tốc độ 13/10). */
+export const MAU_SINH_TON: Record<string, string> = { '--st-nen': XT.nen, '--st-mat': XT.mat, '--st-vien': XT.vien, '--st-vien-2': '#1a282e', '--st-chu': XT.chu }

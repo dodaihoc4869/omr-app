@@ -200,3 +200,7 @@
 @media (prefers-reduced-motion: reduce) { .xl-xuong, .xl-xuly .vong::before { animation: none; } .xl-mo svg, .xl .xl-nut { transition: none; } }
 html.may-yeu .xl-xuong, html.may-yeu .xl-xuly .vong::before { animation: none; }
 html.may-yeu .xl-mo svg, html.may-yeu .xl .xl-nut { transition: none; }
+
+/* NHẬT KÝ BÀI DẠY (thầy 13/11): thẻ mở bài hoạt hoạ ở bìa buổi + khung phủ kín chứa trang tĩnh /nhat-ky/ (trang tự có nút «Về buổi live»). */
+.xl-nk { position: fixed; inset: 0; z-index: 1000; background: var(--tr-nen); }
+.xl-nk iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--tr-nen); }

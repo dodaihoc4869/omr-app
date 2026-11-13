@@ -1,9 +1,10 @@
 // LIVE THEO KHỐI — LỚP NỔI MÁY EM (mặt; kho + nối phòng ở em-khoi.ts): phòng chờ có trò Sinh Tồn, màn bốn đội, nút chat mép phải, bong bóng tin mới.
-import { laDienThoai, thuocTinhXoay, toaDoXoay } from '../live/chieu-xoay'
+import { laDienThoai, thuocTinhXoay } from '../live/chieu-xoay'
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { useChatLop } from './ChatEm'
 import { dangKy, dongKhoi, guiTho, kenh, layKho } from './em-khoi'
+import { DaNghi } from './da-nghi'
 import './em-khoi.css'
 
 const TroSinhTon = lazy(() => import('./TroSinhTon'))
@@ -41,6 +42,14 @@ export default function LopNoiEm() {
   const gd = s.khoi?.gd ?? null
   const dangVao = !s.khoi && !!s.dangVao && !s.xong
   const cho = gd === 'cho' || dangVao
+  // NÚT «NGHỈ» (thầy duyệt bản vẽ 67–70 ngày 13/11): thầy cho nghỉ giải lao ⇒ em về màn chờ chơi trò; thầy «Học tiếp» ⇒ đếm 3 giây rồi vào lại đúng chỗ đang dạy.
+  const giaiLao = gd === 'dang' && !!s.khoi?.giaiLao
+  const [vaoLai, setVaoLai] = useState(0)
+  const [glCu, setGlCu] = useState(giaiLao)
+  if (glCu !== giaiLao) { setGlCu(giaiLao); setVaoLai(!giaiLao && gd === 'dang' ? 3 : 0) }
+  useEffect(() => { if (!vaoLai) return; const h = setTimeout(() => setVaoLai((n) => Math.max(0, n - 1)), 1000); return () => clearTimeout(h) }, [vaoLai])
+  /** Đang ở màn chơi trò: phòng chờ, nghỉ giải lao, hoặc 3 giây đếm trước khi vào học tiếp. */
+  const choi = cho || giaiLao || vaoLai > 0
   const { xoay, style, rong } = useXoay()
   const [bonDoi, setBonDoi] = useState<'xem' | null>(null)
   const [chatMo, setChatMo] = useState(false)
@@ -61,20 +70,13 @@ export default function LopNoiEm() {
   const lamCau = s.khoi?.che === 'hoc' && !!s.coLuot
   const [lamCu, setLamCu] = useState(lamCau)
   if (lamCu !== lamCau) { setLamCu(lamCau); if (lamCau) setChatMo(false) }
-  // NGĂN «TIN NHẮN LỚP» (thầy duyệt bản vẽ 60–66 ngày 13/11). Điện thoại: vuốt từ mép phải / kéo vạch vàng ⇒ ngăn trượt theo ngón tay (LopLive báo
-  // `ddh-lk-keo` số px đã kéo, `ddh-lk-tha` lúc thả). Máy tính màn rộng: GHIM thành cột bên phải, màn live co sang trái; Enter gõ ngay, Esc về bài.
+  // NGĂN «TIN NHẮN LỚP» (thầy duyệt bản vẽ 60–66 ngày 13/11). Điện thoại: em bấm thanh vàng rồi chọn «Nhắn cả lớp» ⇒ ngăn trượt ra từ mép phải (thầy 13/11
+  // lần 2: «vuốt để ra bảng tin nhắn rất khó, bạn bỏ vuốt đi để hs bấm vào thanh vàng rồi chọn» ⇒ ĐÃ BỎ vuốt mép phải / kéo thanh vàng). Máy tính màn rộng:
+  // GHIM thành cột bên phải, màn live co sang trái; Enter gõ ngay, Esc về bài.
   const coGhim = !laDienThoai() && rong >= GHIM_RONG
   const [ghimMuon, setGhimMuon] = useState(docGhim)
-  const cotGhim = coGhim && ghimMuon && gd === 'dang'
-  const [keo, setKeo] = useState<number | null>(null)
+  const cotGhim = coGhim && ghimMuon && gd === 'dang' && !choi
   const [tieuDiem, setTieuDiem] = useState(0)
-  useEffect(() => {
-    const k = (e: Event) => setKeo(Math.max(0, Number((e as CustomEvent<number>).detail) || 0))
-    const t = (e: Event) => { setKeo(null); if ((Number((e as CustomEvent<number>).detail) || 0) > 90) setChatMo(true) }
-    window.addEventListener('ddh-lk-keo', k); window.addEventListener('ddh-lk-tha', t)
-    return () => { window.removeEventListener('ddh-lk-keo', k); window.removeEventListener('ddh-lk-tha', t) }
-  }, [])
-  const trucX = useCallback((e: { clientX: number; clientY: number }): number => (xoay ? toaDoXoay(e, { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }).x : e.clientX), [xoay])
   const datGhim = useCallback((b: boolean): void => { setGhimMuon(b); if (!b) setChatMo(false); try { localStorage.setItem(KHOA_GHIM, b ? '1' : '0') } catch { /* máy chặn lưu */ } }, [])
   const dongChat = useCallback(() => setChatMo(false), [])
   // cột ghim ⇒ màn live (lớp `.bpu-hs` bên dưới) co sang trái đúng bề ngang cột (em-khoi.css)
@@ -87,7 +89,7 @@ export default function LopNoiEm() {
   // ngăn trượt đang mở: chạm ra ngoài (vào bảng) ⇒ đóng
   useEffect(() => {
     if (!chatMo || cotGhim) return
-    const f = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.('.lc-ngan, .lv-nam, .lv-vuot, .lke-mep')) setChatMo(false) }
+    const f = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.('.lc-ngan, .lv-nam, .lv-khay, .lke-mep')) setChatMo(false) }
     window.addEventListener('pointerdown', f, true)
     return () => window.removeEventListener('pointerdown', f, true)
   }, [chatMo, cotGhim])
@@ -133,17 +135,19 @@ export default function LopNoiEm() {
   if (dangVao) return <div className="lke cho dang-vao" data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }} role="status"><p><i aria-hidden="true" />Đang vào phòng live…</p></div>
   if (!s.khoi || !s.toi || (cho && roiCho)) return null
   return (
-    <div className={`lke${cho ? ' cho' : ''}${cotGhim ? ' co-cot' : ''}`} data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>
+    <div className={`lke${choi ? ' cho' : ''}${cotGhim ? ' co-cot' : ''}`} data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>
       <Suspense fallback={null}>
-        {cho ? <TroSinhTon toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
+        {choi ? <TroSinhTon toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
         {cho ? <button type="button" className="lke-roi" onClick={() => { setRoiCho(true); try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }}>Rời phòng chờ</button> : null}
-        {!cho && !sanh && !bonDoi ? <MayTinhEm kenh={kenh} /> : null}
-        {!cho ? <HoiHieuEm kenh={kenh} /> : null}
+        {giaiLao && s.khoi?.giaiLao ? <div className="lke-nghi" role="status"><i aria-hidden="true" /><b>Nghỉ giải lao</b><span>Thầy gọi Học tiếp là em vào lại bài</span><time><DaNghi tu={s.khoi.giaiLao} /></time></div> : null}
+        {vaoLai > 0 ? <div className="lke-vao-lai" role="alert"><div><small>Hết giờ nghỉ</small><b>Thầy gọi học tiếp</b><p>Em vào lại đúng chỗ thầy đang dạy.</p><span>{vaoLai}</span></div></div> : null}
+        {!choi && !sanh && !bonDoi ? <MayTinhEm kenh={kenh} /> : null}
+        {!choi ? <HoiHieuEm kenh={kenh} /> : null}
         {!cho && s.luat ? <LuatRoiEm luat={s.luat} onXin={() => guiTho({ t: 'live-luat-xin' })} /> : null}
-        {!cho && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
-        {!cho && (sanh || !bonDoi) ? (
+        {!choi && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
+        {!choi && (sanh || !bonDoi) ? (
           <>
-            {chatMo || cotGhim || keo != null ? <NganChatEm chat={chat} toiSbd={s.toi.sbd} soEm={s.ds.length} ghim={cotGhim} coGhim={coGhim} keo={chatMo || cotGhim ? null : keo} tieuDiem={tieuDiem} trucX={trucX} onDong={dongChat} onGhim={datGhim} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
+            {chatMo || cotGhim ? <NganChatEm chat={chat} toiSbd={s.toi.sbd} soEm={s.ds.length} ghim={cotGhim} coGhim={coGhim} tieuDiem={tieuDiem} onDong={dongChat} onGhim={datGhim} banPhimRieng={xoay} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
             {sanh && (mic.moi || mic.mic) ? (
               <div className="lke-moi" role="dialog" aria-label="Mic của em">
                 {mic.mic === 'mo' ? <><p><b>Mic của em đang bật</b>Thầy và cả lớp đang nghe em.</p><button type="button" onClick={() => lenhLk('mic-tat')}>Tắt mic</button></>

@@ -16,12 +16,25 @@ export class KenhLopMay {
   private lucChat = new Map<string, number>()
   private lucHieu = new Map<string, number>()
   /** Trò Sinh Tồn ở phòng chờ: máy trò dùng chung với phòng chờ ca kiểm tra (sinh-ton-may-chu.ts); lớp này chỉ lo hẹn giờ + phát tin. */
-  private tro = new MaySinhTon()
+  private tro: MaySinhTon
   private hen: ReturnType<typeof setTimeout> | null = null
+  /** Kết nối máy em ⇒ số báo danh (ghi lúc em gửi gói trò) — «chỉ gửi gần» cần biết mỗi kết nối là em nào; chưa biết ⇒ đọc dữ liệu gắn kết nối. */
+  private sbdWs = new WeakMap<WsMayChu, string>()
   private dauDs = ''
-  constructor(private ctx: DurableObjectState, private nho: () => TrangThaiPhong | null | undefined) {}
+  constructor(private ctx: DurableObjectState, private nho: () => TrangThaiPhong | null | undefined) {
+    // Máy bù mang tên như học sinh: tránh tên MỌI em trong danh sách lớp (cả em chưa vào — em vắng không thấy «mình» đang chơi).
+    this.tro = new MaySinhTon(Math.random, () => (this.nho()?.ds ?? []).map((e) => e.ten))
+  }
 
   private gui(ws: WsMayChu, d: string): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
+  private sbdCua(ws: WsMayChu): string {
+    let s = this.sbdWs.get(ws)
+    if (s === undefined) {
+      try { const a = ws.deserializeAttachment?.() as KemBpu | null | undefined; s = a?.v === 'hs' && typeof a.s === 'string' ? a.s : '' } catch { s = '' }
+      this.sbdWs.set(ws, s)
+    }
+    return s
+  }
   private moiMay(d: string, caThay = true): void {
     for (const ws of this.ctx.getWebSockets('hs')) this.gui(ws, d)
     if (caThay) for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, d)
@@ -79,7 +92,8 @@ export class KenhLopMay {
       return true
     }
     if (j.k === 'tro') {
-      if (thay || st.live.khoi.gd !== 'cho') return true
+      if (thay || !(st.live.khoi.gd === 'cho' || st.live.khoi.giaiLao)) return true
+      this.sbdWs.set(ws, a.s)
       this.tro.nhan(a.s, e!.doi, x, nay)
       if (!this.hen && this.tro.soEm) this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)
       return true
@@ -89,10 +103,17 @@ export class KenhLopMay {
   private nhipTro(): void {
     this.hen = null
     const st = this.nho(), nay = Date.now()
-    if (!st || st.ketThuc || st.live?.khoi?.gd !== 'cho') { this.tro.dung(); return }
+    if (!st || st.ketThuc || !(st.live?.khoi?.gd === 'cho' || st.live?.khoi?.giaiLao)) { this.tro.dung(); return } // trò chạy ở phòng chờ và lúc nghỉ giải lao
     const anh = this.tro.nhip(nay)
     if (!anh) return
-    this.moiMay(JSON.stringify({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: nay, x: anh }))
+    // «Chỉ gửi gần»: máy thầy nhận ảnh đủ; mỗi máy em chỉ nhận phần quanh mình (em chưa lên sân / không rõ là ai ⇒ ảnh đủ).
+    const goi = this.tro.goi(anh, nay)
+    for (const ws of this.ctx.getWebSockets('hs')) {
+      const s = this.sbdCua(ws)
+      this.gui(ws, s ? goi.cho(s) : goi.du())
+    }
+    const gvWs = this.ctx.getWebSockets('gv')
+    if (gvWs.length) { const du = goi.du(); for (const ws of gvWs) this.gui(ws, du) }
     this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)
   }
 }

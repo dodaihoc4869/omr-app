@@ -205,7 +205,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       const w = new WebSocket(`${goc0.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(String(r.du.ve))}`)
       ws.current = w
       noiLive(w, String(r.du.ve), goc0)
-      w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000) }
+      w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"nhip"}') } catch { /* rớt */ } }, 45_000) /* 13/11: «nhip» (KHÔNG phải «ping» phòng tự trả) ⇒ đánh thức phòng ⇒ nạp sẵn câu tự làm mới khi lớp im */ }
       w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } else if (m.t === 'dk') { const l = (m as { lenh?: string }).lenh, d = dkRef.current; if (l === 'toi') d.onToi?.(1); else if (l === 'lui') d.onToi?.(-1); else if (l === 'giai') d.onGiai?.() } } catch { /* bỏ qua */ } }
       w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }

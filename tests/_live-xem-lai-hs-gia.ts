@@ -3,7 +3,8 @@
 // Nét là NÉT THẬT của bộ máy bút: mã hoá bằng `maNetXong` / `maBangMoi` / `maXoaHet` rồi đóng `net.bin` bằng `ghiNetBin` — y như máy chủ sẽ ghi.
 import type { DiemBut, NetBut } from '../src/lib/but-bang-loi'
 import { maBangMoi, maNetXong, maXoaHet, maXoaNet } from '../src/lib/live/ma-net'
-import { DAU_BAN_GHI_NET, ghiNetBin, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type TraLiveBuoiHs, type TraLiveDsHs } from '../src/lib/live/xem-lai-kieu'
+import { DAU_BAN_GHI_NET, ghiNetBin, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type MocMayTinh, type TraLiveBuoiHs, type TraLiveDsHs } from '../src/lib/live/xem-lai-kieu'
+import { bam, manHinh, taoMay } from '../src/lib/may-tinh/may'
 import { VUNG_MAC_DINH, maTrang } from '../src/components/live/bo-cuc'
 
 const PHUT = 60_000
@@ -189,4 +190,15 @@ export function taoTiengGia(msLive: number, coTieng: readonly KhoangMs[]): Uint8
     for (let i = i0; i < i1; i++) { const s = i / HZ, nhip = 0.5 + 0.5 * Math.sin(s * 5.2); b[44 + i] = 128 + Math.round(10 * nhip * Math.sin(2 * Math.PI * (150 + 40 * Math.sin(s * 1.7)) * s)) }
   }
   return b
+}
+
+/** MÁY TÍNH FX4869 của thầy trong buổi giả (13/11): mở lúc `t0`, bấm 9,3 ÷ 93 = (mỗi phím 0,6 giây), dời sang trái sau 12 giây, cất sau 40 giây. Đúng dạng `buoi.mayTinh`. */
+export function mayTinhGia(t0: number): MocMayTinh[] {
+  const phim = ['9', 'phay', '3', 'chia', '9', '3', 'bang'], ra: MocMayTinh[] = []
+  let tt = taoMay()
+  ra.push({ t: t0, mo: 1, x: 0.78, y: 0.52, w: 0.24, mh: manHinh(tt) })
+  phim.forEach((p, i) => { tt = bam(tt, p); ra.push({ t: t0 + 1500 + i * 600, mo: 1, x: 0.78, y: 0.52, w: 0.24, mh: manHinh(tt), p, n: i + 1 }) })
+  ra.push({ t: t0 + 12_000, mo: 1, x: 0.3, y: 0.45, w: 0.24 })
+  ra.push({ t: t0 + 40_000, mo: 0 })
+  return ra
 }

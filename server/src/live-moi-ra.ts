@@ -83,16 +83,22 @@ export async function gvLiveThongKe(env: Env, b: Row, hoiPhong: (buoiId: string)
   const vang = khoi ? [...hs].filter(([sbd, h]) => h.khoi === khoi && !daVao.has(sbd)).map(([sbd, h]) => ({ sbd, ten: h.ten, lop: h.lop })) : []
   // sổ mời ra: gộp theo em — lần mời ra cuối + việc xảy ra sau đó
   const moiRa = new Map<string, { sbd: string; ten: string; lop: string; soLan: number; lan: number; gio: string; trangThai: 'cho' | 'tu-choi' | 'da-vao-lai' }>()
+  // luật rời màn của buổi: `bat` / `dangBat` = nút đang bật, `daBat` = đã từng bật, `n` = số lần thầy đặt trên nút (văn phòng CHỈ nhắn nhóm về rời màn / mời ra khi `daBat`; tin kết thúc buổi thì luôn gửi)
+  const luat = { daBat: false, dangBat: false, n: 0, batLuc: '' }
   for (const r of sk) {
     const sbd = str(r.sbd), loai = str(r.loai), cu = moiRa.get(sbd)
-    if (loai === 'ra') moiRa.set(sbd, { sbd, ten: ten(sbd, str(r.ten)), lop: lop(sbd), soLan: (cu?.soLan ?? 0) + 1, lan: num(r.lan), gio: gioVn(num(r.luc)), trangThai: 'cho' })
+    if (loai === 'bat') { luat.daBat = true; luat.dangBat = true; luat.n = num(r.n); if (!luat.batLuc) luat.batLuc = gioVn(num(r.luc)); continue }
+    if (loai === 'tat') { luat.dangBat = false; continue }
+    if (loai === 'ra') { luat.daBat = true; moiRa.set(sbd, { sbd, ten: ten(sbd, str(r.ten)), lop: lop(sbd), soLan: (cu?.soLan ?? 0) + 1, lan: num(r.lan), gio: gioVn(num(r.luc)), trangThai: 'cho' }) }
     else if (cu) cu.trangThai = loai === 'tu' ? 'tu-choi' : 'da-vao-lai'
   }
+  // phòng đang mở là nguồn đúng nhất của NÚT LUẬT lúc này (`/tk` trả số lần của luật, 0 = đang tắt); phòng không trả lời ⇒ theo sổ
+  if (tk.ok === true && typeof tk.luat === 'number') { luat.dangBat = tk.luat > 0; if (tk.luat > 0) { luat.daBat = true; luat.n = tk.luat } }
   // tên gọi ngắn, không trùng trong buổi (em có mặt + em vắng) — văn phòng dùng thẳng trong tin
   const goi = tenGoiTheoBuoi([...coMat.map((e) => e.ten), ...vang.map((e) => e.ten), ...[...moiRa.values()].map((e) => e.ten)]), tg = (t: string): string => goi.get(t.trim()) ?? t
   return {
     ok: true, buoiId: id, ten: str(buoi.ten), khoi, moLuc: str(buoi.mo_luc), dongLuc: str(buoi.dong_luc) || null, coPhong: tk.ok === true, dangLive: tk.dangLive === true, ketThuc: tk.ketThuc === true || !!str(buoi.dong_luc),
-    siSo: khoi ? coMat.length + vang.length : coMat.length, soCoMat: coMat.length, soVang: vang.length,
+    luat: { bat: luat.dangBat, ...luat }, siSo: khoi ? coMat.length + vang.length : coMat.length, soCoMat: coMat.length, soVang: vang.length,
     coMat: coMat.map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, roi: e.roi })).sort((x, y) => y.roi - x.roi || x.ten.localeCompare(y.ten, 'vi')),
     roiMan: coMat.filter((e) => e.roi > 0).map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, lan: e.roi })).sort((x, y) => y.lan - x.lan),
     moiRa: [...moiRa.values()].map((e) => ({ ...e, tenGoi: tg(e.ten) })), vang: vang.map((e) => ({ ...e, tenGoi: tg(e.ten) })).sort((x, y) => x.lop.localeCompare(y.lop, 'vi') || x.ten.localeCompare(y.ten, 'vi')),

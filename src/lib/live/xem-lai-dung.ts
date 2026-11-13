@@ -12,6 +12,7 @@ import { apMuc, datLai, taoBang } from './so-net'
 import { catDoan, chonDangXem, type LuotCat } from './xem-lai-cat'
 import { MUC_MS, mucTuDb, type DauKhuc } from './xem-lai-khuc'
 import { DAU_BAN_GHI_NET, ghiNetBin, type BangVangLive, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type LyDoKhongDoan, type MocChe } from './xem-lai-kieu'
+import { dungMayTinh, type MucMayTinhXl } from './xem-lai-may-tinh'
 import { BYTE_MOI_KHUNG, MS_MOI_KHUNG } from './xem-lai-mp3'
 import { tenBaiTuDong, tenDoan, tenGoi } from './xem-lai-ten'
 
@@ -70,6 +71,8 @@ export interface DauVaoDung {
   /** Buổi LIVE THEO KHỐI (12/11): thầy giảng trên bảng / tờ cả buổi, có thể không chiếu câu nào ⇒ phần live TRƯỚC câu đầu tiên thành chương «Thầy giảng»,
    *  và mọi câu đã chiếu đều được giữ như câu «chữa trên bảng» (chưa mở đáp án thì vẫn KHÔNG mang đáp án / lời giải). */
   khoi?: boolean
+  /** Nhật ký MÁY TÍNH của thầy (13/11, giờ phòng — xem-lai-may-tinh.ts). Vắng = phòng không ghi (buổi trước 13/11, hoặc thầy không mở máy tính). */
+  mayTinh?: readonly MucMayTinhXl[]
 }
 /** Kế hoạch ghép `tieng.mp3`: theo thứ tự, mỗi mục là một khúc R2 (giữ các khoảng khung `giu`) hoặc `kh` khung câm. */
 export type MucTieng = { loai: 'khuc'; khoa: string; giu: [number, number][] } | { loai: 'cam'; kh: number }
@@ -376,6 +379,9 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     if (cuoi && cuoi.t >= t) { cuoi.v = e.c; if (che.length > 1 && che[che.length - 2]!.v === e.c) che.pop() } else che.push({ t, v: e.c })
   }
 
+  // ── 11. Máy tính FX4869 của thầy (13/11): giờ phòng ⇒ trục tiếng; tắt live / thầy im quá 13 giây ⇒ cất ──
+  const mayTinh = v.mayTinh?.length ? dungMayTinh(v.mayTinh, khoang.map((k) => k[1]), (w) => R2F(W2A(w)), trongLive) : []
+
   const batLuc = khoang.length ? khoang[0]![0] : v.nay, tatLuc = khoang.length ? khoang[khoang.length - 1]![1] : null
   const buoi: BuoiLiveJson = {
     v: 1, id: v.id, ban: v.ban, ngay: ngayVn(batLuc), lop: v.lop, batLuc: new Date(batLuc).toISOString(), tatLuc: tatLuc == null ? null : new Date(tatLuc).toISOString(),
@@ -383,6 +389,7 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     msLive: Math.round(msLive), msDoan: doan.reduce((s, d) => s + d.t1 - d.t0, 0), byteTieng: coTieng ? tongKhung * BYTE_MOI_KHUNG : 0, byteNet: netBin.length,
     cau, doan, lang, emNoi, mocBang, bangVang: v.bangVang,
     ...(che.length ? { che } : {}),
+    ...(mayTinh.length ? { mayTinh } : {}),
   }
   // `ngan` tính trên thời lượng live THẬT (trước khi cắt câu chưa chữa) để lý do hiện cho thầy nói đúng việc đã xảy ra.
   const lyDo: KetQuaDung['lyDo'] = !khoang.length ? 'khong-live' : tongTho < LIVE_TOI_THIEU_MS ? 'ngan' : !cau.length ? 'khong-cau' : doan.length ? '' : !coTieng && !netViet.length ? 'khong-tieng-net' : 'khong-doan'

@@ -7,7 +7,7 @@
 // D1: mở phòng 1 đợt chờ (batch ∥ năng lực chia đội), mỗi lượt đọc câu + kiểm câu bảo vệ song song, KẾT THÚC buổi 1 batch ghi `bpu_luot` (bảng tạo lười). Công tắc: `TAT_BPU`.
 import { ghiMoiRa } from './live-moi-ra'
 import { layChoGhiLuat } from '../../src/lib/bpu/phong-luat'
-import type { DurableObjectState, Env, WsMayChu } from './kieu'
+import type { DurableObjectState, Env, ExecutionContext, WsMayChu } from './kieu'
 import * as L from '../../src/lib/bpu/phong'
 import { grade, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { gameIdentity } from './game-v2-auth'
@@ -20,6 +20,7 @@ import { LiveMay, type KemBpu } from './phong-live'
 import { GIAO_DIEN_DOT_2, datCoLive, duocPhatMic, laEmXaDangLive, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 import { KHOA_CH_XEM_LAI, NhatKyXl, xemLaiBat } from './live-xem-lai'
 import { KenhLopMay } from './kenh-lop-may'
+import { NAP_LAM_MOI_MS, chupAnToan, conKhop, docBan, docNap, duocNhanh, locMaCau, type AnToanNap, type CauNap } from './bpu-nap-san'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -181,12 +182,32 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
 }
 
 /** `POST /gv/bpu/luot { buoiId, qid, hanGiay, bo? }` (bo = bỏ lượt dở cũ, 10/11): đọc câu đầy đủ từ chỉ mục kho + kiểm câu bảo vệ (song song), mở lượt mới, báo máy các em có mặt. */
-export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
+/** NẠP SẴN câu của tờ đang chiếu vào phòng (13/11, bpu-nap-san.ts): một đợt D1 do PHÒNG đọc, không nằm trên đường sang câu. */
+export async function gvBpuNap(env: Env, b: Row): Promise<Row> {
+  if (!bpuBat(env)) return { ok: false, lyDo: 'tat' }
+  const buoiId = buoiHop(b.buoiId), qids = locMaCau(b.qids)
+  if (!buoiId || !qids.length) return { ok: false, error: 'Thiếu buổi hoặc câu.' }
+  return goiPhong(env, buoiId, '/nap', { qids })
+}
+export async function gvBpuLuot(env: Env, b: Row, ctx?: ExecutionContext): Promise<Row> {
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat', error: 'Bình Phản Ứng đang tắt.' }
   const buoiId = buoiHop(b.buoiId), qid = str(b.qid).trim().slice(0, 200)
   if (!buoiId || !qid) return { ok: false, error: 'Thiếu buổi hoặc câu.' }
   // 08/11 thầy «bỏ đếm thời gian»: bảng gửi hanGiay = 0 ⇒ lượt KHÔNG giới hạn giờ (không đồng hồ, không tự khoá); số khác vẫn kẹp 60–180 như cũ.
   const hanGiay = b.hanGiay === 0 ? 0 : kepGiay(b.hanGiay)
+  // ĐƯỜNG NHANH (13/11, bpu-nap-san.ts): phòng đã nạp sẵn câu và ảnh chụp an toàn còn mới ⇒ phòng mở lượt NGAY (0 D1 trên đường này). Phòng từ chối
+  // (`nhanh: false`: chưa nạp / ảnh chụp cũ / có ca thi đang mở / câu bị giữ) ⇒ đi đường cũ bên dưới, kiểm đầy đủ như trước.
+  const nh = await goiPhong(env, buoiId, '/luot-nhanh', { qid, hanGiay, bo: b.bo === true }).catch(() => null)
+  if (nh?.ok === true && nh.nhanh === true) {
+    // Báo kênh đẩy cho các em có mặt (trừ em đang làm bài) — SAU khi phòng đã phát câu, không giữ đường của thầy.
+    const bao = (async () => {
+      const dt = await env.DB.prepare("SELECT DISTINCT sbd FROM luot WHERE trang_thai = 'dang_lam'").all<Row>().catch(() => ({ results: [] as Row[] }))
+      const tru = new Set((dt.results ?? []).map((x) => str(x.sbd)))
+      await baoMayCacEm(env, (Array.isArray(nh.coMat) ? (nh.coMat as unknown[]).map(str) : []).filter((s) => !tru.has(s)), 'bpu').catch(() => 0)
+    })()
+    if (ctx) ctx.waitUntil(bao); else await bao
+    return { ok: true, so: nh.so, tuLuan: nh.tuLuan === true, nhanh: true }
+  }
   // Đọc SONG SONG (không thêm vòng chờ nối tiếp): câu · câu bảo vệ · em đang thi · lớp của buổi + lớp các em có mặt · ca đang mở.
   const [dong, phucVu, dangThi, buoiR, lopEmR, caR] = await Promise.all([
     env.DB.prepare(`SELECT q.json AS json ${TU_CHI_MUC_GAME} LIMIT 1`).bind(JSON.stringify([qid])).first<Row>(),
@@ -319,6 +340,53 @@ export class PhongBinhPhanUng {
     if (henNghi && !this.st.ketThuc) await this.ctx.storage.setAlarm(this.st.luot && this.st.luot.pha !== 'mo' ? mocTuMo(this.st.luot) : Date.now() + NGHI_MS)
   }
   /** Lượt đang làm chưa mở đáp án ⇒ mở + xếp ghi (thầy chuyển câu thẳng, hoặc quá mốc tự mở). */
+  /** Mở lượt mới cho câu `b` (đường cũ `/luot` và đường nhanh `/luot-nhanh` dùng chung).
+   *  Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
+   *  10/11 thầy «chọn câu khác ⇒ xoá lượt câu cũ»: bảng chọn câu gửi `bo` ⇒ lượt dở chưa mở đáp án bỏ hẳn (không chấm, không kJ); đã mở ⇒ giữ. */
+  private async moLuotMoi(st: L.TrangThaiPhong, b: Row, nay: number): Promise<Row> {
+    if (b.bo === true) L.boLuot(st, nay)
+    else if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
+      const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null, giai: (b.giai ?? null) as L.LuotPhong['giai'] }, nay)
+      await this.luu(); this.phat()
+    return { ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) }
+  }
+  // ── NẠP SẴN CÂU (bpu-nap-san.ts): bộ nhớ + kho của phòng (phòng ngủ dậy vẫn còn) ──
+  private nap: { an: AnToanNap; cau: Map<string, CauNap> } | null = null
+  private napDang: Promise<void> | null = null
+  private async datNap(cau: CauNap[], an: AnToanNap): Promise<void> {
+    const cu = this.nap ? [...this.nap.cau.keys()] : (((await this.ctx.storage.get<{ qids: string[] }>('nap:m'))?.qids) ?? [])
+    this.nap = { an, cau: new Map(cau.map((c) => [c.qid, c])) }
+    try {
+      for (const q of cu) if (!this.nap.cau.has(q)) await this.ctx.storage.delete(`nap:q:${q}`)
+      for (const c of cau) await this.ctx.storage.put(`nap:q:${c.qid}`, c)
+      await this.ctx.storage.put('nap:m', { qids: cau.map((c) => c.qid), an })
+    } catch (e) { console.error('[bpu] cất câu nạp sẵn lỗi:', e instanceof Error ? e.message : e) }
+  }
+  private async layNap(): Promise<{ an: AnToanNap; cau: Map<string, CauNap> } | null> {
+    if (this.nap) return this.nap
+    const m = await this.ctx.storage.get<{ qids: string[]; an: AnToanNap }>('nap:m')
+    if (!m?.qids?.length) return null
+    const ds = await this.ctx.storage.list<CauNap>({ prefix: 'nap:q:' })
+    this.nap = { an: m.an, cau: new Map([...ds.values()].filter((c) => m.qids.includes(c.qid)).map((c) => [c.qid, c])) }
+    return this.nap
+  }
+  /** Làm mới ngầm ảnh chụp an toàn (ca thi đang mở + câu bảo vệ) — tối đa `NAP_LAM_MOI_MS` một lần, một lượt một lúc. `ep` = bỏ qua nhịp. */
+  private lamMoiNap(ep = false): void {
+    const n = this.nap
+    if (!n || this.napDang || (!ep && Date.now() - n.an.luc < NAP_LAM_MOI_MS)) return
+    this.napDang = (async () => {
+      try {
+        const qids = [...n.cau.keys()]
+        const [k, ban] = await Promise.all([chupAnToan(this.env, qids), docBan(this.env, qids)])
+        // thầy sửa đáp án / đẩy lại tờ / xoá tờ sau khi nạp ⇒ đọc lại cả bài (đáp án mới), không mở lượt bằng đáp án cũ
+        if (!conKhop(n.cau.values(), ban)) { const d = await docNap(this.env, qids); await this.datNap(d.cau, d.an); return }
+        for (const c of n.cau.values()) c.baoVe = k.biBaoVe.has(c.qid)
+        n.an = k.an
+        await this.ctx.storage.put('nap:m', { qids: [...n.cau.keys()], an: k.an })
+      } catch (e) { console.error('[bpu] làm mới nạp sẵn lỗi:', e instanceof Error ? e.message : e) } finally { this.napDang = null }
+    })()
+    this.ctx.waitUntil(this.napDang)
+  }
   private async chotLuot(st: L.TrangThaiPhong, nay: number): Promise<boolean> {
     if (!st.luot || st.luot.pha === 'mo') return false
     const doi = L.moDapAn(st, nay, chamSo)
@@ -408,7 +476,7 @@ export class PhongBinhPhanUng {
     const b = (await req.json().catch(() => ({}))) as Row
     const nay = Date.now()
     // THỐNG KÊ BUỔI cho văn phòng trực live (13/11): ai đã vào, mỗi em rời màn mấy lần. Đọc-chỉ, không đổi trạng thái, dùng được cả sau khi buổi kết thúc.
-    if (u.pathname === '/tk') { const st = await this.doc(); return json(st ? { ok: true, phong: st.lop, ketThuc: st.ketThuc, dangLive: !!st.live?.bat, em: st.ds.map((e) => [e.sbd, e.ten, e.vao ? 1 : 0, e.roi]) } : { ok: false, lyDo: 'chua-mo' }) }
+    if (u.pathname === '/tk') { const st = await this.doc(); return json(st ? { ok: true, phong: st.lop, ketThuc: st.ketThuc, dangLive: !!st.live?.bat, luat: st.live?.luat?.n ?? 0, em: st.ds.map((e) => [e.sbd, e.ten, e.vao ? 1 : 0, e.roi]) } : { ok: false, lyDo: 'chua-mo' }) }
     if (u.pathname === '/tt-doc') return json({ ok: true, tt: (await this.ctx.storage.get('tt')) ?? null })
     if (u.pathname === '/tt-ghi') {
       const moi = chuanTienTrinh(b.tt), cu = chuanTienTrinh(await this.ctx.storage.get('tt'))
@@ -441,14 +509,26 @@ export class PhongBinhPhanUng {
       if (co) { await this.luu(false); this.phat(); this.ctx.waitUntil(baoMayCacEm(this.env, [str(b.sbd)], 'bpu').catch(() => 0)) }
       return json({ ok: co })
     }
-    if (u.pathname === '/luot') {
-      // Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
-      // 10/11 thầy «chọn câu khác ⇒ xoá lượt câu cũ»: bảng chọn câu gửi `bo` ⇒ lượt dở chưa mở đáp án bỏ hẳn (không chấm, không kJ); đã mở ⇒ giữ.
-      if (b.bo === true) L.boLuot(st, nay)
-      else if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
-      const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null, giai: (b.giai ?? null) as L.LuotPhong['giai'] }, nay)
-      await this.luu(); this.phat()
-      return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
+    if (u.pathname === '/luot') return json(await this.moLuotMoi(st, b, nay))
+    // NẠP SẴN (13/11, bpu-nap-san.ts): tờ vừa mở ⇒ phòng tự đọc D1 MỘT lần cho cả bài; thầy sang câu ⇒ `/luot-nhanh` mở lượt từ bộ nhớ (0 D1) khi an toàn.
+    if (u.pathname === '/nap') {
+      const moi = locMaCau(b.qids)
+      if (!moi.length) return json({ ok: false, error: 'Thiếu mã câu.' })
+      // GỘP với câu đã nạp (tờ của bảng + tờ riêng của tấm hoạt động cùng sống): tờ mới đứng trước, giữ tối đa NAP_TOI_DA; đọc lại CẢ danh sách một lần
+      // ⇒ ảnh chụp an toàn phủ đúng mọi câu đang giữ.
+      const cu = await this.layNap()
+      const qids = locMaCau([...moi, ...(cu ? cu.cau.keys() : [])])
+      const d = await docNap(this.env, qids)
+      await this.datNap(d.cau, d.an)
+      return json({ ok: true, so: d.cau.length, coCaMo: d.an.coCaMo })
+    }
+    if (u.pathname === '/luot-nhanh') {
+      const n = await this.layNap(), c = n?.cau.get(str(b.qid)), vi = duocNhanh(n?.an ?? null, c, nay)
+      if (vi || !c) { if (n && vi === 'cu') this.lamMoiNap(true); return json({ ok: false, nhanh: false, vi }) }
+      const hanGiay = b.hanGiay === 0 ? 0 : Number(b.hanGiay) || null
+      const r = await this.moLuotMoi(st, { qid: c.qid, phan: c.phan, tuLuan: c.tuLuan, cau: c.cau, dung: c.dung, hanGiay: c.tuLuan ? 0 : hanGiay, giai: c.giai, bo: b.bo === true }, nay)
+      this.lamMoiNap()
+      return json({ ...r, nhanh: true, tuLuan: c.tuLuan })
     }
     if (u.pathname === '/dong') { await this.ketThucBuoi(); return json({ ok: true }) }
     // LIVE đợt 2: `/hs/bpu/cua-em` hỏi «em này có được vào xem từ xa lúc này không» (0 D1) · đọc nhật ký đàm thoại của buổi.
@@ -466,6 +546,9 @@ export class PhongBinhPhanUng {
   }
 
   async webSocketMessage(ws: WsMayChu, goi: string | ArrayBuffer): Promise<void> {
+    // NẠP SẴN: mọi tin trong phòng (nét bút, câu trả lời, nhịp «nhip» 45 giây của bảng máy thầy — «ping» thì phòng tự trả, không vào đây) ⇒ làm mới ngầm ảnh
+    // chụp an toàn (tối đa 20 giây một lần)
+    if (this.nap && Date.now() - this.nap.an.luc >= NAP_LAM_MOI_MS) this.lamMoiNap()
     // LIVE (10/11): tin NHỊ PHÂN = mục sổ nét / lô điểm đang viết của máy thầy — đường riêng, không đụng luật lượt.
     if (typeof goi !== 'string') { await this.live.nhiPhan(ws, goi); return }
     if (goi.length > 2000) return
@@ -486,6 +569,8 @@ export class PhongBinhPhanUng {
       j = { t: 'chao-ve' } as Row
     }
     if (st.ketThuc) return
+    // Xem lại Live (13/11): máy tính FX4869 của thầy đi qua kênh lớp ⇒ ghi vào nhật ký buổi (chỉ bộ nhớ, ghi gom nền) rồi mới chuyển tiếp như cũ
+    if (j.t === 'lop' && j.k === 'mt' && a.v === 'gv') { try { this.xl.mayTinh(st, j.x, nay) } catch { /* lỗi ghi nhật ký không chặn kênh lớp */ } }
     if (this.lop.tin(ws, a, j, st, nay)) return
     if (await this.live.tinChu(ws, a, j, st, nay)) return
     let doi = j.t === 'chao-ve', gom = false

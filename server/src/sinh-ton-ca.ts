@@ -3,7 +3,8 @@
 // máy trò của phòng chờ Live theo khối). 0 D1, 0 storage, không có đáp án / điểm nào đi qua đây.
 //  · Em vào bằng vé đã kiểm ⇒ xếp vào ĐỘI ÍT EM THẬT NHẤT (bằng nhau ⇒ đội số nhỏ). Cùng số báo danh mở ở máy khác ⇒ kết nối cũ đóng 4002.
 //  · Đủ 78 em ⇒ đóng 4009 «sang:k+1» (máy em tự nối phòng kế, tối đa 8 phòng một ca).
-//  · Máy em gửi chuỗi JSON `{ t: 'st', x: SinhTonGui }`; phòng phát mỗi 250 ms MỘT ảnh `{ t: 'lop', k: 'tro', … }` (đúng dạng TinLop ⇒ màn TroSinhTon dùng chung).
+//  · Máy em gửi chuỗi JSON `{ t: 'st', x: SinhTonGui }`; phòng phát mỗi 250 ms MỘT ảnh `{ t: 'lop', k: 'tro', … }` (đúng dạng TinLop ⇒ màn TroSinhTon dùng chung),
+//    lọc riêng từng em («chỉ gửi gần», bản 2 đợt 2).
 //  · Thầy bấm Bắt đầu ⇒ `dongTatCa('bat-dau')`: báo `{ t: 'dong' }` rồi đóng mọi kết nối mã 4000 — trò không được cản việc vào bài.
 import type { SinhTonGui } from '../../src/lib/live-khoi/kieu'
 import { MaySinhTon } from './sinh-ton-may-chu'
@@ -39,7 +40,8 @@ export class PhongSinhTonCa {
   private nguoi = new Map<string, NguoiSt>()
   private theoKn = new Map<KetNoi, NguoiSt>()
   private may: MaySinhTon
-  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0) { this.may = new MaySinhTon(rng) }
+  // Máy bù mang tên như học sinh: tránh tên em đang trong phòng (phòng ca không có danh sách lớp).
+  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0) { this.may = new MaySinhTon(rng, () => [...this.nguoi.values()].map((n) => n.ten)) }
 
   get soNguoi(): number { return this.nguoi.size }
   /** Còn em thật vừa gửi gói ⇒ giữ nhịp 250 ms; hết ⇒ Durable Object được ngủ (kết nối vẫn giữ). */
@@ -91,13 +93,13 @@ export class PhongSinhTonCa {
     this.may.nhan(n.sbd, n.doi, j.x as unknown as Record<string, unknown>, this.bayGio())
   }
 
-  /** Nhịp 250 ms: có ảnh chụp ⇒ phát cho MỖI máy trong phòng. */
+  /** Nhịp 250 ms: có ảnh chụp ⇒ phát cho MỖI máy trong phòng — «chỉ gửi gần»: mỗi em chỉ nhận phần quanh mình (sinh-ton-may-chu.ts `GoiSinhTon`). */
   nhip(): void {
     const nay = this.bayGio()
     const anh = this.may.nhip(nay)
     if (!anh) return
-    const d = JSON.stringify({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: nay, x: anh })
-    for (const n of this.nguoi.values()) n.kn.gui(d)
+    const goi = this.may.goi(anh, nay)
+    for (const n of this.nguoi.values()) n.kn.gui(goi.cho(n.sbd))
   }
 
   roi(kn: KetNoi): void {

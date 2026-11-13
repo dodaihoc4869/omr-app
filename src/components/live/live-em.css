@@ -16,6 +16,8 @@
 .lv-chieu { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 .lv-giay { position: absolute; border-radius: 12px; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; }
 .lv-de { position: absolute; inset: 0; padding: 14px 18px; overflow-x: hidden; overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+/* Hình xoay 90° (điện thoại cầm dọc): trình duyệt không cuộn hộ khung nằm trong khối xoay ⇒ khung giấy tự cuộn theo ngón tay (KhungDocLap.tsx, cuon-giay.ts) */
+.lv[data-xoay] .lv-de { touch-action: none; }
 .lv-de-trong { transform-origin: 0 0; pointer-events: none; }
 .lv-de-trong .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex-direction: column; gap: 10px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .lv-giay-trong { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; text-align: center; font-size: 34px; font-weight: 700; color: var(--tr-chu-2); }
@@ -61,8 +63,6 @@
    khi không chạm; bút của thầy tới gần ⇒ `data-ne` mờ hẳn. KHÔNG còn nút / huy hiệu nổi riêng: trạng thái là các DẤU 15 px xếp dọc ngay trên viên thuốc. */
 .lv .lv-nam, .lv-phu .lv-nam { position: absolute; right: var(--lv-at-phai, 0px); top: 50%; width: 44px; height: 76px; min-height: 76px; margin: -38px 0 0; padding: 0 3px 0 0; border: 0; background: none; display: grid; place-items: center end;
   cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; z-index: 3; transition: opacity 0.18s; }
-/* Dải vuốt mép phải (live theo khối, điện thoại): vuốt sang trái ⇒ khung «Tin nhắn lớp». Nằm DƯỚI tay nắm (tay nắm vẫn chạm / kéo dọc như cũ). */
-.lv .lv-vuot, .lv-phu .lv-vuot { position: absolute; right: 0; top: 0; bottom: 0; width: 28px; touch-action: none; }
 .lv-nam i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--doi); opacity: 0.55; transition: transform 0.12s, opacity 0.18s;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 25%, transparent), 0 0 14px color-mix(in srgb, var(--doi) 55%, transparent); }
 .lv-nam:active i { opacity: 1; transform: scale(0.9, 0.97); }
@@ -435,4 +435,3 @@ html.may-yeu .lv-song i { transition: none; }
 @keyframes lv-cham-nhay { 50% { opacity: 0.2; } }
 .lv-nam[aria-expanded="true"] .lv-nam-cham { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .lv-tra, .lv-nam-cham.mic, .lv-tra-so output i { animation: none; } }
-

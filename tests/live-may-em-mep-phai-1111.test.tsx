@@ -200,7 +200,7 @@ describe('dải lượt trên bảng live: dải mỏng, đoán xong thu về m�
     const ve = () => { const l = viewEm(st, 'S1').luot!; return render(<div className="lv-luot">{daiLuot({ l, sbd: 'S1', doi: 0, daGuiMay: false, ketQuaBang: null, gui: (m) => lenh.push(m) })}</div>) }
     const r1 = ve()
     expect(r1.container.textContent).toContain('Em đoán Gia Bảo làm đúng không?')
-    expect([...r1.container.querySelectorAll('button')].map((b) => b.textContent!.replace(/ · \d+\/10$/, ''))).toEqual(['Làm đúng', 'Chưa đúng', expect.stringMatching(/^(Tiếp sức|Cổ vũ)$/)])
+    expect([...r1.container.querySelectorAll('button')].map((b) => b.textContent!.replace(/ · \d+\/12$/, ''))).toEqual(['Làm đúng', 'Chưa đúng', expect.stringMatching(/^(Tiếp sức|Cổ vũ)$/)])
     fireEvent.click(r1.container.querySelectorAll('button')[0]!)
     expect(lenh).toEqual([{ t: 'doan', v: 1 }])
     r1.unmount()

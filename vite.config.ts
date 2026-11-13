@@ -374,9 +374,11 @@ export default defineConfig({
           // Live theo khối (12/11): mọi mảnh của tính năng (bảng Live máy thầy, thẻ Live, lớp nổi, trò Sinh Tồn, chat, màn bốn đội) chỉ dùng khi ĐANG có mạng
           // (live) ⇒ kho chạy-lúc, không vào precache (giữ trần 170 tệp).
           '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroSinhTon,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
+          '**/patrick-hand-*.woff2', // phông viết tay trò Sinh Tồn «Trang vở» (13/11) — chỉ tờ kiểu của mảnh lười TroSinhTon khai, tải lúc mở trò
           // Máy tính «Đỗ Đại Học FX4869» (12/11): chỉ hiện trong buổi live (đang có mạng) ⇒ kho chạy-lúc. `dong-bo-????????` = mảnh chung mặt máy + CSS (8 dấu ? = đúng mã băm, không bắt nhầm `dong-bo-thu-muc-*`).
           '**/{MayTinhThay,MayTinhEm}-*.js', '**/dong-bo-????????.{js,css}',
           '**/{HoiHieuThay,HoiHieuEm,hoi-hieu,LuatRoiThay,LuatRoiEm,luat-roi}-*.{js,css}', // phím / «Hiểu chưa?» (12/11) — cũng chỉ dùng lúc live
+          '**/TinhTheCoVu-*.js', // tinh thể cổ vũ bạn lên bảng (13/11) — chỉ dùng trong buổi live (đang có mạng)
           '**/chieu-xoay-*.js', // luật xoay hình lúc live (src/components/live/chieu-xoay.ts) — chỉ dùng trong buổi live (đang có mạng)
           '**/mau-????????.js', // bảng màu xanh than của live theo khối (src/lib/live-khoi/mau.ts) — 8 dấu ? = đúng mã băm, không bắt nhầm `mau-chieu-*`
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
@@ -646,6 +648,7 @@ export default defineConfig({
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',
           '**/cai-app/**',
+          '**/nhat-ky/**', // 13/11 trang tĩnh xem «Nhật ký bài dạy» (khuôn hoạt hoạ ~90 KB) — chỉ mở khi em bấm, cần mạng (tiếng + nét) ⇒ ngoài precache
           '**/cai-app.html',
           '**/cai-dat.html',
           // Biểu tượng cài app 512 px + logo của app thầy: hệ điều hành đọc lúc CÀI app (qua mạng), máy không cần chúng để chạy.

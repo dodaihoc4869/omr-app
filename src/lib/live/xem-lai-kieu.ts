@@ -2,6 +2,7 @@
 // Máy chủ (chốt buổi, lệnh /gv/live-*, /hs/live-*, /live-tep) và máy khách (Lịch sử Live của thầy, danh sách + trang buổi + trình phát của em)
 // CÙNG nhập tệp này. Đổi hợp đồng = CHỈ THÊM trường tuỳ chọn; trường đã có không đổi nghĩa, không đổi kiểu.
 // An toàn: `buoi.json` KHÔNG mang kết quả riêng của em nào, KHÔNG mang câu chưa mở đáp án trong buổi (mục 4.4 luật 7).
+import type { ManHinh } from '../may-tinh/may'
 
 export type TrangThaiBuoiLive = 'dang_ghi' | 'dang_xu_ly' | 'xong' | 'loi' | 'dang_xoa'
 export type QuyenBuoiLive = 'lop' | 'diem_danh'
@@ -115,6 +116,29 @@ export interface BuoiLiveJson {
   /** LIVE THEO KHỐI (13/11): dòng thời gian CHẾ ĐỘ thầy đang dạy — `bang` = bảng kín màn, `hoc` = giấy đề + bảng — theo trục tiếng (ms), tăng dần, không lặp giá trị
    *  liền nhau. Trình phát xếp hình đúng theo đó, kể cả khi thầy đổi qua lại trong một buổi. Vắng (buổi trên lớp / buổi dựng trước 13/11) ⇒ trình phát suy từ trang bút. */
   che?: MocChe[]
+  /** MÁY TÍNH FX4869 của thầy (13/11, chỉ thêm): các lần mở / cất / dời / bấm phím theo trục tiếng (ms), tăng dần. Vắng = buổi không dùng máy tính, hoặc buổi
+   *  dựng trước 13/11 (lúc đó phòng không ghi máy tính ⇒ không khôi phục được). */
+  mayTinh?: MocMayTinh[]
+}
+/** Một mốc của máy tính: `mo` 0 = thầy cất (hoặc thầy im quá 13 giây / tắt live) · 1 = đang hiện tại tâm (`x`, `y`) bề ngang `w` — đều là phần của màn thầy (0–1).
+ *  `mh` = thứ đang hiện trên máy (`ManHinh` của src/lib/may-tinh/may.ts); VẮNG = y như mốc trước (chỉ đổi chỗ). `p` + `n` = phím thầy bấm ở mốc này + số thứ tự lần bấm. */
+export interface MocMayTinh { t: number; mo: 0 | 1; x?: number; y?: number; w?: number; mh?: ManHinh; p?: string; n?: number }
+/** Máy tính tại một thời điểm — cùng dạng gói `TinMayTinh` lúc live (src/components/may-tinh/dong-bo.ts) ⇒ mặt máy chỉ-xem vẽ lại y như máy em lúc live. */
+export interface MayTinhLuc { mo: true; x: number; y: number; w: number; mh: ManHinh; p: string; n: number }
+/** Chỉ số mốc cuối cùng có `t` ≤ giờ đang phát (−1 = chưa tới mốc nào / không có máy tính). Rẻ: gọi được ở mọi khung hình. */
+export function chiSoMayTinh(ds: readonly MocMayTinh[] | undefined, t: number): number {
+  if (!ds?.length || ds[0]!.t > t) return -1
+  let lo = 0, hi = ds.length - 1, k = 0
+  while (lo <= hi) { const g = (lo + hi) >> 1; if (ds[g]!.t <= t) { k = g; lo = g + 1 } else hi = g - 1 }
+  return k
+}
+/** Máy tính đang hiện ở mốc thứ `k` (từ `chiSoMayTinh`): lùi trong lần mở hiện tại tìm màn hình + lần bấm phím gần nhất. Đã cất ⇒ null. */
+export function mayTinhTai(ds: readonly MocMayTinh[] | undefined, k: number): MayTinhLuc | null {
+  const m = ds && k >= 0 ? ds[k] : undefined
+  if (!m || !m.mo) return null
+  let mh: ManHinh | undefined, p = '', n = -1
+  for (let i = k; i >= 0 && ds![i]!.mo && !(mh && n >= 0); i--) { const c = ds![i]!; if (!mh && c.mh) mh = c.mh; if (n < 0 && c.n != null) { n = c.n; p = c.p ?? '' } }
+  return mh ? { mo: true, x: m.x ?? 0.8, y: m.y ?? 0.5, w: m.w ?? 0.25, mh, p, n: Math.max(0, n) } : null
 }
 export interface MocChe { t: number; v: 'hoc' | 'bang' }
 /** Chế độ tại giờ `t` của trục tiếng: mốc cuối cùng có `t` ≤ giờ đang phát (trước mốc đầu ⇒ lấy mốc đầu). Không có dòng thời gian ⇒ null. */

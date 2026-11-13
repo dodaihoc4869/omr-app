@@ -44,3 +44,6 @@ graphify-out/
 .may-soan-kinh/
 .may-ve-hinh/
 __pycache__/
+
+# bản sao làm việc tạm của tác tử phụ (không thuộc mã nguồn)
+.claude/worktrees/

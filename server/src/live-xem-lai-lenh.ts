@@ -59,9 +59,9 @@ export async function kiemVeLive(biMat: string, id: string, ve: unknown, nay = D
 
 // ── Dùng chung ──
 const laThay = (req: Request, env: Env, b: Row): boolean => { const gui = str(b.secret ?? req.headers.get('x-ma-bi-mat') ?? req.headers.get('x-omr-secret')).trim(); return gui.length > 0 && gui === str(env.MA_BI_MAT).trim() }
-async function than(req: Request, url: URL): Promise<Row> {
+async function than(req: Request, url: URL, toiDa = 20_000): Promise<Row> {
   const b: Row = Object.fromEntries(url.searchParams)
-  if (req.method === 'POST') { try { const chu = await req.text(); if (chu && chu.length <= 20_000) Object.assign(b, JSON.parse(chu) as Row) } catch { /* thân hỏng ⇒ chỉ dùng tham số */ } }
+  if (req.method === 'POST') { try { const chu = await req.text(); if (chu && chu.length <= toiDa) Object.assign(b, JSON.parse(chu) as Row) } catch { /* thân hỏng ⇒ chỉ dùng tham số */ } }
   return b
 }
 const goiPhong = async (env: Env, id: string, duong: string, b: Row = {}): Promise<Row> => {
@@ -107,7 +107,7 @@ async function ghiKhucLenh(req: Request, env: Env, url: URL): Promise<Response> 
 }
 
 // ── GET /live-tep/<id>/<tệp>?ve= ──
-const KIEU_TEP: Record<string, string> = { [TEP_LIVE.buoi]: 'application/json;charset=utf-8', [TEP_LIVE.net]: 'application/octet-stream', [TEP_LIVE.tieng]: 'audio/mpeg' }
+const KIEU_TEP: Record<string, string> = { [TEP_LIVE.buoi]: 'application/json;charset=utf-8', [TEP_LIVE.net]: 'application/octet-stream', [TEP_LIVE.tieng]: 'audio/mpeg', 'nhat-ky.json': 'application/json;charset=utf-8' }
 const DAU_TEP = { ...CORS, 'access-control-expose-headers': 'content-range, accept-ranges, content-length, etag', 'accept-ranges': 'bytes', 'cache-control': 'private, max-age=3600' }
 /** `Range: bytes=a-b | a- | -n` ⇒ khoảng đọc của R2 (một lần đọc, không cần biết cỡ tệp trước); không có / sai dạng ⇒ null (trả cả tệp). */
 export function docRange(dau: string | null): { offset: number; length?: number } | { suffix: number } | null {
@@ -120,8 +120,18 @@ export function docRange(dau: string | null): { offset: number; length?: number 
 async function tepLenh(req: Request, env: Env, url: URL): Promise<Response> {
   const p = url.pathname.split('/') // ['', 'live-tep', id, tệp]
   const id = buoiHop(p[2]), tep = p.length === 4 ? decodeURIComponent(p[3] ?? '') : ''
-  if (!id || !KIEU_TEP[tep]) return json({ ok: false, lyDo: 'khong-co' }, 404)
+  const trangSvg = /^trang-(\d{1,3})\.svg$/.exec(tep) // 13/11 Nhật ký bài dạy: ảnh trang bảng cho văn phòng soạn (live-nhat-ky.ts)
+  const trangJson = tep === 'trang.json' // 13/11 nét phấn từng trang cho màn học sinh xem nhật ký bài dạy
+  if (!id || (!KIEU_TEP[tep] && !trangSvg && !trangJson)) return json({ ok: false, lyDo: 'khong-co' }, 404)
   if (!(await kiemVeLive(env.MA_BI_MAT, id, url.searchParams.get('ve')))) return json({ ok: false, lyDo: 've' }, 403)
+  if (trangSvg) {
+    const svg = await (await import('./live-nhat-ky')).svgTrangCuaBuoi(env, id, Number(trangSvg[1]))
+    return svg ? new Response(svg, { headers: { ...CORS, 'content-type': 'image/svg+xml;charset=utf-8', 'cache-control': 'private, max-age=3600' } }) : json({ ok: false, lyDo: 'khong-co' }, 404)
+  }
+  if (trangJson) {
+    const ra = await (await import('./live-nhat-ky')).netTrangCuaBuoi(env, id)
+    return ra ? new Response(JSON.stringify(ra), { headers: { ...CORS, 'content-type': 'application/json;charset=utf-8', 'cache-control': 'private, max-age=3600' } }) : json({ ok: false, lyDo: 'khong-co' }, 404)
+  }
   if (!env.DE) return json({ ok: false, lyDo: 'khong-r2' }, 503)
   const r = docRange(req.headers.get('range'))
   const ngoai = (co: number | null): Response => new Response(null, { status: 416, headers: { ...DAU_TEP, 'content-range': `bytes */${co ?? '*'}` } })
@@ -191,13 +201,19 @@ export async function xoaBuoiDanhDau(env: Env, ids: readonly string[], hanMs = 2
       if (env.DE?.list && (await env.DE.list({ prefix: tienToLive(id), limit: 1 })).objects.length) { conDo.push(id); continue }
       await goiPhong(env, id, '/xl-don', { xoa: true })
       await env.DB.batch([env.DB.prepare('DELETE FROM live_doan WHERE buoi_id = ?').bind(id), env.DB.prepare("DELETE FROM live_buoi WHERE id = ? AND trang_thai = 'dang_xoa'").bind(id)])
+      await env.DB.prepare('DELETE FROM live_nhat_ky WHERE buoi_id = ?').bind(id).run().catch(() => undefined) // bảng nhật ký bài dạy chưa có ⇒ thôi
       xoa.push(id)
     } catch (e) { console.error('[live-xem-lai] xoá buổi lỗi:', id, e instanceof Error ? e.message : e); conDo.push(id) }
   }
   return { xoa, conDo }
 }
-async function gvLenh(env: Env, p: string, b: Row, nay: number, ctx?: ExecutionContext): Promise<Response> {
+async function gvLenh(env: Env, p: string, b: Row, nay: number, ctx?: ExecutionContext, goc = ''): Promise<Response> {
   await damBaoBangLive(env).catch(() => undefined)
+  // 13/11 NHẬT KÝ BÀI DẠY cho văn phòng soạn (live-nhat-ky.ts, nạp lười): danh sách buổi · tư liệu · nhận kịch bản
+  if (p.startsWith('/gv/live-nhat-ky-')) {
+    const ra = await (await import('./live-nhat-ky')).lenhNhatKy(env, p, b, { goc, kyVe: (id, ban) => kyVeLive(env.MA_BI_MAT, id, SBD_THAY, hanVeLive(nay), ban) })
+    return ra ? json(ra, ra.ok === false && ra.lyDo === 'khong-co' ? 404 : 200) : json({ ok: false, lyDo: 'khong-co' }, 404)
+  }
   const iso = new Date(nay).toISOString()
   if (p === '/gv/live-ds') {
     // Cột `ly_do` (11/11, chỉ-thêm, thêm lười lúc chốt buổi 0 đoạn đầu tiên) có thể CHƯA có ⇒ `SELECT *` lấy cột ấy khi có, không có thì thôi: luôn MỘT câu đọc
@@ -265,6 +281,7 @@ export function cuaXemLai(req: Request, env: Env, ctx?: ExecutionContext): Promi
   const url = new URL(u), p = url.pathname, m = req.method
   const laGhi = p === '/bpu/live/ghi', laTep = p.startsWith('/live-tep/')
   const laLenh = p === '/hs/live-ds' || p === '/hs/live-buoi' || p === '/gv/live-ds' || p === '/gv/live-doi-ten' || p === '/gv/live-xoa' || p === '/gv/live-dat' || p === '/gv/live-dung-lai'
+    || p === '/gv/live-nhat-ky-ds' || p === '/gv/live-nhat-ky-tu-lieu' || p === '/gv/live-nhat-ky-ghi'
   if (!laGhi && !laTep && !laLenh) return null
   if (m === 'OPTIONS') return Promise.resolve(new Response(null, { status: 204, headers: CORS }))
   const bat = (f: () => Promise<Response>): Promise<Response> => f().catch((e) => { console.error('[live-xem-lai] lệnh lỗi:', p, e instanceof Error ? e.message : e); return json({ ok: false, error: 'Máy chủ chưa làm được việc này. Thử lại sau ít phút.' }, 500) })
@@ -272,11 +289,11 @@ export function cuaXemLai(req: Request, env: Env, ctx?: ExecutionContext): Promi
   if (laTep) return m === 'GET' || m === 'HEAD' ? bat(() => tepLenh(req, env, url)) : null
   if (m !== 'GET' && m !== 'POST') return null
   return bat(async () => {
-    const b = await than(req, url), nay = Date.now()
+    const b = await than(req, url, p === '/gv/live-nhat-ky-ghi' ? 400_000 : 20_000), nay = Date.now()
     if (p.startsWith('/hs/')) return hsLenh(env, p, b, nay)
     if (!laThay(req, env, b)) return json({ ok: false, error: 'Sai mã bí mật' }, 403)
     if (p !== '/gv/live-ds' && m !== 'POST') return json({ ok: false, error: 'Lệnh này cần POST.' }, 405)
-    return gvLenh(env, p, b, nay, ctx)
+    return gvLenh(env, p, b, nay, ctx, url.origin)
   })
 }
 

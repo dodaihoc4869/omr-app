@@ -63,8 +63,7 @@
 
 /* ── mục lục dính ────────────────────────────────────────────── */
 .xd-muc-luc { position: sticky; top: 64px; z-index: 4; background: var(--m3-surface); margin: 0 -16px; padding: 0 16px 8px; }
-.xd-muc-luc ul { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; padding: 4px 0; }
-.xd-muc-luc ul::-webkit-scrollbar { display: none; }
+.xd-muc-luc ul { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 0; }
 .xd-muc-luc a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; border-radius: 999px; font-size: var(--bnv-cx-2); font-weight: 600; white-space: nowrap; scroll-snap-align: start; box-shadow: inset 0 0 0 1px var(--xd-vien-dam); color: var(--m3-on-surface-variant); }
 .xd-muc-luc a[aria-current="true"] { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); box-shadow: none; }
 @media (min-width: 1000px) {

@@ -168,7 +168,9 @@ describe('ngăn ghi trong viên Live của tờ chiếu', () => {
   const lvNganGhi = new Function('LV_BT', `${ham}; return lvNganGhi`)({ mic: '<svg></svg>' }) as (t: { ghi?: string; tu?: number }) => string
   it('đang ghi ⇒ «Đang ghi để xem lại»; lỗi ⇒ ngăn vàng «Chưa ghi được · live vẫn chạy»; công tắc tắt ⇒ không vẽ; 15 giây đầu chưa báo ⇒ chưa vẽ', () => {
     expect(lvNganGhi({})).toBe('')
-    expect(lvNganGhi({ ghi: 'dang-ghi' }).replace(/<[^>]+>|&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()).toBe('Đang ghi để xem lại')
+    // 13/11 (thầy «thanh màu đỏ làm cho gọn lại»): ngăn chỉ còn chấm + «Ghi»; câu đầy đủ nằm ở chú giải khi rê chuột
+    expect(lvNganGhi({ ghi: 'dang-ghi' }).replace(/<[^>]+>|&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()).toBe('Ghi')
+    expect(lvNganGhi({ ghi: 'dang-ghi' })).toContain('title="Đang ghi để xem lại"')
     expect(lvNganGhi({ ghi: 'loi' })).toContain('class="ghi-loi"'); expect(lvNganGhi({ ghi: 'loi' })).toContain('Chưa ghi được · live vẫn chạy')
     expect(lvNganGhi({ ghi: 'tat', tu: Date.now() - 3000 })).toBe('')
     expect(lvNganGhi({ ghi: 'tat', tu: Date.now() - 16_000 })).toContain('Chưa ghi được · live vẫn chạy')

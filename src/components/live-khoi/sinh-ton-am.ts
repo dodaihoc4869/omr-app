@@ -1,5 +1,5 @@
 // ÂM THANH của trò «Sinh Tồn» (thầy 12/11 tối: «thêm âm thanh bắn súng cho phấn khích») — tổng hợp bằng Web Audio, KHÔNG tệp âm thanh (không thêm byte tải).
-// Mỗi cấp súng một tiếng riêng: Súng Hạt «piu» · Súng Đôi «piu-piu» · Súng Sấm «xẹt» · Pháo Sao «bùm»; thêm tiếng trúng đạn, hạ đối thủ, lên cấp, bị hạ,
+// Mỗi cấp súng (6 cấp, bản 2) một tiếng riêng — xem `tiengBan`; thêm tiếng trúng đạn, hạ đối thủ, lên cấp, bị hạ,
 // nhặt hộp, hết ván. AudioContext tạo lười ở lần chạm đầu (luật trình duyệt). Im lặng khi: em tắt tiếng trò, em đã tắt «Âm thanh» của app
 // (localStorage 'ddh.am' = 'tat'), tab đang ẩn. Tiếng súng của người khác nhỏ dần theo khoảng cách và có trần số tiếng cùng lúc. Mọi lỗi im lặng.
 let ctx: AudioContext | null = null
@@ -9,6 +9,9 @@ let tat = false
 /** Mốc giờ (giây của AudioContext) các tiếng súng gần đây — để giữ trần 7 tiếng / 0,25 giây (nhịp bắn 4 phát / giây ⇒ mỗi súng tối đa 1 tiếng trong cửa sổ này). */
 const ganDay: number[] = []
 const KHOA_TAT = 'ddh.sinhton.am'
+/** Máy yếu: trần tiếng súng đồng thời thấp hơn (đỡ tốn bộ xử lý âm thanh). */
+let yeuAm = false
+export function datYeuAm(v: boolean): void { yeuAm = v }
 
 export function docTat(): boolean {
   try { tat = localStorage.getItem(KHOA_TAT) === 'tat' } catch { /* không có kho */ }
@@ -62,17 +65,20 @@ function tiengOn(loc: BiquadFilterType, tan: number, dai: number, am: number, tr
   s.connect(l); l.connect(g); g.connect(tong)
   s.start(t, Math.random() * 0.5, dai + 0.02)
 }
-/** Tiếng súng theo cấp 1..4. `cuaToi` = súng của chính em (to, luôn kêu); của người khác thì `gan` 0..1 (1 = sát bên) quyết định độ to. */
+/** Tiếng súng theo cấp 1..6 (bản 2, 13/11): Hạt «piu» · Đôi «piu-piu» · Bọt «bóp» (bọt nổi) · Sấm «xẹt» · Lửa Màu «phù» (lửa phụt) · Pháo Sao «bùm» + lấp lánh.
+ *  `cuaToi` = súng của chính em (to, luôn kêu); của người khác thì `gan` 0..1 (1 = sát bên) quyết định độ to. Trần 7 tiếng / 0,25 giây giữ nguyên. */
 export function tiengBan(cap: number, cuaToi: boolean, gan = 1): void {
   if (!duocKeu() || !ctx) return
   const t = ctx.currentTime
   while (ganDay.length && t - ganDay[0] > 0.25) ganDay.shift()
-  if (!cuaToi && (ganDay.length >= 7 || gan < 0.12)) return
+  if (!cuaToi && (ganDay.length >= (yeuAm ? 3 : 7) || gan < (yeuAm ? 0.3 : 0.12))) return
   ganDay.push(t)
   const am = cuaToi ? 1 : 0.4 * gan, lech = 0.94 + Math.random() * 0.12
   try {
-    if (cap >= 4) { not('sine', 170 * lech, 42, 0.36, 0.55 * am); tiengOn('lowpass', 700, 0.3, 0.4 * am); not('triangle', 520, 180, 0.12, 0.12 * am) }
-    else if (cap === 3) { not('sawtooth', 1900 * lech, 420, 0.13, 0.11 * am); not('square', 2600 * lech, 900, 0.07, 0.05 * am); tiengOn('highpass', 3200, 0.1, 0.1 * am) }
+    if (cap >= 6) { not('sine', 170 * lech, 42, 0.36, 0.55 * am); tiengOn('lowpass', 700, 0.3, 0.4 * am); not('triangle', 2093 * lech, 2637, 0.16, 0.07 * am, 0.06) }
+    else if (cap === 5) { tiengOn('bandpass', 1300 * lech, 0.22, 0.32 * am); not('sine', 240 * lech, 90, 0.2, 0.22 * am) }
+    else if (cap === 4) { not('sawtooth', 1900 * lech, 420, 0.13, 0.11 * am); not('square', 2600 * lech, 900, 0.07, 0.05 * am); tiengOn('highpass', 3200, 0.1, 0.1 * am) }
+    else if (cap === 3) { not('sine', 320 * lech, 760, 0.09, 0.24 * am); not('sine', 900 * lech, 1400, 0.05, 0.08 * am, 0.06) }
     else if (cap === 2) { not('triangle', 1050 * lech, 360, 0.085, 0.2 * am); not('triangle', 1250 * lech, 420, 0.085, 0.18 * am, 0.055) }
     else not('triangle', 900 * lech, 300, 0.1, 0.22 * am)
   } catch { /* nút âm thanh hỏng: bỏ qua */ }

@@ -2,6 +2,17 @@
 // bốn ô. Chỉ có ở buổi LIVE THEO KHỐI. Bấm ⇒ báo app (việc lk, v = 'mt') ⇒ app hiện / ẩn máy tính «Đỗ Đại Học FX4869» nổi trên màn chiếu và đồng bộ
 // sang máy em; app báo lại trạng thái bằng lệnh live-mt để nút sáng vàng khi máy tính đang hiện. Máy tính KHÔNG nằm trong tờ (tờ chỉ có cái nút).
 export const CSS_LIVE_MT = `
+/* VIÊN LIVE GỌN (thầy 13/11: «thanh màu đỏ làm cho gọn lại, toàn bộ thanh chờ dưới làm cho gọn lại đẹp mắt hơn tinh tế hơn»): chỉ ô «LIVE giờ» còn đỏ, các ô còn lại
+   (số em xem · số em nghe · mức mic · đang ghi) thành biểu tượng + số trên nền tối, thấp hơn, chữ nhỏ hơn. Trạng thái vàng (.vang) giữ nguyên. */
+body.mc .mc-thanh .mc-lv-cum:not(.vang){min-height:calc(var(--u)*2.2);background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);font-size:max(12px,calc(var(--u)*.98));font-weight:700}
+.mc-lv-cum:not(.vang)>span{padding:0 .55em;gap:.32em}
+.mc-lv-cum:not(.vang)>span+span{box-shadow:none}
+.mc-lv-cum:not(.vang)>span:first-child{margin:.2em .1em .2em .2em;padding:0 .7em;border-radius:999px;background:var(--mc-do);font-weight:800}
+.mc-lv-cum:not(.vang)>span:last-child{padding-right:.8em}
+.mc-lv-cum:not(.vang) svg{width:1.08em;height:1.08em;opacity:.78}
+.mc-lv-cum:not(.vang) small{opacity:.6;margin-left:-.22em}
+.mc-lv-cum>span.ghi{color:color-mix(in srgb,var(--mc-bang-chu) 76%,transparent)}
+.mc-lv-cum>span.ghi i.cham{width:.5em;height:.5em;background:var(--mc-do)}
 .mc-mt-nut{--n:calc(var(--u)*1.26);flex:none;display:inline-grid;place-items:center;width:calc(var(--n)*2.1);height:calc(var(--n)*2.1);margin-left:auto;padding:0;border:0;border-radius:50%;background:linear-gradient(180deg,color-mix(in srgb,var(--mc-bang-chu) 12%,var(--mc-bang-nut)),var(--mc-bang-nut));box-shadow:inset 0 0 0 1px var(--mc-bang-vien),inset 0 1px 0 color-mix(in srgb,var(--mc-bang-chu) 22%,transparent);color:var(--mc-bang-chu);cursor:pointer;touch-action:manipulation}
 .mc-mt-nut[hidden]{display:none!important}
 .mc-mt-nut svg{width:54%;height:54%;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}

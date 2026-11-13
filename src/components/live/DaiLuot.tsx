@@ -6,7 +6,7 @@
 //   · em vừa gửi (đã tự về bảng live) ⇒ «Đã gửi · n/m bạn đã gửi»; hết giờ chưa gửi ⇒ «Hết giờ — câu này để trống».
 // AN TOÀN: chỉ dùng `viewEm.luot` — đáp án đúng không có ở đây trước khi thầy mở; dải KHÔNG in đáp án kể cả sau khi mở (chỉ đúng / chưa đúng + kJ).
 import type { ReactNode } from 'react'
-import { DOI_BPU, kyHieu, tenNgan, type ViewEm } from '../../lib/bpu/phong'
+import { DOI_BPU, TIEP_SUC_TOI_DA, kyHieu, tenNgan, type ViewEm } from '../../lib/bpu/phong'
 
 export interface DuLieuLuot {
   l: NonNullable<ViewEm['luot']>
@@ -28,7 +28,7 @@ export function daiLuot({ l, sbd, doi, daGuiMay, gui, conLam }: DuLieuLuot): Rea
   const g = l.goi
   if ((l.pha === 'goi' || l.pha === 'lam-bang') && g && g.sbd !== sbd) {
     const khoa = g.emDoan !== null || g.dat != null, mau = { ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }
-    const tiep = <button type="button" className="tiep" style={mau} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{g.doi === doi ? 'Tiếp sức' : 'Cổ vũ'} · {g.emTiep}/10</button>
+    const tiep = <button type="button" className="tiep" style={mau} disabled={g.emTiep >= TIEP_SUC_TOI_DA} onClick={() => gui({ t: 'tiep' })}>{g.doi === doi ? 'Tiếp sức' : 'Cổ vũ'} · {g.emTiep}/{TIEP_SUC_TOI_DA}</button>
     // đã đoán / thầy đã chấm ⇒ viên nhỏ (hai nút đoán đã khoá thì không cần chiếm chỗ trên giấy nữa)
     if (khoa) return (
       <>

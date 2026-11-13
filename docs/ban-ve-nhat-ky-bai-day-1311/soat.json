@@ -1,0 +1,160 @@
+{
+ "tong": {
+  "anh": 15,
+  "loiTrang": 0,
+  "tranNgang": 0,
+  "dichNho": 0,
+  "chuBiCat": 0,
+  "chuHocSinh": 0,
+  "anhQua150KB": 0
+ },
+ "anh": [
+  {
+   "anh": "01-nhat-ky-may-tinh-1366-sang.jpg",
+   "kb": 146,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "02-nhat-ky-may-tinh-1366-toi-vi-du-ch4.jpg",
+   "kb": 140,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "03-nhat-ky-ngang-844-sang.jpg",
+   "kb": 140,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "04-nhat-ky-ngang-844-toi-cong-thuc-electron.jpg",
+   "kb": 83,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "05-nhat-ky-doc-390-sang.jpg",
+   "kb": 142,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "06-nhat-ky-doc-390-toi-doan-nhanh-da-cham.jpg",
+   "kb": 128,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "07-khung-giua-keo-co-dang-thanh-ion-1366-toi.jpg",
+   "kb": 143,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "08-khung-giua-lewis-dang-ve-cap-chung-390-sang.jpg",
+   "kb": 102,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "09-khung-giua-thang-kim-nay-844-sang.jpg",
+   "kb": 87,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "10-bai-fes2-vi-du-cot-doc-1366-sang.jpg",
+   "kb": 146,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "11-xem-nhu-thay-giang-dang-noi-1366-toi.jpg",
+   "kb": 142,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "12-cho-gan-may-tinh-1366-sang.jpg",
+   "kb": 138,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "13-cho-gan-doc-390-sang.jpg",
+   "kb": 127,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "15-xem-nhu-thay-giang-doc-390-toi.jpg",
+   "kb": 112,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  },
+  {
+   "anh": "14-bang-thay-phong-to-390-sang.jpg",
+   "kb": 121,
+   "loiTrang": [],
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuBiCat": [],
+   "chuHocSinh": []
+  }
+ ],
+ "video": [
+  {
+   "video": "video-nhat-ky-may-tinh-1366.mp4",
+   "giay": 39,
+   "mb": 1.66
+  },
+  {
+   "video": "video-nhat-ky-dien-thoai-390.mp4",
+   "giay": 36,
+   "mb": 0.62
+  }
+ ]
+}

@@ -26,13 +26,11 @@
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none;
   overscroll-behavior-x: contain;
   /* chừa chỗ cho vòng focus + vùng chạm ::after, không bị cắt bởi overflow */
   padding: 6px 2px;
   margin: -6px -2px;
 }
-.tl-hang::-webkit-scrollbar { display: none; }
 @media (min-width: 768px) {
   .tl-hang:not(.tl-hang--mot-dong) { flex-wrap: wrap; overflow: visible; row-gap: 8px; }
 }

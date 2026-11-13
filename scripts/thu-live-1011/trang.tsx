@@ -47,6 +47,7 @@ import ManBinhPhanUng from '../../src/components/bpu/ManBinhPhanUng'
 import { noiLive } from '../../src/components/bpu/cau-live'
 import { layDiaChiMayChu } from '../../src/lib/dia-chi-may-chu'
 import { taoHtmlMayChieu } from '../../src/lib/html-may-chieu'
+import { CAU_DAI } from './cau-dai.mjs'
 
 // KHÔNG yêu cầu nào ra máy chủ thật: mọi lệnh (fetch) và mọi WebSocket của app đều đổi về máy chủ thử đang phục vụ trang này.
 const fetchGoc = window.fetch.bind(window)
@@ -79,6 +80,8 @@ if (vai === 'gv') {
       cauGia('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH']),
       cauGia('Q2', 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', ['NaCl', 'NaOH', 'HCl', 'NaHCO₃']),
     ] as never))
+    // 13/11 «cuộn đề»: chiếu MỘT câu đề dài (Q3 giấy soi / Q4 giấy lệch — cau-dai.mjs) bằng đúng hàm thật `chieuCau`.
+    ;(window as unknown as { __chieuCauDai: (qid: string) => Promise<string> }).__chieuCauDai = (qid) => import('../../src/components/bpu/gan-gv').then((m) => { const c = CAU_DAI.find((x) => x.qid === qid); return c ? m.chieuCau([cauGia(c.qid, c.text, c.choices)] as never) : 'không có câu' })
     // Tấm hoạt động thật (Chữa câu khó, Kiểm tra đầu giờ…) KHÔNG chiếu qua gan-gv: nó tự dựng <KhungXemPhieu> của riêng mình (cổng ra <body>, z 99999).
     // Hàm này dựng đúng một tờ như vậy (tên khác tờ của bảng) để kiểm «bấm Chiếu lên bảng ở tấm hoạt động ⇒ tờ nằm TRÊN tấm».
     ;(window as unknown as { __chieuToRieng: () => Promise<void> }).__chieuToRieng = async () => {
