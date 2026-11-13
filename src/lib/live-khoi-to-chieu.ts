@@ -89,4 +89,9 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);
+  // CUỘN LIỀN (thầy 13/11 «màn giáo viên cũng cho cuộn liền mạch không phải bấm space nữa»): tờ vào buổi live theo khối (lớp mc-lk) ⇒ bật chế độ cuộn liền
+  // ngay từ đầu cho MỌI đợt (trước: chỉ bật sau lần gọi em lên bảng đầu tiên) — đề dài cuộn bằng bánh xe / bàn di / kéo chạm / phím, không còn «Trang i/n · Space».
+  function lvCuonLien() { if (typeof S !== 'undefined' && !S.bpuCuon && body.classList.contains('mc-lk')) { S.bpuCuon = true; document.dispatchEvent(new Event('mc-bo-cuc-xong')); } }
+  new MutationObserver(lvCuonLien).observe(body, { attributes: true, attributeFilter: ['class'] });
+  lvCuonLien();
 ${JS_LIVE_NOP}${JS_LIVE_MT}`

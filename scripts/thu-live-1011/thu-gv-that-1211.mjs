@@ -462,6 +462,18 @@ await chup(gv, '4-gv-con-dau-dat')
 await chup(em2, '4-em-dau-dat-that')
 // (b) tờ có em XẾP SẴN (như «Chữa câu khó»): sang câu 2 (lượt mới mở theo tờ), đặt thẻ tên em S2 như tờ xếp sẵn, bấm «Lên bảng» rồi Chưa đạt
 await ngu(2400)
+if (process.env.DO_CHUYEN) { // ĐO CHUYỂN ĐỀ (thầy 13/11 «tốc độ chuyển đề trên máy học sinh bị chậm quá»): thầy bấm → ⇒ mốc từng chặng trên máy em
+  const doEm = (p) => p.evaluate(() => { const t = (document.querySelector('.lv-gt, .lv-de, .lv-giay')?.textContent ?? '') + (document.querySelector('.bpu-hs')?.textContent ?? ''); return { phenol: /Phenol/.test(t), khop: !!document.querySelector('.lv-gt[data-khop]'), soi: !!document.querySelector('.lv[data-soi]') } })
+  const t0 = Date.now(), moc = { phong: null, em1: null, em1Khop: null, em2: null, em2Khop: null }
+  await toHoc.locator('body').press('ArrowRight')
+  while (Date.now() - t0 < 8000) {
+    if (moc.phong == null && st()?.luot?.qid === 'Q2') moc.phong = Date.now() - t0
+    for (const [k, p] of [['em1', em1], ['em2', em2]]) { const d = await doEm(p); if (moc[k] == null && d.phenol) moc[k] = Date.now() - t0; if (moc[k + 'Khop'] == null && d.phenol && d.khop) moc[k + 'Khop'] = Date.now() - t0 }
+    if (Object.values(moc).every((v) => v != null)) break
+    await ngu(25)
+  }
+  console.log('CHUYEN', JSON.stringify(moc)); await chup(em1, 'chuyen-em1'); process.exit(3)
+}
 await toHoc.locator('body').press('ArrowRight'); await ngu(3500)
 kiem('4p tờ sang câu 2 ⇒ phòng mở lượt mới của câu 2', st()?.luot?.qid === 'Q2' && !st()?.luot?.goi, JSON.stringify({ qid: st()?.luot?.qid, pha: st()?.luot?.pha }))
 await toHoc.locator('body').evaluate(() => { const d = window.__mcDot(), n = d.querySelector('.mc-nua') || d; const h = document.createElement('header'); h.className = 'mc-em'; h.id = 'em-xep-san'; h.hidden = true; h.innerHTML = '<div class="mc-em-trai"><div class="mc-em-hang1"><div class="mc-ten-hang"><span class="mc-ten">Em xếp sẵn</span><span class="mc-dau-kq" hidden></span></div><div class="mc-phu"><span class="mc-sbd">S2</span></div></div></div>'; n.insertBefore(h, n.firstChild); window.__mcVaoLai() }); await ngu(500)

@@ -82,6 +82,17 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
   const loi3 = await gv.evaluate((q) => window.__chieuCauDai(q), 'Q3'); await ngu(6500)
   const dau = await Promise.all(EM.map(([, p]) => doGiay(p)))
   kiem('CD1a thầy chiếu câu ĐỀ DÀI ở «Học»: bốn máy em đều dựng giấy SOI khớp giấy thầy; chỉ điện thoại cầm dọc bị xoay hình', loi3 === '' && st()?.live?.khoi?.che === 'hoc' && st()?.luot?.qid === 'Q3' && dau.every((d) => d?.soi) && dau.map((d) => d?.xoay).join() === 'không,90,không,không', JSON.stringify(dau.map((d) => d && { xoay: d.xoay, soi: d.soi, khung: d.khung })))
+  { // (thầy 13/11 «màn giáo viên cũng cho cuộn liền mạch không phải bấm space nữa») tờ của THẦY đề dài: cuộn liền ngay từ đầu, không còn «Trang i/n · Space»
+    const to0 = gv.frameLocator('.lop-xem-phieu iframe')
+    const t = await to0.locator('body').evaluate(() => { const v = window.__mcDot()?.querySelector('.mc-vung-de'), so = v?.querySelector('.mc-trang-so'); return { cuon: !!v?.classList.contains('mc-cuon'), trangSo: !!so?.classList.contains('mc-hien'), coThem: v ? v.scrollHeight > v.clientHeight + 4 : false, oy: v ? getComputedStyle(v).overflowY : '' } })
+    const truoc = await to0.locator('body').evaluate(() => window.__mcDot().querySelector('.mc-vung-de').scrollTop)
+    const k = await gv.locator('.lop-xem-phieu iframe').boundingBox()
+    await gv.mouse.move(k.x + k.width * 0.25, k.y + k.height * 0.4); await gv.mouse.wheel(0, 300); await ngu(500)
+    const sau = await to0.locator('body').evaluate(() => window.__mcDot().querySelector('.mc-vung-de').scrollTop)
+    await to0.locator('body').evaluate(() => { window.__mcDot().querySelector('.mc-vung-de').scrollTop = 0 }); await ngu(300)
+    await chup(gv, 'cd-0-gv-cuon-lien')
+    kiem('CD0 tờ của thầy, đề dài: CUỘN LIỀN ngay từ đầu buổi (lăn chuột là đề trôi), không còn «Trang i/n · Space»', t.cuon && !t.trangSo && t.coThem && sau > truoc + 50, JSON.stringify({ ...t, truoc, sau }))
+  }
   await chup(em2, 'cd-1-em-doc-dau-de')
   await cuonHet('CD1b', 'giấy soi')
   if (!soLuoc) {
@@ -247,12 +258,14 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
     const rv = []
     for (const [ten, p] of [EM[1], EM[3]]) {
       const t0 = await doBang(p), y0 = await vachPhan(p)
-      // ngón đi XUỐNG của hình 140 px, giữ nguyên ngón (chưa nhả) để đo lúc đang vuốt ⇒ bảng dời theo ngón
-      const cdp = await p.context().newCDPSession(p), d = (t) => [{ x: Math.round(t0.tam[0] + t0.xuong[0] * 140 * t), y: Math.round(t0.tam[1] + t0.xuong[1] * 140 * t), id: 1 }]
+      // ngón đi LÊN của hình 320 px (giữ ngón, chưa nhả) ⇒ bảng dời theo ngón, lộ phần dưới (nét CD7 sát đáy hiện ra). 13/11: bảng thầy không tự cuộn nữa
+      // ⇒ lúc em kéo bảng to ra, máy em đang thấy phần TRÊN bảng của thầy, nét sát đáy nằm ngoài khung (y0 = null là đúng)
+      const cdp = await p.context().newCDPSession(p), d = (t) => [{ x: Math.round(t0.tam[0] - t0.xuong[0] * 320 * t), y: Math.round(t0.tam[1] - t0.xuong[1] * 320 * t), id: 1 }]
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: d(0) })
       for (let n = 1; n <= 10; n++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: d(n / 10) }); await ngu(18) }
       await ngu(250)
       const y1 = await vachPhan(p)
+      await chup(p, 'cd-8b-' + ten.split(' ')[0] + '-dang-vuot')
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await cdp.detach()
       await ngu(1500)
       const yDung = await vachPhan(p) // nhả tay: bảng ĐỨNG YÊN ở chỗ em đang xem (không giật về)
@@ -261,7 +274,7 @@ export async function thuCuonDe({ trinh, dist, kiem, chup = async () => {}, loiT
       const y2 = await vachPhan(p)
       rv.push([ten.split(' ')[0], { y: [y0, y1, yDung, y2], nut: !!nut, bang: [t0.rongO, t0.caoKhung] }])
     }
-    kiem('CD8b em VUỐT BẢNG xem phần đã trôi: bảng dời theo ngón, nhả tay thì đứng yên ở chỗ em xem, hiện nút «Về chỗ thầy đang viết»; chạm nút ⇒ bảng về đúng chỗ thầy', rv.every(([, r]) => r.y[0] != null && Math.abs((r.y[1] ?? 1e9) - r.y[0]) >= 40 && r.y[2] === r.y[1] && r.nut && r.y[3] != null && Math.abs(r.y[3] - r.y[0]) <= 3), JSON.stringify(rv))
+    kiem('CD8b em VUỐT BẢNG xem phần đã trôi: bảng dời theo ngón, nhả tay thì đứng yên ở chỗ em xem, hiện nút «Về chỗ thầy đang viết»; chạm nút ⇒ bảng về đúng chỗ thầy', rv.every(([, r]) => r.y[1] != null && (r.y[0] == null || Math.abs(r.y[1] - r.y[0]) >= 40) && r.y[2] === r.y[1] && r.nut && (r.y[0] == null ? r.y[3] == null : r.y[3] != null && Math.abs(r.y[3] - r.y[0]) <= 3)), JSON.stringify(rv))
     for (const [, p] of EM) await p.evaluate(() => { try { localStorage.removeItem('ddh.live.chia') } catch { /* chặn */ } })
   }
 
