@@ -9,5 +9,5 @@ export default defineConfig({
   root: goc,
   plugins: [react()],
   define: { __PHIEN_BAN__: JSON.stringify('thu-live-1011'), __SW_BUILT_AT__: 0 },
-  build: { emptyOutDir: true, rolldownOptions: { input: { live: resolve(goc, 'scripts/thu-live-1011/trang.html'), tieng: resolve(goc, 'scripts/thu-live-1011/do-tieng.html') } } },
+  build: { emptyOutDir: true, rolldownOptions: { input: { live: resolve(goc, 'scripts/thu-live-1011/trang.html'), tieng: resolve(goc, 'scripts/thu-live-1011/do-tieng.html'), tang: resolve(goc, 'scripts/thu-live-1011/do-tang-tieng.html') } } },
 })

@@ -64,7 +64,8 @@ export interface TtLiveTo {
   /** `locOn` = mức lọc ồn riêng thầy chọn; `locOnChay` = tình trạng thật của bộ lọc ('chay' / 'tai' / 'tat' / 'loi' / 'khong'). */
   /** `khac` = tên mic thầy đã chọn mà không mở được (đang dùng mic `ten` của máy) — '' = đúng mic đã chọn. `kieuTieng` = «Làm rõ» / «Chuẩn trình duyệt». */
   /** `coThay` = hiện mức «Chỉ giọng thầy» (cờ chưa phát hành, src/lib/live/chi-thay.ts); `tg` = dòng trạng thái mô hình (bản, ngày luyện, hệ số thời gian thực trên máy này). */
-  mic: { tinh: TinhMic; ten: string; loc: boolean; cheDo: CheDoLoc; locOn: MucLocOn; locOnChay: string; khac: string; kieuTieng: 'lam-ro' | 'chuan'; coThay?: boolean; tg?: string } | null
+  /** `tang` (13/11) = bậc «Tăng tiếng» thầy chọn (0 = Gốc · 3 · 6 · 9 dB). */
+  mic: { tinh: TinhMic; ten: string; loc: boolean; cheDo: CheDoLoc; locOn: MucLocOn; locOnChay: string; khac: string; kieuTieng: 'lam-ro' | 'chuan'; coThay?: boolean; tg?: string; tang: number } | null
   /** Vì sao viên Live ghi không có tiếng ('' = đang có tiếng): chưa có quyền mic / không thấy mic / mic chưa có tín hiệu / chưa nối máy chủ tiếng… */
   lyDoKT: string
   /** Xem lại Live (11/11): trạng thái máy ghi theo phòng — vắng = công tắc tắt (viên Live không có ngăn ghi). */
@@ -101,6 +102,9 @@ const mucLocOn = (): MucLocOn => { const v = nho('ddh.live.loc-on'); return v ==
 // ⇒ MẶC ĐỊNH «Chuẩn trình duyệt» (gửi thẳng mic, khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt — kiểu Meet); «Làm rõ» (chuỗi khung) chỉ khi thầy chọn.
 const kieuTieng = (): 'lam-ro' | 'chuan' => (nho('ddh.live.kieu-tieng') === 'lam-ro' ? 'lam-ro' : 'chuan')
 const cheDoLoc = (): CheDoLoc => { const v = nho(KHOA_LOC); return v === 'bat' || v === 'tat' ? v : 'tu' }
+/** «TĂNG TIẾNG» (thầy 13/11: «chỉ thêm tăng tiếng thôi»): bậc thầy chọn lần trước, nhớ ở máy thầy — 0 = Gốc (mặc định, đường tiếng y như trước) · 3 · 6 · 9 dB. */
+const KHOA_TANG = 'ddh.live.tang-tieng'
+const docTang = (v: unknown): number => { const n = Number(v); return n === 3 || n === 6 || n === 9 ? n : 0 }
 
 let to: Window | null = null
 let lt: LiveThay | null = null
@@ -194,7 +198,7 @@ function trangThai(): TtLiveTo {
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
     doTieng: live ? dongTieng(em) : [],
     the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
-    mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', khac: ttLt.micKhac ?? '', kieuTieng: kieuTieng(), ...(chiThayCo() ? { coThay: true, tg: dongChiThay(lt?.chanDoan?.()) } : {}) } : null,
+    mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', khac: ttLt.micKhac ?? '', kieuTieng: kieuTieng(), ...(chiThayCo() ? { coThay: true, tg: dongChiThay(lt?.chanDoan?.()) } : {}), tang: docTang(nho(KHOA_TANG)) } : null,
     lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? (ttLt.loi === 'khong-noi' ? 'Mạng chặn đường tiếng' : 'Chưa nối máy chủ tiếng')
       : ttLt?.tieng === 'khong' ? (loiMic === 'mic-tu-choi' ? 'Chưa có quyền mic' : loiMic === 'khong-mic' ? 'Không thấy mic' : loiMic === 'mic-ban' ? 'Mic đang bị ứng dụng khác giữ' : loiMic ? 'Mic chưa mở được' : 'Live không tiếng')
       : ttLt?.micTinh === 'im' ? 'Mic chưa có tín hiệu' : ttLt?.micTinh === 'bi-tat' ? 'Mic bị tắt tiếng' : ttLt?.micTinh === 'mat' ? 'Mic bị rút' : '',
@@ -314,7 +318,7 @@ export function dongChanDoan(): string {
   const track = { live: 'đang chạy', muted: 'BỊ TẮT TIẾNG', ended: 'ĐÃ NGẮT', tat: 'thầy đang tắt tiếng', khong: 'chưa mở' }[c.track]
   return [(c.ten || 'chưa có mic') + (c.the ? ' (mục mặc định của máy câm ⇒ đang mở thẳng mic này)' : ''), `luồng ${track}`, `${c.hz ?? '?'} Hz · ${c.kenh ?? '?'} kênh`, `khử vọng ${bt(c.vong)} · lọc ồn ${bt(c.on)} · tự chỉnh ${bt(c.agc)}`, `cách mở ${c.bac + 1}/3`,
     `mức tại mic ${pt(c.muc)} · đang gửi ${pt(c.mucGui)}`, c.kbps == null ? 'chưa gửi' : `${c.kbps} kb/s`, c.gan ? 'bộ gửi cầm mic' : 'bộ gửi CHƯA cầm mic', c.sfu ? 'máy chủ tiếng đã nối' : 'máy chủ tiếng CHƯA nối',
-    `làm rõ tiếng ${c.chuoi ? `bật (${c.kieu})` : 'tắt'}`, `lọc ồn ${c.locOn} (${c.locOnChay})`, `bộ đo ${c.ctx}`, dongTre(c)].filter(Boolean).join(' · ')
+    `làm rõ tiếng ${c.chuoi ? `bật (${c.kieu})` : 'tắt'}`, c.tang ? `tăng tiếng +${c.tang} dB` : '', `lọc ồn ${c.locOn} (${c.locOnChay})`, `bộ đo ${c.ctx}`, dongTre(c)].filter(Boolean).join(' · ')
 }
 /** «Trễ tiếng ước tính ~N ms» (thầy 11/11 «tức thì»): chỉ cộng số đo được — bộ đệm thu trình duyệt báo, chuỗi làm rõ tiếng, khung Opus, nửa RTT máy thầy ↔ máy
  *  chủ tiếng, và từ máy em báo về: nửa RTT + đệm rung (trung vị cả lớp). Chưa gồm loa / tai nghe của máy em. */
@@ -337,7 +341,7 @@ function dam(): Promise<void> {
     lt = taoLiveThay({
       ve: p2.ve, goc: p2.goc,
       kenh: { gui: (t) => { layPhong()?.gui(t) }, guiNhiPhan: (k) => { layPhong()?.guiNhiPhan(k) }, hangCho: () => layPhong()?.hangCho() ?? 0 },
-      layAnh: anh, loc: cheDoLoc(), locOn: mucLocOn(), kieuTieng: kieuTieng(), chuoi: nho('ddh.live.chuoi') !== 'tat', // công tắc lùi khẩn của chuỗi làm rõ tiếng: localStorage `ddh.live.chuoi` = `tat`
+      layAnh: anh, loc: cheDoLoc(), locOn: mucLocOn(), kieuTieng: kieuTieng(), ...(docTang(nho(KHOA_TANG)) ? { tang: docTang(nho(KHOA_TANG)) } : {}), chuoi: nho('ddh.live.chuoi') !== 'tat', // công tắc lùi khẩn của chuỗi làm rõ tiếng: localStorage `ddh.live.chuoi` = `tat`
       // cắm / rút mic ⇒ ô chọn mic đang mở đọc lại danh sách
       khiThietBi: () => { if (the && lt) void lt.dsMic().then((ds) => { if (the) { the = { ...the, ds }; bao() } }).catch(() => {}); void napLoa() },
       micTen: nho(KHOA_MIC_TEN), khiMicMoi: (id) => { ghi(KHOA_MIC, id); if (the) the = { ...the, chon: id } }, // mic đã chọn đổi mã (cắm cổng khác) ⇒ nhớ mã mới
@@ -499,6 +503,8 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'giay': { let k = ''; try { k = m.giay && typeof m.giay === 'object' ? JSON.stringify(m.giay) : '' } catch { k = '' } if (k.length <= 1500) { giayCuoi = k; guiGiay() } break }
     case 'nghe-em': lt?.datNgheEm(m.v === true); break
     case 'nghe-em-lai': lt?.phatLaiEm(); break
+    // «Tăng tiếng» (13/11): Gốc · +3 · +6 · +9 — áp NGAY (đổi hệ số trong Worker + hoán track trên bộ gửi, không mở lại mic), nhớ ở máy
+    case 'tang': { const v = docTang(m.v); ghi(KHOA_TANG, v ? String(v) : ''); lt?.datTang?.(v); bao(); setTimeout(bao, 900); break }
     // «Tiếng: Làm rõ / Chuẩn trình duyệt» — áp NGAY, nhớ ở máy
     case 'kieu-tieng': { const v = m.v === 'chuan' ? 'chuan' : 'lam-ro'; ghi('ddh.live.kieu-tieng', v === 'chuan' ? '' : 'lam-ro'); lt?.datKieuTieng(v === 'chuan'); bao(); setTimeout(bao, 900); break }
     case 'anh': {

@@ -1,0 +1,559 @@
+{
+ "luc": "2026-11-13T02:44:48.731Z",
+ "ket": [
+  {
+   "ten": "Chuẩn trình duyệt (a): Gốc có tiếng suốt 10 giây",
+   "dat": true,
+   "them": "100 % khung trên −60 dBFS, RMS -28.9 dBFS"
+  },
+  {
+   "ten": "Chuẩn trình duyệt: Gốc gửi track mic gốc (Chuẩn) / chuỗi (Làm rõ) như cũ; +N gửi chuỗi khung",
+   "dat": true,
+   "them": ""
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đổi Gốc → +3 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 3.1 dB (đầu nhận 2.7 dB)"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đổi +3 → +6 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 3.1 dB (đầu nhận 1.9 dB)"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đổi +6 → +9 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 3.1 dB (đầu nhận 5.2 dB)"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đổi +9 → Gốc lại — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn -9, hệ số gửi đổi -8.8 dB (đầu nhận -12.3 dB)"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đổi Gốc lại → +6 lại — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 6, hệ số gửi đổi 6.1 dB (đầu nhận 5.6 dB)"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (b): đỉnh tiếng GỬI ở mọi chặng +N ≤ trần −2,16 dBFS",
+   "dat": true,
+   "them": "Gốc -11.7 · +3 -10.4 · +6 -5.8 · +9 -2.3 · Gốc lại -12.7 · +6 lại -7.5"
+  },
+  {
+   "ten": "Chuẩn trình duyệt (c): không quãng câm > 200 ms (kể cả lúc đổi bậc giữa live)",
+   "dat": true,
+   "them": "0 ms"
+  },
+  {
+   "ten": "Làm rõ (a): Gốc có tiếng suốt 10 giây",
+   "dat": true,
+   "them": "100 % khung trên −60 dBFS, RMS -19.4 dBFS"
+  },
+  {
+   "ten": "Làm rõ: Gốc gửi track mic gốc (Chuẩn) / chuỗi (Làm rõ) như cũ; +N gửi chuỗi khung",
+   "dat": true,
+   "them": ""
+  },
+  {
+   "ten": "Làm rõ (b): đổi Gốc → +3 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 2.2 dB (đầu nhận 2.4 dB)"
+  },
+  {
+   "ten": "Làm rõ (b): đổi +3 → +6 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 3 dB (đầu nhận 2.1 dB)"
+  },
+  {
+   "ten": "Làm rõ (b): đổi +6 → +9 — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 3, hệ số gửi đổi 2.5 dB (đầu nhận 1.5 dB)"
+  },
+  {
+   "ten": "Làm rõ (b): đổi +9 → Gốc lại — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn -9, hệ số gửi đổi -8.9 dB (đầu nhận -10.3 dB)"
+  },
+  {
+   "ten": "Làm rõ (b): đổi Gốc lại → +6 lại — tiếng gửi to thêm đúng bậc",
+   "dat": true,
+   "them": "muốn 6, hệ số gửi đổi 5.8 dB (đầu nhận 4.7 dB)"
+  },
+  {
+   "ten": "Làm rõ (b): đỉnh tiếng GỬI ở mọi chặng +N ≤ trần −2,16 dBFS",
+   "dat": true,
+   "them": "Gốc -5.7 · +3 -5.2 · +6 -2.6 · +9 -2.2 · Gốc lại -10 · +6 lại -4.4"
+  },
+  {
+   "ten": "Làm rõ (c): không quãng câm > 200 ms (kể cả lúc đổi bậc giữa live)",
+   "dat": true,
+   "them": "0 ms"
+  },
+  {
+   "ten": "Chuẩn trình duyệt · tiếng to +9: đỉnh tiếng GỬI ≤ trần −2,16 dBFS, có tiếng, không câm",
+   "dat": true,
+   "them": "đỉnh gửi -2.2 dBFS · đỉnh nhận -1.2 dBFS · câm dài nhất 0 ms"
+  },
+  {
+   "ten": "Làm rõ · tiếng to +9: đỉnh tiếng GỬI ≤ trần −2,16 dBFS, có tiếng, không câm",
+   "dat": true,
+   "them": "đỉnh gửi -2.2 dBFS · đỉnh nhận -0.7 dBFS · câm dài nhất 0 ms"
+  },
+  {
+   "ten": "(d) không có kiểu khung: +6 gửi thẳng track mic gốc, vẫn có tiếng, không câm",
+   "dat": true,
+   "them": "track mic gốc · có tiếng 100 % · câm dài nhất 0 ms"
+  }
+ ],
+ "so": {
+  "Chuẩn trình duyệt": {
+   "caiMic": {
+    "ec": true,
+    "ns": true,
+    "agc": true,
+    "kenh": 1
+   },
+   "ghiTrack": [
+    {
+     "chang": "Gốc",
+     "trackGui": "track mic gốc",
+     "chuoi": false
+    },
+    {
+     "chang": "+3",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 3
+    },
+    {
+     "chang": "+6",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 6
+    },
+    {
+     "chang": "+9",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 9
+    },
+    {
+     "chang": "Gốc lại",
+     "trackGui": "track mic gốc",
+     "chuoi": false
+    },
+    {
+     "chang": "+6 lại",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 6
+    }
+   ],
+   "chang": [
+    {
+     "ten": "Gốc",
+     "db": 0,
+     "rmsTvDb": -28.9,
+     "dinhNhanDb": -11.8,
+     "guiTvDb": -28.9,
+     "dinhGuiDb": -11.7,
+     "heSoGuiTvDb": 0,
+     "coTieng": 100
+    },
+    {
+     "ten": "+3",
+     "db": 3,
+     "rmsTvDb": -25.8,
+     "dinhNhanDb": -10.3,
+     "guiTvDb": -25.9,
+     "dinhGuiDb": -10.4,
+     "heSoGuiTvDb": 3,
+     "coTieng": 100
+    },
+    {
+     "ten": "+6",
+     "db": 6,
+     "rmsTvDb": -23.3,
+     "dinhNhanDb": -5.7,
+     "guiTvDb": -23.3,
+     "dinhGuiDb": -5.8,
+     "heSoGuiTvDb": 6,
+     "coTieng": 100
+    },
+    {
+     "ten": "+9",
+     "db": 9,
+     "rmsTvDb": -17.9,
+     "dinhNhanDb": -2.2,
+     "guiTvDb": -18,
+     "dinhGuiDb": -2.3,
+     "heSoGuiTvDb": 9,
+     "coTieng": 100
+    },
+    {
+     "ten": "Gốc lại",
+     "db": 0,
+     "rmsTvDb": -29,
+     "dinhNhanDb": -11.3,
+     "guiTvDb": -29.2,
+     "dinhGuiDb": -12.7,
+     "heSoGuiTvDb": 0,
+     "coTieng": 100
+    },
+    {
+     "ten": "+6 lại",
+     "db": 6,
+     "rmsTvDb": -23.4,
+     "dinhNhanDb": -7.2,
+     "guiTvDb": -23.4,
+     "dinhGuiDb": -7.5,
+     "heSoGuiTvDb": 6,
+     "coTieng": 100
+    }
+   ],
+   "buoc": [
+    {
+     "tu": "Gốc",
+     "toi": "+3",
+     "muon": 3,
+     "doDuoc": 3.1,
+     "nhan": 2.7
+    },
+    {
+     "tu": "+3",
+     "toi": "+6",
+     "muon": 3,
+     "doDuoc": 3.1,
+     "nhan": 1.9
+    },
+    {
+     "tu": "+6",
+     "toi": "+9",
+     "muon": 3,
+     "doDuoc": 3.1,
+     "nhan": 5.2
+    },
+    {
+     "tu": "+9",
+     "toi": "Gốc lại",
+     "muon": -9,
+     "doDuoc": -8.8,
+     "nhan": -12.3
+    },
+    {
+     "tu": "Gốc lại",
+     "toi": "+6 lại",
+     "muon": 6,
+     "doDuoc": 6.1,
+     "nhan": 5.6
+    }
+   ],
+   "camDaiNhatMs": 0
+  },
+  "Làm rõ": {
+   "caiMic": {
+    "ec": false,
+    "ns": false,
+    "agc": true,
+    "kenh": 1
+   },
+   "ghiTrack": [
+    {
+     "chang": "Gốc",
+     "trackGui": "chuỗi khung",
+     "chuoi": true
+    },
+    {
+     "chang": "+3",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 3
+    },
+    {
+     "chang": "+6",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 6
+    },
+    {
+     "chang": "+9",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 9
+    },
+    {
+     "chang": "Gốc lại",
+     "trackGui": "chuỗi khung",
+     "chuoi": true
+    },
+    {
+     "chang": "+6 lại",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 6
+    }
+   ],
+   "chang": [
+    {
+     "ten": "Gốc",
+     "db": 0,
+     "rmsTvDb": -19.4,
+     "dinhNhanDb": -4.7,
+     "guiTvDb": -19.4,
+     "dinhGuiDb": -5.7,
+     "heSoGuiTvDb": 7.6,
+     "coTieng": 100
+    },
+    {
+     "ten": "+3",
+     "db": 3,
+     "rmsTvDb": -18.1,
+     "dinhNhanDb": -4.6,
+     "guiTvDb": -18.2,
+     "dinhGuiDb": -5.2,
+     "heSoGuiTvDb": 8.6,
+     "coTieng": 100
+    },
+    {
+     "ten": "+6",
+     "db": 6,
+     "rmsTvDb": -16.1,
+     "dinhNhanDb": -2.5,
+     "guiTvDb": -16.1,
+     "dinhGuiDb": -2.6,
+     "heSoGuiTvDb": 11,
+     "coTieng": 100
+    },
+    {
+     "ten": "+9",
+     "db": 9,
+     "rmsTvDb": -13.3,
+     "dinhNhanDb": -1,
+     "guiTvDb": -13.3,
+     "dinhGuiDb": -2.2,
+     "heSoGuiTvDb": 13,
+     "coTieng": 100
+    },
+    {
+     "ten": "Gốc lại",
+     "db": 0,
+     "rmsTvDb": -22.9,
+     "dinhNhanDb": -2.3,
+     "guiTvDb": -23,
+     "dinhGuiDb": -10,
+     "heSoGuiTvDb": 3.9,
+     "coTieng": 100
+    },
+    {
+     "ten": "+6 lại",
+     "db": 6,
+     "rmsTvDb": -17.5,
+     "dinhNhanDb": -4.1,
+     "guiTvDb": -17.5,
+     "dinhGuiDb": -4.4,
+     "heSoGuiTvDb": 9.2,
+     "coTieng": 100
+    }
+   ],
+   "buoc": [
+    {
+     "tu": "Gốc",
+     "toi": "+3",
+     "muon": 3,
+     "doDuoc": 2.2,
+     "nhan": 2.4
+    },
+    {
+     "tu": "+3",
+     "toi": "+6",
+     "muon": 3,
+     "doDuoc": 3,
+     "nhan": 2.1
+    },
+    {
+     "tu": "+6",
+     "toi": "+9",
+     "muon": 3,
+     "doDuoc": 2.5,
+     "nhan": 1.5
+    },
+    {
+     "tu": "+9",
+     "toi": "Gốc lại",
+     "muon": -9,
+     "doDuoc": -8.9,
+     "nhan": -10.3
+    },
+    {
+     "tu": "Gốc lại",
+     "toi": "+6 lại",
+     "muon": 6,
+     "doDuoc": 5.8,
+     "nhan": 4.7
+    }
+   ],
+   "camDaiNhatMs": 0
+  },
+  "Chuẩn trình duyệt · tiếng to": {
+   "caiMic": {
+    "ec": true,
+    "ns": true,
+    "agc": true,
+    "kenh": 1
+   },
+   "ghiTrack": [
+    {
+     "chang": "Gốc",
+     "trackGui": "track mic gốc",
+     "chuoi": false
+    },
+    {
+     "chang": "+9",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 9
+    }
+   ],
+   "chang": [
+    {
+     "ten": "Gốc",
+     "db": 0,
+     "rmsTvDb": -18.7,
+     "dinhNhanDb": -2.1,
+     "guiTvDb": -18.8,
+     "dinhGuiDb": -2,
+     "heSoGuiTvDb": 0,
+     "coTieng": 100
+    },
+    {
+     "ten": "+9",
+     "db": 9,
+     "rmsTvDb": -11.5,
+     "dinhNhanDb": -1.2,
+     "guiTvDb": -11.6,
+     "dinhGuiDb": -2.2,
+     "heSoGuiTvDb": 7.2,
+     "coTieng": 100
+    }
+   ],
+   "buoc": [
+    {
+     "tu": "Gốc",
+     "toi": "+9",
+     "muon": 9,
+     "doDuoc": 8.5,
+     "nhan": 8
+    }
+   ],
+   "camDaiNhatMs": 0
+  },
+  "Làm rõ · tiếng to": {
+   "caiMic": {
+    "ec": false,
+    "ns": false,
+    "agc": true,
+    "kenh": 1
+   },
+   "ghiTrack": [
+    {
+     "chang": "Gốc",
+     "trackGui": "chuỗi khung",
+     "chuoi": true
+    },
+    {
+     "chang": "+9",
+     "trackGui": "chuỗi khung",
+     "chuoi": true,
+     "tang": 9
+    }
+   ],
+   "chang": [
+    {
+     "ten": "Gốc",
+     "db": 0,
+     "rmsTvDb": -18.8,
+     "dinhNhanDb": -4.7,
+     "guiTvDb": -18.8,
+     "dinhGuiDb": -5.9,
+     "heSoGuiTvDb": -6,
+     "coTieng": 100
+    },
+    {
+     "ten": "+9",
+     "db": 9,
+     "rmsTvDb": -12.7,
+     "dinhNhanDb": -0.7,
+     "guiTvDb": -12.5,
+     "dinhGuiDb": -2.2,
+     "heSoGuiTvDb": 2.3,
+     "coTieng": 100
+    }
+   ],
+   "buoc": [
+    {
+     "tu": "Gốc",
+     "toi": "+9",
+     "muon": 9,
+     "doDuoc": 8.7,
+     "nhan": 7.1
+    }
+   ],
+   "camDaiNhatMs": 0
+  },
+  "Chuẩn trình duyệt · KHÔNG có kiểu khung": {
+   "caiMic": {
+    "ec": true,
+    "ns": true,
+    "agc": true,
+    "kenh": 1
+   },
+   "ghiTrack": [
+    {
+     "chang": "Gốc",
+     "trackGui": "track mic gốc",
+     "chuoi": false
+    },
+    {
+     "chang": "+6",
+     "trackGui": "track mic gốc",
+     "chuoi": false,
+     "tang": 6
+    }
+   ],
+   "chang": [
+    {
+     "ten": "Gốc",
+     "db": 0,
+     "rmsTvDb": -28.5,
+     "dinhNhanDb": -11.6,
+     "guiTvDb": -28.6,
+     "dinhGuiDb": -11.7,
+     "heSoGuiTvDb": 0,
+     "coTieng": 100
+    },
+    {
+     "ten": "+6",
+     "db": 6,
+     "rmsTvDb": -29.4,
+     "dinhNhanDb": -12.2,
+     "guiTvDb": -29.3,
+     "dinhGuiDb": -12.4,
+     "heSoGuiTvDb": 0,
+     "coTieng": 100
+    }
+   ],
+   "buoc": [
+    {
+     "tu": "Gốc",
+     "toi": "+6",
+     "muon": 6,
+     "doDuoc": 0,
+     "nhan": -0.2
+    }
+   ],
+   "camDaiNhatMs": 0
+  }
+ }
+}
