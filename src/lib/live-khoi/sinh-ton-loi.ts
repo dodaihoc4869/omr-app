@@ -54,6 +54,32 @@ export const CAP_MAY_TOI_DA = 3
 /** Hộp tiếp tế giữa sân: 20 giây một hộp. */
 export const HOP_MS = 20_000
 export const HOP_BK = 36
+/** HỘP 4 LOẠI (bản 2 đợt 2, thầy duyệt 13/11): Hồi đầy máu · Khiên 5 giây (chặn MỌI sát thương: đạn, lan, cháy, ngoài vòng) · Chạy nhanh 6 giây (×1,35) ·
+ *  Pháo Sao 10 giây (súng TẠM cấp 6: không tính lên cấp, không kích chuỗi; hết giờ trả về `cap` thật; bị hạ giữa chừng ⇒ mất, hồi sinh cấp 1). */
+export type LoaiHop = 'mau' | 'khien' | 'nhanh' | 'sao'
+export const LOAI_HOP: readonly LoaiHop[] = ['mau', 'khien', 'nhanh', 'sao']
+export const KHIEN_MS = 5000
+export const NHANH_MS = 6000
+export const SAO_MS = 10_000
+export const HE_NHANH = 1.35
+/** Loại của hộp số `soHop` (`hopSo(nay)`) — hàm thuần DÙNG CHUNG máy chủ / máy em / máy bù, không đi qua giao thức. Băm nhân Fibonacci (dãy Weyl ⇒ bốn loại
+ *  đều nhau, không lặp vòng 4); 2 bit cao của Math.imul ⇒ cùng kết quả mọi máy. Đổi hàm này = đổi giao thức (test khoá giá trị cố định). */
+export const loaiHop = (soHop: number): LoaiHop => LOAI_HOP[Math.imul(Number.isFinite(soHop) ? Math.floor(soHop) | 0 : 0, 0x9e3779b1) >>> 30]
+/** Trạng thái hiệu ứng hộp (mốc giờ phòng, ms; thiếu / 0 = không có) — chung cho `Toi` (máy em) và `May` (máy bù). */
+export interface HieuUngHop { khienDen?: number; nhanhDen?: number; saoDen?: number }
+export const coKhien = (h: HieuUngHop, nay: number): boolean => (h.khienDen ?? 0) > nay
+export const dangNhanh = (h: HieuUngHop, nay: number): boolean => (h.nhanhDen ?? 0) > nay
+/** Cấp súng ĐANG DÙNG: đang Pháo Sao ⇒ 6, không thì `cap` thật. Gói gửi (`p[3]`) và dòng ảnh chụp mang cấp này; lên cấp khi hạ cộng vào `cap` thật. */
+export const capSung = (h: HieuUngHop & { cap: number }, nay: number): number => ((h.saoDen ?? 0) > nay ? CAP_TOI_DA : h.cap)
+/** Áp hiệu ứng hộp lên trạng thái (trả bản mới; `mau` về MAU_DAY). Dùng cho cả máy em (`Toi`) và máy bù (`May`, phòng gán lại tại chỗ). */
+export function apHop<T extends HieuUngHop & { mau: number }>(tt: T, loai: LoaiHop, nay: number): T {
+  if (loai === 'mau') return { ...tt, mau: MAU_DAY }
+  if (loai === 'khien') return { ...tt, khienDen: nay + KHIEN_MS }
+  if (loai === 'nhanh') return { ...tt, nhanhDen: nay + NHANH_MS }
+  return { ...tt, saoDen: nay + SAO_MS }
+}
+/** Bị hạ ⇒ mất mọi hiệu ứng hộp. */
+const HET_HOP: Required<HieuUngHop> = { khienDen: 0, nhanhDen: 0, saoDen: 0 }
 export const ANH_MS = 250
 export const NHIP_GUI_MS = 250
 export const NHIP_NHAC_MS = 2000
@@ -77,8 +103,8 @@ export interface BanDo {
 export interface Vong { cx: number; cy: number; rx: number; ry: number }
 /** Một nhân vật như ảnh chụp cho thấy. */
 export interface NhanVat { id: string; x: number; y: number; mau: number; doi: number; cap: number; t: string }
-/** Bé ma của CHÍNH em. Mốc giờ theo giờ phòng (ms); 0 = không có. */
-export interface Toi {
+/** Bé ma của CHÍNH em. Mốc giờ theo giờ phòng (ms); 0 = không có. Hiệu ứng hộp (`khienDen` / `nhanhDen` / `saoDen`, bản 2 đợt 2) tuỳ chọn ⇒ chỗ cũ dựng `Toi` vẫn đúng. */
+export interface Toi extends HieuUngHop {
   x: number; y: number; mau: number; doi: number; cap: number
   /** > 0: đang bị hạ, hồi sinh lúc này. */ chetDen: number
   batTuDen: number
@@ -417,18 +443,21 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
   if (tt.chetDen) kq = { ...taoToi(bd, tt.doi, nay, hat), van: tt.van }
   const dt = Math.min(dtMs, 100) / 1000
   let { x, y, mau, duong } = kq, lucDong = kq.lucDong
-  const dai = Math.hypot(vao.dx, vao.dy)
+  const dai = Math.hypot(vao.dx, vao.dy), tocDo = dangNhanh(kq, nay) ? TOC_DO * HE_NHANH : TOC_DO
   if (dai > 0.01) {
-    const he = (Math.min(1, dai) / dai) * TOC_DO * dt, p = diChuyen(bd, x, y, vao.dx * he, vao.dy * he)
+    const he = (Math.min(1, dai) / dai) * tocDo * dt, p = diChuyen(bd, x, y, vao.dx * he, vao.dy * he)
     if (p.x !== x || p.y !== y) lucDong = nay
     x = p.x; y = p.y; duong = duong.length ? [] : duong
   } else if (duong.length) {
-    const d = duong[0], kc = Math.hypot(d.x - x, d.y - y), buoc = TOC_DO * dt
+    const d = duong[0], kc = Math.hypot(d.x - x, d.y - y), buoc = tocDo * dt
     if (kc <= buoc) { x = d.x; y = d.y; duong = duong.slice(1) } else { const p = diChuyen(bd, x, y, ((d.x - x) / kc) * buoc, ((d.y - y) / kc) * buoc); if (p.x === x && p.y === y) duong = []; x = p.x; y = p.y }
     lucDong = nay
   }
   let lucTrung = kq.lucTrung, chayAi = kq.chayAi
-  if (!dangNghi(nay)) {
+  // Khiên (hộp tiếp tế): không mất máu vì gì cả — kể cả cháy và ngoài vòng; vẫn hồi máu như thường.
+  if (!dangNghi(nay) && coKhien(kq, nay)) {
+    if (mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
+  } else if (!dangNghi(nay)) {
     // Cháy (Súng Lửa Màu): trừ theo đúng khoảng thời gian đã trôi (không kẹp 100 ms như bước đi ⇒ tab chậm vẫn đủ 16 máu); bất tử thì không cháy.
     const chay = nay >= kq.batTuDen ? matChay(kq.chayDen, nay, dtMs) : 0
     if (chay > 0) { mau -= chay; lucTrung = nay }
@@ -437,15 +466,15 @@ export function buocToi(bd: BanDo, tt: Toi, vao: { dx: number; dy: number }, dtM
     else if (!chay && mau < MAU_DAY && nay - lucTrung >= HOI_CHO_MS) mau = Math.min(MAU_DAY, mau + HOI_MOI_GIAY * dt)
     if (mau <= 0 && !chay) chayAi = ''
   }
-  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + HOI_SINH_MS, chayDen: 0, chayAi }
+  if (mau <= 0) return { ...kq, x, y, mau: 0, duong: [], lucDong, lucTrung, chetDen: nay + HOI_SINH_MS, chayDen: 0, chayAi, ...HET_HOP }
   return { ...kq, x, y, mau, duong, lucDong, lucTrung }
 }
 /** Trúng đạn `mat` máu; `chay` = mã kẻ cầm Súng Lửa Màu bắn thẳng (từ `satThuong`) ⇒ châm lửa 2 giây kể từ lúc này. Đang bị hạ / vừa hồi sinh / đang nghỉ
- *  giữa ván ⇒ không mất, không cháy. Hết máu ⇒ bị hạ, hồi sinh sau 3 giây (hết cháy). */
+ *  giữa ván / đang có KHIÊN ⇒ không mất, không cháy. Hết máu ⇒ bị hạ, hồi sinh sau 3 giây (hết cháy, mất mọi hiệu ứng hộp — Pháo Sao về cấp thật rồi cấp 1). */
 export function nhanDon(tt: Toi, mat: number, nay: number, chay = ''): Toi {
-  if (mat <= 0 || tt.chetDen > nay || nay < tt.batTuDen || dangNghi(nay)) return tt
+  if (mat <= 0 || tt.chetDen > nay || nay < tt.batTuDen || dangNghi(nay) || coKhien(tt, nay)) return tt
   const mau = tt.mau - mat
-  if (mau <= 0) return { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + HOI_SINH_MS, chayDen: 0 }
+  if (mau <= 0) return { ...tt, mau: 0, duong: [], lucTrung: nay, chetDen: nay + HOI_SINH_MS, chayDen: 0, ...HET_HOP }
   return chay ? { ...tt, mau, lucTrung: nay, chayDen: nay + CHAY_MS, chayAi: chay } : { ...tt, mau, lucTrung: nay }
 }
 /** Súng của em đang ngừng bắn để ẩn: đứng yên trong bụi. */

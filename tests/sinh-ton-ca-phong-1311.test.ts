@@ -106,12 +106,17 @@ describe('Phòng Sinh Tồn của ca — nhịp trò', () => {
     expect(tin).toMatchObject({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: T0 + 60 + TRO_NHIP_MS })
     const x = anh(a)
     // Toạ độ kẹp trong sân 2000 (cỡ 0 = 3200 × 2000), cấp kẹp về 6; đội do PHÒNG đóng dấu (S1 đội 0, S2 đội 1).
+    // «Chỉ gửi gần» (bản 4): S1 ở góc dưới-trái, S2 cách 1700 theo dọc ⇒ S1 không nhận dòng S2; S2 nhận dòng của chính mình.
     expect(x.ds.S1).toEqual([100, 2000, 50, 0, 6, ''])
-    expect(x.ds.S2).toEqual([300, 300, 0, 1, 2, ''])
+    expect(x.ds.S2).toBeUndefined()
+    expect(anh(b).ds.S2).toEqual([300, 300, 0, 1, 2, ''])
     expect(x.ds.S3).toBeUndefined() // S3 mới ở phòng, chưa gửi gói ⇒ chưa lên sân
-    expect(x.an).toEqual([['S1', 'S2']]); expect(x.d).toEqual([1, 0, 0, 0]); expect(x.v).toBe(1); expect(x.c).toBe(0)
-    expect(Object.keys(x.ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
-    expect([0, 1, 2, 3].map((d) => Object.values(x.ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
+    // S3 chưa lên sân ⇒ nhận ảnh ĐỦ: máy bù đủ 4 mỗi đội.
+    const du = anh(c)
+    expect(du.ds.S2).toEqual([300, 300, 0, 1, 2, ''])
+    expect(x.an).toEqual([['S1', 'S2', 0, 1, 0]]); expect(x.d).toEqual([1, 0, 0, 0]); expect(x.v).toBe(1); expect(x.c).toBe(0)
+    expect(Object.keys(du.ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
+    expect([0, 1, 2, 3].map((d) => Object.values(du.ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
     // Báo «bị hạ» lặp trong 2,5 giây ⇒ chỉ tính một lượt; lượt hạ của ảnh trước không lặp lại.
     tien(150); p.nhan(b, goi({ p: [300, 300, 0, 1], a: 'S1' }))
     tien(100); p.nhip()
@@ -130,18 +135,20 @@ describe('Phòng Sinh Tồn của ca — nhịp trò', () => {
   it('em rời ⇒ cả phòng nhận `st-ds` mới, ảnh kế không còn em đó và máy bù lại đủ 4', () => {
     const { p, tien } = phong()
     const a = vao(p, 'S1'), b = vao(p, 'S2')
-    p.nhan(a, goi({ p: [100, 100, 100, 1] })); p.nhan(b, goi({ p: [900, 900, 100, 1] }))
+    p.nhan(a, goi({ p: [100, 100, 100, 1] })); p.nhan(b, goi({ p: [800, 800, 100, 1] }))
+    const xem = vao(p, 'XEM') // chưa gửi gói ⇒ không lên sân ⇒ nhận ảnh ĐỦ (đếm máy bù)
     tien(TRO_NHIP_MS); p.nhip()
-    expect(Object.keys(anh(a).ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
+    expect(Object.keys(anh(xem).ds).filter((id) => id.startsWith('~'))).toHaveLength(14)
+    expect(anh(a).ds.S2).toEqual([800, 800, 100, 1, 1, '']) // S2 cách S1 990 ⇒ trong vùng gửi gần
     const n = dem(a, 'st-ds')
     p.roi(b)
     expect(dem(a, 'st-ds')).toBe(n + 1)
-    expect(cuoi(a, 'st-ds')!.ds).toEqual([['S1', 'Bạn S1', 0]])
+    expect(cuoi(a, 'st-ds')!.ds).toEqual([['S1', 'Bạn S1', 0], ['XEM', 'Bạn XEM', 2]])
     tien(200); p.nhan(a, goi({ p: [100, 100, 100, 1] }))
     tien(50); p.nhip()
     expect(anh(a).ds.S2).toBeUndefined()
-    expect(Object.keys(anh(a).ds).filter((id) => id.startsWith('~'))).toHaveLength(15)
-    expect([0, 1, 2, 3].map((d) => Object.values(anh(a).ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
+    expect(Object.keys(anh(xem).ds).filter((id) => id.startsWith('~'))).toHaveLength(15)
+    expect([0, 1, 2, 3].map((d) => Object.values(anh(xem).ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
   })
   it('không còn em thật (em im quá 5 giây hoặc rời hết) ⇒ `canThuc()` false, nhịp không phát gì; em gửi lại ⇒ chạy tiếp từ ván 1', () => {
     const { p, tien } = phong()
