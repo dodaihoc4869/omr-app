@@ -6913,6 +6913,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a": {
+      "tep": "poly324-native-ddh-c2509a6a9334a9fdf63c337a160a0ece762fb773281c6ab19a881aea3f87fb5a.svg",
+      "hashSvg": "c2509a6a9334a9fdf63c337a160a0ece762fb773281c6ab19a881aea3f87fb5a",
+      "byteSvg": 70920,
+      "byteGzip": 9068,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292": {
       "tep": "maltose-lien-ket-mau-ddh-da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08.svg",
       "hashSvg": "da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08",
@@ -30979,6 +30988,20 @@
       ]
     },
     {
+      "qid": "VIP27-C4-B12-III-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a",
+          "where": "VIP27-C4-B12-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "5647a946ed52edd41768faa16852516d42e2a91f0dbf71c885446a3c76119d96",
+          "vector": "poly324-native-ddh-c2509a6a9334a9fdf63c337a160a0ece762fb773281c6ab19a881aea3f87fb5a.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-C3-B9-I-16",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -33055,6 +33078,7 @@
     "VIP27-C3-B11-D1-III-6",
     "VIP27-C4-B12-I-17",
     "VIP27-C4-B12-II-4",
+    "VIP27-C4-B12-III-2",
     "VIP27-C3-B9-I-16",
     "VIP27-C3-B9-II-3",
     "VIP27-C4-B13-I-3",

@@ -1,0 +1,783 @@
+{
+  "hash": "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a",
+  "native": [
+    1054,
+    346
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B12-III-2",
+      "de": "Cho phương trình của các phản ứng được đánh số thứ tự (1), (2), (3), (4) như hình.\nXác định dãy bốn số (ví dụ: 1234, 4321,…) theo trình tự sắp xếp các phản ứng trên theo tên gọi: phản ứng tăng mạch; phản ứng cắt mạch; phản ứng giữ nguyên mạch; phản ứng phân huỷ.",
+      "refs": [
+        {
+          "hash": "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a",
+          "where": "VIP27-C4-B12-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "5647a946ed52edd41768faa16852516d42e2a91f0dbf71c885446a3c76119d96"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "4literalreactions-UNKNOWNnTotal/4RIGHTOPENVheads-splitshaftsROW1threeisolateddashes-ROWS234oneleftdashEACH/EXACT(C6H10O5)n→6nC+5nH2O-H2SO4/Cao su thiên nhiên→Cao su lưu hóa-SITALIC/PS→nCH2=CH(C6H5)-Na/PVAc+nNaOH→PVA+nCH3COONa-NaKEEP/3ROUNDpairs3nSUB-othernBASELINE/2C6H5FIRSTCanchors-freeverticalstemsbelowCH/row4OCOCH3NOTCOOCH3-OH/ALLregularUPRIGHTexceptSregularITALIC/4nums(4)nativeBOTTOMcropKEEP/NOtheoryfix-addedconditions-name-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL2x/3arrowmacros8x; OPENVheads independentconfirmed. Individual dashpieces and freebranchstems/nativeBOTTOMcrop retained. NativeapproxNOTsubpixel.",
+  "independentSourceAudit": {
+    "i": 324,
+    "assetIndexProvided": 1338,
+    "hash": "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a.png",
+    "size": [
+      1054,
+      346
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B12-III-2",
+        "de": "Cho phương trình của các phản ứng được đánh số thứ tự (1), (2), (3), (4) như hình.\nXác định dãy bốn số (ví dụ: 1234, 4321,…) theo trình tự sắp xếp các phản ứng trên theo tên gọi: phản ứng tăng mạch; phản ứng cắt mạch; phản ứng giữ nguyên mạch; phản ứng phân huỷ.",
+        "allHinh": [
+          {
+            "hash": "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a",
+            "where": "VIP27-C4-B12-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "5647a946ed52edd41768faa16852516d42e2a91f0dbf71c885446a3c76119d96"
+          }
+        ],
+        "missingHashes": [
+          "38527cecdc63db07ca16d066598477221df84b71d0ad57c4a0c9c510df890b7a"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/409-full3x.png",
+        "/workspace/scratch/409-arrows3x.png",
+        "/workspace/scratch/409-head115x.png",
+        "/workspace/scratch/409-head215x.png",
+        "/workspace/scratch/409-head315x.png",
+        "/workspace/scratch/409-head415x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": {
+        "allExceptS": "Regular upright serif, noactualboldclaim",
+        "Srow2": "Regular ITALIC uppercaseS",
+        "coefficients": "n and6n/5n BASELINE; repeatparenthesisnSUB;6/10/5/2/3SUB chemicalnumbers"
+      },
+      "headClassification": {
+        "row1": "OPENV curvedstrokelegs withblurredcentralshaftjoin; no closedbase visible, notfullfilledtriangle",
+        "row2": "ClearOPENV2legs+shafttotip, no closedbase",
+        "row3": "OPENV strokearms/centralinkjoin blurred, no fulltrianglebase",
+        "row4": "OPENV curvedstrokelegs/centralinkjoin blurred, no fulltrianglebase",
+        "limits": "Ownindividual15x headmacros; centralblackinkisoverlapofshaft/legs, do not substituteclosedfilledtriangle. Rows1/3/4 lesssharpthanrow2; keeptinyarrowglyphshape."
+      },
+      "rows": [
+        {
+          "number": "(1)",
+          "numberBox": [
+            12,
+            28,
+            53,
+            59
+          ],
+          "reactant": {
+            "literal": "(C₆H₁₀O₅)ₙ",
+            "bbox": [
+              63,
+              0,
+              217,
+              46
+            ],
+            "brackets": "ROUND nSUB"
+          },
+          "shaftSegments": [
+            [
+              [
+                230,
+                23
+              ],
+              [
+                249,
+                23
+              ]
+            ],
+            [
+              [
+                264,
+                23
+              ],
+              [
+                294,
+                23
+              ]
+            ],
+            [
+              [
+                303,
+                23
+              ],
+              [
+                318,
+                23
+              ]
+            ],
+            [
+              [
+                324,
+                23
+              ],
+              [
+                349,
+                23
+              ]
+            ]
+          ],
+          "head": {
+            "tip": [
+              349,
+              23
+            ],
+            "upperLeg": [
+              [
+                344,
+                18
+              ],
+              [
+                349,
+                23
+              ]
+            ],
+            "lowerLeg": [
+              [
+                344,
+                28
+              ],
+              [
+                349,
+                23
+              ]
+            ]
+          },
+          "condition": {
+            "literal": "H₂SO₄",
+            "bbox": [
+              259,
+              3,
+              306,
+              21
+            ]
+          },
+          "product": {
+            "literal": "6nC + 5nH₂O",
+            "bbox": [
+              359,
+              9,
+              540,
+              40
+            ]
+          },
+          "note": "THREE separatehorizontal dashsegments BEFORE lastshortarrow. Do notbridgeconditionarea intoonecontinuousshaft."
+        },
+        {
+          "number": "(2)",
+          "numberBox": [
+            12,
+            82,
+            53,
+            112
+          ],
+          "reactant": {
+            "literal": "Cao su thiên nhiên",
+            "bbox": [
+              61,
+              80,
+              309,
+              112
+            ]
+          },
+          "shaftSegments": [
+            [
+              [
+                329,
+                89
+              ],
+              [
+                347,
+                89
+              ]
+            ],
+            [
+              [
+                362,
+                89
+              ],
+              [
+                397,
+                89
+              ]
+            ]
+          ],
+          "head": {
+            "tip": [
+              397,
+              89
+            ],
+            "upperLeg": [
+              [
+                391,
+                83
+              ],
+              [
+                397,
+                89
+              ]
+            ],
+            "lowerLeg": [
+              [
+                391,
+                95
+              ],
+              [
+                397,
+                89
+              ]
+            ]
+          },
+          "condition": {
+            "literal": "S",
+            "bbox": [
+              358,
+              69,
+              367,
+              85
+            ],
+            "style": "regularitalic"
+          },
+          "product": {
+            "literal": "Cao su lưu hóa",
+            "bbox": [
+              415,
+              80,
+              619,
+              111
+            ]
+          }
+        },
+        {
+          "number": "(3)",
+          "numberBox": [
+            12,
+            201,
+            53,
+            231
+          ],
+          "reactant": {
+            "literal": "(–CH₂ - CH–)ₙ withdownC₆H₅",
+            "CH2box": [
+              101,
+              127,
+              160,
+              161
+            ],
+            "CHbox": [
+              196,
+              127,
+              244,
+              151
+            ],
+            "middleLiteralHyphen": {
+              "bbox": [
+                173,
+                139,
+                184,
+                143
+              ]
+            },
+            "leftFreeBond": [
+              [
+                65,
+                144
+              ],
+              [
+                103,
+                144
+              ]
+            ],
+            "rightFreeBond": [
+              [
+                247,
+                144
+              ],
+              [
+                286,
+                144
+              ]
+            ],
+            "roundParentheses": {
+              "leftGuide": [
+                [
+                  78,
+                  122
+                ],
+                [
+                  71,
+                  133
+                ],
+                [
+                  71,
+                  145
+                ],
+                [
+                  79,
+                  153
+                ]
+              ],
+              "rightGuide": [
+                [
+                  271,
+                  122
+                ],
+                [
+                  280,
+                  133
+                ],
+                [
+                  280,
+                  145
+                ],
+                [
+                  273,
+                  153
+                ]
+              ],
+              "nsubBox": [
+                288,
+                156,
+                299,
+                167
+              ]
+            },
+            "phenylStem": [
+              [
+                209,
+                172
+              ],
+              [
+                209,
+                189
+              ]
+            ],
+            "phenylLiteral": "C₆H₅",
+            "phenylBBox": [
+              198,
+              189,
+              264,
+              218
+            ],
+            "attachment": "StemFIRST Ccenter~209 ofbranchC6H5. UpperstemfloatingbelowCHtextwithwhitegap; do not extendtoHglyph orfillgap."
+          },
+          "shaftSegments": [
+            [
+              [
+                312,
+                141
+              ],
+              [
+                331,
+                141
+              ]
+            ],
+            [
+              [
+                347,
+                141
+              ],
+              [
+                393,
+                141
+              ]
+            ]
+          ],
+          "head": {
+            "tip": [
+              393,
+              141
+            ],
+            "upperLeg": [
+              [
+                388,
+                136
+              ],
+              [
+                393,
+                141
+              ]
+            ],
+            "lowerLeg": [
+              [
+                388,
+                146
+              ],
+              [
+                393,
+                141
+              ]
+            ]
+          },
+          "condition": {
+            "literal": "Na",
+            "bbox": [
+              343,
+              124,
+              362,
+              139
+            ]
+          },
+          "product": {
+            "literal": "nCH₂ =CH withdownC₆H₅",
+            "bbox": [
+              405,
+              127,
+              566,
+              161
+            ],
+            "nBaseline": true,
+            "phenylStem": [
+              [
+                536,
+                166
+              ],
+              [
+                536,
+                184
+              ]
+            ],
+            "phenylLiteral": "C₆H₅",
+            "phenylBBox": [
+              520,
+              183,
+              588,
+              212
+            ],
+            "stemAnchor": "FIRST Cbranch, notH; upperstemseparatedfromCHtext"
+          }
+        },
+        {
+          "number": "(4)",
+          "numberBox": [
+            12,
+            320,
+            53,
+            345
+          ],
+          "reactant": {
+            "literal": "(–CH₂ - CH–)ₙ withdownOCOCH₃",
+            "CH2box": [
+              116,
+              247,
+              176,
+              280
+            ],
+            "CHbox": [
+              210,
+              247,
+              259,
+              273
+            ],
+            "middleLiteralHyphenBox": [
+              185,
+              258,
+              196,
+              262
+            ],
+            "freeBonds": [
+              [
+                [
+                  80,
+                  263
+                ],
+                [
+                  119,
+                  263
+                ]
+              ],
+              [
+                [
+                  260,
+                  263
+                ],
+                [
+                  298,
+                  263
+                ]
+              ]
+            ],
+            "roundParentheses": {
+              "leftGuide": [
+                [
+                  93,
+                  242
+                ],
+                [
+                  86,
+                  254
+                ],
+                [
+                  86,
+                  266
+                ],
+                [
+                  94,
+                  274
+                ]
+              ],
+              "rightGuide": [
+                [
+                  284,
+                  242
+                ],
+                [
+                  292,
+                  253
+                ],
+                [
+                  292,
+                  266
+                ],
+                [
+                  285,
+                  274
+                ]
+              ],
+              "nsubBox": [
+                299,
+                277,
+                311,
+                287
+              ]
+            },
+            "pendantStem": [
+              [
+                209,
+                291
+              ],
+              [
+                209,
+                307
+              ]
+            ],
+            "pendantLiteral": "OCOCH₃",
+            "pendantBBox": [
+              201,
+              307,
+              328,
+              337
+            ],
+            "anchor": "FIRST O at209, notC/CH3"
+          },
+          "plusNaOH": {
+            "literal": "+ nNaOH",
+            "bbox": [
+              329,
+              247,
+              458,
+              274
+            ],
+            "nBaseline": true
+          },
+          "shaftSegments": [
+            [
+              [
+                471,
+                260
+              ],
+              [
+                489,
+                260
+              ]
+            ],
+            [
+              [
+                505,
+                260
+              ],
+              [
+                550,
+                260
+              ]
+            ]
+          ],
+          "head": {
+            "tip": [
+              550,
+              260
+            ],
+            "upperLeg": [
+              [
+                545,
+                255
+              ],
+              [
+                550,
+                260
+              ]
+            ],
+            "lowerLeg": [
+              [
+                545,
+                265
+              ],
+              [
+                550,
+                260
+              ]
+            ]
+          },
+          "condition": {
+            "literal": "Na",
+            "bbox": [
+              500,
+              244,
+              519,
+              259
+            ],
+            "warning": "NativeNa literal eveniftheoryunexpected; do notchange."
+          },
+          "product": {
+            "literal": "(–CH₂ - CH–)ₙ withdownOH",
+            "CH2box": [
+              598,
+              247,
+              657,
+              280
+            ],
+            "CHbox": [
+              693,
+              247,
+              741,
+              273
+            ],
+            "middleHyphenBox": [
+              667,
+              258,
+              678,
+              262
+            ],
+            "freeBonds": [
+              [
+                [
+                  562,
+                  263
+                ],
+                [
+                  601,
+                  263
+                ]
+              ],
+              [
+                [
+                  742,
+                  263
+                ],
+                [
+                  780,
+                  263
+                ]
+              ]
+            ],
+            "roundParentheses": {
+              "leftGuide": [
+                [
+                  575,
+                  242
+                ],
+                [
+                  568,
+                  254
+                ],
+                [
+                  568,
+                  266
+                ],
+                [
+                  576,
+                  274
+                ]
+              ],
+              "rightGuide": [
+                [
+                  766,
+                  242
+                ],
+                [
+                  774,
+                  253
+                ],
+                [
+                  774,
+                  266
+                ],
+                [
+                  767,
+                  274
+                ]
+              ],
+              "nsubBox": [
+                781,
+                277,
+                793,
+                287
+              ]
+            },
+            "OHstem": [
+              [
+                700,
+                291
+              ],
+              [
+                700,
+                307
+              ]
+            ],
+            "OHbbox": [
+              688,
+              307,
+              738,
+              332
+            ]
+          },
+          "byproduct": {
+            "literal": "+ nCH₃COONa",
+            "bbox": [
+              797,
+              246,
+              1009,
+              280
+            ],
+            "nBaseline": true
+          }
+        }
+      ],
+      "crop": {
+        "top": "Row1roundparenthesis/topformula close y0nativeedge; preserveedgeappearance no restoration",
+        "bottom": "(4) bottomglyph touchesnative345/height346, preserveclipnotextraheight"
+      },
+      "noAdded": [
+        "No classificationanswers",
+        "No newreactionconditions",
+        "No stylisticbold",
+        "No expandedphenylhexagons",
+        "No correctionNa→othercondition",
+        "No crosslinkgraphics"
+      ]
+    },
+    "measurementLimits": "Nativeapproxcenterlines/bboxes ±1–2px. Fourheadmacros independentlyopened15x, notgenericheadassumption. Textrowscontainprintedhyphens pluslongfreebondstrokes; preservebothratherthanuniformchemicalbondconversion.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": "Root fresh actualFULL3x opened; all4literalrows/4OPENV heads/conditions/SITALIC3ROUNDpairsnSUB/floatingstems/nativeBOTTOMcrop. NativeapproxNOTsubpixel/noautomaticgate."
+}
