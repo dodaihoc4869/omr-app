@@ -1,0 +1,710 @@
+{
+  "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+  "native": [
+    1172,
+    480
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C4-B12-I-8",
+      "de": "Hãy ghép thông tin công thức của polymer ở cột A (1, 2, 3, 4) với tên gọi thích hợp ở cột B (a, b, c, d) trong bảng.\nCách ghép nối nào sau đây là đúng?",
+      "refs": [
+        {
+          "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+          "where": "VIP27-C4-B12-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "b3fd69b4e5375d677878fa375b2a71dfe48e24dc03cbcea362f1b62b90d7d0d2"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "2cols4rows2TRUEdamheaders-Cột A-Cột B/ALLothersregularUPRIGHTBLACK/4ROUNDnSUB-3innerSQUAREpairsSUB5-6-4/row1CH2-C(CH3)=CH-CH2/row2NH[CH2]5CO/row3Ph3innerCC-OHfirstO-CH2firstC/row4NH[CH2]6NHCO[CH2]4CO/EXACTa) Poly(phenol-formaldehyde)-b) Polyisoprene-c) Nylon-6,6-d) Capron/0arrows-answer-expandedCO-addedH/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicdeVIP27-C4-B12-I-8; EACHrow3xnative. TableROOTpixelbands:vertical3..4/668..669/1160..1161; horizontal38/152..153/230..231partial/396..397/474..475; initialsourceaudit670/1166/y233etcWRONG corrected BEFOREbuilder. PixelbandsSUPPORTvisualNOTautomaticgate. HeaderONLYDAM. NoTOPedgeinvented/noanswer.",
+  "independentSourceAudit": {
+    "i": 747,
+    "assetIndexProvided": 1334,
+    "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec.png",
+    "size": [
+      1172,
+      480
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C4-B12-I-8",
+        "de": "Hãy ghép thông tin công thức của polymer ở cột A (1, 2, 3, 4) với tên gọi thích hợp ở cột B (a, b, c, d) trong bảng.\nCách ghép nối nào sau đây là đúng?",
+        "allHinh": [
+          {
+            "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+            "where": "VIP27-C4-B12-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "b3fd69b4e5375d677878fa375b2a71dfe48e24dc03cbcea362f1b62b90d7d0d2"
+          }
+        ],
+        "missingHashes": [
+          "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/426-747-full3x.png",
+        "/workspace/scratch/426-747-r13x.png",
+        "/workspace/scratch/426-747-r23x.png",
+        "/workspace/scratch/426-747-r33x.png",
+        "/workspace/scratch/426-747-r43x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "table": {
+        "leftVertical": [
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            477
+          ]
+        ],
+        "divider": [
+          [
+            670,
+            0
+          ],
+          [
+            670,
+            477
+          ]
+        ],
+        "rightVertical": [
+          [
+            1166,
+            0
+          ],
+          [
+            1166,
+            477
+          ]
+        ],
+        "horizontalLines": [
+          [
+            [
+              4,
+              39
+            ],
+            [
+              1166,
+              39
+            ]
+          ],
+          [
+            [
+              4,
+              154
+            ],
+            [
+              1166,
+              154
+            ]
+          ],
+          [
+            [
+              4,
+              233
+            ],
+            [
+              1166,
+              233
+            ]
+          ],
+          [
+            [
+              4,
+              399
+            ],
+            [
+              1166,
+              399
+            ]
+          ],
+          [
+            [
+              4,
+              477
+            ],
+            [
+              1166,
+              477
+            ]
+          ]
+        ],
+        "top": "No fulloutertop horizontalvisible atnativey0; do not inventifcropped.",
+        "strokeApprox": 1.2,
+        "headers": [
+          {
+            "literal": "Cột A",
+            "bbox": [
+              297,
+              7,
+              376,
+              31
+            ],
+            "font": "TRUEBOLDUPRIGHTserif"
+          },
+          {
+            "literal": "Cột B",
+            "bbox": [
+              878,
+              7,
+              958,
+              31
+            ],
+            "font": "TRUEBOLDUPRIGHTserif"
+          }
+        ]
+      },
+      "font": "HeadersONLYtruebold. Othertextregularupright: row1chemicalsans; row2/3/4chemicalserif; names/numbersserif. Blackink, coloredfringesAA notcolorcoding.",
+      "row1": {
+        "number": {
+          "literal": "1.",
+          "bbox": [
+            64,
+            122,
+            87,
+            146
+          ]
+        },
+        "formulaLiteral": "(–CH₂–C(CH₃)=CH–CH₂–)ₙ",
+        "tokens": [
+          {
+            "text": "CH₂",
+            "bbox": [
+              124,
+              61,
+              182,
+              92
+            ]
+          },
+          {
+            "text": "C",
+            "bbox": [
+              202,
+              61,
+              223,
+              86
+            ]
+          },
+          {
+            "text": "CH",
+            "bbox": [
+              248,
+              61,
+              293,
+              86
+            ]
+          },
+          {
+            "text": "CH₂",
+            "bbox": [
+              312,
+              61,
+              369,
+              92
+            ]
+          }
+        ],
+        "bonds": [
+          [
+            [
+              103,
+              75
+            ],
+            [
+              123,
+              75
+            ]
+          ],
+          [
+            [
+              184,
+              75
+            ],
+            [
+              199,
+              75
+            ]
+          ],
+          [
+            [
+              226,
+              71
+            ],
+            [
+              244,
+              71
+            ]
+          ],
+          [
+            [
+              226,
+              79
+            ],
+            [
+              244,
+              79
+            ]
+          ],
+          [
+            [
+              295,
+              75
+            ],
+            [
+              309,
+              75
+            ]
+          ],
+          [
+            [
+              372,
+              75
+            ],
+            [
+              390,
+              75
+            ]
+          ]
+        ],
+        "methylBranch": {
+          "stem": [
+            [
+              211,
+              88
+            ],
+            [
+              211,
+              109
+            ]
+          ],
+          "literal": "CH₃",
+          "bbox": [
+            202,
+            112,
+            260,
+            142
+          ],
+          "anchor": "FIRST C"
+        },
+        "roundParentheses": {
+          "leftGuide": [
+            [
+              124,
+              43
+            ],
+            [
+              117,
+              60
+            ],
+            [
+              113,
+              79
+            ],
+            [
+              116,
+              99
+            ],
+            [
+              124,
+              118
+            ]
+          ],
+          "rightGuide": [
+            [
+              369,
+              43
+            ],
+            [
+              377,
+              62
+            ],
+            [
+              380,
+              81
+            ],
+            [
+              377,
+              100
+            ],
+            [
+              369,
+              118
+            ]
+          ],
+          "nsubBox": [
+            379,
+            113,
+            392,
+            131
+          ]
+        },
+        "rightName": {
+          "literal": "a) Poly(phenol-formaldehyde)",
+          "bbox": [
+            716,
+            65,
+            1125,
+            96
+          ],
+          "straightHyphen": true
+        }
+      },
+      "row2": {
+        "number": {
+          "literal": "2.",
+          "bbox": [
+            64,
+            192,
+            87,
+            216
+          ]
+        },
+        "formula": {
+          "literal": "(NH[CH₂]₅CO)ₙ",
+          "bbox": [
+            116,
+            175,
+            341,
+            214
+          ],
+          "outer": "ROUND nSUB",
+          "inner": "SQUARE [CH₂] with5SUB; do notconvert5baseline orroundinner"
+        },
+        "freeEndBonds": [
+          [
+            [
+              99,
+              188
+            ],
+            [
+              117,
+              188
+            ]
+          ],
+          [
+            [
+              319,
+              188
+            ],
+            [
+              340,
+              188
+            ]
+          ]
+        ],
+        "rightName": {
+          "literal": "b) Polyisoprene",
+          "bbox": [
+            725,
+            162,
+            934,
+            191
+          ]
+        }
+      },
+      "row3": {
+        "number": {
+          "literal": "3.",
+          "bbox": [
+            64,
+            367,
+            87,
+            392
+          ]
+        },
+        "ringVertices": [
+          [
+            166,
+            295
+          ],
+          [
+            199,
+            315
+          ],
+          [
+            199,
+            354
+          ],
+          [
+            166,
+            374
+          ],
+          [
+            133,
+            354
+          ],
+          [
+            133,
+            315
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              139,
+              323
+            ],
+            [
+              139,
+              349
+            ]
+          ],
+          [
+            [
+              167,
+              303
+            ],
+            [
+              193,
+              318
+            ]
+          ],
+          [
+            [
+              167,
+              367
+            ],
+            [
+              193,
+              351
+            ]
+          ]
+        ],
+        "leftFreeBond": [
+          [
+            115,
+            316
+          ],
+          [
+            133,
+            316
+          ]
+        ],
+        "rightArm": [
+          [
+            199,
+            314
+          ],
+          [
+            214,
+            314
+          ]
+        ],
+        "CH2": {
+          "literal": "CH₂",
+          "bbox": [
+            216,
+            300,
+            273,
+            329
+          ],
+          "rightFreeBond": [
+            [
+              276,
+              312
+            ],
+            [
+              289,
+              312
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "OH": {
+          "literal": "OH",
+          "bbox": [
+            155,
+            241,
+            199,
+            266
+          ],
+          "stem": [
+            [
+              166,
+              295
+            ],
+            [
+              166,
+              269
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        "roundParentheses": {
+          "leftGuide": [
+            [
+              129,
+              255
+            ],
+            [
+              122,
+              283
+            ],
+            [
+              120,
+              316
+            ],
+            [
+              122,
+              348
+            ],
+            [
+              129,
+              381
+            ]
+          ],
+          "rightGuide": [
+            [
+              270,
+              253
+            ],
+            [
+              278,
+              282
+            ],
+            [
+              279,
+              315
+            ],
+            [
+              277,
+              348
+            ],
+            [
+              269,
+              379
+            ]
+          ],
+          "nsubBox": [
+            274,
+            365,
+            287,
+            382
+          ]
+        },
+        "rightName": {
+          "literal": "c) Nylon-6,6",
+          "bbox": [
+            725,
+            284,
+            897,
+            312
+          ],
+          "straightHyphenComma": true
+        }
+      },
+      "row4": {
+        "number": {
+          "literal": "4.",
+          "bbox": [
+            64,
+            437,
+            87,
+            461
+          ]
+        },
+        "formula": {
+          "literal": "(NH[CH₂]₆NHCO[CH₂]₄CO)ₙ",
+          "bbox": [
+            117,
+            417,
+            538,
+            455
+          ],
+          "outer": "ROUND nSUB",
+          "innerSquare1": "[CH₂]₆",
+          "innerSquare2": "[CH₂]₄",
+          "noExpandedCO": true
+        },
+        "freeEndBonds": [
+          [
+            [
+              99,
+              434
+            ],
+            [
+              117,
+              434
+            ]
+          ],
+          [
+            [
+              516,
+              432
+            ],
+            [
+              536,
+              432
+            ]
+          ]
+        ],
+        "rightName": {
+          "literal": "d) Capron",
+          "bbox": [
+            725,
+            405,
+            860,
+            433
+          ],
+          "baselineApprox": 428
+        }
+      },
+      "counts": {
+        "rows": 4,
+        "columns": 2,
+        "headers": 2,
+        "outerRoundPairs": 4,
+        "innerSquarePairsInText": 3,
+        "aromaticRings": 1,
+        "ringDoubleRays": 3,
+        "explicitCOdoubleStrokes": 0,
+        "arrows": 0
+      },
+      "crop": "Tableverticalsreachnativey0 andheadercloseedge; no extra topcaption. Bottomframevisible477within480.",
+      "noAdded": [
+        "No matchinganswers",
+        "No namesassignedtorows",
+        "No arrows",
+        "No polymerformulacorrection",
+        "No outerSQUAREinsteadROUND",
+        "No expandedCOincondensedformulas"
+      ]
+    },
+    "measurementLimits": "OwnnativeFULLandALL4rowmacrosopened. Approxnativecoords±1–2px. Preserverowheightasymmetric154/233/399, notuniformtablelayout. SourceglyphsblackwithAAfringe.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootSourceCorrection": "Sourceagenttableguides x4/670/1166 y39/154/233/399/477 WRONG; ROOTOWNnativepixelbands corrected BEFOREfirstbuilder to3.5/668.5/1160.5 and38/152.5/230.5/396.5/474.5. NoSVGnegativeforthisBEFOREbuildercorrection.",
+  "rootOldNewXmlAudit": {
+    "children": 33,
+    "changed": [
+      3,
+      4
+    ],
+    "oldHash": "bac992103df4524fbe410baeaadc6ec685da5561ae609d38bf7cc6cc459c035f",
+    "newHash": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "reason": "ONLY2headers32→28/baseline30→28; innerglyphPATHdataEXACT, allotherXMLchildrenEXACT. RootinitialconnectedinkclaimNOTproven; visualspacingtooTIGHT corrected."
+  },
+  "rootActualReview": {
+    "hashSvg": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "ketQua": "Đạtrootactual",
+    "source": "RootOWNnativeFULL/each4row3x/all1publicde.",
+    "actual": "FreshChromiumFULL3x andEACHheader-dot-gap/row1-4/rightnames macros allopened. 2cols4rows2TRUEdamheaders/restregular;4ROUNDnSUB3SQUAREsub5/6/4;row3hex3CCOH-CH2; namesliteral/noglyphclip/noanswer. NativeapproxNOTsubpixel."
+  }
+}

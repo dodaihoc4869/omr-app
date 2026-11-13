@@ -1,0 +1,29 @@
+[
+  {
+    "i": 747,
+    "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+    "fileNguon": "anh/8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec.png",
+    "svg": "table747-native-ddh-456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528.svg",
+    "hashSvg": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "byteSvg": 61228,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B12-I-8",
+        "de": "Hãy ghép thông tin công thức của polymer ở cột A (1, 2, 3, 4) với tên gọi thích hợp ở cột B (a, b, c, d) trong bảng.\nCách ghép nối nào sau đây là đúng?",
+        "refs": [
+          {
+            "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+            "where": "VIP27-C4-B12-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "b3fd69b4e5375d677878fa375b2a71dfe48e24dc03cbcea362f1b62b90d7d0d2"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2cols4rows2TRUEdamheaders-Cột A-Cột B/ALLothersregularUPRIGHTBLACK/4ROUNDnSUB-3innerSQUAREpairsSUB5-6-4/row1CH2-C(CH3)=CH-CH2/row2NH[CH2]5CO/row3Ph3innerCC-OHfirstO-CH2firstC/row4NH[CH2]6NHCO[CH2]4CO/EXACTa) Poly(phenol-formaldehyde)-b) Polyisoprene-c) Nylon-6,6-d) Capron/0arrows-answer-expandedCO-addedH/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

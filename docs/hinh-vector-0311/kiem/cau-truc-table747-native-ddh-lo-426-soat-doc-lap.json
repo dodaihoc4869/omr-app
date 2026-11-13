@@ -1,0 +1,23 @@
+[
+  {
+    "i": 747,
+    "hashSvg": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và fresh FINALChromium3x FULL/macro headersdot/4rows/namesedge. Hai cols4rows/noTOPline/tablegrids giữ; ONLYCột A/B trueDAM, dotộ nay có whitegap border rõ; allothersregularuprightblack. Row1CH₂-C(CH₃)=CH-CH₂; row2NH[CH₂]₅CO; row3Ph3innerCC/OHfirstO/CH₂firstC; row4NH[CH₂]₆NHCO[CH₂]₄CO giữ literal, 4ROUNDnSUB/3SQUAREsub5-6-4/nums1..4. Tên a)Poly(phenol-formaldehyde),b)Polyisoprene,c)Nylon-6,6,d)Capron đúng, không giải matching; longname/rightedge và paren/sub/stemgaps sạch, không crop/tràn. RuntimeSHApre/post đúng final, không carry initialbac992.",
+    "render": "/workspace/scratch/soat426-final-747-fresh.png",
+    "macro": [
+      "/workspace/scratch/table747-final-headers.png",
+      "/workspace/scratch/table747-final-row1.png",
+      "/workspace/scratch/table747-final-row2.png",
+      "/workspace/scratch/table747-final-row3.png",
+      "/workspace/scratch/table747-final-row4.png",
+      "/workspace/scratch/table747-final-headerdot.png"
+    ],
+    "hash": "8b4f2e54f12c6e59b5f3c9f8168cc2da3b4a476b23d07f081883dbafbb584eec",
+    "hashSvgDaSoat": "456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528",
+    "runtimeAudit": {
+      "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/table747-native-ddh-456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528.svg 456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528\n747 { x: 0, y: 0, width: 1172, height: 480 }\n\nPOSTSHOT_SHA 456c56ee698ca75c2cae8897b3e961bf4f0f19a79cc911bd9a393fa2db317528\nCOMMAND node /workspace/scratch/agent-render426-final.cjs\nCONTEXT VIP27-C4-B12-I-8.hinh.0.du_lieu public de/one ref only; no answers.\n",
+      "sha256": "146a65a9cd2cb5745263ab9c0bc7bdd3dfeac0393db99dbfed2f18a577917797"
+    }
+  }
+]
