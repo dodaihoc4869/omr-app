@@ -182,6 +182,8 @@ describe('lệnh của văn phòng', () => {
     expect(cat.canh.every((c: any) => !c.nguon.chep)).toBe(true)
     expect(cat.canh.filter((c: any) => c.khuon !== 'tong-ket').every((c: any) => Array.isArray(c.nguon.vung))).toBe(true)
     expect(r2.du.has('live/b1/nhat-ky-goc.json')).toBe(true)
+    // bản cất mang ngưỡng cổng đã dùng + dấu «văn phòng soạn» ⇒ máy em tin kết quả, không chạy lại cổng trên bản đã gỡ chữ chép bảng
+    expect(cat.nguon.nguoiSoan).toBe('van-phong'); expect(cat.nguong.moTa).toMatch(/Δχ/); expect(cat.nguong.vung).toHaveLength(3)
     const ds = await vp('/gv/live-nhat-ky-ds')
     expect(ds.ds[0]).toMatchObject({ buoiId: 'b1', canSoan: false, nhatKy: { ban: 2, phatHanh: true } })
   })
@@ -215,5 +217,70 @@ describe('lệnh của văn phòng', () => {
     expect(r).toMatchObject({ ok: true, phatHanh: false, lyDo: 'chua-du-canh' })
     expect(r2.du.has('live/b1/nhat-ky.json')).toBe(false)
     expect((await vp('/gv/live-nhat-ky-ds')).ds[0]).toMatchObject({ canSoan: true, nhatKy: { phatHanh: false } })
+  })
+})
+
+describe('màn học sinh xem nhật ký (trang tĩnh public/nhat-ky/)', () => {
+  it('nét phấn từng trang theo dạng khuôn đọc: bảng rộng 1600, p = [x×4, y×4, ms], t = giờ trục tiếng; vung = [x0, y0, x1, y1] cùng hệ toạ độ', async () => {
+    const { netKhuon, RONG_KHUON } = await import('../src/lib/nhat-ky/trang-bang')
+    const ds = tachTrang(netBinGia(), 10_000), M = { nen: 'rgb(19,31,36)', mucXanh: 'rgb(125,170,255)', macDinh: 'rgb(244,239,228)' }
+    const k = netKhuon(ds[0]!, M)
+    expect(k.rong).toBe(RONG_KHUON); expect(k.net).toHaveLength(2)
+    const a = k.net[0]!
+    expect(a.t).toBe(1000); expect(a.p.length % 3).toBe(0)
+    expect(a.p[0]).toBe(Math.round(0.1 * 1600 * 4)); expect(a.p[1]).toBe(Math.round(0.3 * (1600 / (16 / 9)) * 4))
+    expect(k.mau[a.m]![0]).toBe('rgb(244,239,228)')
+    const v = vungTrong(ds[0]!, 900, 1500)!
+    expect(v[0]).toBeLessThanOrEqual(a.p[0]! / 4); expect(v[2]).toBeGreaterThan(v[0]); expect(v[3]).toBeGreaterThan(v[1])
+  })
+  it('trang tĩnh: đọc đúng ba tệp của buổi theo vé (nhat-ky.json, trang.json, tieng.mp3), không mẫu bản vẽ; nút «Về buổi live» báo app đóng', () => {
+    const t = readFileSync('public/nhat-ky/index.html', 'utf8')
+    expect(t).toContain("docJson('nhat-ky.json')"); expect(t).toContain("docJson('trang.json')"); expect(t).toContain("tep('tieng.mp3')")
+    expect(t).not.toMatch(/net-mau\.js|NET_MAU|kich-ban-lien-ket|bv-dai"|Bản vẽ\./)
+    expect(t).toContain("parent.postMessage({ nguon: 'nhat-ky', loai: 'dong' }, '*')")
+  })
+  it('máy cũ: khuôn + trang không dùng regex nhìn-lùi / cú pháp mới; phông chữ nằm cạnh trang (không trỏ src/)', () => {
+    for (const f of ['public/nhat-ky/khuon.js', 'public/nhat-ky/index.html']) {
+      const s = readFileSync(f, 'utf8')
+      expect(s).not.toMatch(/\(\?<[=!]/)
+      expect(s).not.toMatch(/\?\.[a-zA-Z_([]|\?\?=|\.at\(|replaceAll\(|structuredClone|findLast/)
+    }
+    expect(readFileSync('public/nhat-ky/khuon.css', 'utf8')).not.toContain('src/styles')
+  })
+  it('máy em KHÔNG chạy lại cổng trên bài máy chủ đã cất (bản đã gỡ chữ chép bảng: chạy lại thì bỏ oan cảnh) — tin kết quả, dùng ngưỡng đã cất', () => {
+    const t = readFileSync('public/nhat-ky/index.html', 'utf8')
+    expect(t).toContain("const daQuaCong = !!(kbGoc.nguon && kbGoc.nguon.nguoiSoan === 'van-phong')")
+    expect(t).toContain('kbGoc.nguong && kbGoc.nguong.vung ? kbGoc.nguong : N.nguongTuDong(kbGoc)')
+    // chứng minh vì sao: chạy lại cổng trên bản đã cất làm mất cảnh
+    const ra = quaCong(doc('kich-ban-lien-ket.json')).kb
+    expect(kiemCong(JSON.parse(JSON.stringify(ra))).dat.length).toBeLessThan(ra.canh.length)
+  })
+  it('ngoài precache (giữ trần 170) và service worker không trả trang app thay cho /nhat-ky/', () => {
+    expect(readFileSync('vite.config.ts', 'utf8')).toContain("'**/nhat-ky/**'")
+    expect(readFileSync('src/sw.ts', 'utf8')).toContain('/^\\/nhat-ky\\//')
+  })
+  it('cổng tự kiểm của khuôn chạy trên máy em (public) cho CÙNG kết quả với cổng máy chủ (src/lib/nhat-ky/cong.ts)', () => {
+    const g = globalThis as any
+    const cu = { window: g.window, location: g.location, matchMedia: g.matchMedia, document: g.document }
+    g.window = g; g.location = { search: '' }; g.matchMedia = () => ({ matches: false }); g.document = { documentElement: { classList: { contains: () => false } } }
+    new Function(readFileSync('public/nhat-ky/khuon.js', 'utf8'))()
+    const N = g.NKB; Object.assign(g, cu); delete g.NKB
+    for (const t of ['kich-ban-lien-ket.json', 'kich-ban-fes2.json']) {
+      const kb = doc(t); kb.canh[0].loi[0].chu = 'Một câu rất dài để thử luật đếm chữ, ' + 'chữ '.repeat(32) + 'hết. Câu ngắn.'
+      expect(gon(N.kiemCong(JSON.parse(JSON.stringify(kb))))).toEqual(gon(kiemCong(JSON.parse(JSON.stringify(kb)))))
+    }
+  })
+})
+
+describe('tệp trang.json theo vé (máy em tải nét phấn)', () => {
+  it('vé đúng ⇒ mọi trang theo dạng khuôn; vé sai ⇒ 403', async () => {
+    await themBuoi('b1')
+    const { kyVeLive, hanVeLive } = await import('../server/src/live-xem-lai-lenh')
+    const ve = await kyVeLive('bi-mat-thu', 'b1', 'A1', hanVeLive(T0), 2)
+    const r = await goi(`/live-tep/b1/trang.json?ve=${encodeURIComponent(ve)}`, undefined, false)
+    expect(r.status).toBe(200)
+    const j = await r.json() as any
+    expect(j.trang.map((t: any) => [t.stt, t.loai, t.rong, t.net.length])).toEqual([[1, 'giay', 1600, 2], [2, 'bang', 1600, 1], [3, 'giay', 1600, 1]])
+    expect((await goi('/live-tep/b1/trang.json?ve=sai', undefined, false)).status).toBe(403)
   })
 })

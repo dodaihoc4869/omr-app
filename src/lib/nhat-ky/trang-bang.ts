@@ -93,15 +93,43 @@ export function svgTrang(tr: TrangBang, mau: MauAnhTrang, den = Infinity): strin
     + `<g fill="none" stroke-linecap="round" stroke-linejoin="round">${duong.join('')}</g></svg>`
 }
 
-/** Vùng (x, y, rộng, cao — đơn vị SVG) bao các nét của trang có giờ chạm khoảng [tuMs, denMs]; không có nét nào ⇒ null. */
+/** Bề ngang bảng của KHUÔN hoạt hoạ (máy em, public/nhat-ky/khuon.js — BangPhan): toạ độ nét và `vung` của cảnh tính trên bảng rộng 1600. */
+export const RONG_KHUON = 1600
+const heSo = (tr: TrangBang): number => RONG_KHUON / (tr.tiLe > 0 ? tr.tiLe : 16 / 9)
+
+/** Vùng nét của cảnh trên trang: [x0, y0, x1, y1] theo bảng rộng `RONG_KHUON` (đúng dạng `nguon.vung` khuôn đọc), bao các nét có giờ chạm khoảng
+ *  [tuMs, denMs], chừa lề 20. Không có nét nào ⇒ null. */
 export function vungTrong(tr: TrangBang, tuMs: number, denMs: number): [number, number, number, number] | null {
-  const k = W_SVG / (tr.tiLe > 0 ? tr.tiLe : 16 / 9)
+  const k = heSo(tr)
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
   for (const n of tr.net) {
     if (n.net.cong === 'tay' || n.t1 < tuMs || n.t0 > denMs) continue
-    for (const p of n.net.diem) { const x = p[0] * W_SVG, y = p[1] * k; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y }
+    for (const p of n.net.diem) { const x = p[0] * RONG_KHUON, y = p[1] * k; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y }
   }
   if (!Number.isFinite(x0)) return null
-  const le = 24
-  return [Math.max(0, Math.round(x0 - le)), Math.max(0, Math.round(y0 - le)), Math.round(x1 - x0 + 2 * le), Math.round(y1 - y0 + 2 * le)]
+  const le = 20
+  return [Math.max(0, Math.round(x0 - le)), Math.max(0, Math.round(y0 - le)), Math.round(x1 + le), Math.round(y1 + le)]
+}
+
+/** Nét phấn của MỘT trang theo đúng dạng khuôn đọc (BangPhan): { rong, cao, mau: [[màu, tên]], net: [{ m, c, t, p }] } — `m` = chỉ số màu, `c` = bề dày
+ *  (đơn vị bảng 1600), `t` = ms trên trục tiếng lúc nét bắt đầu, `p` = [x×4, y×4, ms kể từ đầu nét, …]. Điểm sát nhau dưới 1,5 đơn vị bỏ bớt. */
+export function netKhuon(tr: TrangBang, mau: MauAnhTrang): { rong: number; cao: number; mau: [string, string][]; net: { m: number; c: number; t: number; p: number[] }[] } {
+  const k = heSo(tr), bang: [string, string][] = [], chiSo = new Map<string, number>(), net: { m: number; c: number; t: number; p: number[] }[] = []
+  let yMax = 0
+  for (const n of tr.net) {
+    if (n.net.cong === 'tay' || !n.net.diem.length) continue
+    const mv = mauVe(n.net.mau, mau)
+    let m = chiSo.get(mv)
+    if (m == null) { m = bang.length; bang.push([mv, '']); chiSo.set(mv, m) }
+    const p: number[] = []
+    let x0 = NaN, y0 = NaN
+    n.net.diem.forEach((d, i) => {
+      const x = d[0] * RONG_KHUON, y = d[1] * k
+      if (i > 0 && i < n.net.diem.length - 1 && Math.hypot(x - x0, y - y0) < 1.5) return
+      p.push(Math.round(x * 4), Math.round(y * 4), Math.max(0, Math.round(d[3]))); x0 = x; y0 = y
+      if (y > yMax) yMax = y
+    })
+    net.push({ m, c: Math.round((Math.max(1, n.net.co) * RONG_KHUON / W_SVG) * 10) / 10, t: Math.round(n.t0), p })
+  }
+  return { rong: RONG_KHUON, cao: Math.max(Math.round(k), Math.ceil(yMax + 40)), mau: bang, net }
 }

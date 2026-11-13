@@ -12,7 +12,7 @@ import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { khoaTep } from './live-xem-lai'
 import { TEP_LIVE, type BuoiLiveJson, type CauBuoiLive } from '../../src/lib/live/xem-lai-kieu'
-import { svgTrang, tachTrang, vungTrong, type MauAnhTrang, type TrangBang } from '../../src/lib/nhat-ky/trang-bang'
+import { netKhuon, svgTrang, tachTrang, vungTrong, type MauAnhTrang, type TrangBang } from '../../src/lib/nhat-ky/trang-bang'
 /** Màu ảnh trang bảng gửi văn phòng: nền xanh than Duolingo (như bảng thật) · mực xanh sáng lên · phấn trắng. */
 const MAU_ANH: MauAnhTrang = { nen: 'rgb(19,31,36)', mucXanh: 'rgb(125,170,255)', macDinh: 'rgb(244,239,228)' }
 import { LUOC_DO, boPhanMay, kiemKichBan } from '../../src/lib/nhat-ky/luoc-do'
@@ -133,6 +133,13 @@ export async function svgTrangCuaBuoi(env: Env, id: string, stt: number): Promis
   return tr ? svgTrang(tr, MAU_ANH) : null
 }
 
+/** Nét phấn mọi trang bảng của buổi theo dạng khuôn hoạt hoạ đọc (màn học sinh xem nhật ký — public/nhat-ky/). Thiếu tệp ⇒ null. */
+export async function netTrangCuaBuoi(env: Env, id: string): Promise<{ trang: Record<string, unknown>[] } | null> {
+  const buoi = await docBuoiJson(env, id)
+  if (!buoi) return null
+  return { trang: (await trangCuaBuoi(env, id, buoi.msLive)).map((t) => ({ stt: t.stt, loai: t.loai, ...netKhuon(t, MAU_ANH) })) }
+}
+
 /** Tên người có thể xuất hiện trong lời Thầy: học sinh đã điểm danh buổi + học sinh cùng lớp buổi (họ tên, tên gọi, hai chữ cuối). */
 async function tenTrongBuoi(env: Env, id: string, lop: string): Promise<string[]> {
   const r = await env.DB.prepare(`SELECT DISTINCT h.ho_ten FROM hoc_sinh h WHERE h.sbd IN (SELECT d.sbd FROM buoi_hoc_diem_danh d WHERE d.buoi_id = ?1)
@@ -191,6 +198,8 @@ export async function nhatKyGhi(env: Env, b: Row, nay = Date.now()): Promise<Row
   const luc = new Date(nay).toISOString()
   ra.buoi = { ten: str(dong.ten_thay).trim() || str(dong.ten_tu_dong), lop: str(dong.lop), ngay: str(dong.ngay), thu: thuVn(str(dong.ngay)), gioBatDau: gioVn(str(dong.bat_luc)), phutLive: Math.round(buoi.msLive / 60_000), ban }
   ra.nguon = { soTrangBang: trang.length, nguoiSoan: 'van-phong', luc, dat: cong.dat.length, soCanh: cong.soCau }
+  // ngưỡng Δχ cổng đã dùng (đọc từ chữ chép bảng — bản phát hành bỏ `chep`) ⇒ máy em dùng đúng ngưỡng này, KHÔNG chạy lại cổng trên bản đã cất
+  ra.nguong = cong.nguong
   if (!env.DE) return { ok: false, lyDo: 'khong-r2', error: 'Máy chủ chưa có kho tệp.' }
   await env.DE.put(khoaTep(id, TEP_NHAT_KY_GOC), JSON.stringify({ luc, ban, kichBan: kb }), { httpMetadata: { contentType: 'application/json;charset=utf-8' } })
   if (cong.phatHanh) await env.DE.put(khoaTep(id, TEP_NHAT_KY), JSON.stringify(ra), { httpMetadata: { contentType: 'application/json;charset=utf-8' } })

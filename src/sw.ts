@@ -48,7 +48,8 @@ precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
 /** Đường của chính Cloudflare Pages, trang cài đặt app và tệp cấu hình — không đụng vào. */
-const KHONG_DUNG: RegExp[] = [/^\/cdn-cgi\//, /[?&]_moi=/, /^\/cai-/, /\.mobileconfig$/]
+// 13/11 /nhat-ky/: trang tĩnh xem «Nhật ký bài dạy» (public/nhat-ky/) mở trong khung — không trả trang app thay cho nó
+const KHONG_DUNG: RegExp[] = [/^\/cdn-cgi\//, /[?&]_moi=/, /^\/cai-/, /\.mobileconfig$/, /^\/nhat-ky\//]
 
 const TU_PRECACHE = createHandlerBoundToURL('index.html')
 

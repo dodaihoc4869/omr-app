@@ -76,4 +76,8 @@ Trả `{ ok: true, phatHanh, soCanh, dat: [id…], bo: [{ id, tieuDe, lyDo[] }],
 - Lời giải theo cách dạy của Thầy (`docs/tu-duy-day-hoa-thay-2610.md`): sơ đồ cột dọc theo chất, bảo toàn nguyên tố, xuôi × H/100, ngược × 100/H.
 
 ## Phía học sinh
-Bản phát hành nằm ở `live/<buoiId>/nhat-ky.json`. Màn học sinh mở bài hoạt hoạ ở trang xem lại của buổi đang được làm, chưa có trên bản sống.
+Bản phát hành nằm ở `live/<buoiId>/nhat-ky.json`. Ở trang xem lại của buổi, học sinh thấy thẻ «Nhật ký bài dạy · bài hoạt hoạ theo giọng Thầy». Bấm vào là mở bài hoạt hoạ, có hai cách xem:
+- «Xem như Thầy giảng»: phát giọng Thầy kèm phụ đề.
+- «Tự đọc»: em tự cuộn qua các cảnh.
+
+Nét phấn thật của Thầy hiện theo đúng giờ viết, vùng nét do máy điền. Máy em tin kết quả cổng của máy chủ, không chạy lại, và dùng đúng ngưỡng Δχ máy chủ đã cất. Buổi chưa có bài thì trang xem lại không hiện thẻ.

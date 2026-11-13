@@ -88,6 +88,23 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
   }, [buoi, khoa])
   const khiGo = useCallback(() => { setPhat(null); setTt({ loai: 'go' }) }, [])
   const hang = useMemo(() => (buoi ? doanHopLe(buoi) : []), [buoi])
+  // NHẬT KÝ BÀI DẠY (thầy 13/11): buổi đã có bài hoạt hoạ văn phòng soạn (máy chủ cất `nhat-ky.json` khi qua cổng tự kiểm) ⇒ thẻ mở trang tĩnh /nhat-ky/
+  // trong khung phủ kín. Hỏi bằng HEAD theo vé tệp (0 lệnh D1); chưa có ⇒ không hiện gì.
+  const [coNk, setCoNk] = useState(false), [moNk, setMoNk] = useState(false)
+  const veNk = tt.loai === 'ok' ? tt.ve : '', gocNk = tt.loai === 'ok' ? tt.goc : ''
+  useEffect(() => {
+    if (!veNk || !gocNk) return
+    let huy = false
+    fetch(`${gocNk}/live-tep/${encodeURIComponent(id)}/nhat-ky.json?ve=${encodeURIComponent(veNk)}`, { method: 'HEAD', cache: 'no-store' }).then((r) => { if (!huy) setCoNk(r.ok) }, () => {})
+    return () => { huy = true }
+  }, [id, veNk, gocNk])
+  useEffect(() => {
+    if (!moNk) return
+    const f = (e: MessageEvent) => { const d = e.data as { nguon?: unknown; loai?: unknown } | null; if (d && d.nguon === 'nhat-ky' && d.loai === 'dong') setMoNk(false) }
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setMoNk(false) }
+    window.addEventListener('message', f); window.addEventListener('keydown', k)
+    return () => { window.removeEventListener('message', f); window.removeEventListener('keydown', k) }
+  }, [moNk])
 
   const dau = (chu?: string) => <header className="xl-dau">
     <button type="button" className="xl-lui" onClick={dong} aria-label={nhanLui}><BtLui /></button>
@@ -124,6 +141,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
     <div className="xl-so so"><div><b>{sl.cau}</b><span>câu</span></div><div><b>{sl.phutLive}</b><span>phút live</span></div><div><b>{sl.doan}</b><span>đoạn xem lại</span></div></div>
     {hang.length ? <button type="button" className="xl-nut" onClick={() => phatDoan(hang[0]!)}><BtPhat s={20} />{hang.length > 1 ? `Phát cả ${hang.length} đoạn` : 'Phát đoạn chữa bài'} · {sl.phutDoan} phút</button> : <p>Buổi này chưa có đoạn chữa bài nào.</p>}
     {nhat ? <button type="button" className="xl-nen" onClick={() => phatDoan(nhat.doan)}><BtSao /><span>{nhat.chu}</span><BtMui s={18} /></button> : null}
+    {coNk ? <button type="button" className="xl-nen xl-nk-mo" onClick={() => setMoNk(true)}><BtPhat s={18} /><span>Nhật ký bài dạy · bài hoạt hoạ theo giọng Thầy</span><BtMui s={18} /></button> : null}
   </section>
   const khuc = dongThoiGian(buoi)
   const dongTg = <section className="xl-kinh xl-the"><h2>Dòng thời gian<small className="so">{sl.phutLive} phút</small></h2>
@@ -165,12 +183,15 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
         </> : null}
         {buoi.cau.filter((c) => !hang.length || c.so !== soDang).map((c) => theCau(c.so))}{chan}
       </div>
+      {moNk ? <div className="xl-nk" role="dialog" aria-modal="true" aria-label="Nhật ký bài dạy"><iframe title="Nhật ký bài dạy" src={`/nhat-ky/?id=${encodeURIComponent(id)}&ve=${encodeURIComponent(ve)}&goc=${encodeURIComponent(goc)}`} allow="autoplay" /></div> : null}
     </main>
+    
   }
   return <>
     <main className="xl-trang">{dau()}
       <div className="xl-hai"><div>{bia}{dongTg}{bangVang}</div><div>{dsDoan}{buoi.cau.map((c) => theCau(c.so))}{chan}</div></div>
     </main>
     {phat ? <Suspense fallback={null}><TrinhPhat goc={goc} buoi={buoi} ve={ve} hang={hang} batDau={phat.vt} tuPhat LC={LC} tenDoi={tenDoi} dong={() => setPhat(null)} khiXem={khiXem} khiGo={khiGo} /></Suspense> : null}
+    {moNk ? <div className="xl-nk" role="dialog" aria-modal="true" aria-label="Nhật ký bài dạy"><iframe title="Nhật ký bài dạy" src={`/nhat-ky/?id=${encodeURIComponent(id)}&ve=${encodeURIComponent(ve)}&goc=${encodeURIComponent(goc)}`} allow="autoplay" /></div> : null}
   </>
 }

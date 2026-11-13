@@ -121,11 +121,16 @@ async function tepLenh(req: Request, env: Env, url: URL): Promise<Response> {
   const p = url.pathname.split('/') // ['', 'live-tep', id, tệp]
   const id = buoiHop(p[2]), tep = p.length === 4 ? decodeURIComponent(p[3] ?? '') : ''
   const trangSvg = /^trang-(\d{1,3})\.svg$/.exec(tep) // 13/11 Nhật ký bài dạy: ảnh trang bảng cho văn phòng soạn (live-nhat-ky.ts)
-  if (!id || (!KIEU_TEP[tep] && !trangSvg)) return json({ ok: false, lyDo: 'khong-co' }, 404)
+  const trangJson = tep === 'trang.json' // 13/11 nét phấn từng trang cho màn học sinh xem nhật ký bài dạy
+  if (!id || (!KIEU_TEP[tep] && !trangSvg && !trangJson)) return json({ ok: false, lyDo: 'khong-co' }, 404)
   if (!(await kiemVeLive(env.MA_BI_MAT, id, url.searchParams.get('ve')))) return json({ ok: false, lyDo: 've' }, 403)
   if (trangSvg) {
     const svg = await (await import('./live-nhat-ky')).svgTrangCuaBuoi(env, id, Number(trangSvg[1]))
     return svg ? new Response(svg, { headers: { ...CORS, 'content-type': 'image/svg+xml;charset=utf-8', 'cache-control': 'private, max-age=3600' } }) : json({ ok: false, lyDo: 'khong-co' }, 404)
+  }
+  if (trangJson) {
+    const ra = await (await import('./live-nhat-ky')).netTrangCuaBuoi(env, id)
+    return ra ? new Response(JSON.stringify(ra), { headers: { ...CORS, 'content-type': 'application/json;charset=utf-8', 'cache-control': 'private, max-age=3600' } }) : json({ ok: false, lyDo: 'khong-co' }, 404)
   }
   if (!env.DE) return json({ ok: false, lyDo: 'khong-r2' }, 503)
   const r = docRange(req.headers.get('range'))

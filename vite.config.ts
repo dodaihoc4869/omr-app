@@ -648,6 +648,7 @@ export default defineConfig({
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',
           '**/cai-app/**',
+          '**/nhat-ky/**', // 13/11 trang tĩnh xem «Nhật ký bài dạy» (khuôn hoạt hoạ ~90 KB) — chỉ mở khi em bấm, cần mạng (tiếng + nét) ⇒ ngoài precache
           '**/cai-app.html',
           '**/cai-dat.html',
           // Biểu tượng cài app 512 px + logo của app thầy: hệ điều hành đọc lúc CÀI app (qua mạng), máy không cần chúng để chạy.

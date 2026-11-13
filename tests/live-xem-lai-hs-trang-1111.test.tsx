@@ -311,7 +311,8 @@ describe('trang buổi live', () => {
     render(<MoTuThay buoi={taoDsGia(buoi).buoi[0]!} ve="ve-thay" goc="https://goc-thay.test/" onDong={onDong} />)
     await screen.findByText('Phát cả 5 đoạn · 29 phút')
     const ds = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.map((c) => String(c[0]))
-    expect(ds).toEqual([`https://goc-thay.test/live-tep/${ID_BUOI_GIA}/buoi.json?ve=ve-thay`])
+    // 13/11 SỬA CÓ CHỦ ĐÍCH: thêm đúng một lượt HEAD hỏi «buổi có Nhật ký bài dạy không» (cùng gốc, cùng vé, 0 lệnh D1)
+    expect(ds).toEqual([`https://goc-thay.test/live-tep/${ID_BUOI_GIA}/buoi.json?ve=ve-thay`, `https://goc-thay.test/live-tep/${ID_BUOI_GIA}/nhat-ky.json?ve=ve-thay`])
     expect(screen.queryByText('Em chưa đúng')).toBeNull(); expect(screen.queryByText('Câu em chưa đúng')).toBeNull(); expect(screen.queryByText('Em lên bảng')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Về Lịch sử Live' }))
     expect(onDong).toHaveBeenCalledOnce()
@@ -426,5 +427,41 @@ describe('dòng «Live» ở tấm «Thêm» (MenuDocTrong thật)', () => {
     await waitFor(() => expect(goi).toContain('/hs/live-ds'))
     await cho(30)
     expect(dong.querySelector('.xl-chip-moi')).toBeNull()
+  })
+})
+
+// NHẬT KÝ BÀI DẠY (thầy 13/11 «Làm luôn màn học sinh xem nhật ký bài dạy nhé»): buổi đã có bài hoạt hoạ (máy chủ cất nhat-ky.json) ⇒ thẻ ở bìa mở trang tĩnh
+// /nhat-ky/ trong khung phủ kín, bằng đúng vé tệp của buổi; chưa có ⇒ không hiện gì. Hỏi bằng HEAD (0 lệnh D1), trang tự báo «Về buổi live» để đóng.
+describe('nhật ký bài dạy trên trang buổi', () => {
+  const vao = async (coNk: boolean) => {
+    const { buoi } = taoBuoiGia()
+    datMayChu({ rieng: () => taoRiengGia(buoi), buoi: () => buoi })
+    const goc = fetch as unknown as (a: RequestInfo | URL, b?: RequestInit) => Promise<Response>, hoi: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (u: RequestInfo | URL, k?: RequestInit) => {
+      if (/\/nhat-ky\.json/.test(String(u))) { hoi.push(`${k?.method ?? 'GET'} ${new URL(String(u)).pathname}`); return new Response(null, { status: coNk ? 200 : 404 }) }
+      return goc(u, k)
+    }))
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: TOKEN }))
+    render(<XemBuoiLive id={ID_BUOI_GIA} ve="ve-gia" nguon="hs" dong={() => {}} />)
+    await screen.findByText(/^Phát cả \d+ đoạn/)
+    await cho(30)
+    return hoi
+  }
+  it('đã có nhật ký ⇒ thẻ «Nhật ký bài dạy» ở bìa; bấm ⇒ khung phủ kín mở /nhat-ky/ bằng vé của buổi; trang báo «dong» ⇒ đóng', async () => {
+    const hoi = await vao(true)
+    expect(hoi).toEqual([`HEAD /live-tep/${ID_BUOI_GIA}/nhat-ky.json`])
+    fireEvent.click(await screen.findByRole('button', { name: /Nhật ký bài dạy/ }))
+    const k = await screen.findByRole('dialog', { name: 'Nhật ký bài dạy' })
+    const src = k.querySelector('iframe')!.getAttribute('src')!
+    expect(src.startsWith('/nhat-ky/?')).toBe(true)
+    const q = new URLSearchParams(src.slice(src.indexOf('?')))
+    expect(q.get('id')).toBe(ID_BUOI_GIA); expect(q.get('ve')).toBeTruthy(); expect(q.get('goc')).toMatch(/^https?:\/\//)
+    await act(async () => { window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'nhat-ky', loai: 'dong' } })) })
+    expect(screen.queryByRole('dialog', { name: 'Nhật ký bài dạy' })).toBeNull()
+  })
+  it('chưa có nhật ký (404) ⇒ không có thẻ, không khung', async () => {
+    await vao(false)
+    expect(screen.queryByRole('button', { name: /Nhật ký bài dạy/ })).toBeNull()
+    expect(screen.queryByRole('dialog', { name: 'Nhật ký bài dạy' })).toBeNull()
   })
 })
