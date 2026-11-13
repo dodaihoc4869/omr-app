@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: nút «Nghỉ» — cả lớp về màn chờ chơi game, «Học tiếp» vào lại đúng chỗ đang dạy</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --nen-2: #0e171b; --mat: #1a262c; --vien: #2e3e47; --chu: #f1f7fb; --chu2: #cfdae0; --chu3: #8fa1ab; --na: #f59e0b; --k: #8b5cf6; --cu: #10b981; --ca: #ef4444; --vang: #f5c84a; --xanh: #34c98a; --u: calc(100vw / 1366); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen-2); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+/* ── SÂN TRÒ SINH TỒN (vẽ gọn) ── */
+.san { position: absolute; border-radius: calc(18 * var(--z)); background: #101b20; border: calc(2.5 * var(--z)) solid #5d6e77; overflow: hidden; }
+.san i { position: absolute; display: block; }
+.san .da { background: linear-gradient(#a9b4ba, #7d8a91); border-radius: calc(5 * var(--z)); box-shadow: 0 calc(5 * var(--z)) 0 #2a363c; }
+.san .bui { border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4fd9a5, #1f9c72); box-shadow: calc(14 * var(--z)) calc(4 * var(--z)) 0 calc(-3 * var(--z)) #27a87c, calc(-12 * var(--z)) calc(6 * var(--z)) 0 calc(-4 * var(--z)) #2fb586; }
+.san .hop { background: #d6b24a; border: calc(2 * var(--z)) solid #8d7226; border-radius: calc(4 * var(--z)); }
+.san .tru { border-radius: 50%; border: calc(2 * var(--z)) solid var(--d); background: color-mix(in srgb, var(--d) 14%, transparent); }
+.san .vong { border-radius: 50%; border: calc(2 * var(--z)) dashed #7fd3e6; }
+.san .nv { width: calc(22 * var(--z)); height: calc(24 * var(--z)); border-radius: 46% 46% 30% 30%; background: var(--d); border: calc(2 * var(--z)) solid #fff; }
+.san .nv::after { content: ''; position: absolute; left: -20%; right: -20%; top: calc(-9 * var(--z)); height: calc(4 * var(--z)); border-radius: 99px; background: #34e3a4; }
+.diem { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: calc(12 * var(--z)); padding: calc(5 * var(--z)) calc(14 * var(--z)); border-radius: 99px; background: #17232a; border: calc(1.5 * var(--z)) solid #3a4a53; font-size: calc(13 * var(--z)); font-weight: 800; white-space: nowrap; }
+.diem b::before { content: ''; display: inline-block; width: calc(9 * var(--z)); height: calc(9 * var(--z)); border-radius: 50%; background: var(--d); margin-right: calc(5 * var(--z)); }
+.diem span { color: var(--chu3); font-weight: 700; }
+/* ── MÁY THẦY ── */
+.dau { position: absolute; left: 24px; right: 24px; top: 18px; display: flex; align-items: center; gap: 12px; }
+.vien { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 99px; background: #1d2a31; font-size: 15px; font-weight: 800; white-space: nowrap; }
+.vien i { width: 9px; height: 9px; border-radius: 50%; background: var(--vang); } .vien.gio { font-variant-numeric: tabular-nums; }
+.dau .ket { margin-left: auto; height: 42px; padding: 0 18px; border-radius: 13px; border: 1.5px solid rgba(239,68,68,.6); color: #ff8f8f; display: grid; place-items: center; font-size: 15px; font-weight: 800; }
+.doi { position: absolute; right: 24px; width: 360px; border-radius: 16px; border: 1.5px solid color-mix(in srgb, var(--d) 60%, transparent); background: color-mix(in srgb, var(--d) 8%, #141f25); padding: 10px 12px; }
+.doi h4 { margin: 0 0 8px; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: color-mix(in srgb, var(--d) 75%, #fff); } .doi h4 b { width: 28px; height: 28px; border-radius: 50%; background: var(--d); color: #16222a; display: grid; place-items: center; font-size: 12.5px; } .doi h4 small { margin-left: auto; font-size: 12.5px; color: var(--chu3); }
+.doi div { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .doi span { padding: 5px 9px; border-radius: 8px; background: #1b272e; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chan { position: absolute; left: 24px; right: 24px; bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.chan p { margin: 0; flex: 1; font-size: 15px; font-weight: 700; color: var(--chu2); line-height: 1.4; } .chan p b { color: var(--chu); }
+.nut-hoc { height: 58px; padding: 0 34px; border-radius: 18px; background: var(--xanh); color: #0d2b20; font-size: 19px; font-weight: 800; display: flex; align-items: center; gap: 10px; box-shadow: 0 5px 0 #129267; }
+.nut-hoc svg { width: 20px; height: 20px; }
+/* thầy: màn chiếu + khay nút bốn ô có nút Nghỉ */
+.chieu { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; transform-origin: 0 0; background: var(--nen); overflow: hidden; }
+.chieu .tren { position: absolute; left: 0; right: 0; top: 0; height: 48px; background: #fff; }
+.chieu .ke { position: absolute; left: 66.667%; top: 58px; bottom: 62px; width: 2px; background: #33434c; }
+.chieu .day { position: absolute; left: 8px; right: 8px; bottom: 6px; height: 50px; border-radius: 16px; background: #1a262c; display: flex; align-items: center; gap: 12px; padding: 0 10px; }
+.live { display: flex; align-items: center; height: 38px; border-radius: 19px; background: #c8262b; font-weight: 800; font-size: 15px; padding: 0 14px; gap: 8px; } .live u { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.o4 { margin-left: auto; width: 38px; height: 38px; border-radius: 30%; background: var(--chu); display: grid; place-items: center; }
+.khay { position: absolute; right: 10px; bottom: 66px; width: 400px; padding: 14px; border-radius: 20px; background: #1d2a31; border: 1.5px solid #3a4a53; box-shadow: 0 20px 60px rgba(0,0,0,.55); }
+.khay h5 { margin: 0 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--chu3); }
+.khay .hang { display: flex; gap: 8px; margin-bottom: 10px; } .khay .hang:last-child { margin: 0; }
+.khay .o { flex: 1; height: 46px; border-radius: 12px; background: #2c3a42; border: 1.5px solid #4a5a63; display: grid; place-items: center; font-size: 14.5px; font-weight: 800; } .khay .o.chon { background: var(--chu); color: #16222a; border-color: var(--chu); }
+.khay .o.nghi { flex: 1.4; background: rgba(245,200,74,.14); border-color: rgba(245,200,74,.65); color: var(--vang); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.khay .o.nghi svg { width: 18px; height: 18px; }
+svg.viet { position: absolute; overflow: visible; } svg.viet text { font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; fill: #eef4f7; font-style: italic; }
+.cot { position: fixed; right: 0; top: 0; bottom: 0; background: #0f191e; border-left: 1.5px solid #24323a; padding: 14px; font-size: 14.5px; font-weight: 800; }
+.dai { position: fixed; left: 0; bottom: 0; background: #0f191e; border-top: 1.5px solid #24323a; }
+/* ── MÁY EM ── */
+.bang-nghi { position: fixed; left: 50%; transform: translateX(-50%); top: calc(8 * var(--z)); display: flex; align-items: center; gap: calc(10 * var(--z)); padding: calc(7 * var(--z)) calc(16 * var(--z)) calc(7 * var(--z)) calc(12 * var(--z)); border-radius: 99px; background: rgba(20,31,37,.94); border: calc(1.5 * var(--z)) solid rgba(245,200,74,.6); box-shadow: 0 calc(10 * var(--z)) calc(30 * var(--z)) rgba(0,0,0,.45); white-space: nowrap; }
+.bang-nghi i { width: calc(26 * var(--z)); height: calc(26 * var(--z)); border-radius: 50%; background: rgba(245,200,74,.18); display: grid; place-items: center; }
+.bang-nghi i svg { width: calc(15 * var(--z)); height: calc(15 * var(--z)); }
+.bang-nghi b { font-size: calc(14.5 * var(--z)); font-weight: 800; } .bang-nghi span { font-size: calc(12.5 * var(--z)); font-weight: 600; color: var(--chu2); } .bang-nghi time { font-size: calc(13 * var(--z)); font-weight: 800; color: var(--vang); font-variant-numeric: tabular-nums; }
+.phu { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(10,18,24,.72); }
+.vao { text-align: center; padding: calc(22 * var(--z)) calc(40 * var(--z)); border-radius: calc(24 * var(--z)); background: linear-gradient(160deg, #26343c, #18242b); border: calc(1.5 * var(--z)) solid rgba(52,201,138,.6); box-shadow: 0 calc(24 * var(--z)) calc(70 * var(--z)) rgba(0,0,0,.6); }
+.vao small { display: block; font-size: calc(13 * var(--z)); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--xanh); }
+.vao h3 { margin: calc(6 * var(--z)) 0 calc(4 * var(--z)); font-size: calc(24 * var(--z)); font-weight: 800; } .vao p { margin: 0; font-size: calc(14 * var(--z)); font-weight: 600; color: var(--chu2); }
+.vao .so { margin: calc(12 * var(--z)) auto 0; width: calc(64 * var(--z)); height: calc(64 * var(--z)); border-radius: 50%; border: calc(4 * var(--z)) solid var(--xanh); display: grid; place-items: center; font-size: calc(30 * var(--z)); font-weight: 800; }
+</style></head><body>
+<script>
+const q = new URLSearchParams(location.search), k = q.get('k') || 'thay-nghi', W = innerWidth, H = innerHeight
+const them = (h) => document.body.insertAdjacentHTML('beforeend', h)
+const bt = { ca: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v5a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v2M12 3v2"/></svg>', choi: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' }
+// sân trò: toạ độ theo phần trăm của sân
+function san(x, y, w, h, z) {
+  const o = [], da = (l, t, ww, hh) => o.push(`<i class="da" style="left:${l}%;top:${t}%;width:${ww}%;height:${hh}%"></i>`), bui = (l, t) => o.push(`<i class="bui" style="left:${l}%;top:${t}%;width:5.2%;aspect-ratio:1"></i>`), hop = (l, t) => o.push(`<i class="hop" style="left:${l}%;top:${t}%;width:3.2%;aspect-ratio:1"></i>`)
+  ;[[7, 24], [86, 24], [7, 68], [86, 68]].forEach(([l, t]) => da(l, t, 8, 4.5)); [[16, 12], [81, 12], [16, 70], [81, 70]].forEach(([l, t]) => da(l, t, 2.6, 13)); [[40, 35], [56, 35], [40, 58], [56, 58]].forEach(([l, t]) => da(l, t, 5, 4.5)); [[28, 24], [64, 24], [28, 68], [64, 68]].forEach(([l, t]) => da(l, t, 10, 4.5)); da(48.6, 4, 2.8, 8); da(48.6, 87, 2.8, 8)
+  ;[[24, 15], [48, 19], [72, 15], [15, 45], [80, 45], [24, 76], [48, 72], [72, 76], [34, 62], [66, 62]].forEach(([l, t]) => bui(l, t)); [[35, 8], [61, 8], [35, 83], [61, 83], [4, 46], [93, 46], [23, 41], [74, 41], [23, 51], [74, 51]].forEach(([l, t]) => hop(l, t))
+  ;[['--na', 3, 6], ['--k', 86, 6], ['--cu', 3, 80], ['--ca', 86, 80]].forEach(([d, l, t]) => o.push(`<i class="tru" style="--d:var(${d});left:${l}%;top:${t}%;width:11%;height:12%"></i>`))
+  o.push('<i class="vong" style="left:26%;top:25%;width:48%;height:50%"></i>')
+  ;[['--na', 33, 38], ['--na', 36, 44], ['--na', 31, 49], ['--k', 62, 36], ['--k', 65, 42], ['--cu', 35, 60], ['--cu', 39, 65], ['--ca', 62, 60], ['--ca', 66, 55], ['--ca', 46, 70]].forEach(([d, l, t]) => o.push(`<i class="nv" style="--d:var(${d});left:${l}%;top:${t}%"></i>`))
+  return `<div class="san" style="--z:${z}px;left:${x}px;top:${y}px;width:${w}px;height:${h}px">${o.join('')}<div class="diem" style="top:${6 * z}px"><b style="--d:var(--na)">Na 3</b><b style="--d:var(--k)">K 5</b><b style="--d:var(--cu)">Cu 2</b><b style="--d:var(--ca)">Ca 4</b><span>lượt hạ · Ván 2 · còn 1:24</span></div></div>`
+}
+const viet = (x, y, co, dong, mau) => `<svg class="viet" style="left:${x}%;top:${y}%"><g>${dong.map((d, i) => `<text x="0" y="${i * co * 1.55}" font-size="${co}" ${mau && mau[i] ? `style="fill:${mau[i]}"` : ''}>${d}</text>`).join('')}</g></svg>`
+if (k === 'thay-khay') {
+  const C = Math.round(Math.min(340, Math.max(248, W * 0.2))), s = (W - C) / W
+  them(`<div class="chieu" style="transform:scale(${s})"><div class="tren"></div><i class="ke"></i>${viet(5, 13, 30, ['Liên kết cộng hoá trị', 'H₂ :  H · · H  ⇒  H – H', 'O₂ :  O :: O  ⇒  O = O'], ['#f5c84a'])}
+    <div class="khay"><h5>Chế độ</h5><div class="hang"><div class="o">Học</div><div class="o chon">Bảng</div><div class="o">Lớp</div><div class="o nghi">${bt.ca}Nghỉ</div></div><h5>Trong buổi</h5><div class="hang"><div class="o">Chọn bài</div><div class="o">Tin nhắn</div><div class="o">Luật rời màn</div></div></div>
+    <div class="day"><div class="live"><u></u>LIVE 42:10 · 62</div><div class="o4"><svg width="18" height="18" viewBox="0 0 24 24" fill="#16222a"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></div></div></div>
+    <aside class="cot" style="width:${C}px">Tin nhắn lớp</aside><div class="dai" style="width:${W - C}px;height:${Math.round(H - H * s)}px"></div>`)
+} else if (k === 'thay-nghi') {
+  them(`<div class="dau"><span class="vien"><i></i>Đang nghỉ · Khối 12</span><span class="vien gio">Nghỉ được 03:12</span><span class="vien">62 em đang chơi</span><span class="ket">Kết thúc buổi</span></div>`)
+  them(san(24, 76, W - 24 - 360 - 24 - 18, H - 76 - 100, 1))
+  ;[['--na', 'Na', 'Đội Natri', ['Nguyễn Thị Hà', 'Đỗ Hoàng Nam', 'Trần Minh Anh', 'Bùi Đức Anh']], ['--k', 'K', 'Đội Kali', ['Lê Gia Huy', 'Phạm Khánh Vy', 'Ngô Gia Bảo', 'Vũ Ngọc Lan']], ['--cu', 'Cu', 'Đội Đồng', ['Trần Minh Khôi', 'Đặng Quỳnh Chi', 'Lê Hoàng Nam', 'Hồ Bảo Trâm']], ['--ca', 'Ca', 'Đội Canxi', ['Phạm Ngọc Bảo Anh', 'Hoàng Đức Anh', 'Đinh Tuấn Kiệt', 'Mai Thu Uyên']]].forEach(([d, ky, ten, ds], i) => them(`<div class="doi" style="--d:var(${d});top:${76 + i * 147}px"><h4><b>${ky}</b>${ten}<small>${15 + (i % 2)} em</small></h4><div>${ds.map((t) => `<span>${t}</span>`).join('')}</div></div>`))
+  them(`<div class="chan"><p>Các em đang chơi Sinh Tồn trong lúc nghỉ. Bấm <b>Học tiếp</b>, cả lớp vào lại đúng chỗ đang dạy: <b>chế độ Bảng</b>, bảng giữ nguyên nét đã viết.</p><div class="nut-hoc">${bt.choi}Học tiếp</div></div>`)
+} else {
+  const z = W / 844
+  document.documentElement.style.setProperty('--z', z + 'px')
+  them(san(6, 6, W - 12, H - 12, z * 0.9))
+  if (k === 'em-nghi') them(`<div class="bang-nghi" style="--z:${z}px;top:${40 * z}px"><i style="color:var(--vang)">${bt.ca}</i><b>Nghỉ giải lao</b><span>Thầy gọi Học tiếp là em vào lại bài</span><time>03:12</time></div>`)
+  else them(`<div class="phu" style="--z:${z}px"><div class="vao"><small>Hết giờ nghỉ</small><h3>Thầy gọi học tiếp</h3><p>Em vào lại đúng chỗ thầy đang dạy.</p><div class="so">3</div></div></div>`)
+}
+</script>
+</body></html>
