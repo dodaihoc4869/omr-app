@@ -75,4 +75,8 @@ html.may-yeu .hh-the { animation: none; }
    (Luật `.hh-troi` ở trên giữ nguyên khai báo cũ theo luật giữ màu; lớp `.phang` ghi đè.) */
 .hh-lop .hh-troi.phang { border-radius: 0; box-shadow: none; background: transparent; animation: hh-hien 0.3s ease-out both; }
 .hh-lop .hh-troi.phang::before { display: none; }
+/* Thầy 13/11 «ẩn chữ hiểu chưa và các em đang trả lời đi, dịch 1 0 xuống phía dưới một chút»: bảng đã hoà vào nền nên dòng tựa đè lên thẻ tên ⇒ ẩn
+   (nhãn cho trình đọc màn vẫn nằm ở aria-label của khung); hai số lùi xuống dưới thẻ tên. */
+.hh-lop .hh-troi.phang h3 { display: none; }
+.hh-lop .hh-troi.phang .hh-cot { top: calc(112 * var(--k)); }
 @keyframes hh-hien { from { opacity: 0; } }

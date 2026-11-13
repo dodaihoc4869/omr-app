@@ -2,9 +2,10 @@
 // KHUNG CHAT LUÔN HIỆN BÊN PHẢI MÁY THẦY (thầy duyệt bản vẽ 55–59 ngày 13/11): «thêm một khung chat bên phải luôn hiện … không làm ảnh hưởng tới bố cục phần
 // chiếu cho hs. Tin nhắn hiển thị màu theo đội có họ tên đầy đủ của hs màu theo đội in đậm dòng trên và nội dung chữ nhỏ hơn ở dòng dưới».
 import { describe, expect, it } from 'vitest'
-import { render } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
-import { COT_MAN_CAO, COT_MAN_RONG, hinhCot, vungChieu } from '../src/components/live-khoi/cot-chat-hinh'
+import { COT_HEP, COT_MAN_CAO, COT_MAN_RONG, COT_TRAN, KHOA_COT, cotTheoDai, docCotMuon, ghiCotMuon, hinhCot, vungChieu } from '../src/components/live-khoi/cot-chat-hinh'
+import KeoCot from '../src/components/live-khoi/KeoCot'
 import { DanhSachTin } from '../src/components/live-khoi/ChatEm'
 import type { TinChat } from '../src/lib/live-khoi/chat-loi'
 
@@ -62,5 +63,50 @@ describe('dòng tin gọn của cột cố định', () => {
     const luat = /:root\[data-lk-cot\] \.lop-xem-phieu \{([^}]*)\}/.exec(thay)![1]!
     expect(luat).toMatch(/transform: scale\(var\(--lkc-s\)\)/); expect(luat).toMatch(/transform-origin: 0 0/); expect(luat).not.toMatch(/width|height|inset|right|bottom/)
     expect(thay.slice(thay.indexOf('CỘT TIN NHẮN CỐ ĐỊNH'))).not.toMatch(/:has\(/) // phần mới không dùng :has() (luật mượt 27/10)
+  })
+})
+
+// Thầy 13/11: «cho tôi điều chỉnh kích thước được của thẻ đen chỉ thầy thấy ở dưới».
+describe('thầy tự kéo cỡ dải «Chỉ thầy thấy» / cột tin nhắn', () => {
+  it('không đặt gì ⇒ y như cũ; đặt bề ngang cột ⇒ phần chiếu vẫn thu ĐỀU, dải cao theo đúng tỉ lệ; kẹp trong [COT_HEP, min(COT_TRAN, 40 % phần chiếu)]', () => {
+    expect(hinhCot(1366, 768, 0, null)).toEqual(hinhCot(1366, 768))
+    const a = hinhCot(1366, 768, 0, 200)!
+    expect(a.c).toBe(200); expect(a.s).toBeCloseTo(1166 / 1366, 6); expect(a.d).toBe(Math.round(768 - 768 * a.s))
+    expect(a.d).toBeLessThan(hinhCot(1366, 768)!.d) // cột hẹp lại ⇔ dải thấp đi ⇔ phần chiếu to ra
+    expect(hinhCot(1366, 768, 0, 10)!.c).toBe(COT_HEP)
+    expect(hinhCot(1366, 768, 0, 9999)!.c).toBe(COT_TRAN)
+    expect(hinhCot(1000, 600, 0, 9999)!.c).toBe(400) // 40 % phần chiếu
+    expect(hinhCot(800, 600, 0, 300)).toBeNull() // cửa sổ nhỏ vẫn không dựng cột cố định
+  })
+  it('kéo mép trên của dải: dải cao d px ⇒ bề ngang cột tương ứng; nhớ / quên trên máy', () => {
+    const c = cotTheoDai(1366, 768, 0, 113)
+    expect(hinhCot(1366, 768, 0, c)!.d).toBeGreaterThanOrEqual(112); expect(hinhCot(1366, 768, 0, c)!.d).toBeLessThanOrEqual(114)
+    localStorage.clear(); expect(docCotMuon()).toBeNull()
+    ghiCotMuon(201.4); expect(localStorage.getItem(KHOA_COT)).toBe('201'); expect(docCotMuon()).toBe(201)
+    ghiCotMuon(null); expect(docCotMuon()).toBeNull()
+  })
+  it('hai tay kéo: mép trên dải (dọc) và mép trái cột (ngang); đang kéo báo liên tục, nhả tay mới báo «xong»; bấm hai lần ⇒ về mặc định', () => {
+    const goi: Array<[number | null, boolean]> = []
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1366 }); Object.defineProperty(window, 'innerHeight', { configurable: true, value: 768 })
+    const r = render(<KeoCot xTo={0} dat={(c, xong) => goi.push([c, xong])} />)
+    const ngang = r.container.querySelector<HTMLElement>('.lkt-keo.ngang')!, doc = r.container.querySelector<HTMLElement>('.lkt-keo.doc')!
+    expect(ngang.getAttribute('role')).toBe('separator'); expect(ngang.getAttribute('aria-orientation')).toBe('horizontal'); expect(doc.getAttribute('aria-orientation')).toBe('vertical')
+    fireEvent.pointerMove(ngang, { pointerId: 1, clientX: 500, clientY: 600 }) // chưa nhấn ⇒ không làm gì
+    expect(goi).toHaveLength(0)
+    fireEvent.pointerDown(ngang, { pointerId: 1, clientX: 500, clientY: 615 }); fireEvent.pointerMove(ngang, { pointerId: 1, clientX: 500, clientY: 655 }); fireEvent.pointerUp(ngang, { pointerId: 1 })
+    expect(goi).toEqual([[cotTheoDai(1366, 768, 0, 768 - 655), false], [cotTheoDai(1366, 768, 0, 768 - 655), true]])
+    goi.length = 0
+    fireEvent.pointerDown(doc, { pointerId: 2, clientX: 1093, clientY: 300 }); fireEvent.pointerMove(doc, { pointerId: 2, clientX: 1033, clientY: 300 }); fireEvent.pointerUp(doc, { pointerId: 2 })
+    expect(goi).toEqual([[333, false], [333, true]])
+    goi.length = 0
+    fireEvent.doubleClick(ngang)
+    expect(goi).toEqual([[null, true]])
+  })
+  it('kiểu tay kéo chỉ dùng biến màu chuẩn; lớp nổi của thầy nối tay kéo khi cột đang dựng', () => {
+    const css = readFileSync('src/components/live-khoi/thay-khoi.css', 'utf8'), thay = readFileSync('src/components/live-khoi/LopNoiThay.tsx', 'utf8')
+    expect(css).toMatch(/\.lkt-keo\.ngang \{[^}]*bottom: calc\(var\(--lkc-h\) - 7px\)[^}]*cursor: ns-resize/)
+    expect(css.slice(css.indexOf('.lkt-keo {'), css.indexOf('.lkt-dai-nhan {'))).not.toMatch(/#[0-9a-f]{3,8}\b|rgb\(/i)
+    expect(thay).toContain('{cot ? <KeoCot xTo={xTo} dat={datCot} /> : null}')
+    expect(thay).toContain('hinhCot(man.w, man.h, xTo, cotMuon)')
   })
 })

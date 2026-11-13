@@ -179,6 +179,21 @@ const tiLeHoc = oB.h / oB.w
 await veNgang(oB, 0.3); await ngu(1300)
 const n1 = await netEm(em1, tiLeHoc, false)
 kiem('3T2 «Học»: thầy kẻ nét ngang 20–80 % bề ngang ở 30 % chiều cao bảng ⇒ máy em thấy ĐÚNG nét ấy: dài 60 % ô bảng, đúng chỗ (không lệch, không bé xíu ở góc)', coNet(n1, 0.3) && n1.length === 1, JSON.stringify(n1))
+{ // (thầy 13/11 «bảng đen xanh trên màn thầy với hs phải đồng bộ tỷ lệ với nhau để viết bút hiển thị đầy đủ trên máy hs»)
+  const khungB = (p) => p.evaluate(() => { const b = document.querySelector('.lv-bang'); return b ? [b.offsetWidth, b.offsetHeight] : null })
+  const kb = [await khungB(em1), await khungB(em2), await khungB(em3)]
+  kiem('BT1 «Học»: khung bảng máy em chứa TRỌN ô bảng của thầy, cùng tỉ lệ (máy ngang, điện thoại cầm dọc hình xoay, cửa sổ dọc) — phần dưới bảng không nằm ngoài khung', kb.every((k) => !!k && k[0] * tiLeHoc <= k[1] + 2), JSON.stringify({ tiLeHoc: Number(tiLeHoc.toFixed(3)), kb }))
+}
+{ // (thầy 13/11 «bút khi không viết thì hiện một chấm laze màu đỏ sáng rõ siêu nét để chỉ bài còn khi viết lại hiện bút bình thường»)
+  await gv.mouse.move(oB.x + oB.w * 0.5, oB.y + oB.h * 0.6, { steps: 4 }); await ngu(1100)
+  const lzGv = await toT.locator('body').evaluate(() => { const c = document.querySelector('.mc-laze'), r = c?.getBoundingClientRect(), cv = document.querySelector('canvas.mc-but'); return { hien: !!c && !c.hidden, x: r ? Math.round(r.left + r.width / 2) : null, y: r ? Math.round(r.top + r.height / 2) : null, conTro: cv ? getComputedStyle(cv).cursor : '' } })
+  const anh = (await em1.screenshot({ type: 'png' })).toString('base64')
+  const lzEm = await em1.evaluate(async ([b64, tiLe]) => { const k = document.querySelector('.lv-bang').getBoundingClientRect(); const i = new Image(); i.src = 'data:image/png;base64,' + b64; await i.decode(); const c = document.createElement('canvas'); c.width = i.width; c.height = i.height; const g = c.getContext('2d'); g.drawImage(i, 0, 0); const d = g.getImageData(Math.round(k.left), Math.round(k.top), Math.round(k.width), Math.round(k.height)); let n = 0, sx = 0, sy = 0; for (let y = 0; y < d.height; y++) for (let x = 0; x < d.width; x++) { const o = (y * d.width + x) * 4; if (d.data[o] > 190 && d.data[o + 1] < 110 && d.data[o + 2] < 110) { n++; sx += x; sy += y } } const oW = Math.min(k.width, (k.height - 26) / tiLe); return { n, x: n ? sx / n / oW : null, y: n ? sy / n / (oW * tiLe) : null, khung: [Math.round(k.width), Math.round(k.height)] } }, [anh, tiLeHoc])
+  await chup(em1, 'lz-1-em-cham-laze'); await chup(gv, 'lz-1-gv-cham-laze')
+  kiem('LZ1 thầy đưa bút lơ lửng trên bảng (chưa đặt bút): tờ của thầy hiện CHẤM ĐỎ đúng chỗ con trỏ, con trỏ hệ thống ẩn; máy em hiện chấm đỏ đúng chỗ ấy trên bảng (không còn hình cây bút)', lzGv.hien && lzGv.conTro === 'none' && lzEm.n >= 20 && Math.abs(lzEm.x - 0.5) < 0.06 && Math.abs(lzEm.y - 0.6) < 0.06, JSON.stringify({ lzGv, lzEm }))
+  await gv.mouse.move(1300, 300, { steps: 3 }); await ngu(500) // rời tờ (sang cột tin nhắn) ⇒ chấm ẩn, các bước đo nét phía sau không dính chấm
+  kiem('LZ2 con trỏ rời lớp bút ⇒ chấm đỏ trên tờ ẩn', await toT.locator('body').evaluate(() => document.querySelector('.mc-laze').hidden))
+}
 if (process.env.DO_3T) { await chup(gv, '3T-gv-hoc'); await chup(em1, '3T-em-hoc'); process.exit(3) }
 // Tab ⇒ Bảng: CHÍNH tờ ấy sang chế độ Bảng tức thì (không dựng tờ thứ hai), phòng sang «bang»
 const soToTruoc = (await soTo()).length
@@ -206,12 +221,14 @@ const n3 = await netEm(em1, tiLeHoc, false)
 kiem('3T6 viết tiếp ở «Học» sau khi đổi qua lại: nét mới tới máy em ĐÚNG CHỖ (50 % chiều cao), nét cũ vẫn đúng chỗ', coNet(n3, 0.5) && coNet(n3, 0.3) && n3.length === 2, JSON.stringify(n3))
 await toT.locator('body').press('Tab'); await ngu(1700)
 const nBang2 = await netEm(em1, tiLeBang, true)
-kiem('3T7 Tab sang «Bảng» lần nữa: mọi nét cũ của «Bảng» CÒN NGUYÊN ĐÚNG CHỖ, nét vừa viết ở «Học» không lẫn sang', st()?.live?.khoi?.che === 'bang' && JSON.stringify(nBang2) === JSON.stringify(nBang1), JSON.stringify({ truoc: nBang1, sau: nBang2 }))
+// so hai lần đo nét có dung sai 1,5 % ô bảng: từ 13/11 con trỏ lơ lửng của thầy là CHẤM LAZE đỏ (có quầng) nằm cạnh đầu nét lúc chụp ⇒ mép dải mực lệch tới 1 %
+const netGiong = (a, b) => a.length === b.length && a.every((g, i) => Math.abs(g.y - b[i].y) <= 0.015 && Math.abs(g.x0 - b[i].x0) <= 0.015 && Math.abs(g.x1 - b[i].x1) <= 0.015)
+kiem('3T7 Tab sang «Bảng» lần nữa: mọi nét cũ của «Bảng» CÒN NGUYÊN ĐÚNG CHỖ, nét vừa viết ở «Học» không lẫn sang', st()?.live?.khoi?.che === 'bang' && netGiong(nBang2, nBang1), JSON.stringify({ truoc: nBang1, sau: nBang2 }))
 // đổi thật nhanh 6 lần liên tiếp (thầy bấm Tab liên tục) ⇒ kết thúc đúng chế độ, nét hai phía vẫn đúng
 for (let i = 0; i < 6; i++) { await toT.locator('body').press('Tab'); await ngu(140) }
 await ngu(2800)
 const nBang3 = await netEm(em1, tiLeBang, true)
-kiem('3T7b bấm Tab 6 lần liên tiếp: tờ và phòng dừng ở cùng một chế độ («bang»), nét trên máy em vẫn nguyên, đúng chỗ', st()?.live?.khoi?.che === 'bang' && (await toT.locator('body.mc-che-bang').count()) === 1 && JSON.stringify(nBang3) === JSON.stringify(nBang1), JSON.stringify({ che: st()?.live?.khoi?.che, sau: nBang3 }))
+kiem('3T7b bấm Tab 6 lần liên tiếp: tờ và phòng dừng ở cùng một chế độ («bang»), nét trên máy em vẫn nguyên, đúng chỗ', st()?.live?.khoi?.che === 'bang' && (await toT.locator('body.mc-che-bang').count()) === 1 && netGiong(nBang3, nBang1), JSON.stringify({ che: st()?.live?.khoi?.che, sau: nBang3 }))
 kiem('3T7c tờ riêng đang chiếu: nút nổi «Về màn chiếu» của tấm KHÔNG đè lên thanh đáy của tờ', await gv.evaluate(() => { const n = document.querySelector('.lkt-ve-noi'); return !n || getComputedStyle(n).display === 'none' }))
 
 // ── MT. MÁY TÍNH «Đỗ Đại Học FX4869» (thầy 12/11, bản vẽ 31–34): nút trên thanh đáy của tờ ⇒ máy tính nổi, bấm được, kéo được, máy em thấy y hệt ──
@@ -263,6 +280,8 @@ await toT.locator('body').press('/'); await ngu(900)
 const hhEm = await em1.evaluate(() => { const t = document.querySelector('.hh-the'); if (!t) return null; const r = t.getBoundingClientRect(); return { x: (r.left + r.width / 2) / innerWidth, y: (r.top + r.height / 2) / innerHeight, trai: r.left / innerWidth, trong: r.top >= 0 && r.bottom <= innerHeight && r.right <= innerWidth, nut: [...t.querySelectorAll('.hh-nut')].map((n) => n.textContent) } })
 kiem('HH1 thầy bấm / trong tờ ⇒ máy thầy hiện «bầu trời» ở 1/3 bên phải; máy em hiện hai phím 1 Hiểu · 2 Chưa hiểu ở CHÍNH GIỮA phần bảng 1/3 bên phải', await gv.locator('.hh-troi').isVisible() && (await gv.evaluate(() => { const ds = document.querySelectorAll('.lop-xem-phieu'), o = ds[ds.length - 1].getBoundingClientRect(); return (document.querySelector('.hh-troi').getBoundingClientRect().left - o.left) / o.width })) > 0.64 && !!hhEm && hhEm.trai >= 0.655 && Math.abs(hhEm.x - 0.83) < 0.03 && Math.abs(hhEm.y - 0.5) < 0.04 && hhEm.trong && hhEm.nut.join('|') === '1Hiểu|2Chưa hiểu', JSON.stringify(hhEm))
 kiem('HH1b máy em cầm DỌC (hình xoay) và cửa sổ dọc trên máy tính cũng có hai phím, nằm gọn trong màn', await em2.locator('.hh-the').isVisible() && await em3.locator('.hh-the').isVisible() && await em2.evaluate(() => { const r = document.querySelector('.hh-the').getBoundingClientRect(); return r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight }))
+kiem('HH1c (thầy 13/11 «ẩn chữ hiểu chưa và các em đang trả lời đi, dịch 1 0 xuống phía dưới») máy thầy: dòng tựa ẩn, hai số nằm thấp hơn chỗ thẻ tên', await gv.evaluate(() => { const h = document.querySelector('.hh-troi h3'), c = document.querySelector('.hh-troi .hh-cot'), t = document.querySelector('.hh-troi'); return !!h && getComputedStyle(h).display === 'none' && !!c && c.getBoundingClientRect().top - t.getBoundingClientRect().top >= 60 }))
+await chup(gv, 'hh-1c-gv-khong-tua')
 await chup(em1, 'hh-1-em'); await chup(em2, 'hh-2-em-doc')
 await em1.locator('.hh-nut').first().click(); await ngu(250)
 kiem('HH2 em chạm «1 Hiểu» ⇒ hai phím TỰ ẨN NGAY, thoáng «Đã gửi thầy»; hơn 1 giây sau sạch hẳn', (await em1.locator('.hh-the').count()) === 0 && (await em1.locator('.hh-da').count()) === 1)
@@ -457,6 +476,14 @@ kiem('4p tờ sang câu 2 ⇒ phòng mở lượt mới của câu 2', st()?.luo
 await toHoc.locator('body').evaluate(() => { const d = window.__mcDot(), n = d.querySelector('.mc-nua') || d; const h = document.createElement('header'); h.className = 'mc-em'; h.id = 'em-xep-san'; h.hidden = true; h.innerHTML = '<div class="mc-em-trai"><div class="mc-em-hang1"><div class="mc-ten-hang"><span class="mc-ten">Em xếp sẵn</span><span class="mc-dau-kq" hidden></span></div><div class="mc-phu"><span class="mc-sbd">S2</span></div></div></div>'; n.insertBefore(h, n.firstChild); window.__mcVaoLai() }); await ngu(500)
 await nutLen.click(); await ngu(1500)
 kiem('4q tờ có em xếp sẵn: bấm «Lên bảng» ⇒ phòng gọi ĐÚNG em trên thẻ (S2); máy em S2 và máy bạn đều hiện thông báo', st()?.luot?.goi?.sbd === 'S2' && (await baoEm(em2)) && (await baoEm(em1)), JSON.stringify(st()?.luot?.goi ?? null))
+{ // (thầy 13/11 «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»)
+  await ngu(2600) // chờ thẻ tên bay từ giữa màn về chỗ
+  let tt = null
+  for (const f of gv.frames()) { const d = await f.evaluate(() => { const t = [...document.querySelectorAll('.mc-em')].find((e) => !e.hidden && e.getClientRects().length && e.getBoundingClientRect().left >= 0); if (!t || !document.body.classList.contains('mc-lk')) return null; const r = t.getBoundingClientRect(), c = ((t.closest('.mc-dot') || document).querySelector('.mc-cot-lam-bai') || t.parentElement).getBoundingClientRect(), an = [...t.querySelectorAll('.mc-phu, .mc-xem-ct, .mc-thu, .mc-ls')].every((e) => getComputedStyle(e).display === 'none'), ten = t.querySelector('.mc-ten'); return { cao: Math.round(r.height), rong: Math.round(r.width), lechGiua: Math.round(Math.abs(r.left + r.width / 2 - (c.left + c.width / 2))), an, chu: parseFloat(getComputedStyle(ten).fontSize), bo: getComputedStyle(t).borderTopLeftRadius, ten: ten.textContent } }).catch(() => null); if (d) tt = d }
+  kiem('TT1 thẻ tên em lên bảng trong buổi live: một viên nhỏ bo tròn chỉ còn TÊN, đứng giữa đầu cột bảng (cao ≤ 40 px ở màn 1366); «Chi tiết», số báo danh, nhãn dự kiến ẩn', !!tt && tt.cao <= 40 && tt.an && tt.lechGiua <= 3 && tt.chu <= 24 && parseFloat(tt.bo) >= 16, JSON.stringify(tt))
+  await chup(gv, 'tt-1-gv-the-ten-gon')
+  if (process.env.DO_THE) { for (const f of gv.frames()) { const h = await f.evaluate(() => (document.body.classList.contains('mc-lk') ? JSON.stringify([...document.querySelectorAll('.mc-em')].map((e) => { const r = e.getBoundingClientRect(), k = getComputedStyle(e); return [e.id, e.hidden, k.display, k.position, k.opacity, Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height), e.parentElement.className, (e.closest('.mc-dot') || {}).className, e.textContent.trim().slice(0, 20)] })) : null)).catch(() => null); if (h) console.log('THE', h) } process.exit(3) } // chỉ soi thẻ tên rồi dừng
+}
 await ngu(4500)
 await toHoc.locator('body').press('k'); await ngu(1200)
 const dauB = await em1.evaluate(() => { const d = document.querySelector('.lv-dau-dat'); if (!d) return null; const a = d.getBoundingClientRect(), g = document.querySelector('.lv-giay').getBoundingClientRect(), m = document.querySelector('.lv').getBoundingClientRect(); return { chu: d.firstChild.textContent, giuaMan: Math.abs((a.left + a.right) / 2 - (m.left + m.right) / 2) < m.width * 0.08, deSangDe: a.left < g.right - 20, ten: d.querySelector('small')?.textContent ?? '' } })
@@ -547,7 +574,7 @@ gvWs.close()
 const trangHoc = await gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => ({ trang: window.__mcBut.trang(), net: window.__mcBut.xuat().net.length }))
 await lk('bang'); await ngu(1800)
 const mucB2 = await mucEm(em1), aGv2 = await mucVungGv(gv, ...netA.gv), aEm2 = await mucVung(em1, ...netA.em)
-kiem('7b Học → Bảng lần nữa: đủ nét cũ (nét A + hai nét sau) ở cả hai phía', aGv2 > 60 && aEm2 > 30 && mucB2.t >= muc1.t - 8 && mucB2.ph >= muc1.ph - 8, JSON.stringify({ A: { thay: aGv2, em: aEm2 }, truoc: muc1, sau: mucB2, cot: await gv.evaluate(() => ({ co: document.documentElement.hasAttribute('data-lk-cot'), to: [...document.querySelectorAll('.lop-xem-phieu')].map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), getComputedStyle(e).visibility] }) })) }))
+kiem('7b Học → Bảng lần nữa: đủ nét cũ (nét A + hai nét sau) ở cả hai phía', aGv2 > 60 && aEm2 > 30 && mucB2.t >= muc1.t - 8 && mucB2.ph >= muc1.ph - 20 /* 13/11: lần đo trước có chấm laze đỏ của thầy (≈ 10–15 điểm sáng) nằm trong vùng phải */, JSON.stringify({ A: { thay: aGv2, em: aEm2 }, truoc: muc1, sau: mucB2, cot: await gv.evaluate(() => ({ co: document.documentElement.hasAttribute('data-lk-cot'), to: [...document.querySelectorAll('.lop-xem-phieu')].map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), getComputedStyle(e).visibility] }) })) }))
 await chup(gv, '7b-gv-bang-lan-hai')
 kiem('7c nét của Bảng KHÔNG lẫn sang bảng của bài ở «Học» (bảng của câu là trang riêng, đang sạch)', trangHoc.trang !== 'bl' && trangHoc.net === 0, JSON.stringify(trangHoc))
 await lk('hoc'); await ngu(1500)
@@ -585,11 +612,31 @@ const doCk = () => gv.evaluate(() => { const g = document.documentElement, to = 
 const tiLeTo = () => gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => window.__mcBut.xuat().tiLe)
 const ck1 = await doCk(), tl1 = await tiLeTo(), emBang1 = await em1.locator('.lv-bang').first().boundingBox()
 kiem('CK1 có cột: phần chiếu thu đều (cùng tỉ lệ cửa sổ), sát góc trên-trái, khung tờ bên trong vẫn nguyên cỡ cửa sổ; dải «Chỉ thầy thấy» lấp đúng phần dư bên dưới', ck1.co && ck1.to[0] === 0 && ck1.to[1] === 0 && Math.abs(ck1.to[2] / ck1.to[3] - ck1.W / ck1.H) < 0.01 && ck1.khung[0] === ck1.W && !!ck1.dai && Math.abs(ck1.dai[1] - ck1.to[3]) <= 1 && Math.abs(ck1.dai[2] - ck1.to[2]) <= 1 && ck1.dai[1] + ck1.dai[3] === ck1.H, JSON.stringify(ck1))
-await gv.locator('.lkt-dai').click({ position: { x: 5, y: 5 } }); await gv.keyboard.press('m'); await ngu(700)
+await gv.locator('.lkt-dai').click({ position: { x: 5, y: 40 } }); await gv.keyboard.press('m'); await ngu(700)
 const ck2 = await doCk(), tl2 = await tiLeTo(), emBang2 = await em1.locator('.lv-bang').first().boundingBox()
 kiem('CK2 phím M cất cột ⇒ phần chiếu về kín cửa sổ; TỈ LỆ BẢNG tờ gửi máy em và khung bảng trên máy em KHÔNG đổi (bố cục phần chiếu cho học sinh không bị ảnh hưởng)', !ck2.co && ck2.to[2] === ck2.W && ck2.to[3] === ck2.H && (await gv.locator('.lkt-cot').count()) === 0 && Math.abs(tl1 - tl2) < 1e-6 && !!emBang1 && !!emBang2 && Math.abs(emBang1.width - emBang2.width) <= 1 && Math.abs(emBang1.height - emBang2.height) <= 1, JSON.stringify({ tiLe: [tl1, tl2], em: [emBang1, emBang2], to: ck2.to }))
 await gv.keyboard.press('m'); await ngu(700)
 kiem('CK3 phím M lần nữa ⇒ cột hiện lại với đủ tin cũ, phần chiếu thu lại như trước', (await doCk()).co && (await gv.locator('.lkt-cot .lc-g').count()) >= 2 && JSON.stringify((await doCk()).to) === JSON.stringify(ck1.to))
+{ // (thầy 13/11 «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»)
+  const quet = () => { const ds = [...document.querySelectorAll('*')].filter((e) => { const k = getComputedStyle(e); return /(auto|scroll)/.test(k.overflowY + ' ' + k.overflowX) }); const xau = ds.filter((e) => getComputedStyle(e).scrollbarWidth !== 'none' || e.offsetWidth - e.clientWidth > 2 * parseFloat(getComputedStyle(e).borderLeftWidth || '0') + 1); return { n: ds.length, xau: xau.slice(0, 4).map((e) => e.className || e.tagName) } }
+  const sc = { gv: await gv.evaluate(quet), em1: await em1.evaluate(quet), em2: await em2.evaluate(quet), to: [] }
+  for (const f of gv.frames()) if (f !== gv.mainFrame()) { const d = await f.evaluate(quet).catch(() => null); if (d) sc.to.push(d) }
+  kiem('SC1 suốt buổi live không còn thanh cuộn nào hiện: máy thầy (app + mọi tờ chiếu), máy em ngang, máy em cầm dọc — các khung cuộn vẫn là khung cuộn', [sc.gv, sc.em1, sc.em2, ...sc.to].every((d) => d.xau.length === 0) && sc.to.some((d) => d.n > 0), JSON.stringify(sc))
+}
+{ // (thầy 13/11 «cho tôi điều chỉnh kích thước được của thẻ đen chỉ thầy thấy ở dưới»)
+  const doDai = () => gv.evaluate(() => { const g = document.documentElement.style; return { h: parseFloat(g.getPropertyValue('--lkc-h')), w: parseFloat(g.getPropertyValue('--lkc-w')), s: parseFloat(g.getPropertyValue('--lkc-s')), nho: localStorage.getItem('ddh.lk.cotRong'), dai: Math.round(document.querySelector('.lkt-dai').getBoundingClientRect().height) } })
+  const d0 = await doDai(), tk = await gv.locator('.lkt-keo.ngang').boundingBox()
+  await gv.mouse.move(tk.x + tk.width / 2, tk.y + 5); await gv.mouse.down(); await gv.mouse.move(tk.x + tk.width / 2, tk.y + 45, { steps: 6 }); await gv.mouse.up(); await ngu(350)
+  const d1 = await doDai()
+  await chup(gv, 'ck-4-gv-dai-thap')
+  kiem('CK4 kéo mép trên dải «Chỉ thầy thấy» xuống 40 px ⇒ dải thấp đi ≈ 40 px, cột tin nhắn hẹp lại, phần chiếu to ra (vẫn thu đều); máy nhớ cỡ mới', Math.abs(d0.h - d1.h - 40) <= 4 && d1.dai === d1.h && d1.w < d0.w && d1.s > d0.s && Number(d1.nho) === d1.w, JSON.stringify({ d0, d1 }))
+  const tc = await gv.locator('.lkt-keo.doc').boundingBox()
+  await gv.mouse.move(tc.x + 5, 300); await gv.mouse.down(); await gv.mouse.move(tc.x + 5 - 60, 300, { steps: 6 }); await gv.mouse.up(); await ngu(350)
+  const d15 = await doDai()
+  await gv.locator('.lkt-keo.ngang').dblclick(); await ngu(350)
+  const d2 = await doDai()
+  kiem('CK5 kéo mép trái cột sang trái 60 px ⇒ cột rộng thêm ≈ 60 px, dải cao lên theo; bấm hai lần tay kéo ⇒ về cỡ mặc định, máy quên cỡ đã nhớ', Math.abs(d15.w - d1.w - 60) <= 4 && d15.h > d1.h && d2.h === d0.h && d2.w === d0.w && d2.nho === null, JSON.stringify({ d15, d2 }))
+}
 
 // ── NG. NÚT «NGHỈ» (thầy duyệt bản vẽ 67–70 ngày 13/11): cả lớp về màn chờ chơi trò; «Học tiếp» ⇒ vào lại ĐÚNG chỗ đang dạy ──
 const truocNghi = { che: st()?.live?.khoi?.che, net: await gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => window.__mcBut.xuat().net.length), emBang: await em1.locator('.lv-bang').first().isVisible() }

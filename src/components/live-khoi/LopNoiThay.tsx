@@ -8,7 +8,8 @@ import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
 import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
 import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
-import { SK_COT, hinhCot } from './cot-chat-hinh'
+import { SK_COT, docCotMuon, ghiCotMuon, hinhCot } from './cot-chat-hinh'
+import KeoCot from './KeoCot'
 import { DaNghi } from './da-nghi'
 import './thay-khoi.css'
 import './em-khoi.css'
@@ -80,7 +81,10 @@ export default function LopNoiThay() {
   const k1 = Math.min(man.w / 1920, man.h / 1080)
   // CỘT TIN NHẮN CỐ ĐỊNH: chỉ khi phần chiếu đang ở trên cùng (không ở bảng danh sách / bảng chọn bài / tấm hoạt động — các màn đó vẫn kín cửa sổ như cũ).
   const xTo = useSyncExternalStore(ngheToRieng, mepTraiTo)
-  const hinh = hinhCot(man.w, man.h, xTo)
+  // thầy tự kéo cỡ cột / dải (nhớ trên máy); null = mặc định
+  const [cotMuon, setCotMuon] = useState<number | null>(docCotMuon)
+  const datCot = (c: number | null, xong: boolean): void => { setCotMuon(c); if (xong) ghiCotMuon(c == null ? null : hinhCot(window.innerWidth, window.innerHeight, mepTraiTo(), c)?.c ?? c) }
+  const hinh = hinhCot(man.w, man.h, xTo, cotMuon)
   const chat = chatMuon ?? !!hinh
   // bật / tắt tính trên giá trị MỚI NHẤT (các trình nghe phím đăng ký một lần, không được giữ `chat` cũ): chưa từng bật / tắt ⇒ lấy mặc định theo cỡ cửa sổ lúc bấm
   const setChat = (f: boolean | ((c: boolean) => boolean)): void => setChatMuon((m) => (typeof f === 'function' ? f(m ?? !!hinhCot(window.innerWidth, window.innerHeight, mepTraiTo())) : f))
@@ -240,6 +244,7 @@ export default function LopNoiThay() {
           {dang && v.luat ? <Suspense fallback={null}><LuatRoiThay luat={v.luat} ds={v.ds} onDuyet={duyetLuat} /></Suspense> : null}
         </>
       )}
+      {cot ? <KeoCot xTo={xTo} dat={datCot} /> : null}
       {cot ? <aside className="lkt-cot"><Suspense fallback={null}><CotChatThay kenh={kenh} coDinh /></Suspense></aside> : chat && !hinh ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
       {mtHien ? <Suspense fallback={null}><MayTinhThay kenh={kenh} /></Suspense> : null}
       {dang && !sanh && !chon && goiBang && goiBang.dat == null && v.luot?.pha !== 'mo' ? <Suspense fallback={null}><TinhTheCoVu coDinh khoa={`${v.luot?.so}:${goiBang.sbd}`} dem={goiBang.tiepDoi ?? KHONG_TIEP} dich={dichTheTo} /></Suspense> : null}

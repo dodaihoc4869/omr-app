@@ -7,11 +7,20 @@
 export const COT_MAN_RONG = 880, COT_MAN_CAO = 480
 export interface HinhCot { /** bề ngang cột (px) */ c: number; /** hệ số thu phần chiếu */ s: number; /** bề cao dải dưới phần chiếu (px) */ d: number }
 /** `x` = mép trái của lớp phủ tờ (thanh bên trái của app đang mở thì tờ không bắt đầu từ 0). */
-export function hinhCot(w: number, h: number, x = 0): HinhCot | null {
+/** THẦY TỰ KÉO CỠ (13/11: «cho tôi điều chỉnh kích thước được của thẻ đen chỉ thầy thấy ở dưới»): phần chiếu thu ĐỀU nên bề cao dải và bề ngang cột đi
+ *  cùng nhau (dải thấp đi ⇔ cột hẹp lại ⇔ phần chiếu to ra). `muon` = bề ngang cột thầy muốn (px, null = mặc định 20 % cửa sổ), kẹp trong
+ *  [COT_HEP, min(COT_TRAN, 40 % phần chiếu)]. Máy nhớ ở `KHOA_COT`. */
+export const COT_HEP = 168, COT_TRAN = 520, KHOA_COT = 'ddh.lk.cotRong'
+export function hinhCot(w: number, h: number, x = 0, muon: number | null = null): HinhCot | null {
   if (!(w >= COT_MAN_RONG) || !(h >= COT_MAN_CAO)) return null
-  const c = Math.round(Math.min(340, Math.max(232, w * 0.2))), rong = Math.max(1, w - x), s = (rong - c) / rong
+  const rong = Math.max(1, w - x)
+  const c = Math.round(muon != null && Number.isFinite(muon) ? Math.min(Math.max(COT_HEP, Math.min(COT_TRAN, rong * 0.4)), Math.max(COT_HEP, muon)) : Math.min(340, Math.max(232, w * 0.2))), s = (rong - c) / rong
   return { c, s, d: Math.round(h - h * s) }
 }
+/** Bề ngang cột ứng với dải cao `d` px (kéo mép trên của dải). */
+export const cotTheoDai = (w: number, h: number, x: number, d: number): number => Math.round((Math.max(1, w - x) * d) / Math.max(1, h))
+export function docCotMuon(): number | null { try { const v = Number(localStorage.getItem(KHOA_COT)); return v > 0 ? v : null } catch { return null } }
+export function ghiCotMuon(c: number | null): void { try { if (c == null) localStorage.removeItem(KHOA_COT); else localStorage.setItem(KHOA_COT, String(Math.round(c))) } catch { /* đầy / chặn */ } }
 /** Vùng phần chiếu lúc này (LopNoiThay ghi `--lkc-w` / `--lkc-s` ở gốc trang khi cột đang dựng) — máy tính nổi và các lớp bám theo phần chiếu dùng. */
 export function vungChieu(): { w: number; h: number } {
   const w = window.innerWidth, h = window.innerHeight, g = typeof document !== 'undefined' ? document.documentElement.style : null

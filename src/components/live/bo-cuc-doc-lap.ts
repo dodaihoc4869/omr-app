@@ -67,7 +67,7 @@ export interface BoCucDL {
   sG: number; sB: number
   /** Tấm giấy (đúng ô giấy của thầy đã co): lề trái trong khung + khổ. Cao hơn khung ⇒ cuộn. */
   tam: { x: number; w: number; h: number }
-  /** Ô bảng của thầy đã co: lề trái trong khung + khổ (cao hơn khung ⇒ máy em trôi theo bút). */
+  /** Ô bảng của thầy đã co: lề trái trong khung + khổ. Hai khung cạnh nhau ⇒ luôn nằm trọn khung (13/11); em tự phóng bảng ⇒ có thể cao hơn khung, máy trôi theo bút. */
   oBang: { x: number; w: number; h: number }
   /** Tâm vạch chia (px CSS) — nằm giữa khe hai khung; đang phóng kín thì không có vạch. */
   vach: number | null
@@ -84,11 +84,19 @@ export interface DauVaoDL { w: number; h: number; at: AnToan; kc: KhungChieu; ch
 export function boCucDocLap({ w, h, at, kc, chia, phong = null, dauBang = 0, vua = false }: DauVaoDL): BoCucDL {
   const A = khungDung(w, h, at), Wd = A.x1 - A.x0, H = A.y1 - A.y0, W = Math.max(1, Wd - KHE_GIUA)
   const p = kep(chia, 0.2, 0.9), trai = kc.giay.x <= kc.bang.x
-  const wG0 = Math.round(W * p), wB0 = W - wG0
-  const wG = phong === 'giay' ? Wd : wG0, wB = phong === 'bang' ? Wd : wB0
-  // dải thẻ tên chỉ lấy chỗ của khung BẢNG (không quá 1/5 chiều cao); bảng vốn co theo bề ngang nên nét không nhỏ đi, chỉ bớt phần thấy được
+  // dải thẻ tên chỉ lấy chỗ của khung BẢNG (không quá 1/5 chiều cao)
   const dau = kep(dauBang, 0, H * 0.2), HB = H - dau
-  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, vua && phong === 'bang' ? HB / kc.bang.h : Math.max(HB / kc.bang.h, S_TRAN))
+  // BẢNG CÙNG TỈ LỆ VỚI BẢNG CỦA THẦY, THẤY TRỌN (thầy 13/11: «bảng đen xanh trên màn thầy với hs phải đồng bộ tỷ lệ với nhau để viết bút hiển thị đầy đủ
+  // trên máy hs» — trước đây bảng co theo bề ngang, bảng thầy cao hơn khung máy em thì phần dưới nằm ngoài khung, chỉ thấy khi máy trôi theo bút): lúc hai
+  // khung đứng cạnh nhau, ô bảng co VỪA TRỌN khung bảng (cả ngang lẫn dọc). Khung bảng không rộng hơn mức ô bảng cần ở chiều cao ấy ⇒ phần dư trả cho GIẤY
+  // (chữ đề to hơn). Chỉ khi em tự chạm hai lần phóng bảng (buổi thường) mới còn phép co theo bề ngang + trôi theo bút.
+  // Chiều cao tính phép «vừa trọn» LUÔN trừ sẵn chỗ của dải thẻ tên (dù dải đang hiện hay không) ⇒ thầy gọi em lên bảng, thẻ tên hiện ra mà khung và
+  // nét trên bảng không nhảy cỡ.
+  const HV = H - Math.max(dau, kep(DAU_BANG, 0, H * 0.2))
+  const wBVua = Math.max(1, Math.ceil((kc.bang.w * HV) / kc.bang.h))
+  const wB0 = Math.min(W - Math.round(W * p), wBVua), wG0 = W - wB0
+  const wG = phong === 'giay' ? Wd : wG0, wB = phong === 'bang' ? Wd : wB0
+  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, phong !== 'bang' ? HV / kc.bang.h : vua ? HB / kc.bang.h : Math.max(HB / kc.bang.h, S_TRAN))
   // chỗ đứng: bình thường xếp cạnh nhau; khung đang phóng phủ cả bề ngang, khung kia đứng ngoài màn về phía của nó
   const xT = A.x0, xP = (rong: number): number => A.x1 - rong
   let xG: number, xB: number

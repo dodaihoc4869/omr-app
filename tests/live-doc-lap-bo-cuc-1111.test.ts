@@ -29,8 +29,10 @@ describe('ba mốc chia bề ngang theo nội dung', () => {
       const g = boCucDocLap({ w, h, at: KHONG, kc: KC, chia: m.giay }), b = boCucDocLap({ w, h, at: KHONG, kc: KC, chia: m.bang })
       expect(chu(g) / chuCu, ten).toBeGreaterThanOrEqual(tang)
       expect(chu(b), ten).toBeGreaterThanOrEqual(SAN_CHU - 0.05)
-      // ưu tiên bảng: phép co của bảng lớn hơn bản cũ (844: ≥ 40 %)
-      expect(b.sB / cu.s, ten).toBeGreaterThanOrEqual(w === 844 ? 1.4 : 1.05)
+      // 13/11 (thầy «bảng đen xanh trên màn thầy với hs phải đồng bộ tỷ lệ với nhau để viết bút hiển thị đầy đủ trên máy hs»): ô bảng nằm TRỌN trong khung
+      // ở mọi mốc chia (trước đây ưu tiên bảng nở ≥ 40 % nhưng phần dưới bảng nằm ngoài khung, phải chờ máy trôi theo bút); khung bảng ôm sát ô bảng
+      for (const bc of [g, b]) { expect(bc.oBang.h, ten).toBeLessThanOrEqual(bc.bang.h + 0.5); expect(bc.oBang.w, ten).toBeLessThanOrEqual(bc.bang.w + 0.5); expect(bc.bang.w - bc.oBang.w, ten).toBeLessThan(2) }
+      expect(b.sB / cu.s, ten).toBeGreaterThan(0.9)
     }
   })
   it('máy bảng / máy tính: có TRẦN — ưu tiên giấy không đẩy chữ đề quá 34 px (trừ khi mốc giữa vốn đã to hơn), bảng không phóng quá nét thật của thầy', () => {

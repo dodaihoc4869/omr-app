@@ -109,6 +109,14 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 :root[data-lk-cot] .bpu-bao-chay.nhe .bpu-roi-gon { margin-bottom: calc(var(--lkc-s) * max(74px, 10.5vh)); }
 .lkt-cot { position: fixed; right: 0; top: 0; bottom: 0; width: var(--lkc-w); pointer-events: auto; background: var(--tr-chieu-bang); box-shadow: inset 1.5px 0 0 var(--tr-chieu-mat-3); }
 .lkt-dai { position: fixed; left: var(--lkc-x, 0px); right: var(--lkc-w); bottom: 0; height: var(--lkc-h); box-sizing: border-box; display: flex; align-items: stretch; gap: 10px; padding: 10px 12px; overflow: hidden; pointer-events: auto; background: var(--tr-chieu-bang); box-shadow: inset 0 1.5px 0 var(--tr-chieu-mat-3); }
+/* TAY KÉO đổi cỡ dải / cột (KeoCot.tsx): vùng bắt 10 px vắt qua mép, một vạch mảnh ở giữa chỉ rõ lên khi rê chuột / đang kéo. */
+.lkt-keo { position: fixed; z-index: 3; pointer-events: auto; touch-action: none; display: grid; place-items: center; }
+.lkt-keo.ngang { left: var(--lkc-x, 0px); right: var(--lkc-w); bottom: calc(var(--lkc-h) - 7px); height: 10px; cursor: ns-resize; }
+.lkt-keo.doc { right: calc(var(--lkc-w) - 7px); top: 0; bottom: 0; width: 10px; cursor: ew-resize; }
+.lkt-keo i { display: block; border-radius: 99px; background: color-mix(in srgb, var(--tr-chieu-giay) 26%, transparent); transition: background 0.15s; }
+.lkt-keo.ngang i { width: 44px; height: 4px; }
+.lkt-keo.doc i { width: 4px; height: 44px; }
+.lkt-keo:hover i, .lkt-keo:active i { background: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); }
 .lkt-dai-nhan { flex: none; align-self: center; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-chieu-giay) 42%, transparent); }
 .lkt-dai-the { flex: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 104px; padding: 8px 14px; border-radius: 14px; background: var(--tr-chieu-mat); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3); }
 .lkt-dai-the small { font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-chieu-giay) 60%, transparent); }
@@ -120,3 +128,7 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 .lkt-dai .lkt-tay ul { max-height: none; }
 .lkt-dai .lr-thay { width: auto; min-width: 300px; max-width: 460px; padding: 10px 12px; }
 
+/* ẨN MỌI THANH CUỘN TRÊN MÁY THẦY SUỐT BUỔI LIVE (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): cột tin nhắn, dải chỉ thầy
+   thấy, bảng danh sách, bảng chọn bài, tấm hoạt động… vẫn cuộn bằng bánh xe / bàn di / kéo chạm. Tờ chiếu (khung riêng) tự ẩn ở live-khoi-to-chieu.ts. */
+html[data-live-khoi], html[data-live-khoi] * { scrollbar-width: none !important; }
+html[data-live-khoi]::-webkit-scrollbar, html[data-live-khoi] *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }

@@ -451,3 +451,7 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 :where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-phim button { height: 44px; min-height: 44px; font-size: 20px; }
 :where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-phim .xoa { grid-column: 4; grid-row: 1 / span 4; height: auto; font-size: 16px; }
 html.may-yeu .bpu-cau > .bpu-cot-de { -webkit-mask-image: none; mask-image: none; } /* máy yếu: không mặt nạ mờ trên khung cuộn */
+
+/* ẨN MỌI THANH CUỘN TRÊN MÀN CÂU HỎI CỦA EM (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): vẫn cuộn bằng vuốt / bánh xe. */
+.bpu-hs, .bpu-hs * { scrollbar-width: none !important; }
+.bpu-hs::-webkit-scrollbar, .bpu-hs *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }

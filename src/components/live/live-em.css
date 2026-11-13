@@ -434,3 +434,7 @@ html.may-yeu .lv-song i { transition: none; }
 .lv-nam[aria-expanded="true"] .lv-nam-cham { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .lv-tra, .lv-nam-cham.mic, .lv-tra-so output i { animation: none; } }
 
+/* ẨN MỌI THANH CUỘN TRÊN MÀN LIVE CỦA EM (thầy 13/11: «ẩn tất cả thanh cuộn trên app gv và hs nhưng vẫn cuộn được»): đề, bảng, khay, tấm trả lời vẫn cuộn
+   bằng vuốt / bánh xe; mũi tên «Thầy đang viết ở dưới ↓» vẫn báo chỗ thầy đang viết. (Các luật `scrollbar-*` cũ ở trên giữ nguyên theo luật giữ màu.) */
+.lv, .lv *, .lv-phu, .lv-phu * { scrollbar-width: none !important; }
+.lv::-webkit-scrollbar, .lv *::-webkit-scrollbar, .lv-phu::-webkit-scrollbar, .lv-phu *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
