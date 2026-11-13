@@ -92,7 +92,7 @@ describe('máy tính — nút trên tờ và chốt trong mã', () => {
     expect(CSS_LIVE_MT).not.toContain('flex-wrap')
     const khoi = doc('src/lib/live-khoi-to-chieu.ts')
     expect(khoi).toContain('${JS_LIVE_NOP}${JS_LIVE_MT}') // 13/11 sau đó còn ghép mã chấm laze (live-laze-to-chieu.ts) — SỬA CÓ CHỦ ĐÍCH
-    expect(khoi).toContain('${CSS_LIVE_MT}`')
+    expect(khoi).toContain('${CSS_LIVE_MT}') // 13/11 sau đó còn CSS chấm laze — SỬA CÓ CHỦ ĐÍCH
   })
   it('máy thầy: nút trên tờ bật / tắt, tạm cất ở bảng danh sách / bảng chọn, Esc giữ nghĩa lùi một màn; nạp lười', () => {
     const lop = doc('src/components/live-khoi/LopNoiThay.tsx'), noi = doc('src/components/live/thay-noi.ts')
