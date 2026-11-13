@@ -1,0 +1,29 @@
+[
+  {
+    "i": 408,
+    "hash": "47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad",
+    "fileNguon": "anh/47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad.png",
+    "svg": "aramid408-native-ddh-4a605646cf47482d284564dd3cb60406923eb5b7cf143eef93fa18f0cb7705f2.svg",
+    "hashSvg": "4a605646cf47482d284564dd3cb60406923eb5b7cf143eef93fa18f0cb7705f2",
+    "byteSvg": 19553,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B12-II-4",
+        "de": "Cho phương trình phản ứng tổng hợp polymer sau (hình).\nPolymer tạo thành được sử dụng làm sợi aramide, một loại sợi rất bền một phần do giữa các mạch polymer cạnh nhau có liên kết hydrogen.",
+        "refs": [
+          {
+            "hash": "47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad",
+            "where": "VIP27-C4-B12-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "06885e91a81e71c1691908085a3806979c9de88b5c9c59c65acffcffdef7239f"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "28C4O4NperdrawnUnitsEXCLbyproduct-nUNKNOWNtotal/4Ph24bareC4innerCIRCLES-NO3doublepattern/4CO2raysEACH-3explicitCWHITEgaps-1terminalbareCnativecornerLEFTwhitewedgeRIGHTcontactNOaddedcrossbar/2reactNH2-LASTN-FIRSTNanchors-2reactCl/2productN+2SEPARATEHleftDOWNmiddleUP/1SQUAREpair+nSUB-2nBASELINEcoefficients-EXACT2n HCl/1FULLFILLEDrighthead-EXACT(1)farRIGHT/ALLregularUPRIGHT/individualringvertices-circles/0stereo-conditions-charge/NOaddedH-polymername-formula-answer-alias",
+    "hashSvgDaSoat": "4a605646cf47482d284564dd3cb60406923eb5b7cf143eef93fa18f0cb7705f2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

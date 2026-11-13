@@ -1,0 +1,867 @@
+{
+  "i": 408,
+  "assetIndexProvided": 1337,
+  "hash": "47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad.png",
+  "size": [
+    1391,
+    314
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B12-II-4",
+      "de": "Cho phương trình phản ứng tổng hợp polymer sau (hình).\nPolymer tạo thành được sử dụng làm sợi aramide, một loại sợi rất bền một phần do giữa các mạch polymer cạnh nhau có liên kết hydrogen.",
+      "allHinh": [
+        {
+          "hash": "47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad",
+          "where": "VIP27-C4-B12-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "06885e91a81e71c1691908085a3806979c9de88b5c9c59c65acffcffdef7239f"
+        }
+      ],
+      "missingHashes": [
+        "47f4ea7ebae1566386483cd762f8a9bc3e8cde75f305e52e2b5e05d48a6c66ad"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/403-full3x.png",
+      "/workspace/scratch/403-react3x.png",
+      "/workspace/scratch/403-product3x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "font": "Allchem/coefficients/stepnumber regular upright serif. H2sub inNH2, productbracketnSUB; reactcoeffn and2nHCl nBASELINE. No truebold/italic.",
+    "counts": {
+      "rings": 4,
+      "innerCircles": 4,
+      "alternatingDoubleRaysInRings": 0,
+      "COdoublePairs": 4,
+      "explicitCarbonylCLabels": 3,
+      "bareCarbonylC": 1,
+      "drawnUnitCExcludingByproductAndUnknownNCoefficient": 28,
+      "drawnUnitO": 4,
+      "drawnUnitN": 4,
+      "reactantCl": 2,
+      "productExplicitSeparateH": 2,
+      "filledRightHeads": 1
+    },
+    "rings": [
+      {
+        "name": "diamine",
+        "vertices": [
+          [
+            108,
+            124
+          ],
+          [
+            146,
+            102
+          ],
+          [
+            184,
+            124
+          ],
+          [
+            184,
+            168
+          ],
+          [
+            146,
+            190
+          ],
+          [
+            108,
+            168
+          ]
+        ],
+        "innerCircle": {
+          "center": [
+            146,
+            146
+          ],
+          "radiusApprox": 26.5
+        }
+      },
+      {
+        "name": "diacidchloride",
+        "vertices": [
+          [
+            395,
+            148
+          ],
+          [
+            433,
+            127
+          ],
+          [
+            471,
+            148
+          ],
+          [
+            471,
+            192
+          ],
+          [
+            433,
+            213
+          ],
+          [
+            395,
+            192
+          ]
+        ],
+        "innerCircle": {
+          "center": [
+            433,
+            170
+          ],
+          "radiusApprox": 27
+        }
+      },
+      {
+        "name": "productLeft",
+        "vertices": [
+          [
+            742,
+            180
+          ],
+          [
+            780,
+            159
+          ],
+          [
+            818,
+            180
+          ],
+          [
+            818,
+            224
+          ],
+          [
+            780,
+            245
+          ],
+          [
+            742,
+            224
+          ]
+        ],
+        "innerCircle": {
+          "center": [
+            780,
+            202
+          ],
+          "radiusApprox": 26.5
+        }
+      },
+      {
+        "name": "productRight",
+        "vertices": [
+          [
+            925,
+            107
+          ],
+          [
+            963,
+            85
+          ],
+          [
+            1001,
+            107
+          ],
+          [
+            1001,
+            151
+          ],
+          [
+            963,
+            172
+          ],
+          [
+            925,
+            151
+          ]
+        ],
+        "innerCircle": {
+          "center": [
+            963,
+            129
+          ],
+          "radiusApprox": 27
+        }
+      }
+    ],
+    "diamine": {
+      "coefficient": {
+        "literal": "n",
+        "bboxApprox": [
+          63,
+          130,
+          80,
+          151
+        ]
+      },
+      "leftGroup": {
+        "literal": "H₂N",
+        "bboxApprox": [
+          29,
+          178,
+          80,
+          201
+        ],
+        "anchor": "LAST N near70"
+      },
+      "leftArm": [
+        [
+          84,
+          181
+        ],
+        [
+          108,
+          168
+        ]
+      ],
+      "rightGroup": {
+        "literal": "NH₂",
+        "bboxApprox": [
+          212,
+          90,
+          260,
+          115
+        ],
+        "anchor": "FIRST N near222"
+      },
+      "rightArm": [
+        [
+          184,
+          124
+        ],
+        [
+          207,
+          111
+        ]
+      ]
+    },
+    "plus": {
+      "bboxApprox": [
+        259,
+        147,
+        277,
+        165
+      ]
+    },
+    "diacidchloride": {
+      "coefficient": {
+        "literal": "n",
+        "bboxApprox": [
+          341,
+          148,
+          359,
+          169
+        ]
+      },
+      "lowerLeft": {
+        "C": {
+          "bboxApprox": [
+            349,
+            203,
+            365,
+            223
+          ]
+        },
+        "O": {
+          "bboxApprox": [
+            349,
+            249,
+            365,
+            267
+          ]
+        },
+        "Cl": {
+          "bboxApprox": [
+            298,
+            180,
+            323,
+            199
+          ],
+          "anchor": "LAST lowercase l near319"
+        },
+        "ringArm": [
+          [
+            369,
+            207
+          ],
+          [
+            395,
+            192
+          ]
+        ],
+        "ClArm": [
+          [
+            326,
+            195
+          ],
+          [
+            344,
+            206
+          ]
+        ],
+        "CO": [
+          [
+            [
+              353,
+              226
+            ],
+            [
+              353,
+              243
+            ]
+          ],
+          [
+            [
+              360,
+              226
+            ],
+            [
+              360,
+              243
+            ]
+          ]
+        ],
+        "glyphGaps": "Allrayends stopbeforeexplicitC/O glyphs; no chemicalsplitfeetjoin throughCletter."
+      },
+      "upperRight": {
+        "C": {
+          "bboxApprox": [
+            501,
+            117,
+            517,
+            136
+          ]
+        },
+        "O": {
+          "bboxApprox": [
+            501,
+            72,
+            517,
+            91
+          ]
+        },
+        "Cl": {
+          "bboxApprox": [
+            538,
+            137,
+            564,
+            157
+          ],
+          "anchor": "FIRST C near546"
+        },
+        "ringArm": [
+          [
+            471,
+            148
+          ],
+          [
+            496,
+            134
+          ]
+        ],
+        "ClArm": [
+          [
+            521,
+            134
+          ],
+          [
+            536,
+            141
+          ]
+        ],
+        "CO": [
+          [
+            [
+              505,
+              95
+            ],
+            [
+              505,
+              112
+            ]
+          ],
+          [
+            [
+              512,
+              95
+            ],
+            [
+              512,
+              112
+            ]
+          ]
+        ],
+        "glyphGaps": "RaysterminatewithwhitespacearoundexplicitC/Olabels."
+      }
+    },
+    "arrow": {
+      "shaft": [
+        [
+          568,
+          167
+        ],
+        [
+          655,
+          167
+        ]
+      ],
+      "filledHeadApprox": [
+        [
+          640,
+          162.5
+        ],
+        [
+          655,
+          167
+        ],
+        [
+          640,
+          171.5
+        ],
+        [
+          643,
+          167
+        ]
+      ],
+      "conditions": "NONE"
+    },
+    "product": {
+      "leftN": {
+        "Nbox": [
+          694,
+          236,
+          714,
+          256
+        ],
+        "Hbox": [
+          694,
+          280,
+          714,
+          300
+        ],
+        "NHsingle": [
+          [
+            704,
+            261
+          ],
+          [
+            704,
+            277
+          ]
+        ],
+        "leftCutBond": [
+          [
+            663,
+            236
+          ],
+          [
+            689,
+            242
+          ]
+        ],
+        "ringArm": [
+          [
+            719,
+            237
+          ],
+          [
+            742,
+            224
+          ]
+        ],
+        "anchor": "Nleft/rightedges separatedfromHbelow; do notwriteNHgroupinonebaseline"
+      },
+      "middleN": {
+        "Nbox": [
+          847,
+          148,
+          866,
+          168
+        ],
+        "Hbox": [
+          848,
+          105,
+          867,
+          125
+        ],
+        "NHsingle": [
+          [
+            856,
+            128
+          ],
+          [
+            856,
+            145
+          ]
+        ],
+        "leftArm": [
+          [
+            818,
+            180
+          ],
+          [
+            842,
+            168
+          ]
+        ],
+        "rightArm": [
+          [
+            872,
+            168
+          ],
+          [
+            883,
+            174
+          ]
+        ]
+      },
+      "centralCarbonyl": {
+        "Cbox": [
+          886,
+          171,
+          903,
+          191
+        ],
+        "Obox": [
+          886,
+          214,
+          903,
+          234
+        ],
+        "CO": [
+          [
+            [
+              890,
+              197
+            ],
+            [
+              890,
+              212
+            ]
+          ],
+          [
+            [
+              897,
+              197
+            ],
+            [
+              897,
+              212
+            ]
+          ]
+        ],
+        "ringArm": [
+          [
+            907,
+            169
+          ],
+          [
+            925,
+            151
+          ]
+        ],
+        "gap": "ExplicitCglyph getswhitegaptoallbondends; do notjointhroughletterbox."
+      },
+      "upperRightCarbonyl": {
+        "bareC": [
+          1032.5,
+          75.5
+        ],
+        "Obox": [
+          1024,
+          22,
+          1041,
+          40
+        ],
+        "rays": [
+          [
+            [
+              1029,
+              44
+            ],
+            [
+              1029,
+              75.5
+            ]
+          ],
+          [
+            [
+              1035,
+              44
+            ],
+            [
+              1035,
+              75.5
+            ]
+          ]
+        ],
+        "ringArm": [
+          [
+            1001,
+            107
+          ],
+          [
+            1029,
+            75.5
+          ]
+        ],
+        "rightCutArm": [
+          [
+            1035,
+            75.5
+          ],
+          [
+            1074,
+            86
+          ]
+        ],
+        "contact": "Bareapex native shortjoin contactsbothrays; NOTexplicitCglyph. Ohaswhitegapaboveraytops.",
+        "rootMainPath": [
+          [
+            1001,
+            107
+          ],
+          [
+            1029.5,
+            77
+          ],
+          [
+            1031,
+            75.5
+          ],
+          [
+            1035.5,
+            76
+          ],
+          [
+            1074,
+            86
+          ]
+        ],
+        "rootRays": [
+          [
+            [
+              1028.5,
+              44
+            ],
+            [
+              1028.5,
+              75.5
+            ]
+          ],
+          [
+            [
+              1035.5,
+              44
+            ],
+            [
+              1035.5,
+              76
+            ]
+          ]
+        ]
+      },
+      "brackets": {
+        "left": [
+          [
+            688,
+            2
+          ],
+          [
+            673,
+            2
+          ],
+          [
+            673,
+            269
+          ],
+          [
+            688,
+            269
+          ]
+        ],
+        "right": [
+          [
+            1037,
+            2
+          ],
+          [
+            1053,
+            2
+          ],
+          [
+            1053,
+            269
+          ],
+          [
+            1037,
+            269
+          ]
+        ],
+        "nsub": {
+          "literal": "n",
+          "bboxApprox": [
+            1060,
+            265,
+            1078,
+            280
+          ]
+        }
+      },
+      "byproduct": {
+        "literal": "2n HCl",
+        "bboxApprox": [
+          1150,
+          151,
+          1245,
+          177
+        ],
+        "nBaseline": true
+      },
+      "plus": {
+        "bboxApprox": [
+          1118,
+          153,
+          1136,
+          172
+        ]
+      },
+      "farRightStep": {
+        "literal": "(1)",
+        "bboxApprox": [
+          1330,
+          152,
+          1372,
+          180
+        ]
+      }
+    },
+    "noAdded": [
+      "No conditions",
+      "No HClcharge",
+      "No aromatic3doublepattern",
+      "No NH2 inproduct",
+      "No polymercoefficientliteralbeforebracket",
+      "No wholepolymerformula/numericalmoleculecount"
+    ]
+  },
+  "measurementLimits": "Nativeapprox vertices/radii/bboxes ±1–2px. Fourrings individuallyread, circlecentersnotinferredbyuniformtranslation. FULL3x viewerdownscaled, react/product3x separatelyopened. Explicitcarbonylglyphgaps separatefrombareterminalcarbonylcontact.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "nativeFull2xAcyl3xProduct3xBareCO10xOpened": true,
+    "oldAgentBareCO": {
+      "bareC": [
+        1032.5,
+        75.5
+      ],
+      "Obox": [
+        1024,
+        22,
+        1041,
+        40
+      ],
+      "rays": [
+        [
+          [
+            1029,
+            44
+          ],
+          [
+            1029,
+            75.5
+          ]
+        ],
+        [
+          [
+            1035,
+            44
+          ],
+          [
+            1035,
+            75.5
+          ]
+        ]
+      ],
+      "ringArm": [
+        [
+          1001,
+          107
+        ],
+        [
+          1029,
+          75.5
+        ]
+      ],
+      "rightCutArm": [
+        [
+          1035,
+          75.5
+        ],
+        [
+          1074,
+          86
+        ]
+      ],
+      "contact": "Bareapex native shortjoin contactsbothrays; NOTexplicitCglyph. Ohaswhitegapaboveraytops."
+    },
+    "sourcePixelRows": {
+      "75": [
+        1028,
+        1029,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036
+      ],
+      "76": [
+        1030,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036,
+        1037,
+        1038,
+        1039,
+        1040
+      ],
+      "77": [
+        1029,
+        1030,
+        1031,
+        1036,
+        1037,
+        1038,
+        1039,
+        1040
+      ]
+    },
+    "correctionBeforeBuilder": "Agent short horizontal footjoin/contact description too broad. Root keeps left vertical nativecorner/whitewedge around1029,75→1030,76 and tiny nonhorizontal apex, rightcontact. No extra horizontal crossbar or full symmetricVfoot extension. Coordinates approximate, NOT measured subpixel; source correction before firstSVG, noSVGnegative."
+  },
+  "rootActualReview": {
+    "hashSvg": "4a605646cf47482d284564dd3cb60406923eb5b7cf143eef93fa18f0cb7705f2",
+    "actualChromium3xFULLAndMacrosOpened": true,
+    "nativeCornerComparison": "Ownnative1029,75 BLACK→1030,76 BLACK; ownactual3x3087,226 gray144→3088,227 gray66. Corner adjacency withwhitewedge, not full symmetricVfeet or addedcrossbar. Pixel inspection supports ownvisualreview, not automaticacceptance/numericgate. NativeapproxNOTsubpixel.",
+    "noSvgChange": true
+  }
+}
