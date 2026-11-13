@@ -1,0 +1,29 @@
+[
+  {
+    "i": 808,
+    "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+    "fileNguon": "anh/96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6.png",
+    "svg": "tri808-native-ddh-d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7.svg",
+    "hashSvg": "d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7",
+    "byteSvg": 9678,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-49",
+        "de": "Triolein (hình 1) là loại chất béo có nhiều trong dầu thực vật như dầu oliu, dầu lạc, dầu vừng. Triolein giúp làm giảm cholesterol trong máu, giảm nguy cơ mắc các bệnh tim mạch, tăng cường hấp thụ vitamin (A, D, E và K), chống viêm, điều hoà hormone...\nCho các nhận định sau về triolein:\n(a) Chủ yếu tồn tại ở dạng đồng phân trans.\n(b) Có nhiệt độ nóng chảy thấp hơn 25 °C.\n(c) Có 6 liên kết π trong phân tử.\n(d) Dễ hoà tan các vitamin A, D, E và K.\n(e) Ở điều kiện thường, triolein là chất rắn.\nSố phát biểu không đúng là",
+        "refs": [
+          {
+            "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+            "where": "DH-12-C1-B1-P2-I-49.hinh.0.du_lieu",
+            "hashDataUrl": "0cbad471f2d1c3dc412098dda600d2a9abcd352d4189182017df3fbf891286d7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "57C6O=3bareglycerol+3individualfolded18Cacyl/3CCdouble3COdouble/3explicitmethylTOPH3C-LASTC-RIGHTandBOTTOMCH3-FIRSTC/ALLregularUPRIGHT-allthinblack/3CO2raysCONTACTrespectivearms-individualshortnativejoins/NOaddedH-CH2-name-caption-formula-stereo-arrow-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+    "hashSvgDaSoat": "d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

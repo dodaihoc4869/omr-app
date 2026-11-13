@@ -1,0 +1,670 @@
+{
+  "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+  "native": [
+    633,
+    436
+  ],
+  "questions": [
+    {
+      "qid": "DH-12-C1-B1-P2-I-49",
+      "de": "Triolein (hình 1) là loại chất béo có nhiều trong dầu thực vật như dầu oliu, dầu lạc, dầu vừng. Triolein giúp làm giảm cholesterol trong máu, giảm nguy cơ mắc các bệnh tim mạch, tăng cường hấp thụ vitamin (A, D, E và K), chống viêm, điều hoà hormone...\nCho các nhận định sau về triolein:\n(a) Chủ yếu tồn tại ở dạng đồng phân trans.\n(b) Có nhiệt độ nóng chảy thấp hơn 25 °C.\n(c) Có 6 liên kết π trong phân tử.\n(d) Dễ hoà tan các vitamin A, D, E và K.\n(e) Ở điều kiện thường, triolein là chất rắn.\nSố phát biểu không đúng là",
+      "refs": [
+        {
+          "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+          "where": "DH-12-C1-B1-P2-I-49.hinh.0.du_lieu",
+          "hashDataUrl": "0cbad471f2d1c3dc412098dda600d2a9abcd352d4189182017df3fbf891286d7"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "57C6O=3bareglycerol+3individualfolded18Cacyl/3CCdouble3COdouble/3explicitmethylTOPH3C-LASTC-RIGHTandBOTTOMCH3-FIRSTC/ALLregularUPRIGHT-allthinblack/3CO2raysCONTACTrespectivearms-individualshortnativejoins/NOaddedH-CH2-name-caption-formula-stereo-arrow-answer-alias/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+  "rootSourceAudit": "Root OWNnativeFULL3x/EACHcarbonyl10x/allpublicde; independentindividualvertices, no chemistry normalization. FeetCALCULATEDfromapproxnativearms NOTnativeSubpixel.",
+  "independentSourceAudit": {
+    "i": 808,
+    "assetIndexProvided": 1150,
+    "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6.png",
+    "size": [
+      633,
+      436
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-49",
+        "de": "Triolein (hình 1) là loại chất béo có nhiều trong dầu thực vật như dầu oliu, dầu lạc, dầu vừng. Triolein giúp làm giảm cholesterol trong máu, giảm nguy cơ mắc các bệnh tim mạch, tăng cường hấp thụ vitamin (A, D, E và K), chống viêm, điều hoà hormone...\nCho các nhận định sau về triolein:\n(a) Chủ yếu tồn tại ở dạng đồng phân trans.\n(b) Có nhiệt độ nóng chảy thấp hơn 25 °C.\n(c) Có 6 liên kết π trong phân tử.\n(d) Dễ hoà tan các vitamin A, D, E và K.\n(e) Ở điều kiện thường, triolein là chất rắn.\nSố phát biểu không đúng là",
+        "allHinh": [
+          {
+            "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+            "where": "DH-12-C1-B1-P2-I-49.hinh.0.du_lieu",
+            "hashDataUrl": "0cbad471f2d1c3dc412098dda600d2a9abcd352d4189182017df3fbf891286d7"
+          }
+        ],
+        "missingHashes": [
+          "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/412-full2x.png",
+        "/workspace/scratch/412-co110x.png",
+        "/workspace/scratch/412-co210x.png",
+        "/workspace/scratch/412-co310x.png",
+        "/workspace/scratch/412-cc18x.png",
+        "/workspace/scratch/412-cc28x.png",
+        "/workspace/scratch/412-cc38x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "topBareAcylC": 17,
+        "rightBareAcylC": 17,
+        "bottomBareAcylC": 17,
+        "explicitTerminalMethylC": 3,
+        "eachAcylC": 18,
+        "glycerolC": 3,
+        "totalC": 57,
+        "O": 6,
+        "CCdouble": 3,
+        "COdouble": 3,
+        "stereoWedges": 0
+      },
+      "font": "Allregularuprightsans O/H3C/CH3. No caption/charge/truebold. Methyl3SUB.",
+      "topAcyl": {
+        "orderedBareVerticesFromCO": [
+          [
+            243,
+            107
+          ],
+          [
+            212,
+            124
+          ],
+          [
+            182,
+            107
+          ],
+          [
+            152,
+            124
+          ],
+          [
+            122,
+            107
+          ],
+          [
+            93,
+            124
+          ],
+          [
+            62,
+            107
+          ],
+          [
+            32,
+            124
+          ],
+          [
+            3,
+            107
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            32,
+            55
+          ],
+          [
+            62,
+            72
+          ],
+          [
+            93,
+            55
+          ],
+          [
+            122,
+            72
+          ],
+          [
+            152,
+            55
+          ],
+          [
+            152,
+            20
+          ],
+          [
+            122,
+            3
+          ]
+        ],
+        "terminalLabel": {
+          "literal": "H₃C",
+          "bbox": [
+            59,
+            12,
+            99,
+            32
+          ],
+          "anchor": "LAST C near91",
+          "bond": [
+            [
+              122,
+              3
+            ],
+            [
+              99,
+              17
+            ]
+          ]
+        },
+        "CCdouble": {
+          "main": [
+            [
+              3,
+              107
+            ],
+            [
+              3,
+              72
+            ]
+          ],
+          "innerRay": [
+            [
+              8,
+              103
+            ],
+            [
+              8,
+              75
+            ]
+          ],
+          "footInterpretation": "Innerparallelfloatingends, preservewhitegapsnotjoincrossbars."
+        },
+        "CO": {
+          "rays": [
+            [
+              [
+                239.5,
+                82
+              ],
+              [
+                239.5,
+                108.5
+              ]
+            ],
+            [
+              [
+                245,
+                82
+              ],
+              [
+                245,
+                108.5
+              ]
+            ]
+          ],
+          "OcarbonylBox": [
+            235,
+            64,
+            251,
+            80
+          ],
+          "contact": "Eachfoot contactsownincomingchain/outgoingesterarm aroundbareC243,107; native smallarch/horizontaljoin, no whitegap."
+        },
+        "esterO": {
+          "bbox": [
+            265,
+            116,
+            281,
+            132
+          ],
+          "armFromCO": [
+            [
+              245,
+              108.5
+            ],
+            [
+              263,
+              119
+            ]
+          ],
+          "armToGlycerol": [
+            [
+              281,
+              119
+            ],
+            [
+              302,
+              106
+            ]
+          ]
+        }
+      },
+      "rightAcyl": {
+        "orderedBareVerticesFromCO": [
+          [
+            390,
+            123
+          ],
+          [
+            420,
+            106
+          ],
+          [
+            450,
+            123
+          ],
+          [
+            480,
+            106
+          ],
+          [
+            510,
+            123
+          ],
+          [
+            540,
+            106
+          ],
+          [
+            570,
+            123
+          ],
+          [
+            600,
+            106
+          ],
+          [
+            630,
+            123
+          ],
+          [
+            630,
+            158
+          ],
+          [
+            600,
+            175
+          ],
+          [
+            570,
+            158
+          ],
+          [
+            540,
+            175
+          ],
+          [
+            510,
+            158
+          ],
+          [
+            480,
+            175
+          ],
+          [
+            480,
+            209
+          ],
+          [
+            510,
+            226
+          ]
+        ],
+        "terminalLabel": {
+          "literal": "CH₃",
+          "bbox": [
+            533,
+            201,
+            573,
+            222
+          ],
+          "anchor": "FIRST C near541",
+          "bond": [
+            [
+              510,
+              226
+            ],
+            [
+              532,
+              213
+            ]
+          ]
+        },
+        "CCdouble": {
+          "main": [
+            [
+              630,
+              123
+            ],
+            [
+              630,
+              158
+            ]
+          ],
+          "innerRay": [
+            [
+              624.5,
+              126
+            ],
+            [
+              624.5,
+              154
+            ]
+          ],
+          "footInterpretation": "Innerparallelfloatsinsidefold, no addedendbridges."
+        },
+        "CO": {
+          "rays": [
+            [
+              [
+                387.5,
+                123
+              ],
+              [
+                387.5,
+                147.5
+              ]
+            ],
+            [
+              [
+                393,
+                123
+              ],
+              [
+                393,
+                147.5
+              ]
+            ]
+          ],
+          "OcarbonylBox": [
+            384,
+            150,
+            399,
+            165
+          ],
+          "contact": "Upperfeet eachcontactincomingOarm/rightchainarm, source smallVjoin. No fullwhitegap."
+        },
+        "esterO": {
+          "bbox": [
+            354,
+            97,
+            370,
+            114
+          ],
+          "armToCO": [
+            [
+              372,
+              111
+            ],
+            [
+              387.5,
+              123
+            ]
+          ],
+          "armFromGlycerol": [
+            [
+              331,
+              123
+            ],
+            [
+              351,
+              111
+            ]
+          ]
+        }
+      },
+      "bottomAcyl": {
+        "orderedBareVerticesFromCO": [
+          [
+            302,
+            208
+          ],
+          [
+            333,
+            226
+          ],
+          [
+            333,
+            261
+          ],
+          [
+            363,
+            278
+          ],
+          [
+            363,
+            312
+          ],
+          [
+            394,
+            329
+          ],
+          [
+            394,
+            364
+          ],
+          [
+            424,
+            381
+          ],
+          [
+            424,
+            415
+          ],
+          [
+            394,
+            432
+          ],
+          [
+            365,
+            415
+          ],
+          [
+            365,
+            381
+          ],
+          [
+            334,
+            364
+          ],
+          [
+            334,
+            330
+          ],
+          [
+            304,
+            313
+          ],
+          [
+            275,
+            330
+          ],
+          [
+            275,
+            365
+          ]
+        ],
+        "terminalLabel": {
+          "literal": "CH₃",
+          "bbox": [
+            297,
+            374,
+            337,
+            395
+          ],
+          "anchor": "FIRST C near305",
+          "bond": [
+            [
+              275,
+              365
+            ],
+            [
+              296,
+              377
+            ]
+          ]
+        },
+        "CCdouble": {
+          "main": [
+            [
+              424,
+              415
+            ],
+            [
+              394,
+              432
+            ]
+          ],
+          "innerRay": [
+            [
+              419.5,
+              412
+            ],
+            [
+              395.5,
+              426.5
+            ]
+          ],
+          "footInterpretation": "Upperinnerfloatingraybetweenfoldarms, no extraC."
+        },
+        "CO": {
+          "rays": [
+            [
+              [
+                280,
+                220.5
+              ],
+              [
+                300.5,
+                207
+              ]
+            ],
+            [
+              [
+                283.5,
+                225
+              ],
+              [
+                304.5,
+                211
+              ]
+            ]
+          ],
+          "OcarbonylBox": [
+            266,
+            219,
+            281,
+            235
+          ],
+          "contact": "Upper-rightfoot contactsverticalesterOstem near300.5,207, lower-rightfoot contactsoutgoingchainarm304.5,211. Own10x distinctpositions; noforcedsymmetricV/gap."
+        },
+        "esterO": {
+          "bbox": [
+            295,
+            167,
+            311,
+            183
+          ],
+          "stem": [
+            [
+              302,
+              186
+            ],
+            [
+              302,
+              208
+            ]
+          ]
+        }
+      },
+      "glycerol": {
+        "bareVertices": [
+          [
+            302,
+            106
+          ],
+          [
+            331,
+            123
+          ],
+          [
+            331,
+            158
+          ]
+        ],
+        "C1C2": [
+          [
+            302,
+            106
+          ],
+          [
+            331,
+            123
+          ]
+        ],
+        "C2C3": [
+          [
+            331,
+            123
+          ],
+          [
+            331,
+            158
+          ]
+        ],
+        "bottomOArm": [
+          [
+            331,
+            158
+          ],
+          [
+            311,
+            170
+          ]
+        ],
+        "warning": "No explicitCH2/CHlabels on3bareglycerolvertices."
+      },
+      "crop": "LeftCCmainx3 andrightCCx630closeedgesbutinside633; bottomvertex394432inside436. Do not addmargins/completeextraoutsideC.",
+      "noAdded": [
+        "No caption Hình1",
+        "No molecularformula",
+        "No atomnumbers",
+        "No E/Ztext",
+        "No branchesfromknowntrioleinname",
+        "No stereohashes"
+      ]
+    },
+    "measurementLimits": "Eachfoldedchain orderedindependently fromnative, ±1–2px. EachCOown10x andCCown8x inspected. Counts17bare+1printedmethyl each, notinferredfromname. NoSVGreview.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull3x": true,
+    "eachNativeCO10x": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": true,
+    "eachActualCO10x": true,
+    "individualFoldedChains57C6O": true,
+    "threeCCthreeCOContact": true,
+    "H3ClastCCH3firstC": true,
+    "noAddedHCaptionStereoAnswers": true,
+    "feetCalculatedFromApproxArmsNotNativeSubpixel": true,
+    "sourceVsBuilderApprox": "Independent source guides refer ±1–2px native centers; builder own vertices retained individually, COfeet calculated from builderapproxarms. No automatic pixelgate.",
+    "finalHash": "d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7",
+    "freshActualBottomCC10x": true,
+    "verdict": "Đạt root + readonly freshFULL3x/eachCO-chain-CC-methylmacros/exactSHA"
+  }
+}

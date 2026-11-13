@@ -1,0 +1,24 @@
+[
+  {
+    "i": 808,
+    "hashSvg": "d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất và fresh Chromium3x FULL, macro từng3CO/3chain-CC/methyl. Đếm57C6O: từng acyl18C riêng gấp khúc +3bareglycerol; ba CCdouble đúng hướng/vị trí, 3COsplitrays tiếp xúc hai arm tương ứng, bottom có shortjoin đúng nguồn không thêm crossbar. Ba methyl topH₃C-lastC/right-bottomCH₃-firstC, sáu O regular upright và khe glyph sạch. Nét allthin/không stereo, không thêm H-CH₂text/caption/answer; không tràn/cắt nguồn mới. Actual runtimeSHApre/post khớp.",
+    "render": "/workspace/scratch/soat412-808-fresh.png",
+    "macro": [
+      "/workspace/scratch/tri808-COtop.png",
+      "/workspace/scratch/tri808-COmid.png",
+      "/workspace/scratch/tri808-CObottom.png",
+      "/workspace/scratch/tri808-left.png",
+      "/workspace/scratch/tri808-right.png",
+      "/workspace/scratch/tri808-bottom.png"
+    ],
+    "hash": "96077242a5b599e99fa7833695079323674709387e63a92869e1488044fdd8b6",
+    "hashSvgDaSoat": "d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7",
+    "runtimeProof": {
+      "file": "/workspace/scratch/tri808-runtime.log",
+      "sha256": "433f97cb8022f8da53b89616d4ea6baa54948a057cd1ca13a4ff181f0df3b711",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/tri808-native-ddh-d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7.svg d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7\n808 { x: 0, y: 0, width: 633, height: 436 }\n\nPOSTSHOT_SHA d3c0daed03b4b1af20d2feeaaf53cace8059da20ae0fa09a57f9f62723bff5f7\nCOMMAND node /workspace/scratch/agent-render412.cjs\nCONTEXT DH-12-C1-B1-P2-I-49.hinh.0.du_lieu; public de and only ref, no answers.\n"
+    }
+  }
+]
