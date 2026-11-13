@@ -7,6 +7,8 @@ import { cleanup, fireEvent, render } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import KhungXemPhieu from '../src/components/KhungXemPhieu'
+import { themCssMayYeu } from '../src/lib/may-yeu'
+// SỬA CÓ CHỦ ĐÍCH 13/11 (thầy «Ẩn thanh cuộn mọi lúc mọi chỗ»): khung nhúng nhận HTML đã qua `themCssMayYeu` — thêm ĐÚNG một thẻ ẩn thanh cuộn, phần còn lại nguyên văn
 import { ThanhTren } from '../src/components/m3'
 import { CSS_PHIEU_M3, dungPhieu } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
@@ -45,7 +47,7 @@ describe('ngoài M3 (đường giáo viên, tờ máy chiếu): khung ra ĐÚNG 
       expect(nut[0].getAttribute('title')).toBe('Đóng (Esc, hoặc vuốt quay lại)')
       expect(goc_().querySelectorAll('button')).toHaveLength(1)
       expect(khungFrame().getAttribute('style')).toContain('background: var(--p-giay)')
-      expect(khungFrame().getAttribute('srcdoc')).toBe('<p>x</p>')
+      expect(khungFrame().getAttribute('srcdoc')).toBe(themCssMayYeu('<p>x</p>'))
       expect(khungFrame().getAttribute('allow')).toBe('fullscreen')
     })
   }
@@ -97,7 +99,7 @@ describe('cổng học sinh / phụ huynh (dungM3()): khung mặc M3 — một t
     render(<KhungXemPhieu html="<p>x</p>" ten="Đề em vừa làm" dong={() => {}} />)
     expect(khungFrame().getAttribute('style')).toContain('background: var(--m3-surface)')
     expect(khungFrame().getAttribute('style')).not.toContain('--p-giay')
-    expect(khungFrame().getAttribute('srcdoc')).toBe('<p>x</p>')
+    expect(khungFrame().getAttribute('srcdoc')).toBe(themCssMayYeu('<p>x</p>'))
     expect(khungFrame().getAttribute('allow')).toBe('fullscreen')
     cleanup()
     render(<KhungXemPhieu src="https://may.test/bao-cao#m1" ten="Báo cáo phụ huynh sẽ thấy" dong={() => {}} />)
@@ -126,7 +128,7 @@ describe('cổng học sinh / phụ huynh (dungM3()): khung mặc M3 — một t
     const html = dungPhieu({ hoTen: 'Minh', sbd: '12001', ngay: new Date(2026, 8, 19), tenChuyenDe: 'Este', ketQua: '', hienDapAn: true }, cau, { nop: { ma: 'abcd1234ef', sbd: '12001', url: 'https://may.test/exec' } })
     expect(html).toContain('id="gd-tren"')
     render(<KhungXemPhieu html={html} ten="Đề em vừa làm" dong={() => {}} />)
-    expect(khungFrame().getAttribute('srcdoc')).toBe(html)
+    expect(khungFrame().getAttribute('srcdoc')).toBe(themCssMayYeu(html))
     expect(goc_().querySelectorAll('button[aria-label="Đóng"]')).toHaveLength(1)
   })
 })
