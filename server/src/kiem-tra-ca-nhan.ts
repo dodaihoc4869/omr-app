@@ -18,7 +18,8 @@ import { ketQuaTungY } from './omni-game'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { sqlTenLopHs } from './goi-bai-7'
-import { lamLaiChangKt, SQL_QUYEN_LAM_LAI, quyenTuDong, quyenConDung } from './kiem-tra-ca-nhan-lam-lai'
+import { lamLaiChangKt, SQL_QUYEN_LAM_LAI, quyenTuDong, quyenConDung, SQL_CHANG_KEM_MO_LAI, ID_LAM_LAI_KT, KT_HOM_NAY } from './kiem-tra-ca-nhan-lam-lai'
+export { SQL_CHANG_KEM_MO_LAI }
 import { henHalfLife, type MoHinhHalfLife } from './half-life'
 import { dongGoiDe2026 } from './kiem-tra-ca-nhan-chu-ky'
 import { nguonTuongDuongKt } from './kiem-tra-ca-nhan-nguon'
@@ -81,9 +82,6 @@ const TU_DOC_KT_CN = `FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND
 const SQL_DOC_KT_CN_DU = `SELECT k.* ${TU_DOC_KT_CN}`
 /** 12/11 (H3, đo 24h: 36.863 lượt × ~228 hàng): CHỌN dòng trước (cùng điều kiện, cùng thứ tự — (sbd, ngay) là khoá duy nhất nên không có hoà), RỒI mới tính các
  *  cột nặng (số tính sẵn + đếm "đã trả lời" + chặng đã chốt) cho ĐÚNG dòng đó. Trước: SQLite tính cột cho MỌI lịch từ hôm nay của em rồi mới xếp lấy một. Tham số y hệt. */
-/** 13/11 (thầy cho làm lại chặng): em có quyền làm lại còn hạn, chưa dùng, và HÔM NAY không có bài kiểm tra ⇒ sảnh trỏ vào bài có quyền (bài cũ đã nộp) — một câu, dò khoá chính. */
-const ID_LAM_LAI_KT = `(SELECT l.bai_id FROM kiem_tra_ca_nhan_lam_lai l WHERE l.bai_id>='ktcn:'||?1||':' AND l.bai_id<'ktcn:'||?1||';' AND l.dung_luc IS NULL AND l.het_luc>?3 AND (l.bat_dau IS NULL OR l.han>?3) ORDER BY l.bai_id LIMIT 1)`
-const KT_HOM_NAY = `EXISTS(SELECT 1 FROM kiem_tra_ca_nhan t WHERE t.sbd=?1 AND t.ngay=?2 AND t.trang_thai<>'cho_nguon')`
 export const sqlDocKtCnMeta = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT},(SELECT json_group_array(l.stt) FROM kiem_tra_ca_nhan_lam_lai l WHERE l.bai_id=k.id AND l.dung_luc IS NULL AND l.het_luc>?3 AND (l.bat_dau IS NULL OR l.han>?3)) AS lam_lai FROM kiem_tra_ca_nhan k WHERE k.id=CASE WHEN ${KT_HOM_NAY} THEN (SELECT k.id ${TU_DOC_KT_CN}) ELSE COALESCE(${ID_LAM_LAI_KT},(SELECT k.id ${TU_DOC_KT_CN})) END`
 /** Câu 12/11 (trước quyền làm lại) — chỉ để test và đường lùi khi bảng quyền chưa có. */
 export const sqlDocKtCnMeta1211 = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} FROM kiem_tra_ca_nhan k WHERE k.id=(SELECT k.id ${TU_DOC_KT_CN})`
@@ -310,7 +308,6 @@ export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
 
 /** 13/11: chặng mở lại được (một lần) — đã HẾT GIỜ (không phải em bấm nộp sớm: chốt_lúc trống hoặc = hạn), em CHƯA TRẢ LỜI câu nào, chưa mở lại lần nào
  *  (`mo_lai` = 1 khi đã có dòng kiem_tra_ca_nhan_mo_lai), còn ≥ 1 phút tới hạn bài. Bài đã nộp: nơi gọi tự loại. */
-export const SQL_CHANG_KEM_MO_LAI = 'SELECT c.*,EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_mo_lai m WHERE m.bai_id=c.bai_id AND m.stt=c.stt) AS mo_lai FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=?'
 export function moLaiDuoc(cr: Row, qids: readonly string[], t: Record<string, unknown>, phanQ: ReadonlyMap<string, string>, hanBai: number, now: number): boolean {
   const han = Number(cr.han)
   if (Number(cr.mo_lai) || !(now >= han) || (cr.chot_luc != null && Number(cr.chot_luc) < han) || now + 60_000 >= hanBai) return false

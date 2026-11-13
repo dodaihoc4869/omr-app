@@ -79,3 +79,10 @@ export async function lamLaiChangKt(env: Env, sbd: string, action: string, b: Ro
   const r2 = await p.docBai(env, sbd, s(r.id))
   return { ok: true, kiemTra: p.tomTatKt(r2, now), revision: Number(r2.revision), daLuu, daChot: false }
 }
+
+// ── Câu SQL dùng ở kiem-tra-ca-nhan.ts (dời sang đây 13/11 — cổng cỡ tệp) ──
+/** 13/11 (mở lại chặng hết giờ khi vắng): chặng kèm cờ «đã mở lại». */
+export const SQL_CHANG_KEM_MO_LAI = 'SELECT c.*,EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_mo_lai m WHERE m.bai_id=c.bai_id AND m.stt=c.stt) AS mo_lai FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=?'
+/** 13/11 (thầy cho làm lại chặng): em có quyền làm lại còn hạn, chưa dùng, và HÔM NAY không có bài kiểm tra ⇒ sảnh trỏ vào bài có quyền (bài cũ đã nộp) — một câu, dò khoá chính. */
+export const ID_LAM_LAI_KT = `(SELECT l.bai_id FROM kiem_tra_ca_nhan_lam_lai l WHERE l.bai_id>='ktcn:'||?1||':' AND l.bai_id<'ktcn:'||?1||';' AND l.dung_luc IS NULL AND l.het_luc>?3 AND (l.bat_dau IS NULL OR l.han>?3) ORDER BY l.bai_id LIMIT 1)`
+export const KT_HOM_NAY = `EXISTS(SELECT 1 FROM kiem_tra_ca_nhan t WHERE t.sbd=?1 AND t.ngay=?2 AND t.trang_thai<>'cho_nguon')`
