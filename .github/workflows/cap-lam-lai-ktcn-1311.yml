@@ -1,0 +1,42 @@
+# CẤP QUYỀN LÀM LẠI CHẶNG KIỂM TRA ÔN TẬP (13/11 — thầy: «Cho 20 em làm lại chặng bị khoá»). Chạy tay.
+# Luật (như lượt đếm soi-ngay-kt-1311: 20 em · 21 bài · 22 chặng): bài ngày 01–12/11 đã chốt (nop_luc có), chặng HẾT GIỜ (chot_luc trống hoặc ≥ hạn chặng)
+# mà em CHƯA TRẢ LỜI câu nào. Quyền hết hạn cuối ngày 15/11 (giờ VN). `ghi=khong` (mặc định) chỉ ĐẾM; `ghi=co` ghi INSERT OR IGNORE (chạy lại không nhân đôi).
+# Chỉ in số đếm — không in mã / tên em. Không sửa điểm, không sửa bài: điểm chỉ tính lại khi em làm lại chặng.
+name: Cấp quyền làm lại chặng kiểm tra (13/11)
+on:
+  workflow_dispatch:
+    inputs:
+      ghi:
+        description: 'co = ghi quyền; khong = chỉ đếm'
+        default: 'khong'
+permissions:
+  contents: read
+concurrency:
+  group: cap-lam-lai-ktcn
+  cancel-in-progress: false
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm / cấp quyền
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          GHI: ${{ inputs.ghi }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>&1 | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s.slice(s.indexOf('[')));const r=(Array.isArray(j)?j:[j]).flatMap(x=>x.results??[]);for(const x of r)console.log(JSON.stringify(x));const m=(Array.isArray(j)?j:[j]).map(x=>x.meta?.changes).filter(x=>x!=null);if(m.length)console.log('changes',JSON.stringify(m))}catch{console.log('(lỗi)',s.slice(-400))}})"; sleep 2; }
+          HET=$(node -e "console.log(Date.parse('2026-11-16T00:00:00+07:00'))")
+          TRA="trim(COALESCE(json_extract(k.tra_json,'\$.\"'||q.value||'\"'),''))"
+          CH="SELECT k.id bai,c.stt FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.ngay BETWEEN '2026-11-01' AND '2026-11-12' AND k.nop_luc IS NOT NULL AND (c.chot_luc IS NULL OR c.chot_luc>=c.han) AND NOT EXISTS(SELECT 1 FROM json_each(json_extract(k.json,'\$.chang['||c.stt||'].qids')) q WHERE $TRA<>'' AND instr($TRA,'_')=0 AND (length($TRA)<>4 OR $TRA GLOB '[DS][DS][DS][DS]' OR $TRA NOT GLOB '*[DS_]*'))"
+          q "Ứng viên (bài · em · chặng)" "SELECT COUNT(DISTINCT bai) so_bai,COUNT(DISTINCT substr(bai,1,instr(substr(bai,6),':')+4)) so_em,COUNT(*) so_chang FROM ($CH)"
+          if [ "$GHI" = "co" ]; then
+            q "Ghi quyền" "INSERT OR IGNORE INTO kiem_tra_ca_nhan_lam_lai(bai_id,stt,cap_luc,het_luc) SELECT bai,stt,CAST(strftime('%s','now') AS INTEGER)*1000,$HET FROM ($CH)"
+          fi
+          q "Quyền hiện có (tổng · chưa dùng · đang chạy · đã dùng)" "SELECT COUNT(*) tong,SUM(bat_dau IS NULL) chua_mo,SUM(bat_dau IS NOT NULL AND dung_luc IS NULL) dang,SUM(dung_luc IS NOT NULL) da_dung,MIN(het_luc) het FROM kiem_tra_ca_nhan_lam_lai"
