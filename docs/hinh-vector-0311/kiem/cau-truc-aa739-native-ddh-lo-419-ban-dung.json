@@ -1,0 +1,29 @@
+[
+  {
+    "i": 739,
+    "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+    "fileNguon": "anh/89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280.png",
+    "svg": "aa739-native-ddh-934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74.svg",
+    "hashSvg": "934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74",
+    "byteSvg": 39357,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B9-II-4",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly.\nCho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+        "refs": [
+          {
+            "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+            "where": "VIP27-C3-B9-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "7235cae3860dcc02b145613cefb293eebb0e8290fa3529fbd4cb5a87bcb46b6c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3AA13C8O6N/4CO1CNdouble-3CO1CNshortnativeARCHjoins-GlyCO2splitfeetCONTACTrespectivearms/4NH2-1imineNH-1bridgeNplusHSEPARATE-NONHstroke/4OH/ALLchemical4nums3captionsregularUPRIGHT/EXACTArginine (Arg)-Glutamic acid (Glu)-Glycine (Gly)/7BOTTOMtinyCROPUNKNOWNretain-NOrestore/0charge-stereo-arrows/NOaddedH-N-answer-alias7111022/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+    "hashSvgDaSoat": "934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

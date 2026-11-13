@@ -1,0 +1,25 @@
+[
+  {
+    "i": 739,
+    "hashSvg": "934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref, fresh Chromium3x FULL và macro riêng3AA/CO-CN/captions/crop. 13C8O6N, 4CO1CNdouble; 3CO1CN shortarchedjoins giữ source, GlyCO hai splitfeet tiếp xúc respectivearms không detached. 4NH₂/imineNH/bridgeN và HSEPARATE không thêm stroke/4OH đúng vị trí. Các neo N/HO/OH/glyphgaps sạch, bốn nums và ba caption EXACTArginine (Arg)/Glutamic acid (Glu)/Glycine (Gly) allregularupright. Giữ 7bottomtinyunknownfragments không restore; không thêm H/charge/stereo/answer. ActualruntimeSHApre/post khớp, không carry initial a8fec.",
+    "render": "/workspace/scratch/soat419-739-fresh.png",
+    "macro": [
+      "/workspace/scratch/aa739-Arg.png",
+      "/workspace/scratch/aa739-Glu.png",
+      "/workspace/scratch/aa739-Gly.png",
+      "/workspace/scratch/aa739-CN.png",
+      "/workspace/scratch/aa739-COarg.png",
+      "/workspace/scratch/aa739-COglu.png",
+      "/workspace/scratch/aa739-COgly.png",
+      "/workspace/scratch/aa739-crop.png"
+    ],
+    "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+    "hashSvgDaSoat": "934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74",
+    "runtimeExactHashProof": {
+      "sha256": "8f77d08caf88b3867c2f155748826fee12b1c27aaf7fc6f2ff26b1f41f4547a2",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/aa739-native-ddh-934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74.svg 934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74\n739 { x: 0, y: 0, width: 979, height: 211 }\n\nPOSTSHOT_SHA 934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74\nCOMMAND node /workspace/scratch/agent-render419.cjs\nCONTEXT VIP27-C3-B9-II-4.hinh.0.du_lieu; public de/one ref only, no answers.\n"
+    }
+  }
+]

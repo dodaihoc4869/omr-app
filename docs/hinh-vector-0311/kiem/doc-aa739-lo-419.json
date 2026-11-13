@@ -1,0 +1,658 @@
+{
+  "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+  "native": [
+    979,
+    211
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C3-B9-II-4",
+      "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly.\nCho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+      "refs": [
+        {
+          "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+          "where": "VIP27-C3-B9-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "7235cae3860dcc02b145613cefb293eebb0e8290fa3529fbd4cb5a87bcb46b6c"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "3AA13C8O6N/4CO1CNdouble-3CO1CNshortnativeARCHjoins-GlyCO2splitfeetCONTACTrespectivearms/4NH2-1imineNH-1bridgeNplusHSEPARATE-NONHstroke/4OH/ALLchemical4nums3captionsregularUPRIGHT/EXACTArginine (Arg)-Glutamic acid (Glu)-Glycine (Gly)/7BOTTOMtinyCROPUNKNOWNretain-NOrestore/0charge-stereo-arrows/NOaddedH-N-answer-alias7111022/nativeapproxNOTsubpixel-COfeetCALCULATEDfromapproxarms",
+  "rootSourceAudit": "Root OWNnativeFULL3x/LEFT-RIGHT4x/BOTTOM4x/allpublicde. Independent13C8O6N count. FourNH2, NHimine, bridgeN+H separate; noaddedN-Hstroke. ALLregularupright. SevenBOTTOMcroppedunknownretain. COfeetcalculatedfromapproxarms, notnativeSubpixel.",
+  "independentSourceAudit": {
+    "i": 739,
+    "assetIndexProvided": 1341,
+    "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280.png",
+    "size": [
+      979,
+      211
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C3-B9-II-4",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly.\nCho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+        "allHinh": [
+          {
+            "hash": "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280",
+            "where": "VIP27-C3-B9-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "7235cae3860dcc02b145613cefb293eebb0e8290fa3529fbd4cb5a87bcb46b6c"
+          }
+        ],
+        "missingHashes": [
+          "89a253ea4f51ccff306b97e528548c359ac113ffe84f670401bb365e57fe2280"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/419-full3x.png",
+        "/workspace/scratch/419-Arg3x.png",
+        "/workspace/scratch/419-Glu3x.png",
+        "/workspace/scratch/419-Gly3x.png",
+        "/workspace/scratch/419-bottom2x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "Arg": {
+          "C": 6,
+          "N": 4,
+          "O": 2
+        },
+        "Glu": {
+          "C": 5,
+          "N": 1,
+          "O": 4
+        },
+        "Gly": {
+          "C": 2,
+          "N": 1,
+          "O": 2
+        },
+        "totalC": 13,
+        "totalN": 6,
+        "totalO": 8,
+        "explicitHgrouptotal": 14,
+        "COdouble": 4,
+        "CNdouble": 1,
+        "numberLabels": 4
+      },
+      "font": "Allregularuprightsans includingatomlabels/captions/parenthesizednumbers, no actualbold/italic. Chemical2SUB.",
+      "Arg": {
+        "guanidineBareC": [
+          85.5,
+          62
+        ],
+        "NHtop": {
+          "literal": "NH",
+          "bbox": [
+            74,
+            6,
+            118,
+            30
+          ],
+          "CNrays": [
+            [
+              [
+                81.5,
+                33
+              ],
+              [
+                81.5,
+                63
+              ]
+            ],
+            [
+              [
+                89,
+                33
+              ],
+              [
+                89,
+                63
+              ]
+            ]
+          ],
+          "anchor": "FIRST N, notH"
+        },
+        "leftH2N": {
+          "literal": "H₂N",
+          "bbox": [
+            4,
+            73,
+            59,
+            96
+          ],
+          "arm": [
+            [
+              63,
+              74
+            ],
+            [
+              81.5,
+              63
+            ]
+          ],
+          "anchor": "LAST N"
+        },
+        "bridgeN": {
+          "Nbox": [
+            113,
+            73,
+            133,
+            96
+          ],
+          "Hbox": [
+            113,
+            98,
+            133,
+            121
+          ],
+          "leftArm": [
+            [
+              89,
+              63
+            ],
+            [
+              109,
+              75
+            ]
+          ],
+          "rightArm": [
+            [
+              137,
+              75
+            ],
+            [
+              159,
+              62
+            ]
+          ],
+          "noNHbond": true,
+          "warning": "NaboveHseparate, no vertical N-Hstrokein source."
+        },
+        "chainVertices": [
+          [
+            159,
+            62
+          ],
+          [
+            198,
+            83
+          ],
+          [
+            235,
+            62
+          ],
+          [
+            273,
+            83
+          ],
+          [
+            310,
+            62
+          ]
+        ],
+        "alphaNH2": {
+          "literal": "NH₂",
+          "bbox": [
+            262,
+            118,
+            319,
+            143
+          ],
+          "stem": [
+            [
+              273,
+              83
+            ],
+            [
+              273,
+              113
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "CO": {
+          "rays": [
+            [
+              [
+                306.5,
+                33
+              ],
+              [
+                306.5,
+                63
+              ]
+            ],
+            [
+              [
+                314,
+                33
+              ],
+              [
+                314,
+                63
+              ]
+            ]
+          ],
+          "OBox": [
+            298,
+            6,
+            322,
+            30
+          ],
+          "OHBox": [
+            338,
+            74,
+            379,
+            96
+          ],
+          "armOH": [
+            [
+              314,
+              63
+            ],
+            [
+              335,
+              75
+            ]
+          ],
+          "contact": "EachfootnativecontactincomingalphaCarm/rightOHarm via smallnativejoin; whiteglyphgaptoOabove."
+        },
+        "numbers": [
+          {
+            "literal": "(1)",
+            "bbox": [
+              20,
+              111,
+              46,
+              131
+            ]
+          },
+          {
+            "literal": "(2)",
+            "bbox": [
+              233,
+              122,
+              259,
+              142
+            ]
+          }
+        ],
+        "caption": {
+          "literal": "Arginine (Arg)",
+          "bbox": [
+            121,
+            168,
+            280,
+            189
+          ]
+        }
+      },
+      "Glu": {
+        "chainVertices": [
+          [
+            505,
+            62
+          ],
+          [
+            543,
+            83
+          ],
+          [
+            581,
+            62
+          ],
+          [
+            619,
+            83
+          ],
+          [
+            657,
+            62
+          ]
+        ],
+        "leftHO": {
+          "literal": "HO",
+          "bbox": [
+            435,
+            73,
+            478,
+            96
+          ],
+          "arm": [
+            [
+              481,
+              75
+            ],
+            [
+              501,
+              63
+            ]
+          ],
+          "anchor": "LAST O"
+        },
+        "leftCO": {
+          "rays": [
+            [
+              [
+                501,
+                33
+              ],
+              [
+                501,
+                63
+              ]
+            ],
+            [
+              [
+                509,
+                33
+              ],
+              [
+                509,
+                63
+              ]
+            ]
+          ],
+          "OBox": [
+            493,
+            6,
+            517,
+            30
+          ],
+          "contact": "LeftfootcontactHOarm,rightfootcontactoutgoingchainarm, sourcearchedjoin."
+        },
+        "alphaNH2": {
+          "literal": "NH₂",
+          "bbox": [
+            608,
+            118,
+            665,
+            143
+          ],
+          "stem": [
+            [
+              619,
+              83
+            ],
+            [
+              619,
+              113
+            ]
+          ],
+          "anchor": "FIRST N"
+        },
+        "rightCO": {
+          "rays": [
+            [
+              [
+                653,
+                33
+              ],
+              [
+                653,
+                63
+              ]
+            ],
+            [
+              [
+                661,
+                33
+              ],
+              [
+                661,
+                63
+              ]
+            ]
+          ],
+          "OBox": [
+            645,
+            6,
+            669,
+            30
+          ],
+          "OHBox": [
+            685,
+            74,
+            729,
+            96
+          ],
+          "armOH": [
+            [
+              661,
+              63
+            ],
+            [
+              682,
+              75
+            ]
+          ],
+          "contact": "Bothfeetcontactindividualslopes/nativejoin."
+        },
+        "numbers": [
+          {
+            "literal": "(1)",
+            "bbox": [
+              446,
+              108,
+              473,
+              129
+            ]
+          },
+          {
+            "literal": "(2)",
+            "bbox": [
+              693,
+              108,
+              719,
+              129
+            ]
+          }
+        ],
+        "caption": {
+          "literal": "Glutamic acid (Glu)",
+          "bbox": [
+            473,
+            168,
+            692,
+            189
+          ]
+        }
+      },
+      "Gly": {
+        "bareVertices": [
+          [
+            885,
+            61
+          ],
+          [
+            923,
+            83
+          ]
+        ],
+        "leftH2N": {
+          "literal": "H₂N",
+          "bbox": [
+            803,
+            73,
+            857,
+            96
+          ],
+          "arm": [
+            [
+              860,
+              75
+            ],
+            [
+              885,
+              61
+            ]
+          ],
+          "anchor": "LAST N"
+        },
+        "CO": {
+          "rays": [
+            [
+              [
+                920,
+                80.5
+              ],
+              [
+                946,
+                64
+              ]
+            ],
+            [
+              [
+                924,
+                87
+              ],
+              [
+                950,
+                70
+              ]
+            ]
+          ],
+          "OBox": [
+            952,
+            49,
+            974,
+            72
+          ],
+          "contact": "Upperleftfootcontactsincomingamino-chainarm, lowerleftfootcontactsverticalOHstem. Distinctsplitfeet noforcedsingleapex; nofullwhitegap."
+        },
+        "OH": {
+          "literal": "OH",
+          "bbox": [
+            912,
+            118,
+            957,
+            141
+          ],
+          "stem": [
+            [
+              923,
+              83
+            ],
+            [
+              923,
+              113
+            ]
+          ],
+          "anchor": "FIRST O"
+        },
+        "caption": {
+          "literal": "Glycine (Gly)",
+          "bbox": [
+            817,
+            168,
+            961,
+            189
+          ]
+        }
+      },
+      "bottomCroppedMarks": {
+        "classification": "Tinycroppedinkatnativebottom, intentUNKNOWNretain/noletterrestoration",
+        "bboxesInclusive": [
+          [
+            64,
+            210,
+            66,
+            210
+          ],
+          [
+            119,
+            210,
+            122,
+            210
+          ],
+          [
+            145,
+            210,
+            147,
+            210
+          ],
+          [
+            227,
+            210,
+            230,
+            210
+          ],
+          [
+            294,
+            210,
+            298,
+            210
+          ],
+          [
+            336,
+            209,
+            339,
+            210
+          ],
+          [
+            476,
+            210,
+            479,
+            210
+          ]
+        ],
+        "appearance": "Sixveryfaintgraytinybars andone darker tinyhook/nub near336..339; noaddedcaptiontext."
+      },
+      "noAdded": [
+        "No aminoacidcharges",
+        "No peptidebonds",
+        "No guanidineNHbondbetweenNandHstack",
+        "No extra numberingonGly",
+        "No answerfortripeptide",
+        "No captiontheoryfix"
+      ]
+    },
+    "measurementLimits": "Nativeapproxcenterlines/bboxes±1–2px; eachAA ownmacroindependentlyopened. Bottomcomponentslocatecroppedinkonly, no chemicalmeaning. ExplicitHcountfromlabelsnotimplicitCH2Hs.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull3xLeftRight4xCN_CO20x": true,
+    "allPublicDeRead": true,
+    "freshFinalChromiumFull3xEachAA3xOpened": true,
+    "allRegularCaptionsAndChemical": true,
+    "counts": "13C8O6N4CO1CN4NH2NHbridgeN+Hseparate",
+    "shortNativeArchedJoins3CO1CN": true,
+    "glySplitFeetContact": true,
+    "sevenBottomFragmentsUnknownRetained": true,
+    "initialNegativeKept": true
+  },
+  "rootOldNewXmlAudit": {
+    "initialHash": "a8fec217a7eeec82c9a8827d0be0d8167bcc6aa03c516677ebb1451910ef8daf",
+    "finalHash": "934555dea26bfbeb54ded1fd7a28024589ee29344b548de0fdbf23a22ba74b74",
+    "children": 35,
+    "changedChildren": [
+      1,
+      2,
+      4,
+      10,
+      11,
+      13,
+      14,
+      16,
+      17
+    ],
+    "nativeApproxNotSubpixel": true,
+    "COFeetCalculated": true,
+    "changedGlyphAnchors": "ArgNH85.5/GluO505-GluO657-GluNH2at619: FOUR anchors",
+    "onlyBondGeometryAndFourGlyphAnchorsChanged": true,
+    "allGlyphPathDataAndLiteralsExactPlacementChangesOnly": true
+  }
+}
