@@ -1,0 +1,23 @@
+[
+  {
+    "i": 650,
+    "hashSvg": "876c46ed33b33aec3ea4d06ce4df1be261f9c34b3bbb9a32a8870a5cfe9cba18",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự fresh FINAL Chromium3x FULL và sáu macro, đối native FULL/public de/ref duy nhất. Bốn lysine24C8N8O, đúng 3NH₃UP/1NH₂UP-3H₃NLEFT/1H₂NLEFT, 6Nplus/4COOminus/2OHminus/2H₂O; 4 half-harpoon đúng hướng. Caption Dạng (I)/(III)/(II)/(III) và mọi glyph regular upright/chỉ số/charge/neo N-COO có khe sạch, không chạm/cắt/tràn. Hai topflecks mờ giữ đúng dạng vệt nhỏ, không suy nhãn. Pre/post SHA thực đọc khớp final; không carry draft38ae.",
+    "render": "/workspace/scratch/soat407-final-650-fresh.png",
+    "macro": [
+      "/workspace/scratch/lysine650-final-topL.png",
+      "/workspace/scratch/lysine650-final-topR.png",
+      "/workspace/scratch/lysine650-final-bottomL.png",
+      "/workspace/scratch/lysine650-final-bottomR.png",
+      "/workspace/scratch/lysine650-final-heads.png",
+      "/workspace/scratch/lysine650-final-crop.png"
+    ],
+    "hash": "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d",
+    "hashSvgDaSoat": "876c46ed33b33aec3ea4d06ce4df1be261f9c34b3bbb9a32a8870a5cfe9cba18",
+    "runtimeProof": {
+      "sha256": "75a344cc70ed47fce29bc1c33869fc245c3b84cd12bac890f1c56cef79e04a42",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/lysine650-native-ddh-876c46ed33b33aec3ea4d06ce4df1be261f9c34b3bbb9a32a8870a5cfe9cba18.svg 876c46ed33b33aec3ea4d06ce4df1be261f9c34b3bbb9a32a8870a5cfe9cba18\n650 { x: 0, y: 0, width: 990, height: 300 }\n\nPOSTSHOT_SHA 876c46ed33b33aec3ea4d06ce4df1be261f9c34b3bbb9a32a8870a5cfe9cba18\nCOMMAND node /workspace/scratch/agent-render407-final.cjs\nCONTEXT VIP27-C3-B11-D2-I-16.hinh.0.du_lieu; public de/one ref, no answers.\n"
+    }
+  }
+]

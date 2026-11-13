@@ -1,0 +1,847 @@
+{
+  "hash": "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d",
+  "native": [
+    990,
+    300
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C3-B11-D2-I-16",
+      "de": "Lysine là amino acid thiết yếu giúp trẻ em phát triển chiều cao, được cung cấp chủ yếu từ thực phẩm như trứng, thịt, đậu nành, phô mát. Xét cân bằng khi hòa tan lysine vào nước (hình).\nKhi khảo sát hiện tượng điện di ở pH = 9,7 thì lysine hầu như không di chuyển trong điện trường. Cho các phát biểu sau:\n(a) Trong hai cân bằng, dạng (I) và dạng (II) đều là base theo Brønsted-Lowry.\n(b) Khi đặt trong điện trường, dạng (III) di chuyển về cực dương.\n(c) Ở pH = 2,0 dạng (I) và dạng (II) chuyển về dạng phân tử trung hòa.\n(d) Ở pH = 9,7 lysine tồn tại đồng thời ở dạng (I) và dạng (II).\nCác phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d",
+          "where": "VIP27-C3-B11-D2-I-16.hinh.0.du_lieu",
+          "hashDataUrl": "863a941e2fe7d8956327cfc0691ddc46983617805dfeedd9ffb24e37076700de"
+        }
+      ]
+    }
+  ],
+  "chains": [
+    [
+      [
+        55,
+        91
+      ],
+      [
+        79,
+        76
+      ],
+      [
+        115,
+        97
+      ],
+      [
+        152,
+        76
+      ],
+      [
+        188,
+        97
+      ],
+      [
+        224,
+        76
+      ],
+      [
+        249,
+        91
+      ]
+    ],
+    [
+      [
+        604,
+        89
+      ],
+      [
+        628,
+        74
+      ],
+      [
+        665,
+        95
+      ],
+      [
+        701,
+        74
+      ],
+      [
+        737,
+        95
+      ],
+      [
+        773,
+        74
+      ],
+      [
+        798,
+        89
+      ]
+    ],
+    [
+      [
+        57,
+        246
+      ],
+      [
+        83,
+        230
+      ],
+      [
+        120,
+        252
+      ],
+      [
+        158,
+        230
+      ],
+      [
+        196,
+        252
+      ],
+      [
+        233,
+        230
+      ],
+      [
+        260,
+        246
+      ]
+    ],
+    [
+      [
+        603,
+        242
+      ],
+      [
+        630,
+        228
+      ],
+      [
+        667,
+        250
+      ],
+      [
+        705,
+        228
+      ],
+      [
+        742,
+        250
+      ],
+      [
+        779,
+        228
+      ],
+      [
+        806,
+        244
+      ]
+    ]
+  ],
+  "ghiChu": "4lysine24C8N8O-EXCL2water2OH/4individual5bareCchains+4COO/3NH3UP1NH2UP-3H3NLEFT1H2NLEFT/6Nplus4COOminus2OHminus/2HALFharpoonpairsUPRIGHTABOVE-LOWLEFTBELOW/ALLregularUPRIGHT-SUB23/EXACTDạng(I)-Dạng(III)-Dạng(II)-Dạng(III)/TOPtinycropUNKNOWNretain/NOaddedH-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root mở riêng native FULL và FULL2x, đọc toàn1publicde-ref; tọa độ gần đúng, không đo subpixel.",
+  "independentSourceAudit": {
+    "i": 650,
+    "assetIndexProvided": 1323,
+    "hash": "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d.png",
+    "size": [
+      990,
+      300
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C3-B11-D2-I-16",
+        "de": "Lysine là amino acid thiết yếu giúp trẻ em phát triển chiều cao, được cung cấp chủ yếu từ thực phẩm như trứng, thịt, đậu nành, phô mát. Xét cân bằng khi hòa tan lysine vào nước (hình).\nKhi khảo sát hiện tượng điện di ở pH = 9,7 thì lysine hầu như không di chuyển trong điện trường. Cho các phát biểu sau:\n(a) Trong hai cân bằng, dạng (I) và dạng (II) đều là base theo Brønsted-Lowry.\n(b) Khi đặt trong điện trường, dạng (III) di chuyển về cực dương.\n(c) Ở pH = 2,0 dạng (I) và dạng (II) chuyển về dạng phân tử trung hòa.\n(d) Ở pH = 9,7 lysine tồn tại đồng thời ở dạng (I) và dạng (II).\nCác phát biểu đúng là",
+        "allHinh": [
+          {
+            "hash": "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d",
+            "where": "VIP27-C3-B11-D2-I-16.hinh.0.du_lieu",
+            "hashDataUrl": "863a941e2fe7d8956327cfc0691ddc46983617805dfeedd9ffb24e37076700de"
+          }
+        ],
+        "missingHashes": [
+          "793876c6f084e746755178f89a7909a5094af2b8aadeb3ea5e88fd3893ae722d"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/407-full3x.png",
+        "/workspace/scratch/407-left3x.png",
+        "/workspace/scratch/407-right3x.png",
+        "/workspace/scratch/407-heads3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "font": {
+        "chemical": "Regular upright sans, H2/H3subscript. Charges standalonePLUSaboveN, COOminus raised afterOO, OHminusraisedafterH.",
+        "captions": "Regular upright serif, notitalic/dam",
+        "noTrueBoldClaim": true
+      },
+      "counts": {
+        "lysineUnits": 4,
+        "perUnitC": 6,
+        "perUnitN": 2,
+        "perUnitO": 2,
+        "lysinePrintedC": 24,
+        "lysinePrintedN": 8,
+        "lysinePrintedO": 8,
+        "waterLabels": 2,
+        "OHminusLabels": 2,
+        "knownPrintedOIncludingWaterOH": 12,
+        "explicitHFromAllH2H3AndWaterOH": 28,
+        "halfHarpoonHeads": 4,
+        "standalonePlusReactantTopN": 1,
+        "standalonePlusReactantBottomN": 1,
+        "productNPlus": 4,
+        "COOminus": 4,
+        "OHminus": 2
+      },
+      "units": [
+        {
+          "caption": "Dạng (I)",
+          "vertices": [
+            [
+              78,
+              76
+            ],
+            [
+              114,
+              97
+            ],
+            [
+              153,
+              76
+            ],
+            [
+              189,
+              97
+            ],
+            [
+              224,
+              76
+            ]
+          ],
+          "leftArm": [
+            [
+              55,
+              90
+            ],
+            [
+              78,
+              76
+            ]
+          ],
+          "leftLabel": {
+            "literal": "H₂N",
+            "bbox": [
+              4,
+              87,
+              51,
+              112
+            ],
+            "anchor": "LAST N"
+          },
+          "alphaArm": [
+            [
+              224,
+              76
+            ],
+            [
+              224,
+              47
+            ]
+          ],
+          "alphaLabel": {
+            "literal": "NH₃",
+            "bbox": [
+              215,
+              25,
+              263,
+              48
+            ],
+            "anchor": "FIRST N"
+          },
+          "alphaPlus": {
+            "center": [
+              224,
+              14
+            ],
+            "bbox": [
+              218,
+              8,
+              231,
+              20
+            ]
+          },
+          "COOArm": [
+            [
+              224,
+              76
+            ],
+            [
+              249,
+              90
+            ]
+          ],
+          "COO": {
+            "literal": "COO⁻",
+            "bbox": [
+              252,
+              83,
+              321,
+              109
+            ]
+          },
+          "captionBox": [
+            121,
+            130,
+            204,
+            149
+          ]
+        },
+        {
+          "caption": "Dạng (II)",
+          "vertices": [
+            [
+              83,
+              230
+            ],
+            [
+              121,
+              252
+            ],
+            [
+              158,
+              230
+            ],
+            [
+              196,
+              252
+            ],
+            [
+              233,
+              230
+            ]
+          ],
+          "leftArm": [
+            [
+              56,
+              246
+            ],
+            [
+              83,
+              230
+            ]
+          ],
+          "leftLabel": {
+            "literal": "H₃N",
+            "bbox": [
+              5,
+              242,
+              53,
+              266
+            ],
+            "anchor": "LAST N"
+          },
+          "leftPlus": {
+            "center": [
+              44,
+              233
+            ],
+            "bbox": [
+              38,
+              227,
+              51,
+              239
+            ]
+          },
+          "alphaArm": [
+            [
+              233,
+              230
+            ],
+            [
+              233,
+              203
+            ]
+          ],
+          "alphaLabel": {
+            "literal": "NH₂",
+            "bbox": [
+              223,
+              179,
+              273,
+              202
+            ],
+            "anchor": "FIRST N"
+          },
+          "COOArm": [
+            [
+              233,
+              230
+            ],
+            [
+              260,
+              245
+            ]
+          ],
+          "COO": {
+            "literal": "COO⁻",
+            "bbox": [
+              263,
+              238,
+              332,
+              265
+            ]
+          },
+          "captionBox": [
+            122,
+            279,
+            211,
+            299
+          ]
+        },
+        {
+          "caption": "Dạng (III)",
+          "vertices": [
+            [
+              628,
+              75
+            ],
+            [
+              663,
+              96
+            ],
+            [
+              700,
+              75
+            ],
+            [
+              736,
+              96
+            ],
+            [
+              773,
+              75
+            ]
+          ],
+          "leftArm": [
+            [
+              604,
+              89
+            ],
+            [
+              628,
+              75
+            ]
+          ],
+          "leftLabel": {
+            "literal": "H₃N",
+            "bbox": [
+              553,
+              86,
+              601,
+              110
+            ],
+            "anchor": "LAST N"
+          },
+          "leftPlus": {
+            "center": [
+              592,
+              76
+            ],
+            "bbox": [
+              586,
+              70,
+              598,
+              82
+            ]
+          },
+          "alphaArm": [
+            [
+              773,
+              75
+            ],
+            [
+              773,
+              46
+            ]
+          ],
+          "alphaLabel": {
+            "literal": "NH₃",
+            "bbox": [
+              764,
+              23,
+              814,
+              46
+            ],
+            "anchor": "FIRST N"
+          },
+          "alphaPlus": {
+            "center": [
+              773,
+              12
+            ],
+            "bbox": [
+              767,
+              6,
+              779,
+              18
+            ]
+          },
+          "COOArm": [
+            [
+              773,
+              75
+            ],
+            [
+              798,
+              89
+            ]
+          ],
+          "COO": {
+            "literal": "COO⁻",
+            "bbox": [
+              801,
+              81,
+              871,
+              107
+            ]
+          },
+          "captionBox": [
+            651,
+            129,
+            749,
+            149
+          ]
+        },
+        {
+          "caption": "Dạng (III)",
+          "vertices": [
+            [
+              630,
+              229
+            ],
+            [
+              667,
+              250
+            ],
+            [
+              704,
+              229
+            ],
+            [
+              741,
+              250
+            ],
+            [
+              778,
+              229
+            ]
+          ],
+          "leftArm": [
+            [
+              604,
+              245
+            ],
+            [
+              630,
+              229
+            ]
+          ],
+          "leftLabel": {
+            "literal": "H₃N",
+            "bbox": [
+              553,
+              240,
+              601,
+              265
+            ],
+            "anchor": "LAST N"
+          },
+          "leftPlus": {
+            "center": [
+              592,
+              230
+            ],
+            "bbox": [
+              586,
+              224,
+              598,
+              236
+            ]
+          },
+          "alphaArm": [
+            [
+              778,
+              229
+            ],
+            [
+              778,
+              200
+            ]
+          ],
+          "alphaLabel": {
+            "literal": "NH₃",
+            "bbox": [
+              769,
+              176,
+              819,
+              200
+            ],
+            "anchor": "FIRST N"
+          },
+          "alphaPlus": {
+            "center": [
+              778,
+              166
+            ],
+            "bbox": [
+              772,
+              160,
+              784,
+              172
+            ]
+          },
+          "COOArm": [
+            [
+              778,
+              229
+            ],
+            [
+              805,
+              244
+            ]
+          ],
+          "COO": {
+            "literal": "COO⁻",
+            "bbox": [
+              808,
+              236,
+              878,
+              263
+            ]
+          },
+          "captionBox": [
+            671,
+            279,
+            770,
+            299
+          ]
+        }
+      ],
+      "waterReactants": [
+        {
+          "plusBox": [
+            347,
+            81,
+            363,
+            98
+          ],
+          "literal": "H₂O",
+          "bbox": [
+            386,
+            77,
+            434,
+            102
+          ]
+        },
+        {
+          "plusBox": [
+            353,
+            235,
+            370,
+            252
+          ],
+          "literal": "H₂O",
+          "bbox": [
+            392,
+            231,
+            441,
+            257
+          ]
+        }
+      ],
+      "productOH": [
+        {
+          "plusBox": [
+            889,
+            86,
+            906,
+            103
+          ],
+          "literal": "OH⁻",
+          "bbox": [
+            925,
+            81,
+            978,
+            106
+          ]
+        },
+        {
+          "plusBox": [
+            898,
+            235,
+            915,
+            253
+          ],
+          "literal": "OH⁻",
+          "bbox": [
+            934,
+            230,
+            986,
+            256
+          ]
+        }
+      ],
+      "equilibria": [
+        {
+          "upperShaft": [
+            [
+              452,
+              83
+            ],
+            [
+              538,
+              83
+            ]
+          ],
+          "upperHalfHead": [
+            [
+              522,
+              77
+            ],
+            [
+              538,
+              83
+            ],
+            [
+              522,
+              83
+            ]
+          ],
+          "lowerShaft": [
+            [
+              451,
+              89
+            ],
+            [
+              538,
+              89
+            ]
+          ],
+          "lowerHalfHead": [
+            [
+              451,
+              89
+            ],
+            [
+              467,
+              89
+            ],
+            [
+              467,
+              94
+            ]
+          ]
+        },
+        {
+          "upperShaft": [
+            [
+              456,
+              236
+            ],
+            [
+              538,
+              236
+            ]
+          ],
+          "upperHalfHead": [
+            [
+              522,
+              230
+            ],
+            [
+              538,
+              236
+            ],
+            [
+              522,
+              236
+            ]
+          ],
+          "lowerShaft": [
+            [
+              455,
+              242
+            ],
+            [
+              538,
+              242
+            ]
+          ],
+          "lowerHalfHead": [
+            [
+              455,
+              242
+            ],
+            [
+              471,
+              242
+            ],
+            [
+              471,
+              247
+            ]
+          ]
+        }
+      ],
+      "headEvidence": "Ownnarrowhead3x bothpairs: fullfilledtriangle onONEside only; upperabove/right, lowerbelow/left. No fullarrowheads, no addedoppositeleg.",
+      "cropAndMarks": {
+        "bottom": "Dạng(II)/(III) descenderg near y299 touchesbottomcrop; keepnative300height, no restorelowerglyph.",
+        "topFlecks": [
+          {
+            "bboxApprox": [
+              200,
+              0,
+              207,
+              1
+            ],
+            "intent": "UNKNOWN faintgraycroppedinkretain"
+          },
+          {
+            "bboxApprox": [
+              677,
+              0,
+              680,
+              1
+            ],
+            "intent": "UNKNOWN tinygrayinkretain"
+          }
+        ]
+      },
+      "noAdded": [
+        "No pHlabels9.7fromstem",
+        "No specieschargesnormalizedafterNH3",
+        "No expandedCOdoubleforCOOtext",
+        "No reactionconditions",
+        "No answertruefalse"
+      ]
+    },
+    "measurementLimits": "Native approximate centerlines/bboxes±1–2px. Fourchains individuallyread; bottomIIshift not copiedtopI. Ionpluspositions literalaboveN, nottypographicrightSUPsubstitution. NativeFULLviewerresized; perhalfandheadmacrosopenedseparately.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": "FreshFINAL876c46... FULL3x mở mới; 4chains/6Nplus4COOminus2OHminus/4HALFheads/4captions/all1publicde-ref. NativeapproxNOTsubpixel. Initial38ae missingtinyTOPfleck rejected; finalONLYgrayTOP2flecks, freshnewhashALL."
+}
