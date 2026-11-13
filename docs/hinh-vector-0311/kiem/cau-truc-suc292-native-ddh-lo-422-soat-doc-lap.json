@@ -1,0 +1,22 @@
+[
+  {
+    "i": 292,
+    "hashSvg": "e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref duy nhất, fresh Chromium3x FULL và macro từngring/bridge/bottomglyphgaps. 12C11O5freeOH3CH₂OH8standaloneH đúng; trái6phải5ring/2ringO1bridgeO. Giữ vị trí từngH/OH, 2HO lastO (tráidown/phảiup), CH₂OHfirstC tráiUP/phảitráiUP/phảiphảiDOWN. Không taper/wedge, hai frontuniform2px còn lại thin như nguồn. Chữ allregularuprightblack/sub2, các khe H/OH dưới và Oglyph/bridge sạch không chạm/cắt/tràn. Không thêm stereoH/OH/num/caption/answer; actualSHApre/post đúng final, không carryinitial.",
+    "render": "/workspace/scratch/soat422-292-fresh.png",
+    "macro": [
+      "/workspace/scratch/suc292-left.png",
+      "/workspace/scratch/suc292-right.png",
+      "/workspace/scratch/suc292-bridge.png",
+      "/workspace/scratch/suc292-bottomL.png",
+      "/workspace/scratch/suc292-bottomR.png"
+    ],
+    "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+    "hashSvgDaSoat": "e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae",
+    "runtimeExactHashProof": {
+      "sha256": "c5cb517fa7eb8a0c4df189b65260375a5a9eeccb547a1ca1373271f5d9aa5723",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/suc292-native-ddh-e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae.svg e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae\n292 { x: 0, y: 0, width: 522, height: 251 }\n\nPOSTSHOT_SHA e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae\nCOMMAND node /workspace/scratch/agent-render422.cjs\nCONTEXT VIP27-C2-B5-II-1.hinh.0.du_lieu public de/one ref only; no answers.\n"
+    }
+  }
+]

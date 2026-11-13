@@ -1,0 +1,29 @@
+[
+  {
+    "i": 292,
+    "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+    "fileNguon": "anh/314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57.png",
+    "svg": "suc292-native-ddh-e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae.svg",
+    "hashSvg": "e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae",
+    "byteSvg": 18497,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B5-II-1",
+        "de": "Saccharose là nguyên liệu quan trọng trong công nghiệp thực phẩm, sản xuất bánh kẹo, nước giải khát và là chất làm ngọt phổ biến trong đời sống hàng ngày. Phân tử saccharose có cấu tạo như sau:",
+        "refs": [
+          {
+            "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+            "where": "VIP27-C2-B5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "00fbb168234a8e0aece6a229fa8a56fbff39f8e999c88d014a0b4d6a83573eb3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O-5freeOH3CH2OH8hydroxylO-2ringO1bridgeO/8standaloneH/LEFTsixRIGHTfiveRings-0TAPER0wedge-2uniformhorizontalFronts2px-othersTHIN/ALLregularUPRIGHTBLACK-SUB2-FIRSTC-FIRSTO-2literalHOLASTO/3CH2OH-leftUP-rightleftUP-rightrightDOWN/0nums-caption-arrows-charge/NOaddedH-OH-stereo-alphaBeta-answer-alias/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

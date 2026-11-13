@@ -1,0 +1,661 @@
+{
+  "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+  "native": [
+    522,
+    251
+  ],
+  "questions": [
+    {
+      "qid": "VIP27-C2-B5-II-1",
+      "de": "Saccharose là nguyên liệu quan trọng trong công nghiệp thực phẩm, sản xuất bánh kẹo, nước giải khát và là chất làm ngọt phổ biến trong đời sống hàng ngày. Phân tử saccharose có cấu tạo như sau:",
+      "refs": [
+        {
+          "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+          "where": "VIP27-C2-B5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "00fbb168234a8e0aece6a229fa8a56fbff39f8e999c88d014a0b4d6a83573eb3"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "12C11O-5freeOH3CH2OH8hydroxylO-2ringO1bridgeO/8standaloneH/LEFTsixRIGHTfiveRings-0TAPER0wedge-2uniformhorizontalFronts2px-othersTHIN/ALLregularUPRIGHTBLACK-SUB2-FIRSTC-FIRSTO-2literalHOLASTO/3CH2OH-leftUP-rightleftUP-rightrightDOWN/0nums-caption-arrows-charge/NOaddedH-OH-stereo-alphaBeta-answer-alias/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "Root OWNnativeFULL4x/LEFT-RIGHT4x/fronts4x/allpublicde. 12C11O5freeOH3CH2OH8standaloneH. LEFT6RIGHT5rings. NoTAPER, twohorizontalfront2pxuniform, remainingthin. TwoHOlastO leftdown-rightup, allregularblack. NativeapproxnotSubpixel.",
+  "independentSourceAudit": {
+    "i": 292,
+    "assetIndexProvided": 1311,
+    "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57.png",
+    "size": [
+      522,
+      251
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C2-B5-II-1",
+        "de": "Saccharose là nguyên liệu quan trọng trong công nghiệp thực phẩm, sản xuất bánh kẹo, nước giải khát và là chất làm ngọt phổ biến trong đời sống hàng ngày. Phân tử saccharose có cấu tạo như sau:",
+        "allHinh": [
+          {
+            "hash": "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57",
+            "where": "VIP27-C2-B5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "00fbb168234a8e0aece6a229fa8a56fbff39f8e999c88d014a0b4d6a83573eb3"
+          }
+        ],
+        "missingHashes": [
+          "314ed47bdb67e225b36943b82c968ae3504991a538e8a766b5169054cea1af57"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/422-full3x.png",
+        "/workspace/scratch/422-front4x.png",
+        "/workspace/scratch/422-right4x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "C": 12,
+        "O": 11,
+        "freeOH": 5,
+        "CH2OH": 3,
+        "standaloneH": 8,
+        "ringO": 2,
+        "bridgeO": 1,
+        "TAPER": 0,
+        "hash": 0,
+        "rings6and5": true
+      },
+      "font": "Allregularuprightserif H/O/OH/HO/CH2OH,2SUB; no number/caption/actualbold.",
+      "lineStyles": {
+        "thinBackAndBranches": "~1.2–1.5pxuniform",
+        "frontHorizontal": "~2pxuniform, modestlyheavierthansomebackedges, NOTtaper/wedge",
+        "noStereoPolygons": true
+      },
+      "left6ring": {
+        "carbonPositions": {
+          "C5": [
+            71,
+            70
+          ],
+          "C4": [
+            37,
+            124
+          ],
+          "C3": [
+            71,
+            183
+          ],
+          "C2": [
+            153,
+            183
+          ],
+          "C1": [
+            186,
+            126
+          ]
+        },
+        "ringO": {
+          "bbox": [
+            145,
+            61,
+            164,
+            79
+          ]
+        },
+        "ringBonds": [
+          [
+            [
+              37,
+              124
+            ],
+            [
+              71,
+              70
+            ],
+            [
+              140,
+              70
+            ]
+          ],
+          [
+            [
+              161,
+              82
+            ],
+            [
+              186,
+              126
+            ]
+          ],
+          [
+            [
+              186,
+              126
+            ],
+            [
+              153,
+              183
+            ]
+          ],
+          [
+            [
+              71,
+              183
+            ],
+            [
+              37,
+              124
+            ]
+          ]
+        ],
+        "frontHorizontal": [
+          [
+            71,
+            183
+          ],
+          [
+            153,
+            183
+          ]
+        ],
+        "CH2OH": {
+          "literal": "CH₂OH",
+          "bbox": [
+            64,
+            15,
+            149,
+            36
+          ],
+          "stem": [
+            [
+              71,
+              39
+            ],
+            [
+              71,
+              70
+            ]
+          ],
+          "anchor": "FIRST C"
+        },
+        "Hlabels": [
+          {
+            "position": "C5DOWN",
+            "bbox": [
+              64,
+              99,
+              83,
+              117
+            ],
+            "stem": [
+              [
+                71,
+                70
+              ],
+              [
+                71,
+                94
+              ]
+            ]
+          },
+          {
+            "position": "C4UP",
+            "bbox": [
+              28,
+              70,
+              48,
+              88
+            ],
+            "stem": [
+              [
+                37,
+                124
+              ],
+              [
+                37,
+                93
+              ]
+            ]
+          },
+          {
+            "position": "C3DOWN",
+            "bbox": [
+              63,
+              218,
+              83,
+              236
+            ],
+            "stem": [
+              [
+                71,
+                183
+              ],
+              [
+                71,
+                214
+              ]
+            ]
+          },
+          {
+            "position": "C2UP",
+            "bbox": [
+              144,
+              134,
+              164,
+              153
+            ],
+            "stem": [
+              [
+                153,
+                183
+              ],
+              [
+                153,
+                156
+              ]
+            ]
+          },
+          {
+            "position": "C1UP",
+            "bbox": [
+              177,
+              72,
+              197,
+              91
+            ],
+            "stem": [
+              [
+                186,
+                126
+              ],
+              [
+                186,
+                94
+              ]
+            ]
+          }
+        ],
+        "OHlabels": [
+          {
+            "literal": "HO",
+            "position": "C4DOWN",
+            "bbox": [
+              6,
+              162,
+              44,
+              182
+            ],
+            "stem": [
+              [
+                37,
+                124
+              ],
+              [
+                37,
+                159
+              ]
+            ],
+            "anchor": "LAST O"
+          },
+          {
+            "literal": "OH",
+            "position": "C3UP",
+            "bbox": [
+              64,
+              133,
+              104,
+              152
+            ],
+            "stem": [
+              [
+                71,
+                183
+              ],
+              [
+                71,
+                155
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "literal": "OH",
+            "position": "C2DOWN",
+            "bbox": [
+              145,
+              218,
+              186,
+              238
+            ],
+            "stem": [
+              [
+                153,
+                183
+              ],
+              [
+                153,
+                214
+              ]
+            ],
+            "anchor": "FIRST O"
+          }
+        ]
+      },
+      "bridgeO": {
+        "literal": "O",
+        "bbox": [
+          226,
+          146,
+          245,
+          164
+        ],
+        "leftArm": [
+          [
+            186,
+            126
+          ],
+          [
+            221,
+            146
+          ]
+        ],
+        "rightArm": [
+          [
+            250,
+            146
+          ],
+          [
+            284,
+            126
+          ]
+        ]
+      },
+      "right5ring": {
+        "carbonPositions": {
+          "leftTop": [
+            284,
+            126
+          ],
+          "leftFront": [
+            317,
+            183
+          ],
+          "rightFront": [
+            399,
+            183
+          ],
+          "rightTop": [
+            434,
+            124
+          ]
+        },
+        "ringO": {
+          "bbox": [
+            350,
+            74,
+            369,
+            92
+          ]
+        },
+        "ringBonds": [
+          [
+            [
+              284,
+              126
+            ],
+            [
+              345,
+              90
+            ]
+          ],
+          [
+            [
+              374,
+              89
+            ],
+            [
+              434,
+              124
+            ]
+          ],
+          [
+            [
+              434,
+              124
+            ],
+            [
+              399,
+              183
+            ]
+          ],
+          [
+            [
+              317,
+              183
+            ],
+            [
+              284,
+              126
+            ]
+          ]
+        ],
+        "frontHorizontal": [
+          [
+            317,
+            183
+          ],
+          [
+            399,
+            183
+          ]
+        ],
+        "CH2OHlabels": [
+          {
+            "literal": "CH₂OH",
+            "position": "leftTopUP",
+            "bbox": [
+              275,
+              41,
+              360,
+              62
+            ],
+            "stem": [
+              [
+                284,
+                126
+              ],
+              [
+                284,
+                66
+              ]
+            ],
+            "anchor": "FIRST C"
+          },
+          {
+            "literal": "CH₂OH",
+            "position": "rightTopDOWN",
+            "bbox": [
+              425,
+              162,
+              508,
+              183
+            ],
+            "stem": [
+              [
+                434,
+                124
+              ],
+              [
+                434,
+                158
+              ]
+            ],
+            "anchor": "FIRST C"
+          }
+        ],
+        "Hlabels": [
+          {
+            "position": "leftFrontUP",
+            "bbox": [
+              310,
+              137,
+              330,
+              155
+            ],
+            "stem": [
+              [
+                317,
+                183
+              ],
+              [
+                317,
+                158
+              ]
+            ]
+          },
+          {
+            "position": "rightFrontDOWN",
+            "bbox": [
+              391,
+              217,
+              411,
+              236
+            ],
+            "stem": [
+              [
+                399,
+                183
+              ],
+              [
+                399,
+                213
+              ]
+            ]
+          },
+          {
+            "position": "rightTopUP",
+            "bbox": [
+              424,
+              73,
+              445,
+              92
+            ],
+            "stem": [
+              [
+                434,
+                124
+              ],
+              [
+                434,
+                95
+              ]
+            ]
+          }
+        ],
+        "OHlabels": [
+          {
+            "literal": "OH",
+            "position": "leftFrontDOWN",
+            "bbox": [
+              310,
+              220,
+              351,
+              239
+            ],
+            "stem": [
+              [
+                317,
+                183
+              ],
+              [
+                317,
+                212
+              ]
+            ],
+            "anchor": "FIRST O"
+          },
+          {
+            "literal": "HO",
+            "position": "rightFrontUP",
+            "bbox": [
+              369,
+              135,
+              407,
+              155
+            ],
+            "stem": [
+              [
+                399,
+                183
+              ],
+              [
+                399,
+                157
+              ]
+            ],
+            "anchor": "LAST O (notFIRSTH)"
+          }
+        ]
+      },
+      "crop": "Entirefigureinside522×251. No restoredtext/hiddenC.",
+      "noAdded": [
+        "No atomnumbering",
+        "No TAPERstereo",
+        "No Hlabelsnotshown",
+        "No inversionHOtoOH",
+        "No caption alpha/beta",
+        "No glycosidicname"
+      ]
+    },
+    "measurementLimits": "Eachringnativeapprox±1px, directH/OHorientationfromsource notsaccharosetheory. Frontstylefreshmacrocheckeduniformmodestlyheavier, no imposedboldstereo. Source-onlynoSVGreview.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootActualReview": {
+    "nativeFull4xEachRingFronts4x": true,
+    "allPublicDeRead": true,
+    "freshFinalChromiumFull3xEachRingBridgeBottomH_OHGaps3xOpened": true,
+    "C12O11FreeOH5CH2OH3StandaloneH8": true,
+    "leftSixRightFiveRingsNoTaperOrStereoWedge": true,
+    "twoUniformHorizontalFronts2pxOthersThin": true,
+    "twoLiteralHO_LastO_ThreeCH2OH_FirstC": true,
+    "allRegularUprightBlack": true,
+    "initialNegativeKept": true,
+    "nativeApproxNotSubpixel": true
+  },
+  "rootOldNewXmlAudit": {
+    "initialHash": "608bcd72007100662c91e6a1b800a2654fb2f538fd2a2320bd0203e5bb93200f",
+    "finalHash": "e072f324f27918fb6d0451ac231513d395e4afd23fe7964d73ef01f51c7f60ae",
+    "children": 27,
+    "changedChildren": [
+      1,
+      3,
+      4,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      13,
+      14,
+      16,
+      18,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "onlyBondGeometryAndGlyphAnchorsChanged": true,
+    "allGlyphPathDataAndLiteralsExact": true,
+    "nativeApproxNotSubpixel": true
+  }
+}
