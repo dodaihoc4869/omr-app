@@ -6,7 +6,7 @@
 // vật chặn + bụi + bé ma xếp theo chiều sâu (mép dưới) → bé ma trong bụi mà em thấy → đạn → gạch chéo ngoài vòng + vòng nét đứt → bảng tên → số máu bay.
 import { DAN_BAY_MS, NHIP_BAN_MS, type BanDo, type Diem, type Vong } from '../../lib/live-khoi/sinh-ton-loi'
 import { HINH_MA, MA_H, MA_OX, MA_OY, MA_W, SUNG_DAI, dat, duong, loaiTuong, mau, pha, type BangMau, type BoHinh, type P, type Rgb } from './sinh-ton-hinh'
-import { veTrang, type BoSan } from './sinh-ton-san'
+import { veTrang, type BoO, type BoSan } from './sinh-ton-san'
 
 const TAU = Math.PI * 2
 /** Thời gian hiệu ứng «hiện ra» (vào trận / sống lại), nằm trong thời gian bất tử thật. */
@@ -39,6 +39,8 @@ export interface Canh {
   nv: NvVe[]; hopCo: boolean; nghi: boolean
   /** Đường «chạm để tới» của em (gồm điểm đang đứng ở đầu) hoặc null. */ duong: Diem[] | null
   hieu: Hieu[]
+  /** Máy YẾU: bỏ công thức / hình vẽ chơi, ít hạt (giấy hoa, sao). */ yeu: boolean
+  /** Ô nướng sẵn lớp dưới (null = vẽ thẳng); `ranh` = khung này còn dư sức để nướng trước ô kề. */ o: BoO | null; ranh: boolean
 }
 
 // ── Chữ trên màn: câu hô «hành trình thi cử» (đặc tả mục «Câu hô») ──
@@ -115,14 +117,17 @@ export function veKhung(c: Canh): void {
   }
   // ── Nền ô li: ô mẫu tô theo ĐIỂM ẢNH THIẾT BỊ (chỉ dời nguyên điểm ảnh) ──
   const k = dpr * ti, px = Math.round(dpr * ox), py = Math.round(dpr * oy)
-  {
+  // Ô nướng sẵn: lớp dưới (nền + trang, kiểu phẳng cả vật chặn) dán từ ô; không đủ trần bộ nhớ ⇒ vẽ thẳng như cũ.
+  const tren = c.o ? c.o.ve(g, px, py, x0, y0, x1, y1, c.ranh) : false
+  const gop = tren && phang
+  if (!tren) {
     const ax = Math.max(0, Math.round(px + Math.max(0, x0) * k)), ay = Math.max(0, Math.round(py + Math.max(0, y0) * k))
     const bx = Math.min(Math.ceil(W * dpr), Math.round(px + Math.min(bd.rong, x1) * k)), by = Math.min(Math.ceil(H * dpr), Math.round(py + Math.min(bd.cao, y1) * k))
     g.setTransform(1, 0, 0, 1, px, py)
     g.fillStyle = c.san.nen ?? mau(b.giay); g.fillRect(ax - px, ay - py, bx - ax, by - ay)
   }
   sanT()
-  veTrang(g, b, h, bd, x0, y0, x1, y1)
+  if (!tren) veTrang(g, b, h, bd, x0, y0, x1, y1, !c.yeu)
   // ── Vết mực (dưới mọi thứ) ──
   for (const e of c.hieu) {
     if (e.k !== 'muc' || !trong(e.x, e.y, 30)) continue
@@ -153,8 +158,8 @@ export function veKhung(c: Canh): void {
   // ── Vật chặn + bé ma theo chiều sâu (mép dưới) ──
   let m = 0
   const them = (y: number, t: 0 | 1 | 2 | 3, i: number): void => { const o = ke[m] ?? (ke[m] = { y: 0, t: 0, i: 0 }); o.y = y; o.t = t; o.i = i; m++ }
-  for (let i = 0; i < bd.tuong.length; i++) { const t = bd.tuong[i]; if (trong(t.x + t.w / 2, t.y + t.h / 2, Math.max(t.w, t.h))) them(t.y + t.h, 0, i) }
-  for (let i = 0; i < bd.thung.length; i++) { const t = bd.thung[i]; if (trong(t.x + t.w / 2, t.y + t.h / 2, t.w + 30)) them(t.y + t.h, 1, i) }
+  if (!gop) for (let i = 0; i < bd.tuong.length; i++) { const t = bd.tuong[i]; if (trong(t.x + t.w / 2, t.y + t.h / 2, Math.max(t.w, t.h))) them(t.y + t.h, 0, i) }
+  if (!gop) for (let i = 0; i < bd.thung.length; i++) { const t = bd.thung[i]; if (trong(t.x + t.w / 2, t.y + t.h / 2, t.w + 30)) them(t.y + t.h, 1, i) }
   for (let i = 0; i < c.nv.length; i++) { const n = c.nv[i]; if (!n.an && trong(n.x, n.y - 30, 70)) them(n.y, 2, i) }
   // Bụi cũng xếp theo mép dưới: bé ma đứng TRONG bụi (chân trên mép dưới) bị bụi che; đứng ngay dưới bụi thì nổi trước bụi.
   for (let i = 0; i < bd.bui.length; i++) { const t = bd.bui[i]; if (trong(t.x + t.w / 2, t.y + t.h / 2, Math.max(t.w, t.h))) them(t.y + t.h, 3, i) }
@@ -268,13 +273,13 @@ function hienRa(c: Canh, n: NvVe): void {
       dat(g, h.ma(n.doi, trai, 0), n.x, y, bung)
       g.beginPath(); g.ellipse(n.x, cy, 24 + q * 74, 16 + q * 50, 0, 0, TAU); g.setLineDash([10, 6]); g.strokeStyle = mau(md, 1 - q * 0.7); g.lineWidth = 7 * (1 - q) + 1.5; g.stroke(); g.setLineDash([])
       g.beginPath(); g.ellipse(n.x, cy, 14 + q * 44, 10 + q * 30, 0, 0, TAU); g.strokeStyle = mau(b.sao, 0.9 - q * 0.6); g.lineWidth = 3; g.stroke()
-      const HOA: Rgb[] = [md, b.sao, b.tin, b.sai]
-      for (let i = 0; i < 14; i++) {
-        const a = (i / 14) * TAU + 0.3, r = 26 + q * 70
+      const HOA: Rgb[] = [md, b.sao, b.tin, b.sai], nHoa = c.yeu ? 4 : 14, nSao = c.yeu ? 2 : 4
+      for (let i = 0; i < nHoa; i++) {
+        const a = (i / nHoa) * TAU + 0.3, r = 26 + q * 70
         g.save(); g.translate(n.x + Math.cos(a) * r, cy + Math.sin(a) * r * 0.75 + q * q * 18); g.rotate(a + q * 6); g.fillStyle = mau(HOA[i % 4], 1 - q * 0.5); g.fillRect(-4, -2, 8, 4); g.restore()
       }
       const sao = h.sao(n.doi)
-      for (let i = 0; i < 4; i++) { const a = (i / 4) * TAU + 0.8, r = 20 + q * 46; dat(g, sao, n.x + Math.cos(a) * r, cy + Math.sin(a) * r * 0.7, 0.8) }
+      for (let i = 0; i < nSao; i++) { const a = (i / nSao) * TAU + 0.8, r = 20 + q * 46; dat(g, sao, n.x + Math.cos(a) * r, cy + Math.sin(a) * r * 0.7, 0.8) }
     }
   }
   dat(g, chu, n.x, oy + 6)

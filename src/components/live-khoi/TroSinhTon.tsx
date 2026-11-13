@@ -13,9 +13,9 @@ import {
 } from '../../lib/live-khoi/sinh-ton-loi'
 import { tenMay } from '../../lib/live-khoi/ten-may'
 import { MAU_SINH_TON } from '../../lib/live-khoi/mau'
-import { datTat, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
+import { datTat, datYeuAm, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
 import { BoHinh, taoBangMau, type BangMau, type Rgb } from './sinh-ton-hinh'
-import { lamTronTi, taoBoSan, type BoSan } from './sinh-ton-san'
+import { BoO, lamTronTi, taoBoSan, type BoSan } from './sinh-ton-san'
 import { BoTen, HIEN_MS, MUC_MS, XEP_DOI, bamSo, cauChuoi, duoiBiHa, veBanDoNho, veKhung, type Hieu, type NvVe } from './sinh-ton-ve'
 import './tro-giu-lua.css'
 import './tro-sinh-ton.css'
@@ -91,6 +91,15 @@ function docPhang(): boolean {
 }
 function ghiPhang(): void { try { localStorage.setItem(KHOA_PHANG, String(Date.now())) } catch { /* không có kho */ } }
 
+/** Máy YẾU theo phần cứng, nhận NGAY từ đầu (khỏi chịu vài giây đầu giật): ≤ 4 lõi hoặc ≤ 3 GB RAM. Trình duyệt không khai (`undefined`) thì không đoán. */
+function phanCungYeu(): boolean {
+  try {
+    const n = navigator as Navigator & { deviceMemory?: number }
+    const lo = n.hardwareConcurrency, ram = n.deviceMemory
+    return (typeof lo === 'number' && lo > 0 && lo <= 4) || (typeof ram === 'number' && ram > 0 && ram <= 3)
+  } catch { return false }
+}
+
 /** Hình bé ma nhỏ của một đội (bảng hết ván). */
 function AnhMa({ bang, doi }: { bang: BangMau; doi: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -133,11 +142,14 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
 
   useEffect(() => {
     const goc = gocRef.current, vai = vaiRef.current
-    const g = vai?.getContext('2d')
+    const g = vai?.getContext('2d', { alpha: false })
     if (!goc || !vai || !g) return
     const giam = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nhe = mayYeu || giam
     const nhipKhung = nhe ? 1000 / 30 : 0
+    /** MÁY YẾU = khai báo / giảm chuyển động / phần cứng yếu / đã tự hạ từ lần trước ⇒ vẽ dpr 1, kiểu phẳng, ít hạt, ít tiếng. Tự hạ giữa chừng cũng vào đây. */
+    let yeu = nhe || phanCungYeu() || docPhang()
+    datYeuAm(yeu)
     const hat = bamSo(sbd) / 997
     let conSong = true
     /** Đội của em THEO PHÒNG (dòng của chính em trong ảnh chụp là chuẩn): phòng vừa chia lại đội mà máy chưa kịp nhận thì vẫn không bắn nhầm đồng đội. */
@@ -179,10 +191,13 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     let W = 0, H = 0, ti = 1, dpr = 1
     let bm = docBangMau(goc)
     /** KIỂU PHẲNG: máy yếu ngay từ đầu, hoặc TỰ HẠ khi máy vẽ không kịp (xem vòng khung) ⇒ bé ma 1 khung, không khối 3D / bóng đổ, không nhún. */
-    let phang = nhe || docPhang()
+    let phang = yeu
     if (phang) goc.setAttribute('data-phang', '1')
     let hinh = new BoHinh(bm, 1, phang)
     let san: BoSan = taoBoSan(g, bm, 1)
+    /** Ô nướng sẵn lớp dưới (nền + trang; kiểu phẳng cả vật chặn); trần bộ nhớ theo máy. */
+    let oSan: BoO | null = null
+    let phiVe = 0
     let bangTen = new BoTen(bm, 1, 13)
     /** Đo theo từng cửa sổ 0,6 giây (bỏ 1 giây đầu lúc còn nướng ảnh, app còn bận việc mở phòng): `cuaXau` = số cửa sổ liền nhau dưới 48 khung / giây. */
     let lucDauVe = 0, cuaTu = 0, cuaKhung = 0, cuaXau = 0
@@ -190,13 +205,16 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     const doKhung = () => {
       W = goc.clientWidth; H = goc.clientHeight
       if (!W || !H) return
-      dpr = Math.min(nhe ? 1.5 : 2, window.devicePixelRatio || 1)
+      dpr = Math.min(yeu ? 1 : 2, window.devicePixelRatio || 1)
       vai.width = Math.round(W * dpr); vai.height = Math.round(H * dpr)
       // Mọi máy thấy CÙNG diện tích sân (máy to không nhìn xa hơn máy nhỏ); máy thầy thấy cả sân. Làm tròn để ô mẫu nền = số nguyên điểm ảnh thiết bị.
       ti = lamTronTi(xem ? Math.min(W / (bd.rong + 40), H / (bd.cao + 40)) : Math.max(0.5, Math.min(1.7, Math.sqrt((W * H) / (1000 * 520)))), dpr)
       // Ảnh nướng sẵn: trần 2,4 điểm ảnh / đơn vị sân (máy tính bảng 1180 × 820 dpr 2 cần 2,73 ⇒ 13,8 MB; trần này giữ bộ nhớ ảnh ≤ 12 MB, mắt không thấy khác).
       hinh = new BoHinh(bm, Math.min(2.4, ti * dpr), phang)
       san = taoBoSan(g, bm, ti * dpr)
+      oSan?.huy()
+      // Chỉ máy yếu / đã tự hạ mới dùng ô: máy thường đủ sức vẽ thẳng, khỏi tốn thêm bộ nhớ ảnh.
+      oSan = yeu ? new BoO(bm, hinh, bd, san, ti * dpr, phang, false, 14e6) : null
       bangTen = new BoTen(bm, dpr, Math.round(Math.max(12, Math.min(16, 17 * ti))))
     }
     const doiMau = () => { bm = docBangMau(goc); setBang(bm); doKhung() }
@@ -227,7 +245,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     /** Rung nhẹ màn khi em hạ được bạn (≤ 120 ms, transform trên lớp bọc canvas); tắt khi giảm chuyển động / bản êm. */
     const rung = () => {
       const r = rungRef.current
-      if (giam || banEm || !r || typeof r.animate !== 'function') return
+      if (giam || banEm || yeu || !r || typeof r.animate !== 'function') return
       r.animate([{ transform: 'translate(0, 0)' }, { transform: 'translate(-3px, 2px)' }, { transform: 'translate(2px, -2px)' }, { transform: 'translate(0, 0)' }], { duration: 110, easing: 'ease-out' })
     }
     const lenCap = (luc: number): boolean => {
@@ -237,7 +255,10 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       baoVui(`Súng lên cấp ${tt.cap} · ${SUNG_TEN[tt.cap - 1]}`, luc)
       return true
     }
-    const themHieu = (e: Hieu) => { hieu.push(e); if (hieu.length > 24) hieu = hieu.slice(-24) }
+    const themHieu = (e: Hieu) => {
+      if (yeu && e.k === 'muc') { let n = 0; for (const x of hieu) if (x.k === 'muc') n++; if (n >= 3) return }
+      hieu.push(e); if (hieu.length > (yeu ? 10 : 24)) hieu = hieu.slice(-(yeu ? 10 : 24))
+    }
 
     // ── Kênh lớp: ảnh chụp mỗi 250 ms ──
     const boNghe = kenh.nghe('tro', (t: TinLop) => {
@@ -359,7 +380,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
           if (luc - cuaTu >= 600) {
             cuaXau = cuaKhung / ((luc - cuaTu) / 1000) < 48 ? cuaXau + 1 : 0
             cuaTu = luc; cuaKhung = 0
-            if (cuaXau >= 2) { phang = true; ghiPhang(); goc.setAttribute('data-phang', '1'); doKhung() }
+            if (cuaXau >= 2) { phang = true; yeu = true; datYeuAm(true); ghiPhang(); goc.setAttribute('data-phang', '1'); doKhung() }
           }
         }
       }
@@ -515,11 +536,14 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         tiengBan(e.cap, e.toi, e.toi ? 1 : Math.max(0, 1 - Math.hypot(e.x - tt.x, e.y - tt.y) / 620))
       }
       if (nhipBan.size > 160) nhipBan.clear()
-      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, san, ten: bangTen, phang, em: banEm, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, hieu })
+      const tVe = performance.now()
+      hinh.han = tVe - lucMo < 2500 ? tVe + 9 : 0
+      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, san, ten: bangTen, phang, em: banEm, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, hieu, yeu, o: oSan, ranh: phiVe < 9 })
+      phiVe = performance.now() - tVe
       const nho = nhoRef.current, gn = nho?.getContext('2d')
       if (nho && gn && luc - lucNho >= 500) {
         lucNho = luc
-        const r = 130, c = Math.round((r * bd.cao) / bd.rong), d2 = Math.min(2, window.devicePixelRatio || 1)
+        const r = 130, c = Math.round((r * bd.cao) / bd.rong), d2 = Math.min(yeu ? 1 : 2, window.devicePixelRatio || 1)
         if (nho.width !== Math.round(r * d2) || nho.height !== Math.round(c * d2)) { nho.width = Math.round(r * d2); nho.height = Math.round(c * d2) }
         veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm)
       }
@@ -556,6 +580,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     chay()
     return () => {
       conSong = false
+      oSan?.huy(); oSan = null
       dung(); boNghe(); quanSat?.disconnect(); window.clearTimeout(henDau)
       nenToi?.removeEventListener?.('change', doiMau)
       window.removeEventListener('resize', doKhung)

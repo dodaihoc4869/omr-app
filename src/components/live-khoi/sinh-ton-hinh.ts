@@ -364,7 +364,17 @@ export class BoHinh {
   private nho = new Map<string, Anh>()
   readonly b: BangMau; readonly k: number; readonly phang: boolean
   constructor(b: BangMau, k: number, phang: boolean) { this.b = b; this.k = k; this.phang = phang }
-  private lay(khoa: string, tao: () => Anh): Anh { let a = this.nho.get(khoa); if (!a) { a = tao(); this.nho.set(khoa, a) } return a }
+  /** Hạn nướng của khung này (`performance.now`): quá hạn thì hình CHƯA nướng được bỏ qua khung này (hiện ở khung kế) — khung đầu ở máy yếu không dồn cả chục lần nướng. 0 = không hạn. */
+  han = 0
+  private trong: Anh | null = null
+  private lay(khoa: string, tao: () => Anh): Anh {
+    let a = this.nho.get(khoa)
+    if (!a) {
+      if (this.han && performance.now() > this.han) return this.trong ??= { c: document.createElement('canvas'), w: 0, h: 0, ox: 0, oy: 0 }
+      a = tao(); this.nho.set(khoa, a)
+    }
+    return a
+  }
   /** Bé ma: `khung` 0 / 1 = hai lượt nét rung (kiểu phẳng luôn khung 0). */
   ma(doi: number, trai: boolean, khung: number): Anh { const kh = this.phang ? 0 : khung; return this.lay(`m${doi}${+trai}${kh}`, () => nuongMa(this.b, this.k, doi, trai, kh)) }
   sung(doi: number, cap: number): Anh { return this.lay(`s${doi}${cap}`, () => nuongSung(this.b, this.k, doi, cap)) }

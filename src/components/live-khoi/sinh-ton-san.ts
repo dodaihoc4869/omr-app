@@ -5,7 +5,7 @@
 // và tô bằng phép dời nguyên điểm ảnh (trình duyệt không phải co giãn mẫu mỗi khung; co giãn thì chỉ còn 24 khung / giây ở CPU ×4). Muốn vậy tỉ lệ
 // sân phải làm tròn để 256 · ti · dpr là số nguyên (`lamTronTi`). Công thức / hình vẽ chơi / tên trại là ẢNH NƯỚNG SẴN (BoHinh.chu…), không vẽ chữ mỗi khung.
 import type { BanDo } from '../../lib/live-khoi/sinh-ton-loi'
-import { dat, mau, type BangMau, type BoHinh } from './sinh-ton-hinh'
+import { dat, loaiTuong, mau, type BangMau, type BoHinh, type LoaiVat } from './sinh-ton-hinh'
 
 /** Cạnh ô mẫu nền (đơn vị sân). */
 export const O_MAU = 256
@@ -48,7 +48,7 @@ export const CONG_THUC: readonly (readonly [number, number, string])[] = [
 const TEN_TRAI = ['Trại Đội Natri', 'Trại Đội Kali', 'Trại Đội Đồng', 'Trại Đội Canxi']
 
 /** Vẽ phần TRANG (lề, gáy, viền trang, công thức, hình vẽ chơi, trại) trong hệ toạ độ sân; chỉ thứ lọt khung nhìn [x0, x1] × [y0, y1]. */
-export function veTrang(g: CanvasRenderingContext2D, b: BangMau, h: BoHinh, bd: BanDo, x0: number, y0: number, x1: number, y1: number): void {
+export function veTrang(g: CanvasRenderingContext2D, b: BangMau, h: BoHinh, bd: BanDo, x0: number, y0: number, x1: number, y1: number, chiTiet = true): void {
   const khuW = bd.rong / Math.max(1, bd.ngang), khuH = bd.cao / Math.max(1, bd.doc)
   const ya = Math.max(0, y0), yb = Math.min(bd.cao, y1)
   // lề đỏ đôi (mỗi nửa trang một lề)
@@ -65,8 +65,8 @@ export function veTrang(g: CanvasRenderingContext2D, b: BangMau, h: BoHinh, bd: 
     g.strokeStyle = mau(b.muc, 0.45); g.lineWidth = 2; g.stroke()
   }
   g.strokeStyle = mau(b.muc, 0.35); g.lineWidth = 2; g.strokeRect(0, 0, bd.rong, bd.cao)
-  // công thức viết chì mờ + hình vẽ chơi (ảnh nướng sẵn)
-  for (let kx = 0; kx < bd.rong; kx += khuW) for (let ky = 0; ky < bd.cao; ky += khuH) {
+  // công thức viết chì mờ + hình vẽ chơi (ảnh nướng sẵn); máy yếu bỏ (nét mờ 16%, mắt gần như không thấy)
+  if (chiTiet) for (let kx = 0; kx < bd.rong; kx += khuW) for (let ky = 0; ky < bd.cao; ky += khuH) {
     for (const [fx, fy, s] of CONG_THUC) {
       const x = kx + fx * khuW, y = ky + fy * khuH
       if (x > x0 - 320 && x < x1 + 10 && y > y0 - 10 && y < y1 + 30) dat(g, h.chu(s, 20, b.muc, 0.16, false, false), x, y)
@@ -82,5 +82,97 @@ export function veTrang(g: CanvasRenderingContext2D, b: BangMau, h: BoHinh, bd: 
     g.beginPath(); g.ellipse(t.x, t.y, 92, 64, 0, 0, Math.PI * 2); g.fillStyle = mau(c, 0.09); g.fill()
     g.setLineDash([3, 5]); g.strokeStyle = mau(c, 0.75); g.lineWidth = 2.2; g.stroke(); g.setLineDash([])
     dat(g, h.chu(TEN_TRAI[i], 19, c, 0.9), t.x, t.y + (t.y < bd.cao / 2 ? 86 : -76))
+  }
+}
+
+// ── Ô NƯỚNG SẴN lớp dưới (tác tử tốc độ 13/11, máy yếu): nền ô li + trang + (kiểu phẳng) vật chặn nướng vào các ô 512 × 512 đơn vị sân, giữ LRU có trần byte;
+// mỗi khung chỉ dán vài ô thay vì tô mẫu + vẽ từng vật. Ô chưa nướng thì vẽ thẳng (cắt đúng ô) và mỗi khung nướng thêm tối đa 1 ô ⇒ khung đầu không phình.
+export const CANH_O = 512
+interface OAnh { c: HTMLCanvasElement; luc: number }
+export class BoO {
+  /** Cạnh ô (điểm ảnh thiết bị) — số nguyên nhờ `lamTronTi`. */ readonly n: number
+  private o = new Map<number, OAnh>()
+  private khung = 0
+  private readonly tran: number
+  private b: BangMau; private h: BoHinh; private bd: BanDo; private san: BoSan; readonly k: number; private gopVat: boolean; private chiTiet: boolean
+  constructor(b: BangMau, h: BoHinh, bd: BanDo, san: BoSan, k: number, gopVat: boolean, chiTiet: boolean, tranByte: number) {
+    this.b = b; this.h = h; this.bd = bd; this.san = san; this.k = k; this.gopVat = gopVat; this.chiTiet = chiTiet
+    this.n = Math.round(CANH_O * k)
+    this.tran = Math.floor(tranByte / (this.n * this.n * 4))
+  }
+  /** Bộ nhớ ảnh đang giữ (byte). */
+  boNho(): number { return this.o.size * this.n * this.n * 4 }
+  huy(): void { for (const a of this.o.values()) { a.c.width = 0; a.c.height = 0 } this.o.clear() }
+  /** Vẽ một ô (hoặc phần ô lọt trang) vào `t` tại điểm ảnh (ox, oy) rộng sw × sh. */
+  private veO(t: CanvasRenderingContext2D, ox: number, oy: number, i: number, j: number, sw: number, sh: number): void {
+    const { k, bd } = this, x0 = i * CANH_O, y0 = j * CANH_O, x1 = x0 + CANH_O, y1 = y0 + CANH_O
+    t.save()
+    t.setTransform(1, 0, 0, 1, ox, oy)
+    t.beginPath(); t.rect(0, 0, sw, sh); t.clip()
+    t.fillStyle = this.san.nen ?? mau(this.b.giay); t.fillRect(0, 0, sw, sh)
+    t.setTransform(k, 0, 0, k, ox - x0 * k, oy - y0 * k)
+    veTrang(t, this.b, this.h, bd, x0, y0, x1, y1, this.chiTiet)
+    if (this.gopVat) {
+      const ke: { y: number; v: BanDo['tuong'][number]; l: LoaiVat }[] = []
+      for (let q = 0; q < bd.tuong.length; q++) { const v = bd.tuong[q]; if (v.x < x1 + 20 && v.x + v.w > x0 - 20 && v.y < y1 + 20 && v.y + v.h > y0 - 40) ke.push({ y: v.y + v.h, v, l: loaiTuong(v.w, v.h, q) }) }
+      for (const v of bd.thung) if (v.x < x1 + 20 && v.x + v.w > x0 - 20 && v.y < y1 + 20 && v.y + v.h > y0 - 40) ke.push({ y: v.y + v.h, v, l: 'tay' })
+      ke.sort((a, c) => a.y - c.y)
+      for (const e of ke) dat(t, this.h.vat(e.l, e.v.w, e.v.h), e.v.x, e.v.y)
+    }
+    t.restore()
+  }
+  private nuong(i: number, j: number): OAnh | null {
+    const c = document.createElement('canvas'), n = this.n
+    c.width = c.height = n
+    const t = c.getContext('2d', { alpha: false })
+    if (!t) return null
+    t.lineCap = 'round'; t.lineJoin = 'round'
+    const han = this.h.han; this.h.han = 0 // ô nướng xong là giữ mãi ⇒ không được bỏ sót hình
+    this.veO(t, 0, 0, i, j, n, n)
+    this.h.han = han
+    const a = { c, luc: this.khung }
+    this.o.set(i * 4096 + j, a)
+    return a
+  }
+  private nhuong(): boolean {
+    if (this.o.size < this.tran) return true
+    let tk = -1, ml = Infinity
+    for (const [k, a] of this.o) if (a.luc < ml) { ml = a.luc; tk = k }
+    if (tk < 0 || ml >= this.khung) return false
+    const a = this.o.get(tk)
+    if (a) { a.c.width = 0; a.c.height = 0 }
+    this.o.delete(tk)
+    return true
+  }
+  /** Vẽ lớp dưới cho khung nhìn [x0, x1] × [y0, y1] (toạ độ sân); (px, py) = điểm ảnh của gốc sân. `false` = không đủ trần bộ nhớ ⇒ người gọi tự vẽ thẳng.
+   *  `ranh` = khung này còn dư sức ⇒ nướng trước thêm 1 ô kề khung nhìn (hướng em đang chạy). */
+  ve(g: CanvasRenderingContext2D, px: number, py: number, x0: number, y0: number, x1: number, y1: number, ranh: boolean): boolean {
+    const { bd, n, k } = this
+    const i0 = Math.max(0, Math.floor(x0 / CANH_O)), i1 = Math.min(Math.ceil(bd.rong / CANH_O) - 1, Math.floor(x1 / CANH_O))
+    const j0 = Math.max(0, Math.floor(y0 / CANH_O)), j1 = Math.min(Math.ceil(bd.cao / CANH_O) - 1, Math.floor(y1 / CANH_O))
+    if (i1 < i0 || j1 < j0) return true
+    if ((i1 - i0 + 1) * (j1 - j0 + 1) > this.tran - 1) return false
+    this.khung++
+    g.setTransform(1, 0, 0, 1, 0, 0)
+    // Hai khung đầu vẽ thẳng hết (khung đầu không phình thêm việc nướng ô).
+    let nuong = this.khung > 2 ? 1 : 0
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      const sw = Math.round(Math.min(CANH_O, bd.rong - i * CANH_O) * k), sh = Math.round(Math.min(CANH_O, bd.cao - j * CANH_O) * k)
+      const ox = px + i * n, oy = py + j * n
+      let a = this.o.get(i * 4096 + j) ?? null
+      if (!a && nuong > 0 && this.nhuong()) { nuong--; a = this.nuong(i, j) }
+      if (a) { a.luc = this.khung; g.drawImage(a.c, 0, 0, sw, sh, ox, oy, sw, sh) } else this.veO(g, ox, oy, i, j, sw, sh)
+    }
+    if (ranh && nuong > 0) {
+      // ô kề khung nhìn (nửa ô mỗi phía) chưa có ⇒ nướng trước một ô
+      const a0 = Math.max(0, Math.floor((x0 - 300) / CANH_O)), a1 = Math.min(Math.ceil(bd.rong / CANH_O) - 1, Math.floor((x1 + 300) / CANH_O))
+      const c0 = Math.max(0, Math.floor((y0 - 300) / CANH_O)), c1 = Math.min(Math.ceil(bd.cao / CANH_O) - 1, Math.floor((y1 + 300) / CANH_O))
+      for (let j = c0; j <= c1; j++) for (let i = a0; i <= a1; i++) {
+        if (this.o.has(i * 4096 + j)) continue
+        if (this.nhuong()) this.nuong(i, j)
+        return true
+      }
+    }
+    return true
   }
 }

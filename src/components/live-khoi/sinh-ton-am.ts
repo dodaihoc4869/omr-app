@@ -9,6 +9,9 @@ let tat = false
 /** Mốc giờ (giây của AudioContext) các tiếng súng gần đây — để giữ trần 7 tiếng / 0,25 giây (nhịp bắn 4 phát / giây ⇒ mỗi súng tối đa 1 tiếng trong cửa sổ này). */
 const ganDay: number[] = []
 const KHOA_TAT = 'ddh.sinhton.am'
+/** Máy yếu: trần tiếng súng đồng thời thấp hơn (đỡ tốn bộ xử lý âm thanh). */
+let yeuAm = false
+export function datYeuAm(v: boolean): void { yeuAm = v }
 
 export function docTat(): boolean {
   try { tat = localStorage.getItem(KHOA_TAT) === 'tat' } catch { /* không có kho */ }
@@ -68,7 +71,7 @@ export function tiengBan(cap: number, cuaToi: boolean, gan = 1): void {
   if (!duocKeu() || !ctx) return
   const t = ctx.currentTime
   while (ganDay.length && t - ganDay[0] > 0.25) ganDay.shift()
-  if (!cuaToi && (ganDay.length >= 7 || gan < 0.12)) return
+  if (!cuaToi && (ganDay.length >= (yeuAm ? 3 : 7) || gan < (yeuAm ? 0.3 : 0.12))) return
   ganDay.push(t)
   const am = cuaToi ? 1 : 0.4 * gan, lech = 0.94 + Math.random() * 0.12
   try {
