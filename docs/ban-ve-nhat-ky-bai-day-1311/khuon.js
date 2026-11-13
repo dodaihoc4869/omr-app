@@ -186,12 +186,12 @@
     goc.append(svg)
     // khung ôm vừa chữ (đo lại khi phông tải xong)
     const doKhung = () => {
-      klPha.forEach((k) => { try { const b = k.t.getBBox(); if (b.width) { const w = Math.min(W - 12, b.width + 40); k.khung.setAttribute('x', XC - w / 2); k.khung.setAttribute('width', w) } } catch (e) { /* chưa vẽ được */ } })
+      klPha.forEach((k) => { try { const b = k.t.getBBox(); if (b.width) { const w = Math.min(W - 12, b.width + 40); k.khung.setAttribute('x', XC - w / 2); k.khung.setAttribute('width', w) } } catch { /* chưa vẽ được */ } })
       // dải pha: các chữ giữa chia đều khoảng trống giữa chữ đầu và chữ cuối
       if (dai && dai.length > 2) try {
         const a = dai[0].firstChild.getBBox(), z = dai[dai.length - 1].firstChild.getBBox(), tu = a.x + a.width, den = z.x
         for (let i = 1; i < dai.length - 1; i++) { const x = tu + (den - tu) * i / (dai.length - 1); dai[i].firstChild.setAttribute('x', x); dai[i].lastChild.setAttribute('cx', x) }
-      } catch (e) { /* chưa vẽ được */ }
+      } catch { /* chưa vẽ được */ }
     }
     doKhung(); if (document.fonts) document.fonts.ready.then(doKhung)
 
@@ -354,7 +354,7 @@
     kyEl.forEach((e, i) => dg.hien(e, i * 220, 420, { transform: 'scale(.5)' }))
     ctx.buoc(0)
     let t = 300 + kyEl.length * 220
-    rieng.forEach((g, i) => { [...g.children].forEach((e, k) => dg.hien(e, t + k * 110, 300, { transform: 'scale(0)' })); t += 260 })
+    rieng.forEach((g) => { [...g.children].forEach((e, k) => dg.hien(e, t + k * 110, 300, { transform: 'scale(0)' })); t += 260 })
     t += 300
     ctx.buoc(t)
     chung.forEach((g) => { [...g.children].forEach((e, k) => (k === 0 ? dg.chuoi(e, [[t + 200, { opacity: 0, transform: 'scale(.3)' }], [t + 520, { opacity: 1, transform: 'scale(1.25)' }], [t + 900, { opacity: 0.85, transform: 'scale(1)' }]]) : dg.hien(e, t + (k - 1) * 160, 360, { transform: 'scale(0)' }))); t += 560 })
@@ -504,7 +504,7 @@
       DUNG[d.mo.khuon](bang, d.mo.duLieu, dgMo, { id: ctx.id + '-mo', nguong: ctx.nguong, buoc: () => {}, tieuDe: d.hoi })
       dgMo.hien(phan, 0, 380, { transform: 'translateY(6px)' })
       if (ngay) dgMo.cuoi(); else dgMo.chay()
-      ctx.khiTraLoi && ctx.khiTraLoi(i, i === dungI)
+      if (ctx.khiTraLoi) ctx.khiTraLoi(i, i === dungI)
     }
     nut.forEach((b, i) => b.addEventListener('click', () => traLoi(i)))
     ctx.dieuKhien.traLoi = traLoi
@@ -550,7 +550,7 @@
       const au = this.au, vt = tu - this.lech
       const phat = () => {
         if (!this.chay || !(vt >= 0 && vt < (au.duration || 0) - 0.05)) return
-        try { au.currentTime = vt } catch (e) { return }
+        try { au.currentTime = vt } catch { return }
         au.playbackRate = TOC
         const p = au.play(); this.dungAu = true
         if (p && p.catch) p.catch(() => { this.dungAu = false })
@@ -605,7 +605,7 @@
         if (e.target.closest('.bp-dk')) return
         tay.set(e.pointerId, { x: e.clientX, y: e.clientY }); if (tay.size === 2) { const [a, b] = [...tay.values()]; khoang0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = this.zoom }
         if (this.zoom > 1 || tay.size === 2) el.setPointerCapture(e.pointerId)
-        const nay = performance.now(); if (tay.size === 1 && nay - cham0 < 300) { const r = el.getBoundingClientRect(); this.zoom > 1 ? this.datLai() : this.doiZoom(2, e.clientX - r.left, e.clientY - r.top) } cham0 = nay
+        const nay = performance.now(); if (tay.size === 1 && nay - cham0 < 300) { const r = el.getBoundingClientRect(); if (this.zoom > 1) this.datLai(); else this.doiZoom(2, e.clientX - r.left, e.clientY - r.top) } cham0 = nay
       })
       el.addEventListener('pointermove', (e) => {
         if (!tay.has(e.pointerId)) return

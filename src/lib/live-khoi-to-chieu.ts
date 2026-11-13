@@ -5,6 +5,9 @@ import { JS_LIVE_NOP } from './live-nop-to-chieu'
 import { CSS_LIVE_MT, JS_LIVE_MT } from './live-mt-to-chieu'
 
 export const CSS_LIVE_KHOI = `
+/* CHẤM LAZE của thầy (13/11: thầy «để lại, phím tắt bật tắt, mặc định tắt» — JS bật / tắt làm ở đợt sau; chưa có JS thì chấm không bao giờ dựng): lõi đỏ nét, viền sáng mảnh, quầng đỏ. Lúc chấm hiện thì ẩn con trỏ hệ thống trên lớp bút; đang viết (.mc-viet) ⇒ con trỏ viết cũ. */
+.mc-laze{position:fixed;left:0;top:0;z-index:2147483600;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;background:var(--mc-do);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--mc-bang-chu) 85%,transparent),0 0 10px 4px color-mix(in srgb,var(--mc-do) 70%,transparent),0 0 22px 9px color-mix(in srgb,var(--mc-do) 32%,transparent);will-change:transform}
+.mc-laze[hidden]{display:none}
 /* THẺ TÊN EM LÊN BẢNG TRONG BUỔI LIVE (thầy 13/11: «thẻ tên cho nhỏ nhất có thể, bo, chữ hiện ở giữa, tối ưu không gian viết»): một viên nhỏ ôm sát
    tên, đứng giữa đầu cột bảng; chỉ còn TÊN (+ dấu Đạt / Không đạt). Nhãn «Dự kiến làm được…», số báo danh, «Chi tiết ›», ảnh linh thú ẩn — phần chỗ trả cho
    bảng. KHÔNG ép display ở thẻ ngoài: tờ còn giấu thẻ bằng luật CSS riêng. Một ô có hơn một thẻ ⇒ chỉ hiện thẻ ĐẦU (lệnh gọi lên bảng ghi tên vào thẻ đầu,

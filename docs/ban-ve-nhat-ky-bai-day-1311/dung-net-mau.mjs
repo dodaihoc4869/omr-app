@@ -72,7 +72,6 @@ function them(diem, mau, co) {
   net.push({ m: mau, c: co, t: Math.round(gio), p })
   gio += t + 70 + rd() * 90
 }
-const nghi = (ms) => { gio += ms }
 /** Đặt giờ (giây trên trục tiếng). Không lùi giờ. */
 const MOC_GIO = []
 const luc = (giay) => { if (MOC_GIO.length) MOC_GIO[MOC_GIO.length - 1].den = Math.round(gio / 100) / 10; gio = Math.max(gio, giay * 1000); MOC_GIO.push({ dat: giay, that: Math.round(gio / 100) / 10 }) }

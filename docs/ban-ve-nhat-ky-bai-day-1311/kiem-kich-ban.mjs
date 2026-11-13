@@ -49,7 +49,7 @@ globalThis.window = globalThis
 globalThis.location = { search: '' }
 globalThis.matchMedia = () => ({ matches: false })
 globalThis.document = { documentElement: { classList: { contains: () => false } } }
-;(0, eval)(readFileSync(join(DAY, 'khuon.js'), 'utf8'))
+;new Function(readFileSync(join(DAY, 'khuon.js'), 'utf8'))() // nạp thư viện khuôn (IIFE gắn vào window) như thẻ <script> của trang
 const N = window.NKB
 for (const t of ['lien-ket', 'fes2']) {
   const c = N.kiemCong(doc(`kich-ban-${t}.json`))
