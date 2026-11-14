@@ -78,7 +78,7 @@ function khungQuay(h) {
 const doan = [], sfx = [], giong = []
 let t = 0
 // mục lục «Hôm nay em học» (dấu hiệu cấu trúc bài): mỗi phần một dòng
-const muc = ch.canh.map((c) => [c.so, c.tieuDe, c.mau])
+const muc = ch.mucLuc ?? ch.canh.map((c) => [c.so, c.tieuDe, c.mau])
 doan.push({ loai: 'mo-dau', t0: 0, t1: MO_DAU, ...ch.moDau, muc }); sfx.push({ t: 0.35, loai: 'vut' }, { t: 1.1, loai: 'dap' }, { t: 2.2, loai: 'bop' }, { t: 4.45, loai: 'vut' })
 muc.forEach((_, i) => sfx.push({ t: 5.05 + i * 0.32, loai: 'bip' }))
 t = MO_DAU
@@ -91,6 +91,15 @@ for (const cc of ch.canh) {
   const canh = { loai: 'canh', id: cc.id, so: cc.so, tieuDe: cc.tieuDe, mau: cc.mau, nhan: cc.nhan, t0: t, manh: [], cau: [], su: [], nhanManh: [], khung: [] }
   const cauGoc = cc.dong.map((i) => ({ i, ...c.loi[i] }))
   let trc = null
+  const chenDoVui = (sMoc) => {
+    const dv = cc.doVui
+    canh.manh.push({ t0: t, t1: t + dv.giay, s0: sMoc, s1: sMoc, giong: false, dung: true })
+    canh.doVui = { t0: t, t1: t + dv.giay, hoi: dv.hoi, luaChon: dv.luaChon, moDong: dv.moDong, tom: dv.tom }
+    sfx.push({ t: t + 0.05, loai: 'vut' }, { t: t + 0.5, loai: 'bop' })
+    for (let g = 0; g < 5; g++) sfx.push({ t: t + dv.giay - 5.4 + g, loai: g === 4 ? 'tich-cuoi' : 'tich' })
+    t += dv.giay
+  }
+  if (cc.doVui && cc.doVui.sauDong === -1) chenDoVui(batDau(cauGoc[0].tu))
   for (const [k, cg] of cauGoc.entries()) {
     const a = batDau(cg.tu), b = ketThuc(cg.den)
     if (trc != null && a > trc) { canh.manh.push({ t0: t, t1: t + NOI_CAU, s0: trc, s1: a, giong: false }); t += NOI_CAU }
@@ -101,14 +110,7 @@ for (const cc of ch.canh) {
     }
     cau.t1 = t; canh.cau.push(cau); trc = b
     // ĐỐ VUI chèn sau câu `sauDong`: bảng đứng, giọng tắt, thẻ câu hỏi + đếm ngược
-    if (cc.doVui && cg.i === cc.doVui.sauDong) {
-      const dv = cc.doVui
-      canh.manh.push({ t0: t, t1: t + dv.giay, s0: b, s1: b, giong: false, dung: true })
-      canh.doVui = { t0: t, t1: t + dv.giay, hoi: dv.hoi, luaChon: dv.luaChon, moDong: dv.moDong }
-      sfx.push({ t: t + 0.05, loai: 'vut' }, { t: t + 0.5, loai: 'bop' })
-      for (let g = 0; g < 5; g++) sfx.push({ t: t + dv.giay - 5.4 + g, loai: g === 4 ? 'tich-cuoi' : 'tich' })
-      t += dv.giay
-    }
+    if (cc.doVui && cg.i === cc.doVui.sauDong) chenDoVui(b)
     void k
   }
   canh.manh.push({ t0: t, t1: t + DUOI_CANH, s0: trc, s1: trc + DUOI_CANH, giong: false }); t += DUOI_CANH
@@ -121,10 +123,11 @@ for (const cc of ch.canh) {
   for (const s of cc.su ?? []) { const tt = moc(s.dong, s.frac); if (tt == null) continue; canh.su.push({ ...s, t: tt }); sfx.push({ t: tt, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
   // HOẠT HOẠ chi tiết của cảnh: mốc = [câu, phần trăm độ dài câu] ⇒ giây trên video
   if (cc.hoat) {
-    canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, [dong, frac]]) => [k, moc(dong, frac)])) }
+    canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, p: cc.hoat.p, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, [dong, frac]]) => [k, moc(dong, frac)])) }
     // 4 HCl bay vào + bộ đếm lên đủ 4a NGAY TRƯỚC lúc lộ đáp án (không lướt qua «3a» khi thẻ đã sáng)
-    if (canh.doVui && 'hcl' in canh.hoat.moc) canh.hoat.moc.hcl = canh.doVui.tMo - 1.35
-    const TD = { 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, chuoi: { hien: 'vut', cat: 'bot', n1: 'bip', n2: 'bip', n3: 'bip', n4: 'bip', tong: 'dap', hcl: 'vut', lys: 'bop' } }[cc.hoat.loai] ?? {}
+    if (canh.doVui && 'thuoc' in canh.hoat.moc) canh.hoat.moc.thuoc = Math.max(canh.doVui.tMo - 1.35, (canh.hoat.moc.tong ?? 0) + 0.3)
+    const TD = { hat: { hien: 'bip', dem50: 'vut', mau: 'bop', lk: 've', oligo: 'bop', poly: 'bop' }, 'dong-phan': { hien: 'vut', doi: 'vut', so: 'dap', quy: 'bop', giu: 'bip', dau: 'bop' }, 'cat-lk': { hien: 'vut', nuoc: 'bot', tach: 'dap', mt: 'bop', hoan: 'bop', khong: 'bop' }, biuret: { thuoc: 'bot', x3: 'bip', tim: 'dung-nhe' }, 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, chuoi: { hien: 'vut', cat: 'bot', d1: 'bip', d2: 'bip', d3: 'bip', d4: 'bip', d5: 'bip', tong: 'dap', thuoc: 'vut', sinh: 'bot', con: 'bop', nhan: 'bop', m1: 'bop', m2: 'bop' } }[cc.hoat.loai] ?? {}
+    if (cc.hoat.loai === 'phuong-trinh') for (const k of Object.keys(canh.hoat.moc)) TD[k] = 'bop'
     for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
     if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
     if (cc.hoat.loai === 'chuoi') sfx.push({ t: canh.hoat.moc.cat + 0.55, loai: 'bot' })
@@ -157,8 +160,9 @@ for (const cc of ch.canh) {
   doan.push(canh)
 }
 // kết
-doan.push({ loai: 'ket', t0: t, t1: t + KET, ...ch.ket }); sfx.push({ t: t + 0.02, loai: 'vut' }); ch.ket.y.forEach((_, i) => sfx.push({ t: t + 1.3 + i * 0.9, loai: 'bop' })); sfx.push({ t: t + KET - 3.6, loai: 'dap' })
-t += KET
+const KET_DAI = Math.max(KET, 6.5 + ch.ket.y.length * 0.9)
+doan.push({ loai: 'ket', t0: t, t1: t + KET_DAI, ...ch.ket }); sfx.push({ t: t + 0.02, loai: 'vut' }); ch.ket.y.forEach((_, i) => sfx.push({ t: t + 1.3 + i * 0.9, loai: 'bop' })); sfx.push({ t: t + KET_DAI - 3.6, loai: 'dap' })
+t += KET_DAI
 
 const kb = { fps: 30, rong: 1920, cao: 1080, nhip: NHIP, bo: BO, tong: Math.round(t * 1000) / 1000, ten: ch.ten, lop: ch.lop, ngay: ch.ngay, doan, giong, sfx: sfx.sort((a, b) => a.t - b.t) }
 writeFileSync(join(ra, 'kich-ban.json'), JSON.stringify(kb))

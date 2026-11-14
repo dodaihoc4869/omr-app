@@ -13,7 +13,7 @@ function lo(tau, f = 2.3, z = 0.5) {
 }
 const lerp = (a, b, p) => a + (b - a) * p
 const MAU = { vang: '#ffd27a', hong: '#fda4af', ngoc: '#6ee7b7', xanh: '#8fb6ff', trang: '#f4efe4' }
-const MAU_PHU = { vang: ['#ffd27a', '#fda4af', '#6ee7b7'], hong: ['#fda4af', '#ffd27a', '#8fb6ff'], ngoc: ['#6ee7b7', '#8fb6ff', '#ffd27a'] }
+const MAU_PHU = { vang: ['#ffd27a', '#fda4af', '#6ee7b7'], hong: ['#fda4af', '#ffd27a', '#8fb6ff'], ngoc: ['#6ee7b7', '#8fb6ff', '#ffd27a'], xanh: ['#8fb6ff', '#c4b5fd', '#6ee7b7'] }
 const $ = (s) => document.querySelector(s)
 const tao = (tag, cls, cha, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (cha) cha.appendChild(e); return e }
 const thoat = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
@@ -91,7 +91,8 @@ function dungCanh() {
     if (d.hoat && HOAT[d.hoat.loai]) {
       const el = tao('div', 'the hoat an', cot); el.style.setProperty('--mau', mau); el.style.height = `${d.hoat.cao}px`
       d.hoatEl = el; HOAT[d.hoat.loai][0](d, el)
-      d.the.push({ el, su: { loai: 'hoat' }, t: d.t0 - 0.2, coDinh: true })
+      const sauTieuDe = d.the.findIndex((x) => x.su.loai !== 'tieu-de')
+      d.the.splice(sauTieuDe < 0 ? d.the.length : sauTieuDe, 0, { el, su: { loai: 'hoat' }, t: d.t0 - 0.2, coDinh: true })
     }
     d.lon = d.su.filter((s) => s.loai === 'lon')
     // phụ đề: mỗi câu một dòng, mỗi chữ một ô
@@ -194,11 +195,10 @@ function vePhanTu(d, t) {
 // ── ĐỐ VUI ──
 function dungDoVui(d) {
   const v = d.doVui
-  $('#dv-hoi').innerHTML = dam(v.hoi)
-  const lc = $('#dv-lc'); lc.innerHTML = ''
-  v.o = v.luaChon.map(([chu, gt, dung]) => { const e = tao('div', 'lc', lc, `<b>${thoat(chu)}</b><span>${thoat(gt)}</span>`); e.dataset.dung = dung ? '1' : ''; return e })
+  // nhiều câu đố trong một video: lớp phủ #dv dùng chung, nội dung nạp lại khi tới câu của cảnh này (veDoVui)
+  v.o = []
   // thẻ thu nhỏ trong cột sau khi đếm xong
-  const mini = tao('div', 'the an', $('#cot-trong'), `<span class="chu" style="font-size:27px">Gly - Lys - Gly : a + HCl ⇒ cần <em>? mol HCl</em></span><div class="mini-lc" style="display:flex;gap:12px;margin-top:14px"></div><i class="bong"></i>`)
+  const mini = tao('div', 'the an', $('#cot-trong'), `<span class="chu" style="font-size:29px">${dam(v.tom || '')}</span><div class="mini-lc" style="display:flex;gap:12px;margin-top:14px"></div><i class="bong"></i>`)
   mini.style.setProperty('--mau', MAU.vang)
   v.mini = mini; v.miniO = v.luaChon.map(([chu, gt, dung]) => { const e = tao('div', '', mini.querySelector('.mini-lc'), `<b style="opacity:.6;font-size:20px">${chu}</b> ${gt}`); e.style.cssText = 'flex:1;text-align:center;padding:10px 0;border-radius:16px;background:rgba(255,255,255,.07);font-size:30px;font-weight:800'; e.dataset.dung = dung ? '1' : ''; return e })
   d.the.unshift({ el: mini, su: { loai: 'the' }, t: v.t1 })
@@ -210,6 +210,11 @@ function veDoVui(d, t) {
   const v = d.doVui, dv = $('#dv')
   const on = t >= v.t0 && t < v.t1 + 0.55
   dv.classList.toggle('an', !on)
+  if (on && dv.dataset.id !== d.id) {
+    dv.dataset.id = d.id; $('#dv-hoi').innerHTML = dam(v.hoi)
+    const lc = $('#dv-lc'); lc.innerHTML = ''
+    v.o = v.luaChon.map(([chu, gt, dung]) => { const e = tao('div', 'lc', lc, `<b>${thoat(chu)}</b><span>${thoat(gt)}</span>`); e.dataset.dung = dung ? '1' : ''; return e })
+  }
   if (on) {
     const vao = lo(t - v.t0, 1.8, 0.55), ra = eInOut(tien(t, v.t1, 0.5))
     $('#dv-nen').style.opacity = kep((t - v.t0) / 0.3) * (1 - ra)
@@ -291,7 +296,8 @@ function veMoDau(d, t) {
 function dungKet() {
   const d = DOAN.find((x) => x.loai === 'ket'); if (!d) return
   $('#ket-ten').innerHTML = `${thoat(d.tieuDe)}<i class="gach"></i>`
-  d.y.forEach((y, i) => { const e = tao('div', 'ket-y', $('#ket'), `<span class="tick">${CHECK}</span><span>${dam(y)}</span>`); e.style.top = `${330 + i * 180}px` })
+  const nhieu = d.y.length > 3
+  d.y.forEach((y, i) => { const e = tao('div', `ket-y${nhieu ? ' nho' : ''}`, $('#ket'), `<span class="tick">${CHECK}</span><span>${dam(y)}</span>`); e.style.top = `${(nhieu ? 300 : 330) + i * (nhieu ? 102 : 180)}px` })
   $('#ket-cuoi').textContent = d.cuoi
 }
 function veKet(d, t) {
@@ -300,7 +306,7 @@ function veKet(d, t) {
   const ten = $('#ket-ten'), pt = lo(t - d.t0 - 0.2); ten.style.transform = `translateX(${(1 - pt) * -80}px)`; ten.style.opacity = kep(pt * 1.4)
   ten.querySelector('.gach').style.width = `${eOut(tien(t, d.t0 + 0.6, 0.6)) * 320}px`
   k.querySelectorAll('.ket-y').forEach((e, i) => { const t0 = d.t0 + 1.3 + i * 0.9, p = lo(t - t0); e.style.transform = `translateX(${(1 - p) * 90}px)`; e.style.opacity = kep(p * 1.5); e.querySelector('.tick').style.transform = `scale(${0.4 + 0.6 * lo(t - t0, 2.6, 0.4)})`; e.querySelector('.dau-tick').style.strokeDashoffset = 40 * (1 - eOut(tien(t, t0 + 0.2, 0.4))) })
-  const c = $('#ket-cuoi'); c.style.opacity = tien(t, d.t0 + 4.6, 0.6)
+  const c = $('#ket-cuoi'); c.style.opacity = tien(t, d.t0 + 1.8 + d.y.length * 0.9, 0.6)
   $('#den').style.opacity = tien(t, d.t1 - 0.9, 0.9)
 }
 

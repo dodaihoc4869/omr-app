@@ -153,54 +153,69 @@ function veCauTruc(d, t) {
   d2.querySelectorAll('em')[1].style.opacity = t >= m.matH ? 1 : 0.25
 }
 
-// ═════════ 3) CHUỖI Gly - Lys - Gly: cắt 2 liên kết bằng 2 H₂O, đếm N 1 → 4, 4 HCl gắn vào N ═════════
+// ═════════ 3) CHUỖI PEPTIDE THUỶ PHÂN (tham số hoá): acid ⇒ HCl đếm N · base ⇒ NaOH đếm đầu C; nước cắt (k−1) liên kết ═════════
+// d.hoat.p = { khoi: [[tên, số N, số đầu C], …], mt: 'acid' | 'base', nhan?: chữ ghi chú, muoi?: [chữ muối 1, chữ muối 2] }
+// mốc: hien, cat (nước cắt liên kết), d1…dK (sáng từng chấm đếm), tong, thuoc (HCl / NaOH bay vào), sinh / con (base: nước sinh / còn), nhan, m1, m2
+const soA = (n) => (n === 1 ? 'a' : `${n}a`)
 function dungChuoi(d, goc) {
   goc.classList.add('cq')
-  const K = [{ ten: 'Gly', x: 14, n: 1 }, { ten: 'Lys', x: 299, n: 2 }, { ten: 'Gly', x: 584, n: 1 }]
-  const C = { khoi: [], lk: [], n: [], hcl: [], giot: [] }
-  K.forEach((k, i) => {
-    const e = tao('div', 'cq-khoi', goc, `<b>${k.ten}</b>`); e.style.left = `${k.x}px`
-    C.khoi.push({ e, x: k.x })
-    for (let j = 0; j < k.n; j++) { const dot = tao('div', 'cq-n', goc, 'N'); const x = k.x + 115 - (k.n - 1) * 40 + j * 80; dot.style.left = `${x - 31}px`; C.n.push({ e: dot, x, khoi: i, so: tao('div', 'cq-so', goc, String(C.n.length + 1)) }) }
+  const P = d.hoat.p || { khoi: [['Gly', 1, 1], ['Lys', 2, 1], ['Gly', 1, 1]], mt: 'acid' }
+  const acid = P.mt !== 'base', K = P.khoi.map(([ten, n, c]) => ({ ten, dem: acid ? n : c })), k = K.length
+  const W = (typeof COT !== 'undefined' && COT.w) || 828, gap = k > 3 ? 34 : 55, bw = Math.min(230, (W - 28 - gap * (k - 1)) / k)
+  const C = { khoi: [], lk: [], n: [], thuoc: [], giot: [], acid, k, P }
+  K.forEach((kh, i) => {
+    const x = 14 + i * (bw + gap), e = tao('div', 'cq-khoi', goc, `<b>${thoat(kh.ten)}</b>`); e.style.left = `${x}px`; e.style.width = `${bw}px`
+    C.khoi.push({ e, x })
+    for (let j = 0; j < kh.dem; j++) { const dot = tao('div', `cq-n${acid ? '' : ' c'}`, goc, acid ? 'N' : 'C'); const cx = x + bw / 2 - (kh.dem - 1) * 40 + j * 80; dot.style.left = `${cx - 31}px`; C.n.push({ e: dot, x: cx, khoi: i, so: tao('div', 'cq-so', goc, String(C.n.length + 1)) }) }
   })
-  for (let i = 0; i < 2; i++) { const l = tao('div', 'cq-lk', goc); l.style.left = `${244 + i * 285}px`; C.lk.push(l); const g = tao('div', 'cq-giot', goc, 'H₂O'); g.style.left = `${233 + i * 285}px`; C.giot.push(g) }
-  C.n.forEach(() => { C.hcl.push(tao('div', 'cq-hcl', goc, 'HCl')) })
-  C.dem = tao('div', 'cq-dem', goc, '<div class="cq-d nuoc"><span>H₂O</span><b>: 0a</b></div><div class="cq-d dem"><span>N</span><b class="pt"><i>1</i><i>+ 2</i><i>+ 1</i><i>= 4</i></b></div><div class="cq-d hcl"><span>HCl</span><b>: 0a</b></div>')
-  C.nhanLys = tao('div', 'cq-nhan-lys', goc, 'Lys có 2 N ⇒ gắn <em>2 HCl</em>')
-  d.cq = C; d.hoatNeo = { nuoc: C.dem.querySelector('.nuoc'), dem: C.dem.querySelector('.dem') }
+  for (let i = 0; i < k - 1; i++) { const x = 14 + (i + 1) * (bw + gap) - gap, l = tao('div', 'cq-lk', goc); l.style.left = `${x}px`; l.style.width = `${gap}px`; C.lk.push(l); const g = tao('div', 'cq-giot', goc, 'H₂O'); g.style.left = `${x + gap / 2 - 38}px`; C.giot.push(g) }
+  C.n.forEach(() => { C.thuoc.push(tao('div', 'cq-hcl', goc, acid ? 'HCl' : 'NaOH')) })
+  const tong = C.n.length, phan = K.map((kh) => kh.dem)
+  C.dem = tao('div', 'cq-dem', goc,
+    (acid ? `<div class="cq-d nuoc"><span>H₂O</span><b class="pt"><i>: ${soA(k - 1)}</i></b></div>` : `<div class="cq-d nuoc"><span>H₂O</span><b class="pt"><i>sinh ${soA(tong)}</i><i>− cần ${soA(k - 1)}</i><i>⇒ còn ${soA(tong - k + 1)}</i></b></div>`)
+    + `<div class="cq-d dem"><span>${acid ? 'N' : 'đầu C'}</span><b class="pt">${phan.map((p, i) => `<i>${i ? '+ ' : ''}${p}</i>`).join('')}<i>= ${tong}</i></b></div>`
+    + `<div class="cq-d hcl"><span>${acid ? 'HCl' : 'NaOH'}</span><b>: 0a</b></div>`)
+  C.nhan = P.nhan ? tao('div', 'cq-nhan-lys', goc, dam(P.nhan)) : null
+  C.muoi = (P.muoi || []).map((m, i) => { const e = tao('div', 'cq-muoi', goc, dam(m)); e.style.top = `${568 + i * 46}px`; return e })
+  d.cq = C; d.hoatNeo = { nuoc: C.dem.querySelector('.nuoc'), dem: C.dem.querySelector('.dem'), thuoc: C.dem.querySelector('.hcl') }
 }
 function veChuoi(d, t) {
-  const m = d.hoat.moc, C = d.cq, Y = 26
-  const tachRa = eInOut(tien(t, m.cat + 0.55, 0.6))
-  C.khoi.forEach((k, i) => { const p = lo(t - m.hien - i * 0.12, 2.2, 0.55), dx = (i - 1) * 22 * tachRa; k.e.style.top = `${Y}px`; k.e.style.transform = `translateX(${dx}px) scale(${0.6 + 0.4 * p})`; k.e.style.opacity = kep(p * 1.4); k.dx = dx })
-  C.lk.forEach((l) => { const ve = tien(t, m.hien + 0.35, 0.3), dut = tien(t, m.cat + 0.55, 0.2); l.style.top = `${Y + 54}px`; l.style.transform = `scaleX(${ve * (1 - dut)})`; l.style.opacity = ve > 0 ? 1 : 0; l.style.boxShadow = t > m.cat + 0.45 && t < m.cat + 0.75 ? '0 0 24px 8px rgba(143,216,238,.9)' : '' })
-  C.giot.forEach((g, i) => { const roi = eInOut(tien(t, m.cat + i * 0.12, 0.55)), mat = tien(t, m.cat + 0.6 + i * 0.12, 0.25); g.style.top = `${lerp(-60, Y + 18, roi)}px`; g.style.opacity = tien(t, m.cat + i * 0.12, 0.15) * (1 - mat); g.style.transform = `scale(${1 - 0.5 * mat})` })
-  // đếm N
-  const tN = [m.n1, m.n2, m.n3, m.n4]
+  const m = d.hoat.moc, C = d.cq, Y = 26, tong = C.n.length
+  const tCat = m.cat ?? m.hien + 1, tachRa = eInOut(tien(t, tCat + 0.55, 0.6))
+  C.khoi.forEach((kh, i) => { const p = lo(t - m.hien - i * 0.12, 2.2, 0.55), dx = (i - (C.k - 1) / 2) * 16 * tachRa; kh.e.style.top = `${Y}px`; kh.e.style.transform = `translateX(${dx}px) scale(${0.6 + 0.4 * p})`; kh.e.style.opacity = kep(p * 1.4); kh.dx = dx })
+  C.lk.forEach((l) => { const ve = tien(t, m.hien + 0.35, 0.3), dut = tien(t, tCat + 0.55, 0.2); l.style.top = `${Y + 54}px`; l.style.transform = `scaleX(${ve * (1 - dut)})`; l.style.opacity = ve > 0 ? 1 : 0; l.style.boxShadow = t > tCat + 0.45 && t < tCat + 0.75 ? '0 0 24px 8px rgba(143,216,238,.9)' : '' })
+  C.giot.forEach((g, i) => { const roi = eInOut(tien(t, tCat + i * 0.12, 0.55)), mat = tien(t, tCat + 0.6 + i * 0.12, 0.25); g.style.top = `${lerp(-70, Y + 16, roi)}px`; g.style.opacity = tien(t, tCat + i * 0.12, 0.15) * (1 - mat); g.style.transform = `scale(${1 - 0.5 * mat})` })
+  const tN = C.n.map((_, i) => m[`d${i + 1}`] ?? m.tong)
   C.n.forEach((n, i) => {
-    const k = C.khoi[n.khoi], hien = tien(t, m.hien + 0.5, 0.4), tau = t - tN[i]
-    n.e.style.top = `${Y + 172}px`; n.e.style.transform = `translateX(${k.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * Math.exp(-tau * 5) : 0.9})`; n.e.style.opacity = hien
+    const kh = C.khoi[n.khoi], hien = tien(t, m.hien + 0.5, 0.4), tau = t - tN[i]
+    n.e.style.top = `${Y + 172}px`; n.e.style.transform = `translateX(${kh.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * Math.exp(-tau * 5) : 0.9})`; n.e.style.opacity = hien
     n.e.classList.toggle('sang', tau >= 0)
-    const ps = lo(tau, 2.4, 0.5); n.so.style.left = `${n.x - 19 + (k.dx || 0)}px`; n.so.style.top = `${Y + 128 - ps * 8}px`; n.so.style.opacity = kep(ps * 1.5); n.so.style.transform = `scale(${0.4 + 0.6 * ps})`
+    const ps = lo(tau, 2.4, 0.5); n.so.style.left = `${n.x - 19 + (kh.dx || 0)}px`; n.so.style.top = `${Y + 128 - ps * 8}px`; n.so.style.opacity = kep(ps * 1.5); n.so.style.transform = `scale(${0.4 + 0.6 * ps})`
   })
-  // HCl bay vào gắn từng N
-  C.hcl.forEach((h, i) => {
-    const t0 = m.hcl + i * 0.16, p = eInOut(tien(t, t0, 0.6)), n = C.n[i], k = C.khoi[n.khoi]
-    const x = lerp(780, n.x - 40 + (k.dx || 0), p), y = lerp(-40, Y + 250, p)
-    h.style.left = `${x}px`; h.style.top = `${y}px`; h.style.opacity = tien(t, t0, 0.12)
-    const lysXung = n.khoi === 1 && t >= m.lys ? 0.5 + 0.5 * Math.sin((t - m.lys) * 7) : 0
-    h.style.boxShadow = lysXung ? `0 0 ${10 + 22 * lysXung}px rgba(253,164,175,.8)` : ''
-    h.style.transform = `scale(${1 + (p >= 1 ? 0.2 * Math.exp(-(t - t0 - 0.6) * 6) : 0) + 0.12 * lysXung})`
+  // HCl / NaOH bay vào gắn từng chấm
+  const tThuoc = m.thuoc ?? m.tong + 0.4
+  C.thuoc.forEach((h, i) => {
+    const t0 = tThuoc + i * 0.16, p = eInOut(tien(t, t0, 0.6)), n = C.n[i], kh = C.khoi[n.khoi]
+    h.style.left = `${lerp(780, n.x - (C.acid ? 40 : 52) + (kh.dx || 0), p)}px`; h.style.top = `${lerp(-40, Y + 250, p)}px`; h.style.opacity = tien(t, t0, 0.12)
+    const xung = m.nhan != null && t >= m.nhan && C.P.khoi[n.khoi][C.acid ? 1 : 2] > 1 ? 0.5 + 0.5 * Math.sin((t - m.nhan) * 7) : 0
+    h.style.boxShadow = xung ? `0 0 ${10 + 22 * xung}px rgba(253,164,175,.8)` : ''
+    h.style.transform = `scale(${1 + (p >= 1 ? 0.2 * Math.exp(-(t - t0 - 0.6) * 6) : 0) + 0.12 * xung})`
   })
   // bộ đếm
   const dn = C.dem.querySelector('.nuoc'), dd = C.dem.querySelector('.dem'), dh = C.dem.querySelector('.hcl')
-  dn.style.opacity = tien(t, m.cat + 0.5, 0.3); const soNuoc = t >= m.cat + 0.72 ? 2 : t >= m.cat + 0.6 ? 1 : 0; dn.querySelector('b').textContent = `: ${soNuoc}a`
-  dn.querySelector('b').style.transform = `scale(${1 + 0.3 * Math.exp(-Math.max(0, t - m.cat - 0.72) * 6)})`
-  dd.style.opacity = tien(t, m.n1 - 0.2, 0.3)
-  dd.querySelectorAll('i').forEach((e, i) => { const t0 = i < 3 ? [m.n1, m.n2, m.n4][i] : m.tong, p = lo(t - t0, 2.4, 0.5); e.style.opacity = kep(p * 1.4); e.style.transform = `translateY(${(1 - p) * 14}px) scale(${i === 3 ? 1 + 0.4 * Math.exp(-Math.max(0, t - t0) * 4) : 1})` })
-  dh.style.opacity = tien(t, m.hcl, 0.3); const soHcl = Math.min(4, Math.max(0, Math.floor((t - m.hcl - 0.6) / 0.16) + 1)); dh.querySelector('b').textContent = `: ${soHcl}a`
-  dh.classList.toggle('du', soHcl === 4)
-  const nl = C.nhanLys, pl = lo(t - m.lys, 2, 0.55); nl.style.opacity = kep(pl * 1.4); nl.style.transform = `translateY(${(1 - pl) * 16}px)`
+  const iNuoc = dn.querySelectorAll('i')
+  if (C.acid) { dn.style.opacity = tien(t, tCat + 0.5, 0.3); iNuoc[0].style.opacity = 1 }
+  else {
+    dn.style.opacity = tien(t, Math.min(m.sinh ?? 1e9, tCat) - 0.1, 0.3)
+    ;[m.sinh, tCat + 0.5, m.con].forEach((tt, i) => { const p = lo(t - (tt ?? 1e9), 2.4, 0.5); iNuoc[i].style.opacity = kep(p * 1.4); iNuoc[i].style.transform = `translateY(${(1 - p) * 12}px)` })
+  }
+  const iDem = dd.querySelectorAll('i'), daDem = C.khoi.map((_, k) => Math.max(...C.n.map((n, i) => (n.khoi === k ? tN[i] : -1e9))))
+  dd.style.opacity = tien(t, Math.min(...tN) - 0.2, 0.3)
+  iDem.forEach((e, i) => { const t0 = i < daDem.length ? daDem[i] : m.tong, p = lo(t - t0, 2.4, 0.5); e.style.opacity = kep(p * 1.4); e.style.transform = `translateY(${(1 - p) * 14}px) scale(${i === daDem.length ? 1 + 0.4 * Math.exp(-Math.max(0, t - t0) * 4) : 1})` })
+  dh.style.opacity = tien(t, tThuoc, 0.3); const so = Math.min(tong, Math.max(0, Math.floor((t - tThuoc - 0.6) / 0.16) + 1)); dh.querySelector('b').textContent = `: ${so ? soA(so) : '0a'}`
+  dh.classList.toggle('du', so === tong)
+  if (C.nhan) { const pl = lo(t - (m.nhan ?? 1e9), 2, 0.55); C.nhan.style.opacity = kep(pl * 1.4); C.nhan.style.transform = `translateY(${(1 - pl) * 16}px)` }
+  C.muoi.forEach((e, i) => { const pl = lo(t - (m[`m${i + 1}`] ?? 1e9), 2, 0.55); e.style.opacity = kep(pl * 1.4); e.style.transform = `translateX(${(1 - pl) * 40}px)` })
 }
 
 const HOAT = { 'thu-vien': [dungThuVien, veThuVien], 'cau-truc': [dungCauTruc, veCauTruc], chuoi: [dungChuoi, veChuoi] }
