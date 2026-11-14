@@ -1,0 +1,35 @@
+{
+  "i": 39,
+  "hash": "0742de28b889645730a5a542f87d70d8e82d18e7c6f2ff40fcd8cc870a527aad",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/0742de28b889645730a5a542f87d70d8e82d18e7c6f2ff40fcd8cc870a527aad.png",
+  "size": [
+    932,
+    404
+  ],
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C123-D2-II-1",
+      "de": "α-linoleic acid (ALA) và γ-linoleic acid (GLA) thuộc nhóm omega-n, với n là số thứ tự vị trí của liên kết đôi đầu tiên tính từ đầu nhóm methyl, là những acid béo có lợi cho sức khoẻ, ngăn ngừa các bệnh về tim mạch.\nCông thức cấu tạo của α-linoleic acid và γ-linoleic acid cho ở hình dưới.",
+      "allHinh": [
+        {
+          "hash": "0742de28b889645730a5a542f87d70d8e82d18e7c6f2ff40fcd8cc870a527aad",
+          "where": "12-KT-C123-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "ef43a452fb2ca7c10f6b2d9fc0e49fe6c2a6ab7a03d82f15761f407e05af9ae5"
+        }
+      ]
+    }
+  ],
+  "ownNativeFullOpened": true,
+  "ownMacro": "/workspace/scratch/448-39-full3x.png",
+  "captionsLiteral": [
+    "(α-linoleic)",
+    "(γ-linoleic)"
+  ],
+  "status": "HOLD/source-only/noSVG/noCount",
+  "blocker": "γ U03B3 missing all4currentappWOFF2 cmap; parent strictF.label raised ValueError Phông app thiếu ký tự [γ]. No Latin-yreplacement/fallback/omission authorized.",
+  "answersRead": false,
+  "rootNativeFullOpened": true,
+  "rootPublicDeRead": true,
+  "sourceShaVerified": true,
+  "productionProof": "font-giu-nguyen-lo-448-hold.json"
+}

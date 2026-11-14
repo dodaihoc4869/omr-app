@@ -1,0 +1,29 @@
+[
+  {
+    "i": 55,
+    "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+    "fileNguon": "anh/0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28.png",
+    "svg": "ester55-native-ddh-c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64.svg",
+    "hashSvg": "c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64",
+    "byteSvg": 22853,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C3-B10-II-1",
+        "de": "Cho phản ứng ester hoá ở hình dưới.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trong phổ hồng ngoại như bảng sau.",
+        "refs": [
+          {
+            "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+            "where": "11-C3-B10-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "333a90182ce851a6c59c4bdf9c41b6f00ff17c12712821773b980e2892642bd3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8C6O20printedH-EXCLcondition/2explicitCOvertical2raysWHITEglyphgaps/2HALFfilledharpoonsUPPERRIGHTABOVE-LOWERLEFTBELOW/EXACTCH₃-C-OH+CH₃CH₂OH-CH₃-C-O-CH₂CH₃+H₂O/H₂SO₄ đặc,tSUPo/ALLregularUPRIGHT-SUB234/noexpandedcondensedethanol/noaddedH-IRtable-names-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

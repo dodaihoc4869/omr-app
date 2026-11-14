@@ -1,0 +1,27 @@
+{
+  "lo": 448,
+  "main": "05bac72320f757e4827ddb9d67c7ee6ce0ab65a3",
+  "previousMain": "37fc8be6c622a5c1e0b165079452b594bdb7a4cd",
+  "diffStat": " .github/workflows/do-live-lag-1411.yml |  9 +++++++++\n DIEU-PHOI.md                           |  2 ++\n server/src/phong-live.ts               | 13 ++++++++++++-\n server/src/thuong-gv-ph.ts             | 19 ++++++++++++++++++-\n src/lib/bpu/phong-live.ts              |  4 +++-\n tests/live-khan-phong-1111.test.ts     |  5 +++++\n tests/live-so-net-noi-lai-1011.test.ts | 31 +++++++++++++++++++++++++++++++\n tests/thuong-giai-tuan-2610.test.ts    | 15 ++++++++++++++-\n 8 files changed, 94 insertions(+), 4 deletions(-)\n",
+  "files": [
+    ".github/workflows/do-live-lag-1411.yml",
+    "DIEU-PHOI.md",
+    "server/src/phong-live.ts",
+    "server/src/thuong-gv-ph.ts",
+    "src/lib/bpu/phong-live.ts",
+    "tests/live-khan-phong-1111.test.ts",
+    "tests/live-so-net-noi-lai-1011.test.ts",
+    "tests/thuong-giai-tuan-2610.test.ts"
+  ],
+  "appChanged": true,
+  "serverChanged": true,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 382,
+  "colorLogSha256": "f4491b9314c0dc989ed8ae800f7fb6442263e024d83e7e28253201714f2576c6",
+  "release": "Main05bac7232 mới so447:8files94insert4delete/workflow-live-lag+appsrcBPUlive-serverlive-thuong-tests-journalchanged/Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised.",
+  "ketLuan": "Main05bac7232 mới so447:8files94insert4delete/workflow-live-lag+appsrcBPUlive-serverlive-thuong-tests-journalchanged/Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised."
+}

@@ -1,0 +1,382 @@
+{
+  "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+  "native": [
+    992,
+    159
+  ],
+  "questions": [
+    {
+      "qid": "11-C3-B10-II-1",
+      "de": "Cho phản ứng ester hoá ở hình dưới.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trong phổ hồng ngoại như bảng sau.",
+      "refs": [
+        {
+          "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+          "where": "11-C3-B10-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "333a90182ce851a6c59c4bdf9c41b6f00ff17c12712821773b980e2892642bd3"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "8C6O20printedH-EXCLcondition/2explicitCOvertical2raysWHITEglyphgaps/2HALFfilledharpoonsUPPERRIGHTABOVE-LOWERLEFTBELOW/EXACTCH₃-C-OH+CH₃CH₂OH-CH₃-C-O-CH₂CH₃+H₂O/H₂SO₄ đặc,tSUPo/ALLregularUPRIGHT-SUB234/noexpandedcondensedethanol/noaddedH-IRtable-names-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/FULL3x/heads10x/all1publicde.8C6O20printedH EXCLcondition.2explicitC carbonylWHITEglyphgaps; 2HALFfilledharpoons notFULLtriangles. AllregularUPRIGHT. Publicde mentions table but inventoryONLY1hinh; no inventedpartner/no tablecheckedclaim. No addedIRdata-answer-caption.",
+  "sourceIndependentAudit": {
+    "i": 55,
+    "assetIndex": 96,
+    "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28.png",
+    "size": [
+      992,
+      159
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "11-C3-B10-II-1",
+        "de": "Cho phản ứng ester hoá ở hình dưới.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trong phổ hồng ngoại như bảng sau.",
+        "allHinh": [
+          {
+            "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+            "where": "11-C3-B10-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "333a90182ce851a6c59c4bdf9c41b6f00ff17c12712821773b980e2892642bd3"
+          }
+        ],
+        "missingHashes": [
+          "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true,
+      "note": "Publicde mentions an absorptiontable but inventorycontainsONLYthishinh. No missingtableimage invented, no answers read."
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/448-55-full3x.png",
+        "/workspace/scratch/448-55-head8x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "labels": [
+        {
+          "literal": "CH₃",
+          "bbox": [
+            41,
+            50,
+            101,
+            82
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            120,
+            50,
+            144,
+            76
+          ]
+        },
+        {
+          "literal": "OH",
+          "bbox": [
+            163,
+            50,
+            212,
+            76
+          ],
+          "anchor": "firstO"
+        },
+        {
+          "literal": "+",
+          "bbox": [
+            228,
+            53,
+            248,
+            75
+          ]
+        },
+        {
+          "literal": "CH₃CH₂OH",
+          "bbox": [
+            258,
+            48,
+            428,
+            84
+          ],
+          "condensedNoInternalBonds": true
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            120,
+            98,
+            145,
+            126
+          ]
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            574,
+            52,
+            630,
+            83
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            647,
+            53,
+            673,
+            78
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            685,
+            53,
+            710,
+            78
+          ]
+        },
+        {
+          "literal": "CH₂CH₃",
+          "bbox": [
+            730,
+            52,
+            840,
+            84
+          ],
+          "condensedNoInternalBonds": true
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            647,
+            99,
+            674,
+            126
+          ]
+        },
+        {
+          "literal": "+",
+          "bbox": [
+            867,
+            53,
+            888,
+            75
+          ]
+        },
+        {
+          "literal": "H₂O",
+          "bbox": [
+            897,
+            48,
+            959,
+            84
+          ]
+        }
+      ],
+      "singleBonds": [
+        [
+          [
+            105,
+            64
+          ],
+          [
+            117,
+            64
+          ]
+        ],
+        [
+          [
+            148,
+            64
+          ],
+          [
+            159,
+            64
+          ]
+        ],
+        [
+          [
+            634,
+            65
+          ],
+          [
+            644,
+            65
+          ]
+        ],
+        [
+          [
+            677,
+            65
+          ],
+          [
+            683,
+            65
+          ]
+        ],
+        [
+          [
+            714,
+            65
+          ],
+          [
+            726,
+            65
+          ]
+        ]
+      ],
+      "explicitCOdoubleRays": [
+        [
+          [
+            127,
+            80
+          ],
+          [
+            127,
+            96
+          ]
+        ],
+        [
+          [
+            134,
+            80
+          ],
+          [
+            134,
+            96
+          ]
+        ],
+        [
+          [
+            655,
+            81
+          ],
+          [
+            655,
+            96
+          ]
+        ],
+        [
+          [
+            662,
+            81
+          ],
+          [
+            662,
+            96
+          ]
+        ]
+      ],
+      "COfootTopology": "Both carbonyls have EXPLICIT Cglyph above twoverticalrays, separatedbyglyphwhitegap. Do not joinslope/bridgerays; preserve Cglyphbottom to raystart gap. BottomOalso gap.",
+      "equilibrium": {
+        "upperShaft": [
+          [
+            434,
+            61
+          ],
+          [
+            550,
+            61
+          ]
+        ],
+        "upperHalfFilledHead": [
+          [
+            542,
+            58
+          ],
+          [
+            550,
+            61
+          ],
+          [
+            542,
+            61
+          ]
+        ],
+        "lowerShaft": [
+          [
+            434,
+            68
+          ],
+          [
+            550,
+            68
+          ]
+        ],
+        "lowerHalfFilledHead": [
+          [
+            434,
+            68
+          ],
+          [
+            442,
+            68
+          ],
+          [
+            442,
+            72
+          ]
+        ],
+        "classification": "OWN8x two HALFfilledharpoons: upperRIGHTABOVE, lowerLEFTBELOW. No secondleg on eitherhead/noFULLV/fulltriangle."
+      },
+      "condition": {
+        "literal": "H₂SO₄ đặc, tᵒ",
+        "bbox": [
+          432,
+          30,
+          543,
+          52
+        ],
+        "baseline": 47,
+        "note": "native smallcircle elevated aftert, no pressure/extra spacecondition added"
+      },
+      "counts": {
+        "CExcludingCondition": 8,
+        "OExcludingCondition": 6,
+        "HPrintedExcludingCondition": 20,
+        "explicitCOdouble": 2,
+        "halfHeads": 2,
+        "plusSigns": 2,
+        "explanation": "Reactants2C2O+2C1O; products4C2O+water1O. HcountfromCH3CH2OHtokensandwater, notanswer inference. Catalyst excluded."
+      },
+      "styles": {
+        "allChemical": "regular upright serif, no truebold oritalic",
+        "condition": "regular upright serif at smaller size, subscript2/4andtsupsmallcircle",
+        "arrow": "thinblackshafts andsmallfilledhalfheads",
+        "caption": "NONE"
+      },
+      "crop": "No clipped chemical glyph, noUNKNOWNedgefragment"
+    },
+    "measurementLimits": "Nativeapprox±1–2px per individualglyph/bond/head. Condensedethanol/productCH2CH3 have no drawninternalbonds. Allformula orderexactCH3-C-O-CH2CH3, acidOHfirstO. No inferredanswer/peakdata.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "render": "/workspace/scratch/root448-55.png",
+    "macro": "/workspace/scratch/root448-condition.png",
+    "hashSvg": "c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64",
+    "imgDecode": [
+      992,
+      159
+    ],
+    "ketQua": "Đạt: 8C6O20printedH EXCLcondition; explicitC carbonyl2separateverticalraysWHITEglyphgaps.2HALFfilledharpoons. AllregularUPRIGHT/H2SO4 đặc,tSUPo. Publicde bảng but inventoryONLY1hinh; no inventedpartner/IRdata-answer. No SVG negative found448.",
+    "readonlyProof": "/workspace/scratch/soat-ester55-lo448.json"
+  },
+  "readonlyRuntime": {
+    "sha256": "437247acbcc57a76e25a2e42aa087a00f6b7658db9a75a7509525b0a413a8e32",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ester55-native-ddh-c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64.svg c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64\nIMGDECODE [ 992, 159 ]\n55 { x: 0, y: 0, width: 992, height: 159 }\nPOSTSHOT_SHA c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64\nCOMMAND node /workspace/scratch/agent-render448.cjs\nCONTEXT 11-C3-B10-II-1.hinh.0.du_lieu public de/ref only; one image inventory; no answers, no claimed table review; own native/FULL/macros viewed.\n"
+  }
+}

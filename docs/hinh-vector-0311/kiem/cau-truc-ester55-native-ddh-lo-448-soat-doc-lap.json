@@ -1,0 +1,16 @@
+[
+  {
+    "i": 55,
+    "hashSvg": "c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, câu dẫn/ref công khai và fresh Chromium IMG.decode FULL3× cùng macro acid/product/condition-head. Đếm 8C6O20H in trong phản ứng, không gồm điều kiện; giữ CH3-C(=O)-OH + CH3CH2OH và CH3-C(=O)-O-CH2CH3 + H2O. Hai C=O tường minh có hai tia đứng, khe trắng tới C/O sạch; không áp chân skeletal. Hai half-filled harpoon: upper RIGHT phía trên, lower LEFT phía dưới; giữ H2SO4 đặc, t SUP o và SUB2/3/4. Toàn chữ DDH regular upright, không thấy chạm/cắt/tràn. Câu dẫn nhắc bảng nhưng inventory chỉ một hình; chỉ so hình phản ứng này, không dựng thêm bảng hay khẳng định đã so bảng/đáp án.",
+    "render": "/workspace/scratch/soat448-55-fresh.png",
+    "macro": [
+      "/workspace/scratch/ester55-acid.png",
+      "/workspace/scratch/ester55-product.png",
+      "/workspace/scratch/ester55-head-condition.png"
+    ],
+    "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+    "hashSvgDaSoat": "c8a20baaf9b616caf3ef7a20d99747b88281f44c64ee0c5c58371360bdc3fd64"
+  }
+]
