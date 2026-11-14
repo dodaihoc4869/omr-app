@@ -1,0 +1,280 @@
+{
+  "i": 1115,
+  "assetIndex": 222,
+  "hash": "c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f.png",
+  "size": [
+    892,
+    162
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C1-B1-D3-II-15",
+      "de": "Nghiên cứu cho thấy tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA cho ở hình dưới.",
+      "allHinh": [
+        {
+          "hash": "c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f",
+          "where": "12-C1-B1-D3-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "0b1da538aae36975685286a8e364301a8df99457bfdc3b00ae4e0e5a9b6d672a"
+        }
+      ],
+      "missingHashes": [
+        "c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/434-1115-full3x.png",
+      "/workspace/scratch/434-1115-CO6x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "orderedCarbonVertices": [
+      [
+        110,
+        76
+      ],
+      [
+        146,
+        41
+      ],
+      [
+        177,
+        77
+      ],
+      [
+        213,
+        42
+      ],
+      [
+        251,
+        42
+      ],
+      [
+        283,
+        78
+      ],
+      [
+        319,
+        43
+      ],
+      [
+        359,
+        43
+      ],
+      [
+        389,
+        78
+      ],
+      [
+        425,
+        43
+      ],
+      [
+        463,
+        43
+      ],
+      [
+        493,
+        79
+      ],
+      [
+        529,
+        44
+      ],
+      [
+        568,
+        44
+      ],
+      [
+        599,
+        80
+      ],
+      [
+        636,
+        45
+      ],
+      [
+        677,
+        45
+      ],
+      [
+        707,
+        81
+      ],
+      [
+        744,
+        46
+      ],
+      [
+        781,
+        46
+      ],
+      [
+        813,
+        82
+      ],
+      [
+        851,
+        46
+      ]
+    ],
+    "CCinnerDoubleRays": [
+      [
+        [
+          214,
+          48
+        ],
+        [
+          250,
+          48
+        ]
+      ],
+      [
+        [
+          320,
+          49
+        ],
+        [
+          359,
+          49
+        ]
+      ],
+      [
+        [
+          426,
+          49
+        ],
+        [
+          463,
+          49
+        ]
+      ],
+      [
+        [
+          530,
+          50
+        ],
+        [
+          568,
+          50
+        ]
+      ],
+      [
+        [
+          637,
+          51
+        ],
+        [
+          676,
+          51
+        ]
+      ],
+      [
+        [
+          745,
+          52
+        ],
+        [
+          780,
+          52
+        ]
+      ]
+    ],
+    "HOarm": [
+      [
+        80,
+        43
+      ],
+      [
+        110,
+        76
+      ]
+    ],
+    "carbonylRays": [
+      [
+        [
+          106,
+          80
+        ],
+        [
+          106,
+          109
+        ]
+      ],
+      [
+        [
+          113,
+          80
+        ],
+        [
+          113,
+          109
+        ]
+      ]
+    ],
+    "carbonylNativeGapAudit": {
+      "vertexDarkLastRow": 76,
+      "fullWhiteRows77and78": true,
+      "firstStemDarkAt79": "right stem tiny pixel; both stems substantial y80",
+      "interpretation": "BOTH carbonyl rays disconnected below V carbon vertex, preserve native white gap; no crossbar/contact forced"
+    },
+    "labels": [
+      {
+        "literal": "HO",
+        "bbox": [
+          38,
+          31,
+          77,
+          50
+        ],
+        "anchor": "last O",
+        "armStart": [
+          80,
+          43
+        ]
+      },
+      {
+        "literal": "O",
+        "bbox": [
+          100,
+          113,
+          119,
+          131
+        ],
+        "center": [
+          109.5,
+          122
+        ]
+      }
+    ],
+    "counts": {
+      "visibleC": 22,
+      "O": 2,
+      "CCdouble": 6,
+      "COdouble": 1,
+      "explicitHOH": 1,
+      "implicitHydrogens": "not inferred"
+    },
+    "styles": {
+      "chemicalLabels": "regular upright serif; high contrast H serifs do not alone establish bold; O has fine thick/thin modulation, no actual bold asserted",
+      "bonds": "black scan, about1.5–2nativepx; no wedge/stereo",
+      "caption": "NONE",
+      "color": "black/gray scan, no intentional colored symbols"
+    },
+    "crop": "No chemical bond/label cropped; large blank margin at right/bottom",
+    "background": "Scattered isolated faint gray scan specks of irregular shapes across blank background, no repeated/connected chemical dot syntax. Do not interpret as charges, radicals, atoms or additional caption. No grain-dependent molecular topology."
+  },
+  "measurementLimits": "Each successive apex/trough read separately from native FULL, ±1–2nativepx estimates; slight slope y42→46 and trough77→82 preserved, not periodic normalize. CO gap independently checked pixel rows. No coordinates inferred from DHA name.",
+  "status": "source-only/noSVG/noCount",
+  "actualSvgReviewed": false
+}

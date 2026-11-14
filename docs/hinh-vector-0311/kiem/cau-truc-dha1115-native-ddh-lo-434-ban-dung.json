@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1115,
+    "hash": "c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f",
+    "fileNguon": "anh/c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f.png",
+    "svg": "dha1115-native-ddh-65849614bd7fbb8aa46714b4251ae44ce6494c91cdff09d59265fb8c999d6dc5.svg",
+    "hashSvg": "65849614bd7fbb8aa46714b4251ae44ce6494c91cdff09d59265fb8c999d6dc5",
+    "byteSvg": 2785,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-II-15",
+        "de": "Nghiên cứu cho thấy tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA cho ở hình dưới.",
+        "refs": [
+          {
+            "hash": "c8cfcec1b88438d69be8bb045105752c329f9a6d26a319ed5e50ceaed160489f",
+            "where": "12-C1-B1-D3-II-15.hinh.0.du_lieu",
+            "hashDataUrl": "0b1da538aae36975685286a8e364301a8df99457bfdc3b00ae4e0e5a9b6d672a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22bareC2O6CCdouble1COdoubleDOWN2verticalraysBOTHnativeWHITEGAP/HOlastO-ALLregularUPRIGHT/individualnonperiodicvertices-rays-RIGHTfreeUP/0stereo-arrows-caption-nums/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "65849614bd7fbb8aa46714b4251ae44ce6494c91cdff09d59265fb8c999d6dc5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

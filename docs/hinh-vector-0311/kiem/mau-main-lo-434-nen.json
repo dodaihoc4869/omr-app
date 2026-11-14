@@ -1,0 +1,16 @@
+{
+  "lo": 434,
+  "main": "4365aca9b5d270a86a93dfc6590d21106f7d0d55",
+  "previousMain": "7a1d74791e2cf78da2efdd01b7727382f429167b",
+  "diffStat": "8 files changed, 56 insertions(+), 9 deletions(-)",
+  "appChanged": false,
+  "serverChanged": true,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2010,
+  "checkerFiles": 377,
+  "colorLogSha256": "a887c0e2d51d9cb94e71ed5f8ef684ed1bfd062989b9fee5e7ecf113d5f5e766",
+  "release": "Giảm đọcD1 cạnh lớp/workflow đề28+nhật ký; server đổi, app/Vite/font/mốc nguyênbyte. Chưa gộp/latestmainfullBYNAME-buildspeed trướcmerge-release."
+}
