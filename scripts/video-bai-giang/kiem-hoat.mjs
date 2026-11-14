@@ -45,6 +45,15 @@ for (const d of canh) {
     if (!(d.doVui.luaChon || []).some((l) => l[2])) loi.push(`${ten}: Đoán nhanh không có phương án đúng`)
   }
 }
+// NHỊP HÌNH (thầy 14/11 «cắt cảnh hấp dẫn hơn và gây nghiện hơn»): quãng > 12 s không có gì mới trên hình (bước hoạt hoạ, khoanh, máy quay đổi khung,
+// thẻ, Em nhẩm, Đoán nhanh) ⇒ CẢNH BÁO (in ra, không chặn) — văn phòng thêm bước hình / khoanh vào quãng đó.
+const canhBao = []
+for (const d of canh) {
+  const ev = [...Object.values(d.hoat?.moc || {}), ...(d.danhDau || []).map((x) => x.t0), ...(d.khung || []).map((x) => x.t), ...(d.su || []).map((x) => x.t), ...(d.nham || []).map((x) => x.t0), ...(d.theNoi || []).map((x) => x.t0), d.doVui?.t0].filter(Number.isFinite).sort((a, b) => a - b)
+  const moc = [d.t0, ...ev, d.t1]
+  for (let i = 1; i < moc.length; i++) if (moc[i] - moc[i - 1] > 12) canhBao.push(`${d.id}: ${(moc[i] - moc[i - 1]).toFixed(0)} s không có gì mới trên hình (từ giây ${(moc[i - 1] - d.t0).toFixed(0)} của cảnh)`)
+}
+if (canhBao.length) console.log(`NHỊP HÌNH: ${canhBao.length} quãng đứng yên > 12 s — thêm bước hình / khoanh:\n  · ${canhBao.join('\n  · ')}`)
 const mo = kb.doan.find((d) => d.loai === 'mo-dau')
 if (mo && bo(mo.tieuDe).length > 12) loi.push(`mở đầu: tiêu đề «${mo.tieuDe}» dài quá 12 kí tự (chữ 230 px sẽ tràn) — 1–2 chữ`)
 if (mo && bo(mo.phu).length > 56) loi.push(`mở đầu: dòng phụ dài quá 56 kí tự (tràn màn điện thoại)`)

@@ -23,7 +23,10 @@ const lang = readFileSync(join(duLieu, 'lang-35.txt'), 'utf8').trim().split('\n'
 
 // ── nhịp dựng ──
 // Nhạc 112 BPM: mở đầu đúng 4 ô nhịp ⇒ chũm chọe của ô 5 rơi đúng lúc thẻ chương đầu vào
-const NHIP = 112, MO_DAU = 4 * 4 * 60 / NHIP, THE_CHUONG = 2.4, NOI_CAU = 0.25, NGUNG_DAI = 0.55, NGUNG_GIU = 0.1, DUOI_CANH = 0.7, KET = 11
+// NHỊP CẮT (thầy 14/11 «cắt cảnh hấp dẫn hơn và gây nghiện hơn»): bản K10 đo 27 % thời lượng là quãng không giọng ⇒ thẻ chương 2,4 ⇒ 2,0 s, nối câu 0,25 ⇒ 0,18 s,
+// ngừng giữ 0,1 ⇒ 0,07 s, cắt ngừng từ 0,55 ⇒ 0,45 s, đoạn Thầy viết im lặng tua ×1,2 ⇒ ×1,9, ngồi yên ≤ 0,12 ⇒ 0,07 s. Cấu hình cũ muốn nhịp cũ: «nhip»: { … }.
+const NHIP_CU = ch.nhip === 'cu'
+const NHIP = 112, MO_DAU = 4 * 4 * 60 / NHIP, THE_CHUONG = NHIP_CU ? 2.4 : 2.0, NOI_CAU = NHIP_CU ? 0.25 : 0.18, NGUNG_DAI = NHIP_CU ? 0.55 : 0.45, NGUNG_GIU = NHIP_CU ? 0.1 : 0.07, DUOI_CANH = 0.7, KET = 11
 const DAU_TRUOC = 0.08, DUOI_SAU = 0.12
 
 /** Số âm tiết khi đọc một chữ trong lời (số đọc thành chữ, công thức đọc từng kí hiệu) — tiếng Việt một chữ một âm. */
@@ -74,14 +77,14 @@ const tr = NET_GIO ? { ...tr0, net: NET_GIO.net.map((n) => { const p = []; for (
 const netBox = tr.net.map((n) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y } return { t0: n.t / 1000, t1: (n.t + (n.p[n.p.length - 1] || 0)) / 1000, x0, y0, x1, y1 } })
 // GIỮ NHỊP VIẾT THẬT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): khoảng không có lời mà Thầy ĐANG VIẾT thì không tua vụt — đoạn đang
 // viết chạy ×TOC_VIET, đoạn ngồi yên rút còn ~0,12 s. Trả các mảnh nối (không giọng) phủ kín [s0, s1], tổng ≥ toiThieu.
-const TOC_VIET = 1.2
+const TOC_VIET = NHIP_CU ? 1.2 : 1.9, NGOI_YEN = NHIP_CU ? 0.12 : 0.07
 function chiaNoi(s0, s1, toiThieu) {
   const ban = netBox.filter((b) => b.t1 > s0 && b.t0 < s1).map((b) => [Math.max(s0, b.t0 - 0.12), Math.min(s1, b.t1 + 0.12)]).sort((x, y) => x[0] - y[0])
   const gop = []; for (const k of ban) { const c = gop[gop.length - 1]; if (c && k[0] <= c[1] + 0.35) c[1] = Math.max(c[1], k[1]); else gop.push([...k]) }
   if (!gop.length) return [{ giong: false, s0, s1, dai: toiThieu }]
   const ra = []; let cur = s0
-  for (const [x, y] of gop) { if (x > cur) ra.push({ giong: false, s0: cur, s1: x, dai: Math.min(x - cur, 0.12) }); ra.push({ giong: false, s0: x, s1: y, dai: (y - x) / TOC_VIET, viet: true }); cur = y }
-  if (s1 > cur) ra.push({ giong: false, s0: cur, s1, dai: Math.min(s1 - cur, 0.12) })
+  for (const [x, y] of gop) { if (x > cur) ra.push({ giong: false, s0: cur, s1: x, dai: Math.min(x - cur, NGOI_YEN) }); ra.push({ giong: false, s0: x, s1: y, dai: (y - x) / TOC_VIET, viet: true }); cur = y }
+  if (s1 > cur) ra.push({ giong: false, s0: cur, s1, dai: Math.min(s1 - cur, NGOI_YEN) })
   const tong = ra.reduce((z, m) => z + m.dai, 0); if (tong < toiThieu) ra[ra.length - 1].dai += toiThieu - tong
   return ra
 }

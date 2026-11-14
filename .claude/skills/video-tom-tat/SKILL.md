@@ -88,6 +88,14 @@ Nhịp: mỗi ý Thầy nói ⇒ 1 bước hình ngay lúc nói chữ đó (khô
 **Cổng kiểm** `node scripts/video-bai-giang/kiem-hoat.mjs <ra>/kich-ban.json` (hoan-tat-buoi.sh tự chạy, hỏng là DỪNG): mốc rỗng, id sai, ngoài lưới / tràn đáy, thiếu bước `hien`, chữ quá dài cho ô, phương án Đoán nhanh > 24 kí tự, tiêu đề mở đầu > 12 kí tự.
 **Giờ tải:** `tu-do` cần bản app có `hoat-hoa-5.js` (lên lượt phát hành 23:40 ngày 14/11). Đêm 14/11: cấu hình dùng `tu-do` ⇒ chỉ tải sau 23:50. Từ 15/11 tải lúc nào cũng được.
 
+## Nhịp «gây nghiện» (thầy 14/11 «cắt cảnh hấp dẫn hơn và gây nghiện hơn»)
+- **Không quá 10 giây màn hình đứng yên**: mỗi ≤ 10 s phải có điều mới — bước hoạt hoạ, khoanh bảng, máy quay tới chỗ Thầy viết, thẻ. Cổng kiểm in «NHỊP HÌNH: … quãng đứng yên > 12 s» ⇒ thêm bước `tu-do` / khoanh vào đúng quãng đó tới khi hết cảnh báo.
+- **Cảnh ≤ 2,5 phút**; dài hơn ⇒ tách hai cảnh (thẻ chương mới = nhịp nghỉ cho mắt).
+- **Mở vòng trước khi lộ**: Thầy sắp nói kết quả tính ⇒ Em nhẩm trước; Thầy hỏi lớp một câu có đáp án ⇒ Đoán nhanh; câu hỏi Thầy đặt đầu cảnh ⇒ đưa lên làm dòng đầu (thẻ / hình hỏi), câu trả lời để hình «sáng» đúng lúc Thầy nói.
+- **Mỗi cảnh kết bằng một hình chốt** (thẻ kết luận + bước `sang`), không kết lửng.
+- Đoạn đùa: giữ nguyên nhịp Thầy kể, thêm hình vui đúng chi tiết (số đếm, gạch, nảy) — không chèn chữ giải thích.
+- Bộ dựng đã tự cắt quãng chết: thẻ chương 2,0 s, nối câu 0,18 s, đoạn Thầy viết im lặng tua ×1,9 (bản K10 19:25 ⇒ 17:17, K12 24:27 ⇒ 22:38).
+
 ## Đã có sẵn trong máy (không phải làm tay)
 - Giọng chuẩn theo mẫu K12 (`mau-giong.json`): độ to −22,4 LUFS giọng ghép + EQ âm sắc theo phổ K12; nhạc + tiếng động mức K12; tổng −16 LUFS.
 - Phụ đề ngắt cụm: không ngắt trong ngoặc / sát dấu phép tính, gộp cụm một chữ; số đứng riêng có ô sáng.
