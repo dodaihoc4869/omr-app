@@ -8,7 +8,7 @@
 
 let dangChay: Promise<number> | null = null
 let lanCuoi = 0
-let hen: ReturnType<typeof setInterval> | null = null
+let hen: ReturnType<typeof setTimeout> | null = null
 const nghe = new Set<() => void>()
 const CACH_TOI_THIEU = 5 * 60_000
 const CHU_KY = 15 * 60_000
@@ -44,13 +44,17 @@ export function dongBoNgam(ep = false): Promise<number> {
   return dangChay
 }
 
-/** Bật đồng bộ ngầm định kì (gọi khi thầy mở khoá app). */
+/** Bật đồng bộ ngầm định kì (gọi khi thầy mở khoá app). Hẹn giờ NỐI TIẾP (setTimeout, không setInterval — bảng nhịp tests/nhip-bang-2109): lượt sau chỉ hẹn
+ *  khi lượt trước xong; chỉ chạy khi cửa sổ đang hiện VÀ app thầy còn mở khoá (App.tsx gỡ `window.__ddh` khi khoá / rời app quản lý ⇒ lượt tự bỏ qua). */
 export function batDongBoNgam(): void {
   void dongBoNgam(true)
   if (hen) return
-  // Chỉ chạy khi cửa sổ đang hiện VÀ app thầy còn mở khoá: App.tsx gỡ `window.__ddh` (cầu nối) khi khoá / rời app quản lý ⇒ lượt định kì tự bỏ qua.
-  hen = setInterval(() => {
-    if (typeof window === 'undefined' || !(window as unknown as Record<string, unknown>).__ddh) return
-    if (document.visibilityState === 'visible') void dongBoNgam()
-  }, CHU_KY)
+  const henLai = (): void => {
+    hen = setTimeout(() => {
+      const mo = typeof window !== 'undefined' && !!(window as unknown as Record<string, unknown>).__ddh
+      if (mo && document.visibilityState === 'visible') void dongBoNgam().finally(henLai)
+      else henLai()
+    }, CHU_KY)
+  }
+  henLai()
 }
