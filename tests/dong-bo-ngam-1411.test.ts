@@ -29,8 +29,8 @@ vi.mock('../src/lib/exam-db', () => ({
   saveSessionTeacherBank: async () => {},
   xoaSessionTeacherBank: async () => {},
   loadTeacherSecret: async () => 'mat',
+  loadScriptUrlHoacMacDinh: async () => 'https://may-chu.thu',
 }))
-vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu.thu' }))
 
 const textCau10 = () => String(((may.local.get('DH-11-C2-B9-D1')?.phanI as { text: string }[] | undefined) ?? [])[0]?.text ?? '')
 

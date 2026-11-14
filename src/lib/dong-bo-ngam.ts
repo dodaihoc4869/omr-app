@@ -26,10 +26,10 @@ export function dongBoNgam(ep = false): Promise<number> {
   lanCuoi = Date.now()
   dangChay = (async () => {
     try {
-      const [{ layDiaChiMayChu }, { loadTeacherSecret }, { dongBoNganHang }] = await Promise.all([
-        import('./dia-chi-may-chu'), import('./exam-db'), import('./exam-sync'),
-      ])
-      const [url, mat] = await Promise.all([layDiaChiMayChu(), loadTeacherSecret()])
+      // KHÔNG nạp động `dia-chi-may-chu` ở đây: nạp động giữ CẢ module trong khối dùng chung của 3 app (+byte máy em / phụ huynh — cổng tốc độ 14/11);
+      // `loadScriptUrlHoacMacDinh` (exam-db) đã tự hỏi `layDiaChiMayChu` khi máy chưa lưu địa chỉ.
+      const [{ loadScriptUrlHoacMacDinh, loadTeacherSecret }, { dongBoNganHang }] = await Promise.all([import('./exam-db'), import('./exam-sync')])
+      const [url, mat] = await Promise.all([loadScriptUrlHoacMacDinh(), loadTeacherSecret()])
       if (!url.trim() || !mat.trim()) return 0
       const kq = await dongBoNganHang(url.trim(), mat.trim(), false, { ngam: true })
       const n = kq.moi.length + kq.capNhat.length + kq.daXoa.length
