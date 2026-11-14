@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1112,
+    "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+    "fileNguon": "anh/c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595.png",
+    "svg": "nylon1112-native-ddh-65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f.svg",
+    "hashSvg": "65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f",
+    "byteSvg": 4454,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-I-14",
+        "de": "Tơ nylon-6,6 có độ bền cơ học cao, được sử dụng để làm vải lót lốp xe, bện dây cáp, dây dù, dệt vải.\nCho cấu tạo tơ nylon-6,6 như hình vẽ dưới đây.\nNhận định nào sau đây là đúng?",
+        "refs": [
+          {
+            "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+            "where": "12-KT-C4-D1-I-14.hinh.0.du_lieu",
+            "hashDataUrl": "26c75e9c7c4f803be5f48dc63f887a31caf88e566cd29ef1a2b72d2a623580c7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12visibleC2N2O2explicitH/2COdouble-EACHshortnativeHORIZONTALjoin-contact2verticalrays/2ROUND+nSUBregularUPRIGHT/N-Hseparate/individualnonperiodicvertices/2freecutendsUNKNOWNcontinuation-NOaddedC-H-formula-caption-stereo-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

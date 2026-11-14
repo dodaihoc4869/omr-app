@@ -1,0 +1,387 @@
+{
+  "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+  "native": [
+    732,
+    214
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C4-D1-I-14",
+      "de": "Tơ nylon-6,6 có độ bền cơ học cao, được sử dụng để làm vải lót lốp xe, bện dây cáp, dây dù, dệt vải.\nCho cấu tạo tơ nylon-6,6 như hình vẽ dưới đây.\nNhận định nào sau đây là đúng?",
+      "refs": [
+        {
+          "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+          "where": "12-KT-C4-D1-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "26c75e9c7c4f803be5f48dc63f887a31caf88e566cd29ef1a2b72d2a623580c7"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "12visibleC2N2O2explicitH/2COdouble-EACHshortnativeHORIZONTALjoin-contact2verticalrays/2ROUND+nSUBregularUPRIGHT/N-Hseparate/individualnonperiodicvertices/2freecutendsUNKNOWNcontinuation-NOaddedC-H-formula-caption-stereo-answer/nativeapproxNOTsubpixel",
+  "independentSourceAudit": {
+    "i": 1112,
+    "assetIndex": 703,
+    "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595.png",
+    "size": [
+      732,
+      214
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C4-D1-I-14",
+        "de": "Tơ nylon-6,6 có độ bền cơ học cao, được sử dụng để làm vải lót lốp xe, bện dây cáp, dây dù, dệt vải.\nCho cấu tạo tơ nylon-6,6 như hình vẽ dưới đây.\nNhận định nào sau đây là đúng?",
+        "allHinh": [
+          {
+            "hash": "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595",
+            "where": "12-KT-C4-D1-I-14.hinh.0.du_lieu",
+            "hashDataUrl": "26c75e9c7c4f803be5f48dc63f887a31caf88e566cd29ef1a2b72d2a623580c7"
+          }
+        ],
+        "missingHashes": [
+          "c7fca34ecadcec95466712b46eec810d167084d1d00f11e5d197388c49dae595"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/438-1112-full3x.png",
+        "/workspace/scratch/438-1112-up.png",
+        "/workspace/scratch/438-1112-down.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "firstSixCarbonPath": [
+        [
+          137,
+          112
+        ],
+        [
+          161,
+          126
+        ],
+        [
+          197,
+          106
+        ],
+        [
+          233,
+          126
+        ],
+        [
+          269,
+          106
+        ],
+        [
+          305,
+          126
+        ],
+        [
+          340,
+          106
+        ],
+        [
+          364,
+          119
+        ]
+      ],
+      "secondSixCarbonPath": [
+        [
+          390,
+          118
+        ],
+        [
+          408,
+          107
+        ],
+        [
+          415,
+          107
+        ],
+        [
+          448,
+          126
+        ],
+        [
+          484,
+          106
+        ],
+        [
+          520,
+          126
+        ],
+        [
+          556,
+          106
+        ],
+        [
+          588,
+          126
+        ],
+        [
+          595,
+          126
+        ],
+        [
+          660,
+          87
+        ]
+      ],
+      "carbonylRays": [
+        [
+          [
+            408,
+            107
+          ],
+          [
+            408,
+            78
+          ]
+        ],
+        [
+          [
+            415,
+            107
+          ],
+          [
+            415,
+            78
+          ]
+        ],
+        [
+          [
+            588,
+            126
+          ],
+          [
+            588,
+            153
+          ]
+        ],
+        [
+          [
+            595,
+            126
+          ],
+          [
+            595,
+            153
+          ]
+        ]
+      ],
+      "carbonylFootTopology": "OWN10x upper and lower show native SHORT HORIZONTAL joins x408..415y107 andx588..595y126. Both parallel rays contact opposite ends of short horizontaljoin; adjacent incoming/outgoing arms land at respective ends. NOT one V apex with separated splitfeet, no whitegap. White wedge inside V above/below join is not disconnect.",
+      "freeEndLeft": [
+        [
+          75,
+          132
+        ],
+        [
+          112,
+          112
+        ]
+      ],
+      "NHhydrogenBonds": [
+        [
+          [
+            125,
+            93
+          ],
+          [
+            125,
+            73
+          ]
+        ],
+        [
+          [
+            376,
+            134
+          ],
+          [
+            376,
+            153
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "literal": "N",
+          "bbox": [
+            115,
+            95,
+            135,
+            117
+          ],
+          "center": [
+            125,
+            106
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            115,
+            51,
+            135,
+            72
+          ],
+          "center": [
+            125,
+            61.5
+          ]
+        },
+        {
+          "literal": "N",
+          "bbox": [
+            367,
+            110,
+            386,
+            132
+          ],
+          "center": [
+            376.5,
+            121
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            367,
+            155,
+            385,
+            176
+          ],
+          "center": [
+            376,
+            165.5
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            402,
+            51,
+            423,
+            72
+          ],
+          "center": [
+            412.5,
+            61.5
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            582,
+            159,
+            603,
+            180
+          ],
+          "center": [
+            592.5,
+            169.5
+          ]
+        },
+        {
+          "literal": "n",
+          "bbox": [
+            632,
+            130,
+            644,
+            145
+          ],
+          "baseline": 144,
+          "style": "regular upright lowercase subscript"
+        }
+      ],
+      "parentheses": {
+        "leftBezierGuide": [
+          [
+            102,
+            80
+          ],
+          [
+            90,
+            99
+          ],
+          [
+            91,
+            124
+          ],
+          [
+            102,
+            142
+          ]
+        ],
+        "rightBezierGuide": [
+          [
+            623,
+            82
+          ],
+          [
+            635,
+            102
+          ],
+          [
+            633,
+            124
+          ],
+          [
+            622,
+            143
+          ]
+        ],
+        "strokeWidth": 1.5
+      },
+      "counts": {
+        "C": 12,
+        "N": 2,
+        "O": 2,
+        "explicitH": 2,
+        "COdouble": 2,
+        "CCdouble": 0,
+        "roundParentheses": 2,
+        "explanation": "first6visible C; secondCO+4CH2vertices+terminalCO=6. Outside cut-bond endpoints not added C, polymer continuation UNKNOWN; no totalH inferred."
+      },
+      "styles": {
+        "labels": "regular upright sans all N/H/O/n; no actual bold or italic observed",
+        "bonds": "black uniform approx1.5nativepx; no wedge/stereo",
+        "caption": "NONE"
+      },
+      "crop": "No edge-clipped chemical glyph; two exterior bond ends mark continuation, not terminal formula"
+    },
+    "measurementLimits": "Nativeapprox ±1–2px individualzigzagvertices, no uniformperiod normalize. Carbonyl horizontal joins independently seen own10x and explicitly represented in second path/rays. Parentheses curves approximate guide through visiblenative extents, no roundpair->square substitution.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "RootOWNnativeFULL3x/all1de12-KT-C4-D1-I-14/COup8x-down10x. 12C individually counted; 2CO short horizontal joins upper408..415y107/lower588..595y126 native visible, rays contact respective ends; no forced common V. 2separate NH upright regular, 2ROUND/nSUB. No chemical additions or answers.",
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicRefsRead": [
+      "12-KT-C4-D1-I-14.hinh.0.du_lieu"
+    ],
+    "freshChromium3xFull": "/workspace/scratch/root438-1112.png",
+    "macrosOpened": [
+      "/workspace/scratch/root438-left.png",
+      "/workspace/scratch/root438-co-up.png",
+      "/workspace/scratch/root438-co-down.png"
+    ],
+    "hashSvg": "65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f",
+    "verdict": "Đạt root freshNEW hashALL: 12C2N2O2H/2COshortHjoincontact/N-Hseparate/2ROUNDnSUBregular/2cutendsUNKNOWN/noaddedchemistry."
+  },
+  "oldNewAudit": {
+    "onlyChanged": "xmlns2140→2000; exact UTF8 replace verified. ALL14 direct children unchanged UTF8/geometry/glyphs EXACT. Initialinlinepositive invalidated for old assetdecodefail; freshNEW root+readonlyALL required.",
+    "negativeHistory": "nylon1112-lo-438-ban-cu-bi-loai.json"
+  },
+  "readonlyRuntime": {
+    "sha256": "0cd502255469f6f498d91c9a8e095b14c2029d436cefd8be8b270cc8ab5a68fc",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/nylon1112-native-ddh-65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f.svg 65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f\nIMGDECODE [ 732, 214 ]\n1112 { x: 0, y: 0, width: 732, height: 214 }\n\nPOSTSHOT_SHA 65a5d381e1d3e69028c6b67e829c362b266f7b732e6dc9b530c77bcd9c6bdf8f\nCOMMAND node /workspace/scratch/agent-render438-final.cjs\nCONTEXT 12-KT-C4-D1-I-14 public de/ref reviewed; fresh img.decode data-image successful732x214 and actual screenshot at3x, no answers.\n"
+  }
+}

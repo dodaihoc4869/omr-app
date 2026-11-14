@@ -1,0 +1,16 @@
+{
+  "lo": 438,
+  "main": "41ec9c7bc9920a1f27a26f6f97d37ed31dd90afe",
+  "previousMain": "41ec9c7bc9920a1f27a26f6f97d37ed31dd90afe",
+  "diffStat": "0 files changed",
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "Main41ec9c7bc nguyênbyte so437; không gộp. LatestmainfullBYNAME-buildspeed trướcmerge-release."
+}
