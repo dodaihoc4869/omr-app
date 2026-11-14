@@ -445,5 +445,6 @@
   ],
   "cuoi": "Xem lại cả buổi trong app · Thầy Đỗ Đại Học"
  },
- "netCoGio": true
+ "netCoGio": true,
+ "loiAsr": "loi-asr.json"
 }

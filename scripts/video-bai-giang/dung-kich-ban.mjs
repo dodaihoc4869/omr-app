@@ -8,6 +8,7 @@
 // Dùng: node dung-kich-ban.mjs <thư mục tư liệu> <cau-hinh.json> <thư mục ra>
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { amNguyenVan, gioTungChu } from './khop-loi.mjs'
 
 const [duLieu, cauHinhTep, ra] = process.argv.slice(2)
 if (!duLieu || !cauHinhTep || !ra) { console.error('dùng: node dung-kich-ban.mjs <tư liệu> <cau-hinh.json> <ra>'); process.exit(1) }
@@ -15,6 +16,8 @@ mkdirSync(ra, { recursive: true })
 const nk = JSON.parse(readFileSync(join(duLieu, 'nhat-ky.json'), 'utf8'))
 const trang = JSON.parse(readFileSync(join(duLieu, 'trang.json'), 'utf8'))
 const ch = JSON.parse(readFileSync(cauHinhTep, 'utf8'))
+// LỜI NGUYÊN VĂN có giờ từng chữ (PhoWhisper chạy trên máy; «loiAsr»: tên tệp trong thư mục tư liệu) — CHỈ để lấy GIỜ, chữ không bao giờ ra màn hình
+const AM_ASR = ch.loiAsr && existsSync(join(duLieu, ch.loiAsr)) ? amNguyenVan(JSON.parse(readFileSync(join(duLieu, ch.loiAsr), 'utf8')).flatMap((c) => c.tu)) : null
 const lang = readFileSync(join(duLieu, 'lang-35.txt'), 'utf8').trim().split('\n').map((d) => d.split(/\s+/).map(Number)).filter((x) => x.length === 2 && x[1] > x[0])
 
 // ── nhịp dựng ──
@@ -159,6 +162,12 @@ for (const cc of ch.canh) {
   // LỘ ĐÁP ÁN đúng lúc Thầy nói chữ cuối câu ("…là 4a"): đáy đoạn giọng cuối của câu − 0,55 s
   if (canh.doVui) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t1 - 0.55; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
   const moc = (dong, frac) => { const q = dauCau(dong); return q ? q.t0 + (frac != null ? frac * (q.t1 - q.t0) : 0.35) : null }
+  // GIỜ TỪNG CHỮ của phụ đề từ lời nguyên văn (gióng hàng khop-loi.mjs)
+  if (AM_ASR) for (const q of canh.cau) {
+    const r = gioTungChu(q.chu.split(/\s+/), AM_ASR, q.s0, q.s1)
+    if (r && r.khop >= Math.min(3, r.tong)) q.gioAsr = r.tu
+    console.log(`  khớp lời câu ${q.i}: ${r ? r.khop : 0}/${q.chu.split(/\s+/).length} chữ neo`)
+  }
   /** giây trên tiếng gốc ⇒ giây trên video (qua bảng mảnh của cảnh) */
   const raGioCanh = (sv) => { for (const m of canh.manh) if (m.s1 > m.s0 && sv >= m.s0 && sv <= m.s1) return m.t0 + ((sv - m.s0) / (m.s1 - m.s0)) * (m.t1 - m.t0); let best = null, kc = 1e9; for (const m of canh.manh) { const d = Math.min(Math.abs(sv - m.s0), Math.abs(sv - m.s1)); if (d < kc) { kc = d; best = sv <= m.s0 ? m.t0 : m.t1 } } return best }
   /** GIỜ TỪ KHOÁ (chỉ có lời tóm tắt, không có giờ từng chữ): câu chia CỤM theo dấu phẩy; cụm đặt lên trục THỜI GIAN CÓ GIỌNG theo số ÂM TIẾT
@@ -172,6 +181,7 @@ for (const cc of ch.canh) {
   }
   /** giờ (video) chữ thứ vt của câu q */
   function gioChu(q, vt) {
+    if (q.gioAsr) return raGioCanh(q.gioAsr[vt]) // giờ thật Thầy nói chữ này
     // GHIM một chữ vào nét viết (cc.ghimChu: [câu, chữ thứ mấy, giây tiếng gốc]) — vd. «gắn Na» đúng lúc Thầy viết «Na»
     const gc = (cc.ghimChu ?? []).find(([d2, w2]) => d2 === q.i && w2 === vt); if (gc) return raGioCanh(gc[2])
     const tu = q.chu.split(/\s+/)
@@ -217,8 +227,9 @@ for (const cc of ch.canh) {
     canh.phuDe = canh.phuDe.map((c, i) => {
       const sau = canh.phuDe[i + 1], t1 = sau ? Math.min(sau.t0 - 0.04, sau.cau === c.cau ? sau.t0 : Math.max(c.cau.t1, c.t0 + 1.2)) : c.cau.t1
       const am = c.chu.split(/\s+/).map(soAm), tw = []; let cong = 0
-      for (const a of am) { tw.push(Math.round(Math.min(c.t0 + cong / 4.5, c.t0 + 0.85 * (t1 - c.t0)) * 1000) / 1000); cong += a }
-      return { chu: c.chu, t0: Math.round(c.t0 * 1000) / 1000, t1: Math.round(t1 * 1000) / 1000, tw }
+      for (const [k, a] of am.entries()) { const that = c.cau.gioAsr ? gioChu(c.cau, c.x + k) : null; tw.push(Math.round(Math.max(c.t0, Math.min(that ?? c.t0 + cong / 4.5, c.t0 + 0.92 * (t1 - c.t0))) * 1000) / 1000); cong += a }
+      const t1g = Math.max(c.t0 + 1.2, Math.min(t1, tw[tw.length - 1] + 3.5)) // nói xong cụm 3,5 s mà chưa sang cụm sau ⇒ tắt, không treo chữ cũ
+      return { chu: c.chu, t0: Math.round(c.t0 * 1000) / 1000, t1: Math.round(t1g * 1000) / 1000, tw }
     })
   }
 
