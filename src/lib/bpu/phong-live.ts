@@ -464,7 +464,9 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
   const ra = biMoiRa(st, sbd), e = st.ds.find((x) => x.sbd === sbd), duoc = !st.ketThuc && !!e && (e.vao || l.xa) && !ra
   const hang = l.tay.findIndex((x) => x.sbd === sbd)
   // Điểm quyết 3 (thầy 11/11 lần 4): em trong lớp mặc định BẬT tiếng; thầy chọn «Em ở xa» (`tiengLop: false`) ⇒ tắt, em đeo tai nghe tự bật lại được. Em ở xa luôn bật.
-  const tieng: TiengLive = !l.sfu ? 'chua-cau-hinh' : e?.vao && !l.tiengLop ? 'tat' : 'bat'
+  // 14/11 (thầy: «Chế độ em ở xa tự động bật tiếng cho hs nhé»): buổi LIVE THEO KHỐI (`l.khoi`) mọi em đều học từ xa — vào phòng là điểm danh nên `vao`
+  // không còn nghĩa «ngồi trong lớp» ⇒ «Em ở xa» KHÔNG tắt tiếng ai, máy em nào cũng tự có tiếng thầy. Buổi trên lớp giữ nguyên luật cũ.
+  const tieng: TiengLive = !l.sfu ? 'chua-cau-hinh' : e?.vao && !l.tiengLop && !l.khoi ? 'tat' : 'bat'
   return {
     duocXem: duoc, san: duoc && l.san, bat: duoc && l.bat, tu: duoc ? l.tu : null, phien: l.phien, ss: duoc ? l.ss : null, tieng, soNet: l.soNet,
     /** Máy em có hiện BẢNG LIVE không (false ⇒ giữ màn câu hỏi bình thường, tiếng vẫn chạy khi `bat`). Em Ở XA không có màn câu hỏi ⇒ luôn xem bảng khi live. */
