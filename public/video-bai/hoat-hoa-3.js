@@ -203,7 +203,7 @@ function veBazoD(Z, m, t) {
   oH.style.visibility = t >= m.d_na && !daGan ? 'hidden' : ''
   if (Z.oD) {
     datXY(d.h, Z.oD.x + ra * 70, Z.oD.y - ra * 34); d.h.style.opacity = r3(tien(t, m.d_na, 0.05) * (1 - tien(t, m.d_na + 0.9, 0.3)))
-    datXY(d.na, lerp(Z.W - 110, Z.oD.x, vao), lerp(Y - 80, Z.oD.y, vao)); d.na.style.opacity = r3(tien(t, m.d_na + 0.4, 0.2) * (daGan ? 0 : 1))
+    datXY(d.na, lerp(Z.W - 90, Z.oD.x, vao), lerp(Z.oD.y + 40, Z.oD.y, vao) - 36 * Math.sin(Math.PI * vao)); d.na.style.opacity = r3(tien(t, m.d_na + 0.4, 0.2) * (daGan ? 0 : 1))
   }
   datXY(d.tenM, X, Y + 84); xuat(d.tenM, t, m.d_coona)
   datXY(d.tru, X, Y + 150); xuat(d.tru, t, m.d_tru1)
