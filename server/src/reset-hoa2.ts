@@ -120,7 +120,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
   // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): dẫn xuất từ hanh_trinh_v4_canh (GIỮ) ⇒ GIỮ cho nhất quán; cron dựng lại ≤ 2 giờ.
-  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc', 'hanh_trinh_v4_bandit_lop', 'hanh_trinh_v4_bandit_lop_moc',
+  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc', 'hanh_trinh_v4_canh_lop_den', 'hanh_trinh_v4_bandit_lop', 'hanh_trinh_v4_bandit_lop_moc',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
   // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10): dẫn xuất từ sổ su_kien_hoc (GIỮ) ⇒ GIỮ cho nhất quán (như nam_kt_cau).

@@ -6,8 +6,14 @@
 //  · Máy em gửi chuỗi JSON `{ t: 'st', x: SinhTonGui }`; phòng phát mỗi 250 ms MỘT ảnh `{ t: 'lop', k: 'tro', … }` (đúng dạng TinLop ⇒ màn TroSinhTon dùng chung),
 //    lọc riêng từng em («chỉ gửi gần», bản 2 đợt 2).
 //  · Thầy bấm Bắt đầu ⇒ `dongTatCa('bat-dau')`: báo `{ t: 'dong' }` rồi đóng mọi kết nối mã 4000 — trò không được cản việc vào bài.
+//  · Bước ghép đợt 4: Durable Object đọc đồ + danh hiệu + ĐỘI CẢ HỌC KỲ lúc nhận vé (gom lô, có hạn chờ) rồi mới gọi `vao(kn, ve, doEm)` ⇒ em vào đội cả kỳ
+//    (thiếu dữ liệu ⇒ đội ít em nhất như cũ; lệch người ⇒ máy bù bù đủ 4 mỗi đội — `soMayCan`). Danh sách: [sbd, tên, đội, mã đồ gọn?, danh hiệu?].
+//    Thống kê ghi theo LÔ qua `du.ghi` (mã phòng `ca:<mã ca>:<k>`): mỗi GHI_MOI_VAN ván, hết em trên sân, em cuối rời, thầy bắt đầu ca — kèm ván thắng / ván
+//    chơi theo đội (14/11, chỉ phòng ca: `demDoi`), cùng lô.
 import type { SinhTonGui } from '../../src/lib/live-khoi/kieu'
-import { MaySinhTon } from './sinh-ton-may-chu'
+import type { DoEm } from '../../src/lib/live-khoi/tu-do'
+import type { NoiDuLieuSt } from './sinh-ton-du-lieu'
+import { GHI_MOI_VAN, MaySinhTon } from './sinh-ton-may-chu'
 
 /** Một kết nối của phòng (bọc WebSocket để luật test được không cần Cloudflare). */
 export interface KetNoi {
@@ -25,11 +31,14 @@ export const SO_PHONG_TOI_DA = 8
 /** Mã đóng kết nối — máy em (mang-sanh / MangDau) không nối lại với các mã này. */
 export const MA_DONG = { veSai: 4003, thayMay: 4002, day: 4009, batDau: 4000, tat: 4010 } as const
 
-/** Dữ liệu gắn trên kết nối (sống qua lúc phòng ngủ): `st: 1` = kết nối của trò Sinh Tồn, số báo danh, tên gọi, đội 0..3. */
-export interface KemSinhTon { st: 1; s: string; t: string; doi: number }
-/** Một dòng danh sách phòng: [số báo danh, tên gọi, đội]. */
-type DongDs = [string, string, number]
-interface NguoiSt { sbd: string; ten: string; doi: number; kn: KetNoi }
+/** Dữ liệu gắn trên kết nối (sống qua lúc phòng ngủ): `st: 1` = kết nối của trò Sinh Tồn, số báo danh, tên gọi, đội 0..3, mã đồ gọn `c`, danh hiệu `dh`. */
+export interface KemSinhTon { st: 1; s: string; t: string; doi: number; c?: string; dh?: number }
+/** Một dòng danh sách phòng: [số báo danh, tên gọi, đội, mã đồ gọn?, danh hiệu?] (hai phần cuối chỉ có khi em có đồ / danh hiệu). */
+type DongDs = [string, string, number] | [string, string, number, string] | [string, string, number, string, number]
+interface NguoiSt { sbd: string; ten: string; doi: number; kn: KetNoi; c: string; dh: number }
+const dongCua = (n: NguoiSt): DongDs => (n.dh >= 0 ? [n.sbd, n.ten, n.doi, n.c, n.dh] : n.c ? [n.sbd, n.ten, n.doi, n.c] : [n.sbd, n.ten, n.doi])
+const gonHop = (c: unknown): string => (typeof c === 'string' && /^[0-8]{4}$/.test(c) ? c : '')
+const dhHop = (d: unknown): number => (d === 0 || d === 1 || d === 2 ? d : -1)
 /** Gói của máy em dài nhất chừng 90 ký tự; quá 400 ⇒ bỏ. */
 const GOI_DAI = 400
 export const CHU_BAN_CU_ST = 'Trò Sinh Tồn đã có bản mới. Em tải lại trang để chơi nhé.'
@@ -40,14 +49,24 @@ export class PhongSinhTonCa {
   private nguoi = new Map<string, NguoiSt>()
   private theoKn = new Map<KetNoi, NguoiSt>()
   private may: MaySinhTon
+  /** Mã ca (đặt từ vé đầu tiên / kết nối khi phòng thức dậy) — mã phòng ghi thống kê `ca:<mã ca>:<k>`. */
+  ma = ''
   // Máy bù mang tên như học sinh: tránh tên em đang trong phòng (phòng ca không có danh sách lớp).
-  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0) { this.may = new MaySinhTon(rng, () => [...this.nguoi.values()].map((n) => n.ten)) }
+  constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0, private du?: Pick<NoiDuLieuSt, 'ghi'>) {
+    this.may = new MaySinhTon(rng, () => [...this.nguoi.values()].map((n) => n.ten))
+    this.may.demDoi = true // phòng ca: đội = đội cả kỳ ⇒ đếm ván thắng / ván chơi theo đội
+  }
+  /** Ghi thống kê theo LÔ (không chờ; lỗi D1 không chạm phòng). */
+  private ghiTk(): void {
+    const ds = this.may.layThongKe(), vd = this.may.layVanDoi()
+    if (ds.length && this.du && this.ma) this.du.ghi(`ca:${this.ma}:${this.soPhong}`, ds, vd)
+  }
 
   get soNguoi(): number { return this.nguoi.size }
   /** Còn em thật vừa gửi gói ⇒ giữ nhịp 250 ms; hết ⇒ Durable Object được ngủ (kết nối vẫn giữ). */
   canThuc(): boolean { return this.may.soEm > 0 }
 
-  private ds(): DongDs[] { return [...this.nguoi.values()].map((n) => [n.sbd, n.ten, n.doi]) }
+  private ds(): DongDs[] { return [...this.nguoi.values()].map(dongCua) }
   private baoDs(): void { const d = JSON.stringify({ t: 'st-ds', ds: this.ds() }); for (const n of this.nguoi.values()) n.kn.gui(d) }
   private doiItNhat(): number {
     const so = [0, 0, 0, 0]
@@ -57,8 +76,9 @@ export class PhongSinhTonCa {
     return d
   }
 
-  /** Em vào bằng vé đã kiểm. Trả false khi phòng đầy (đã đóng kết nối, chỉ sang phòng kế). */
-  vao(kn: KetNoi, ve: VeDau): boolean {
+  /** Em vào bằng vé đã kiểm (+ đồ / danh hiệu / đội cả kỳ đã đọc — null = không có dữ liệu). Trả false khi phòng đầy (đã đóng kết nối, chỉ sang phòng kế). */
+  vao(kn: KetNoi, ve: VeDau, doEm: DoEm | null = null): boolean {
+    this.ma ||= ve.c
     let n = this.nguoi.get(ve.s)
     if (n) {
       // Cùng số báo danh mở ở máy / tab khác (hoặc chính máy đó nối lại): kết nối cũ bị thay, em giữ nguyên đội.
@@ -66,12 +86,14 @@ export class PhongSinhTonCa {
       n.kn = kn
     } else {
       if (this.nguoi.size >= TRAN_KET_NOI) { kn.dong(MA_DONG.day, this.soPhong + 1 < SO_PHONG_TOI_DA ? `sang:${this.soPhong + 1}` : 'day'); return false }
-      n = { sbd: ve.s, ten: String(ve.t || '').slice(0, 16), doi: this.doiItNhat(), kn }
+      // Đội cả học kỳ (đọc lúc nhận vé) — thiếu ⇒ đội ít em nhất như cũ.
+      const dk = doEm?.doi
+      n = { sbd: ve.s, ten: String(ve.t || '').slice(0, 16), doi: dk === 0 || dk === 1 || dk === 2 || dk === 3 ? dk : this.doiItNhat(), kn, c: gonHop(doEm?.c), dh: dhHop(doEm?.dh) }
       this.nguoi.set(n.sbd, n)
     }
     this.theoKn.set(kn, n)
-    kn.ghiKem({ st: 1, s: n.sbd, t: n.ten, doi: n.doi } satisfies KemSinhTon)
-    kn.gui(JSON.stringify({ t: 'st-vao', toi: [n.sbd, n.ten, n.doi] satisfies DongDs, ds: this.ds() }))
+    kn.ghiKem({ st: 1, s: n.sbd, t: n.ten, doi: n.doi, ...(n.c ? { c: n.c } : {}), ...(n.dh >= 0 ? { dh: n.dh } : {}) } satisfies KemSinhTon)
+    kn.gui(JSON.stringify({ t: 'st-vao', toi: dongCua(n), ds: this.ds() }))
     this.baoDs()
     return true
   }
@@ -79,7 +101,7 @@ export class PhongSinhTonCa {
   /** Phòng vừa thức dậy: dựng lại em từ dữ liệu gắn trên kết nối (đúng đội cũ). */
   khoiPhuc(kn: KetNoi, k: KemSinhTon): void {
     if (!k || k.st !== 1 || typeof k.s !== 'string' || !k.s || ![0, 1, 2, 3].includes(k.doi) || this.nguoi.has(k.s)) return
-    const n: NguoiSt = { sbd: k.s, ten: String(k.t || '').slice(0, 16), doi: k.doi, kn }
+    const n: NguoiSt = { sbd: k.s, ten: String(k.t || '').slice(0, 16), doi: k.doi, kn, c: gonHop(k.c), dh: dhHop(k.dh) }
     this.nguoi.set(n.sbd, n); this.theoKn.set(kn, n)
   }
 
@@ -97,7 +119,8 @@ export class PhongSinhTonCa {
   nhip(): void {
     const nay = this.bayGio()
     const anh = this.may.nhip(nay)
-    if (!anh) return
+    if (!anh) { this.ghiTk(); return } // hết em trên sân ⇒ trò dừng (Durable Object sắp được ngủ) ⇒ ghi
+    if (this.may.vanChoGhi >= GHI_MOI_VAN) this.ghiTk()
     const goi = this.may.goi(anh, nay)
     for (const n of this.nguoi.values()) n.kn.gui(goi.cho(n.sbd))
   }
@@ -108,6 +131,7 @@ export class PhongSinhTonCa {
     if (!n || n.kn !== kn) return
     this.nguoi.delete(n.sbd)
     this.may.xoa(n.sbd)
+    if (!this.nguoi.size) this.ghiTk()
     this.baoDs()
   }
 
@@ -115,6 +139,6 @@ export class PhongSinhTonCa {
   dongTatCa(ly: 'bat-dau' | 'tat'): void {
     const s = JSON.stringify({ t: 'dong', ly })
     for (const n of this.nguoi.values()) { n.kn.gui(s); n.kn.dong(ly === 'tat' ? MA_DONG.tat : MA_DONG.batDau, ly) }
-    this.nguoi.clear(); this.theoKn.clear(); this.may.dung()
+    this.nguoi.clear(); this.theoKn.clear(); this.may.dung(); this.ghiTk()
   }
 }

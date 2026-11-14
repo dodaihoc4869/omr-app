@@ -1,0 +1,27 @@
+/* MÁY THẦY · THI ĐUA ĐỘI TUẦN (bản vẽ 17): nền trang vở tối (--st-* gắn nội tuyến), cột gạch chéo màu đội (--p-*), thẻ danh hiệu dán chéo. Không mã màu thô. */
+.tdt { --tdt-ke: color-mix(in srgb, var(--st-vien) 55%, var(--st-nen)); --tdt-le: color-mix(in srgb, var(--tr-sai) 45%, var(--st-nen));
+  position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; gap: 16px; padding: 28px 40px 28px 72px; color: var(--st-chu); font-family: var(--sans);
+  background: linear-gradient(90deg, transparent 40px, var(--tdt-le) 40px, var(--tdt-le) 42px, transparent 42px), repeating-linear-gradient(180deg, var(--st-nen) 0 45px, var(--tdt-ke) 45px 46px), var(--st-nen); }
+.tdt *, .tdt *::before, .tdt *::after { box-sizing: border-box; }
+.tdt-dau { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 18px; }
+.tdt-dau h2 { margin: 0; font-size: clamp(28px, 3.4vw, 46px); font-weight: 800; }
+.tdt-dau span { font-size: clamp(15px, 1.4vw, 20px); color: var(--tr-chu-2); flex: 1; min-width: 200px; }
+.tdt-dong { align-self: center; min-height: 48px; padding: 0 22px; border-radius: 14px; border: 2px solid var(--st-chu); background: var(--st-mat); color: var(--st-chu); font: inherit; font-size: 18px; font-weight: 800; cursor: pointer; }
+.tdt-dong:focus-visible { outline: 3px solid var(--tr-sao); outline-offset: 2px; }
+.tdt-cho { margin: auto; font-size: 20px; color: var(--tr-chu-2); }
+.tdt-than { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 32px; }
+.tdt-cot { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4%; align-items: end; min-height: 0; }
+.tdt-cot li { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 8px; min-height: 0; }
+.tdt-cot li > i { display: block; border: 3px solid var(--st-chu); background: repeating-linear-gradient(135deg, var(--doi) 0 10px, color-mix(in srgb, var(--doi) 78%, var(--st-nen)) 10px 13px); }
+.tdt-so { text-align: center; font-size: clamp(22px, 2.6vw, 38px); font-weight: 800; font-variant-numeric: tabular-nums; }
+.tdt-ten { text-align: center; font-size: clamp(15px, 1.5vw, 22px); }
+.tdt-dh h3 { margin: 0 0 12px; font-size: clamp(18px, 1.6vw, 24px); font-weight: 700; }
+.tdt-dh ul { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.tdt-dh li { padding: 12px 14px; border: 2.5px solid var(--st-chu); background: var(--st-mat); font-size: clamp(15px, 1.3vw, 19px); line-height: 1.35; transform: rotate(-.6deg); }
+.tdt-dh li:nth-child(even) { transform: rotate(.5deg); }
+.tdt-dh li b { font-weight: 700; color: var(--tr-sai); }
+.tdt-dh li em { font-style: normal; color: var(--tr-sao); }
+.tdt-dh li.tdt-thang b { font-weight: 400; color: var(--doi); }
+.tdt-dh p { margin: 0 0 12px; font-size: 16px; color: var(--tr-chu-2); }
+.tdt-dh .tdt-ghi { font-size: 14px; color: var(--tr-chu-3); }
+@media (max-width: 760px) { .tdt { padding: 16px; overflow-y: auto; } .tdt-than { grid-template-columns: 1fr; } .tdt-cot { height: 300px; } }

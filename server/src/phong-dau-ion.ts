@@ -6,11 +6,14 @@
 // GIAO THỨC: gói `vao` phải mang `tro: 'st'` + `v: PHIEN_BAN_ST` + vé của ĐÚNG ca. Máy còn mảnh trò cũ trong bộ nhớ đệm (gói `vao` không có `tro`) ⇒ đóng
 // sạch mã 4010 (máy cũ hiểu là «sảnh chưa mở», không nối lại). Ca đông chia nhiều phòng — phòng số k (header `x-phong-so`, 0…7) đầy ⇒ đóng 4009
 // «sang:k+1», máy em tự nối phòng kế. Thầy bấm Bắt đầu ⇒ POST `/dong` ⇒ mọi kết nối đóng mã 4000.
+// Bước ghép đợt 4: lúc NHẬN VÉ đọc đồ + danh hiệu + đội cả học kỳ (gom lô các em vào cùng lúc, hạn 1,5 giây — quá hạn ⇒ vào như cũ); thống kê trò ghi D1 theo
+// LÔ qua `ctx.waitUntil` (sinh-ton-du-lieu.ts `noiDuLieuSt`). Đường trò (nhịp 250 ms) vẫn 0 D1.
 import type { DurableObjectState, Env, WsMayChu } from './kieu'
 import { kiemVeDau } from './dau-ion-ve'
 import { PHIEN_BAN_ST } from '../../src/lib/live-khoi/kieu'
 import { CHU_BAN_CU_ST, CHU_TRO_CU, MA_DONG, PhongSinhTonCa, type KemSinhTon, type KetNoi } from './sinh-ton-ca'
 import { TRO_NHIP_MS } from './sinh-ton-may-chu'
+import { noiDuLieuSt, type NoiDuLieuSt } from './sinh-ton-du-lieu'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -25,8 +28,11 @@ export class PhongDauIon {
   private vongSt: ReturnType<typeof setInterval> | null = null
   /** Số phòng trong ca (0 = phòng đầu). */
   private soPhong = 0
+  /** Đọc đồ / đội cả kỳ + ghi thống kê (null = không có D1, ví dụ môi trường test). */
+  private noi: NoiDuLieuSt | null
 
   constructor(private ctx: DurableObjectState, private env: Env) {
+    this.noi = env?.DB ? noiDuLieuSt(env, ctx, true) : null
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
 
@@ -48,9 +54,10 @@ export class PhongDauIon {
     if (!this.phongSt) {
       const dsWs = this.ctx.getWebSockets()
       for (const ws of dsWs) { const a = ws.deserializeAttachment() as KemKetNoi | null; if (a?.so) { this.soPhong = a.so; break } }
-      this.phongSt = new PhongSinhTonCa(Date.now, Math.random, this.soPhong)
+      this.phongSt = new PhongSinhTonCa(Date.now, Math.random, this.soPhong, this.noi ?? undefined)
       for (const ws of dsWs) {
         const a = ws.deserializeAttachment() as KemKetNoi | null
+        if (a?.ca && !this.phongSt.ma) this.phongSt.ma = a.ca
         if (a?.st === 1) this.phongSt.khoiPhuc(this.ketNoi(ws), a as KemSinhTon)
       }
     }
@@ -103,7 +110,12 @@ export class PhongDauIon {
     if (this.env.TAT_DAU_ION) return kn.dong(MA_DONG.tat, 'tat')
     const ve = await kiemVeDau(this.env.MA_BI_MAT, j.ve)
     if (!ve || ve.c !== a.ca) return kn.dong(MA_DONG.veSai, 'Vé vào trò phòng chờ không hợp lệ hoặc đã hết hạn.')
-    this.st().vao(kn, ve)
+    let doEm = null
+    if (this.noi) {
+      doEm = await this.noi.doc(ve.s).catch(() => null)
+      if (!this.ctx.getWebSockets().includes(ws)) return // kết nối đóng trong lúc chờ đọc ⇒ không thêm «em ma» vào danh sách
+    }
+    this.st().vao(kn, ve, doEm)
     this.damBaoVong()
   }
 

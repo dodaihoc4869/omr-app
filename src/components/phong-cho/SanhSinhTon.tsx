@@ -15,9 +15,17 @@ import { PHIEN_BAN_ST, type KenhLop, type NguoiLop, type TinLop } from '../../li
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { laDienThoai, thuocTinhXoay } from '../live/chieu-xoay'
 import { MangDau, duongPhong, type TinMang } from './mang-sanh-ca'
+import type { DuLieuTuDo } from './tu-do-api'
+import type { BoMac } from '../../lib/live-khoi/tu-do'
 
 const napTro = () => import('../live-khoi/TroSinhTon')
 const TroSinhTon = lazy(napTro)
+// ĐỢT 4 (tủ đồ · đội cả kỳ · danh hiệu · thi đua tuần): dữ liệu + hình bé ma đều nạp lười SAU khi thẻ đã hiện — không chặn màn chờ, không thêm byte mở app.
+const XemBeMa = lazy(() => import('./XemBeMa'))
+const TuDoBeMa = lazy(() => import('./TuDoBeMa'))
+const TEN_DANH_HIEU: Record<string, string> = { 'tho-san': 'Thợ săn tuần', 'pha-tk': 'Kẻ phá thủ khoa', 'ha-thay': 'Hạ gục Thầy' }
+/** Chờ máy rảnh rồi mới đọc dữ liệu thẻ (màn chờ vẽ xong trước). */
+const HOAN_DOC_MS = 400
 
 /** `chua` = chưa nối · `noi` = đang vào · `mo` = đang chơi · `mat` = rớt mạng (đang nối lại / đã thôi) · `tat` = trò tắt ở ca này · `het-ve` · `may-khac` · `day`. */
 type Mang = 'chua' | 'noi' | 'mo' | 'mat' | 'tat' | 'het-ve' | 'may-khac' | 'day'
@@ -47,7 +55,8 @@ function raToanMan(): void {
 function docNguoi(d: unknown): NguoiLop | null {
   if (!Array.isArray(d) || typeof d[0] !== 'string' || !d[0]) return null
   const doi = Number(d[2])
-  return { sbd: d[0], ten: typeof d[1] === 'string' ? d[1] : '', doi: doi >= 0 && doi <= 3 ? Math.floor(doi) : 0 }
+  // Bản 6 (đợt 4): [sbd, tên, đội, mã đồ gọn?, danh hiệu?] — thiếu ⇒ không đồ / không danh hiệu.
+  return { sbd: d[0], ten: typeof d[1] === 'string' ? d[1] : '', doi: doi >= 0 && doi <= 3 ? Math.floor(doi) : 0, ...(typeof d[3] === 'string' && d[3] ? { c: d[3] } : {}), ...(typeof d[4] === 'number' ? { dh: d[4] } : {}) }
 }
 const docDs = (ds: unknown): NguoiLop[] => (Array.isArray(ds) ? ds.map(docNguoi).filter((n): n is NguoiLop => !!n) : [])
 
@@ -101,6 +110,19 @@ export default function SanhSinhTon({ maCa, veDau, batDau, onBatDau }: SanhSinhT
   const ngheTro = useRef(new Set<(tin: TinLop) => void>())
   const ketThuc = !!batDau || dong
   const coVe = !!(veDau && maCa)
+  const [du, setDu] = useState<DuLieuTuDo | null>(null)
+  const [moTu, setMoTu] = useState(false)
+  /** Bản đầy đủ (cấp + chuỗi ngày + đồ đã mở) chỉ tải khi em bấm «Tủ đồ»: `dang` đang tải · `loi` hỏng. */
+  const [taiTu, setTaiTu] = useState<'' | 'dang' | 'loi'>('')
+  // Dữ liệu thẻ sảnh (đội cả kỳ, đồ đang mặc, danh hiệu, thi đua tuần): đọc MỘT lần sau khi thẻ hiện; thầy bắt đầu / rời màn ⇒ bỏ kết quả. Hỏng ⇒ thẻ như cũ.
+  useEffect(() => {
+    if (!veDau || !maCa || ketThuc) return
+    let bo = false
+    const hen = setTimeout(() => {
+      void import('./tu-do-api').then((m) => (bo ? null : m.taiTuDo({ ve: veDau }, true))).then((d) => { if (!bo && d) setDu(d) }).catch(() => { /* giữ thẻ như cũ */ })
+    }, HOAN_DOC_MS)
+    return () => { bo = true; clearTimeout(hen) }
+  }, [veDau, maCa, ketThuc])
   // Thầy bắt đầu ⇒ gỡ màn trò ngay trong lượt vẽ này (nhánh `ketThuc` bên dưới không còn vẽ trò; đây chỉ dọn trạng thái).
   if (ketThuc && tran) setTran(null)
 
@@ -183,14 +205,51 @@ export default function SanhSinhTon({ maCa, veDau, batDau, onBatDau }: SanhSinhT
     : mang === 'day' ? 'Trò chơi đang đủ người. Em bấm «Chơi» để thử lại sau ít phút.'
     : 'Bấm là vào trận ngay · thầy bắt đầu thì trò tự dừng'
 
+  /** «Tủ đồ»: thẻ chỉ có bản nhẹ ⇒ tải bản đầy đủ (máy chủ tính chuỗi ngày lúc này) rồi mới mở. */
+  const moTuDo = async () => {
+    if (!veDau || taiTu === 'dang') return
+    if (du?.day) { setMoTu(true); return }
+    setTaiTu('dang')
+    const d = await import('./tu-do-api').then((m) => m.taiTuDo({ ve: veDau })).catch(() => null)
+    if (!d) { setTaiTu('loi'); return }
+    setTaiTu(''); setDu(d); setMoTu(true)
+  }
+  const nutChoi = <button type="button" className="sst-nut" disabled={!coVe || dangNoi || mang === 'mo' || mang === 'tat' || mang === 'het-ve'} onClick={() => void choi()}>Chơi</button>
   return <section className="sst-the" aria-label="Trò chơi trong lúc chờ">
     <div><div className="sst-mat">CHƠI MỘT CHÚT TRONG LÚC CHỜ</div><h2>Sinh Tồn bốn đội</h2></div>
-    <p className="sst-ta">Mỗi em một bé ma đeo súng tự bắn. Vuốt để chạy, hạ đối thủ để súng lên cấp; đội thiếu người thì có bạn chơi cùng cho đủ.</p>
-    <ul className="sst-doi" aria-label="Bốn đội">
-      {DOI_SANH.map(([ky, ten, mau]) => <li key={ky} style={{ ['--d' as string]: `var(${mau})` } as CSSProperties}><i aria-hidden="true" />{ky} · Đội {ten}</li>)}
-    </ul>
-    <button type="button" className="sst-nut" disabled={!coVe || dangNoi || mang === 'mo' || mang === 'tat' || mang === 'het-ve'} onClick={() => void choi()}>Chơi</button>
+    {du ? <TheEm du={du} /> : <>
+      <p className="sst-ta">Mỗi em một bé ma đeo súng tự bắn. Vuốt để chạy, hạ đối thủ để súng lên cấp; đội thiếu người thì có bạn chơi cùng cho đủ.</p>
+      <ul className="sst-doi" aria-label="Bốn đội">
+        {DOI_SANH.map(([ky, ten, mau]) => <li key={ky} style={{ ['--d' as string]: `var(${mau})` } as CSSProperties}><i aria-hidden="true" />{ky} · Đội {ten}</li>)}
+      </ul>
+    </>}
+    {du && veDau ? <div className="sst-hang"><button type="button" className="sst-tu" disabled={taiTu === 'dang'} onClick={() => void moTuDo()}>Tủ đồ</button>{nutChoi}</div> : nutChoi}
+    {taiTu ? <p className="sst-phu" role="status">{taiTu === 'dang' ? 'Đang mở tủ đồ…' : 'Chưa mở được tủ đồ. Em bấm «Tủ đồ» để thử lại.'}</p> : null}
     <p className="sst-phu" role="status">{dangNoi ? <i className="sst-cham" aria-hidden="true" /> : null}{phu}</p>
     {tran && <ManTro toi={tran.toi} ds={tran.ds} kenh={kenh} onThoat={thoat} />}
+    {moTu && du?.day && veDau && !ketThuc ? <Suspense fallback={null}><TuDoBeMa du={du} xt={{ ve: veDau }} onDong={() => setMoTu(false)} onDaMac={(mac: BoMac) => setDu((x) => (x ? { ...x, mac } : x))} /></Suspense> : null}
   </section>
+}
+
+/** Phần riêng của em trên thẻ (bản vẽ 16): bé ma đang mặc, đội cả học kỳ, danh hiệu tuần, thi đua tuần của lớp (4 vạch, xếp cao → thấp). */
+function TheEm({ du }: { du: DuLieuTuDo }) {
+  const doi = du.doiKy, max = Math.max(1, ...du.thiDua.doi)
+  const xep = du.thiDua.doi.map((ha, i) => ({ ha, i })).sort((a, b) => b.ha - a.ha || a.i - b.i)
+  return <>
+    <div className="sst-ky">
+      <Suspense fallback={<span className="sst-ma-cho" aria-hidden="true" />}><XemBeMa rong={84} doi={doi ?? 1} mac={du.mac} nen nhan="Bé ma của em" /></Suspense>
+      <div>
+        {doi != null ? <p className="sst-ky-doi" style={{ ['--d' as string]: `var(${DOI_SANH[doi][2]})` } as CSSProperties}><span>Đội của em cả học kỳ</span><b>Đội {DOI_SANH[doi][1]}</b></p> : null}
+        {du.danhHieu.length ? <ul className="sst-dh" aria-label="Danh hiệu tuần của em">{du.danhHieu.map((l) => <li key={l}>{TEN_DANH_HIEU[l]}</li>)}</ul> : null}
+      </div>
+    </div>
+    <div className="sst-td">
+      <p title={du.thiDua.chuTuan ? `Tuần ${du.thiDua.chuTuan}` : undefined}>Thi đua tuần này · lượt hạ cộng dồn</p>
+      <ul aria-label="Lượt hạ của bốn đội trong tuần">
+        {xep.map(({ ha, i }) => <li key={i} data-em={i === doi || undefined} style={{ ['--d' as string]: `var(${DOI_SANH[i][2]})` } as CSSProperties}>
+          <span>{DOI_SANH[i][1]}</span><i aria-hidden="true"><b style={{ width: `${Math.round((ha / max) * 100)}%` }} /></i><span>{ha}</span>
+        </li>)}
+      </ul>
+    </div>
+  </>
 }

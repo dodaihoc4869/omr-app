@@ -22,6 +22,26 @@
   font: inherit; font-size: 22px; font-weight: 800; letter-spacing: .02em; cursor: pointer; touch-action: manipulation; transition: transform .1s; }
 .sst-the .sst-nut:active { transform: translateY(2px); }
 .sst-the .sst-nut:disabled { opacity: .55; cursor: default; }
+/* ĐỢT 4 (bản vẽ 16): bé ma đang mặc + đội cả học kỳ + danh hiệu tuần + thi đua tuần 4 vạch + nút «Tủ đồ» cạnh «Chơi». Hiện khi dữ liệu nạp lười xong. */
+.sst-ky { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.sst-ky > div { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.sst-ma-cho { width: 84px; height: 93px; flex: none; border-radius: 14px; background: var(--sst-mat-2); }
+.sst-ky-doi { margin: 0; display: flex; flex-direction: column; font-size: 15px; line-height: 1.35; color: var(--sst-chu-2); }
+.sst-ky-doi b { font-size: 18px; color: var(--d); }
+.sst-dh { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.sst-dh li { padding: 3px 10px; border: 2px solid var(--tr-sai, var(--do)); border-radius: 10px; color: var(--tr-sai, var(--do)); font-size: 14px; font-weight: 700; transform: rotate(-1.5deg); }
+.sst-td p { margin: 0 0 6px; font-size: 14px; color: var(--sst-chu-2); }
+.sst-td ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sst-td li { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; align-items: center; gap: 8px; font-size: 15px; }
+.sst-td li > i { display: block; height: 14px; border: 1.5px solid var(--sst-chu-3); border-radius: 3px; overflow: hidden; }
+.sst-td li > i b { display: block; height: 100%; background: var(--d); }
+.sst-td li > span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.sst-td li[data-em] > span { font-weight: 800; text-decoration: underline; text-decoration-color: var(--d); text-underline-offset: 3px; }
+.sst-hang { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: 10px; }
+.sst-the .sst-tu { min-height: 60px; border: 2px solid var(--sst-vien); border-radius: 18px; background: var(--sst-mat); color: var(--sst-chu); box-shadow: 0 4px 0 var(--sst-vien);
+  font: inherit; font-size: 18px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+.sst-the .sst-tu:active { transform: translateY(2px); }
+.sst-tu:focus-visible { outline: 3px solid var(--sst-nut); outline-offset: 3px; }
 .sst-nut:focus-visible, .sst-thoat:focus-visible { outline: 3px solid var(--sst-nut, var(--lk-chu)); outline-offset: 3px; }
 .sst-phu { margin: 0; min-height: 20px; font-size: 13px; line-height: 1.5; color: var(--sst-chu-3); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .sst-cham { width: 8px; height: 8px; border-radius: 50%; background: var(--sst-dung); flex: none; animation: sst-nhip 1.2s ease-in-out infinite; }
@@ -49,4 +69,4 @@
 .sst-sap-thi b:nth-of-type(2) { animation-delay: .5s; } .sst-sap-thi b:nth-of-type(3) { animation-delay: 1s; }
 @keyframes sst-so { 30%, 100% { opacity: 1; color: var(--tr-hs-chu, var(--lg-nhan)); } }
 @keyframes sst-sap { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .sst-cham, .sst-sap-thi, .sst-sap-thi b { animation: none; opacity: 1; } .sst-the .sst-nut { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .sst-cham, .sst-sap-thi, .sst-sap-thi b { animation: none; opacity: 1; } .sst-the .sst-nut { transition: none; } .sst-the .sst-tu:active { transform: none; } }

@@ -34,7 +34,8 @@ jobs:
           GOC="CASE WHEN instr(qid,'~')>0 THEN substr(qid,1,instr(qid,'~')-1) ELSE qid END"
           LAM="ket_qua IS NOT NULL AND COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
           PHAN="(SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=x.goc LIMIT 1)"
-          TU="date('now','+7 hours','-14 days')"
+          # 14/11 (chi phí D1): 4 ngày gần nhất thay 14 — số đo 24 giờ: câu «28 câu đầu» quét sổ 14 ngày = 213 triệu hàng đọc/ngày (~20 % cả app).
+          TU="date('now','+7 hours','-4 days')"
 
           q "1+2 cấu trúc 28 câu đầu của ngày và số em đủ 28 câu — theo ngày, loại ngày" "WITH s AS (SELECT sbd, ngay_vn, $GOC goc, MIN(luc) luc FROM su_kien_hoc WHERE ngay_vn >= $TU AND $LAM AND ma_nguon NOT LIKE 'ktcn:%' AND nguon NOT IN ('thi','chua_loi','tu_luyen') GROUP BY sbd, ngay_vn, goc), r AS (SELECT sbd, ngay_vn, goc, ROW_NUMBER() OVER (PARTITION BY sbd, ngay_vn ORDER BY luc, goc) k, COUNT(*) OVER (PARTITION BY sbd, ngay_vn) n FROM s), m AS (SELECT x.goc, $PHAN phan FROM (SELECT DISTINCT goc FROM s) x), e AS (SELECT r.sbd, r.ngay_vn, MAX(r.n) n, SUM(r.k<=28 AND m.phan='I') i, SUM(r.k<=28 AND m.phan='II') ii, SUM(r.k<=28 AND m.phan='III') iii FROM r JOIN m ON m.goc=r.goc GROUP BY r.sbd, r.ngay_vn) SELECT e.ngay_vn ngay, COALESCE(l.loai,'-') loai, COUNT(*) em_co_lam, SUM(n>=28) em_du_28, SUM(n>=28 AND i=18 AND ii=4 AND iii=6) dung_18_4_6, SUM(n>=28 AND ABS(i-18)<=1 AND ABS(ii-4)<=1 AND ABS(iii-6)<=1) sat_18_4_6, ROUND(AVG(CASE WHEN n>=28 THEN i END),1) tb_I, ROUND(AVG(CASE WHEN n>=28 THEN ii END),1) tb_II, ROUND(AVG(CASE WHEN n>=28 THEN iii END),1) tb_III, SUM(n>=28 AND ii=0) khong_co_DS, SUM(n>=28 AND iii=0) khong_co_TLN FROM e LEFT JOIN goi_bai_7_loai_ngay l ON l.sbd=e.sbd AND l.ngay=e.ngay_vn GROUP BY 1,2 ORDER BY 1,2"
 

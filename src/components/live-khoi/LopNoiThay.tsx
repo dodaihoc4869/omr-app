@@ -7,7 +7,7 @@ import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
 import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
-import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
+import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layDoLop, layView, lenhMic, phienCua } from './thay-khoi'
 import { SK_COT, docCotMuon, ghiCotMuon, hinhCot } from './cot-chat-hinh'
 import KeoCot from './KeoCot'
 import { DaNghi } from './da-nghi'
@@ -21,6 +21,7 @@ const MayTinhThay = lazy(() => import('../may-tinh/MayTinhThay'))
 const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
 const TinhTheCoVu = lazy(() => import('../live/TinhTheCoVu'))
 const LuatRoiThay = lazy(() => import('./LuatRoiThay'))
+const ThiDuaTuanThay = lazy(() => import('./ThiDuaTuanThay')) // Sinh Tồn đợt 4: thi đua đội tuần + danh hiệu (mảnh lười)
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
 /** Có tờ RIÊNG đang mở (lớp phủ tờ chiếu không phải tờ Bình Phản Ứng)? Lớp phủ là cổng gắn thẳng vào <body> ⇒ chỉ theo dõi con trực tiếp của body. */
@@ -335,8 +336,10 @@ const TEN_CHE = { hoc: 'chế độ Học', bang: 'chế độ Bảng', sanh: 'b
 function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang NGHỈ GIẢI LAO giữa buổi (13/11): đổi chữ + nút «Học tiếp» */ nghi?: { tu: number; che: 'hoc' | 'bang' | 'sanh'; hocTiep: () => void } }) {
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  const [thiDua, setThiDua] = useState(false)
   const vao = useMemo(() => v.ds.filter((e) => e.vao), [v.ds])
-  const dsLop = useMemo(() => vao.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), [vao])
+  const doLop = useSyncExternalStore(dangKy, layDoLop) // Sinh Tồn đợt 4: đồ + danh hiệu từng em ⇒ máy chiếu thấy như máy em
+  const dsLop = useMemo(() => vao.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, ...doLop.get(e.sbd) })), [vao, doLop])
   const batDau = async () => {
     if (dang) return
     setDang(true); setLoi('')
@@ -360,9 +363,11 @@ function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang 
         {nghi ? <span className="lkt-the">Nghỉ được <DaNghi tu={nghi.tu} /></span> : null}
         <span className="lkt-the">{nghi ? `${vao.length} em trong lớp` : `Đã vào ${vao.length} em`}</span>
         <span className="gian" />
+        <button type="button" className="lkt-ve" onClick={() => setThiDua(true)}>Thi đua tuần</button>
         <button type="button" className="lkt-dong" onClick={() => void dong()} disabled={dang}>{nghi ? 'Kết thúc buổi' : 'Đóng phòng'}</button>
       </header>
-      <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi /></Suspense></div>
+      {thiDua ? <Suspense fallback={null}><ThiDuaTuanThay khoi={khoi} onDong={() => setThiDua(false)} /></Suspense> : null}
+      <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi thayVao /></Suspense></div>
       <div className="lkt-doi">
         {DOI_BPU.map((d, i) => {
           const em = vao.filter((e) => e.doi === i)

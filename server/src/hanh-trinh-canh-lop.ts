@@ -37,17 +37,36 @@ export const SQL_DUNG_CANH_LOP = `INSERT INTO hanh_trinh_v4_canh_lop(tu,den,n_co
 const MOC_TUOI = 'SELECT 1 FROM hanh_trinh_v4_canh_lop_moc WHERE id=1 AND luc>=?2'
 // Câu PHẢI bắt đầu bằng SELECT (không dùng WITH): lớp gộp đọc theo lượt (doc-d1-theo-luot.ts) chỉ nhận câu `SELECT` là câu đọc — câu khác bị coi là ghi
 // (chờ rào ghi, không đi chung lô đọc ⇒ thêm một đợt chờ D1).
-export const SQL_CANH_LOP_DOC = `SELECT 2 nguon,NULL tu,NULL den,NULL nCo,NULL dungCo,NULL nChua,NULL dungChua,NULL soEm FROM hanh_trinh_v4_canh_lop_moc WHERE id=1 AND luc>=?2
+/** Câu đọc 12/11 (trước bảng gộp theo `den`) — đường lùi khi bảng gộp chưa có (lỗi SQL) và để test so cũ ↔ mới. */
+export const SQL_CANH_LOP_DOC_1211 = `SELECT 2 nguon,NULL tu,NULL den,NULL nCo,NULL dungCo,NULL nChua,NULL dungChua,NULL soEm FROM hanh_trinh_v4_canh_lop_moc WHERE id=1 AND luc>=?2
 UNION ALL SELECT 1,tu,den,n_co,dung_co,n_chua,dung_chua,so_em FROM hanh_trinh_v4_canh_lop WHERE den IN (SELECT value FROM json_each(?1)) AND EXISTS(${MOC_TUOI})
 UNION ALL SELECT 0,tu,den,SUM(n_co),SUM(dung_co),SUM(n_chua),SUM(dung_chua),COUNT(DISTINCT sbd) FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?1)) AND cap_nhat_luc>=?3 AND n_co+n_chua>0 AND NOT EXISTS(${MOC_TUOI}) GROUP BY tu,den`
+/**
+ * 14/11 (hoá đơn D1: câu đọc này 13.051 lượt × ~15.260 hàng = 199 triệu hàng/ngày ≈ 19 % cả app): bảng GỘP theo kỹ năng đích `hanh_trinh_v4_canh_lop_den`
+ * (một dòng JSON / `den`, dựng CÙNG lô với bảng cạnh lớp) ⇒ đọc ~số `den` cần hàng thay ~15 nghìn. Nhánh 3: đã dựng + bảng gộp có dòng; nhánh 1 (cạnh từng
+ * dòng) chỉ khi bảng gộp còn rỗng (vừa phát hành, chưa tới lượt dựng); nhánh 0 câu cũ khi chưa dựng / quá hạn. VẪN một lượt D1.
+ */
+const GOP_CO = 'EXISTS(SELECT 1 FROM hanh_trinh_v4_canh_lop_den)'
+export const SQL_CANH_LOP_DOC = `SELECT 2 nguon,NULL tu,NULL den,NULL nCo,NULL dungCo,NULL nChua,NULL dungChua,NULL soEm,NULL j FROM hanh_trinh_v4_canh_lop_moc WHERE id=1 AND luc>=?2
+UNION ALL SELECT 3,NULL,den,NULL,NULL,NULL,NULL,NULL,j FROM hanh_trinh_v4_canh_lop_den WHERE den IN (SELECT value FROM json_each(?1)) AND EXISTS(${MOC_TUOI})
+UNION ALL SELECT 1,tu,den,n_co,dung_co,n_chua,dung_chua,so_em,NULL FROM hanh_trinh_v4_canh_lop WHERE den IN (SELECT value FROM json_each(?1)) AND EXISTS(${MOC_TUOI}) AND NOT ${GOP_CO}
+UNION ALL SELECT 0,tu,den,SUM(n_co),SUM(dung_co),SUM(n_chua),SUM(dung_chua),COUNT(DISTINCT sbd),NULL FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?1)) AND cap_nhat_luc>=?3 AND n_co+n_chua>0 AND NOT EXISTS(${MOC_TUOI}) GROUP BY tu,den`
+/** Dựng bảng gộp theo `den` từ bảng cạnh lớp vừa dựng (cùng lô, cùng điều kiện giành mốc ?1). Mảng: [tu, n_co, dung_co, n_chua, dung_chua, so_em]. */
+export const SQL_DUNG_CANH_LOP_DEN = `INSERT INTO hanh_trinh_v4_canh_lop_den(den,j) SELECT den,json_group_array(json_array(tu,n_co,dung_co,n_chua,dung_chua,so_em)) FROM hanh_trinh_v4_canh_lop
+  WHERE (SELECT luc FROM hanh_trinh_v4_canh_lop_moc WHERE id=1)=?1 GROUP BY den`
 
-type DongDoc = { nguon: number } & CanhHoc
+type DongDoc = { nguon: number; j?: string | null } & CanhHoc
 /** Đọc cạnh lớp: `tong=true` ⇒ lấy từ bảng cộng sẵn (đã lọc ngưỡng); `tong=false` ⇒ câu cũ (đầy đủ, nơi gọi được nhớ đệm như trước). */
 export async function docCanhLopMotLuot(env: Env, dens: readonly string[], now: number, mocCu: number): Promise<{ tong: boolean; ds: CanhHoc[] }> {
-  const r = (await env.DB.prepare(SQL_CANH_LOP_DOC).bind(JSON.stringify(dens), now - HAN_DUNG_CANH_LOP_MS, mocCu).all<DongDoc>()).results ?? []
+  const ts = [JSON.stringify(dens), now - HAN_DUNG_CANH_LOP_MS, mocCu] as const
+  const r = ((await env.DB.prepare(SQL_CANH_LOP_DOC).bind(...ts).all<DongDoc>().catch(() => env.DB.prepare(SQL_CANH_LOP_DOC_1211).bind(...ts).all<DongDoc>())).results ?? [])
   const tong = r.some((x) => Number(x.nguon) === 2)
   const ds: CanhHoc[] = []
-  for (const x of r) if (Number(x.nguon) !== 2) ds.push({ tu: x.tu, den: x.den, nCo: x.nCo, dungCo: x.dungCo, nChua: x.nChua, dungChua: x.dungChua, soEm: x.soEm })
+  for (const x of r) {
+    const n = Number(x.nguon)
+    if (n === 3) { try { for (const [tu, nCo, dungCo, nChua, dungChua, soEm] of JSON.parse(String(x.j)) as [string, number, number, number, number, number][]) ds.push({ tu, den: x.den, nCo, dungCo, nChua, dungChua, soEm }) } catch { /* dòng hỏng ⇒ bỏ */ } }
+    else if (n !== 2) ds.push({ tu: x.tu, den: x.den, nCo: x.nCo, dungCo: x.dungCo, nChua: x.nChua, dungChua: x.dungChua, soEm: x.soEm })
+  }
   return { tong, ds }
 }
 
@@ -63,6 +82,8 @@ export async function dungCanhLopNeuCu(env: Env, now: number): Promise<{ dung: b
     env.DB.prepare('UPDATE hanh_trinh_v4_canh_lop_moc SET luc=?1 WHERE id=1 AND (luc<=?1-?2 OR luc>?1)').bind(now, chuKy),
     env.DB.prepare('DELETE FROM hanh_trinh_v4_canh_lop WHERE (SELECT luc FROM hanh_trinh_v4_canh_lop_moc WHERE id=1)=?1').bind(now),
     env.DB.prepare(SQL_DUNG_CANH_LOP).bind(now),
+    env.DB.prepare('DELETE FROM hanh_trinh_v4_canh_lop_den WHERE (SELECT luc FROM hanh_trinh_v4_canh_lop_moc WHERE id=1)=?1').bind(now),
+    env.DB.prepare(SQL_DUNG_CANH_LOP_DEN).bind(now),
   ])
   const gianh = Number(r[1]?.meta?.changes ?? 0) > 0
   return gianh ? { dung: true, soCanh: Number(r[3]?.meta?.changes ?? 0) } : { dung: false }

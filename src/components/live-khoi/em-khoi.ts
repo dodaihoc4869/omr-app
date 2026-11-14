@@ -66,7 +66,8 @@ function nhanTinPhongEm(d: unknown): void {
     if (doi || coLuot !== !!kho.coLuot || (khoi && kho.dangVao)) dat({ khoi, toi, coLuot, ...(khoi ? { dangVao: false } : {}) })
     if (khoi || kho.dangVao) gan(); else if (khung) go()
   } else if (j.t === 'lop-ds') {
-    const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0, kj: Number(x[3]) || 0 }] : []))
+    // [sbd, tên, đội, kJ, mã đồ gọn?, danh hiệu?] — hai phần cuối (Sinh Tồn đợt 4) thiếu ⇒ không đồ / không danh hiệu.
+    const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0, kj: Number(x[3]) || 0, ...(typeof x[4] === 'string' && x[4] ? { c: x[4] } : {}), ...(typeof x[5] === 'number' ? { dh: x[5] } : {}) }] : []))
     dat({ ds, kj: [0, 1, 2, 3].map((i) => Number((j.kj as unknown[] | undefined)?.[i]) || 0) })
   } else if (j.t === 'lop' && typeof j.k === 'string') for (const f of tai.get(j.k as LoaiTinLop) ?? []) { try { f(j as unknown as TinLop) } catch { /* nơi nghe lỗi */ } }
 }
