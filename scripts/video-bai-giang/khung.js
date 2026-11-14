@@ -77,7 +77,13 @@ function dungCanh() {
       else if (s.loai === 'ghi') { el = tao('div', 'the ghi', cot, `${dam(s.chu)}<i class="bong"></i>`) }
       else if (s.loai === 'dau') { d.dau = s; continue }
       el.style.setProperty('--mau', mau); el.classList.add('an')
+      if (s.vaoCot === false) { el.remove(); continue }
       d.the.push({ el, su: s, t: s.loai === 'lon' ? s.t + 2.4 : s.t })
+    }
+    if (d.hoat && HOAT[d.hoat.loai]) {
+      const el = tao('div', 'the hoat an', cot); el.style.setProperty('--mau', mau); el.style.height = `${d.hoat.cao}px`
+      d.hoatEl = el; HOAT[d.hoat.loai][0](d, el)
+      d.the.push({ el, su: { loai: 'hoat' }, t: d.t0 - 0.2, coDinh: true })
     }
     d.lon = d.su.filter((s) => s.loai === 'lon')
     // phụ đề: mỗi câu một dòng, mỗi chữ một ô
@@ -118,7 +124,7 @@ function dungPhanTu(d) {
   d.pt = {
     n1: tao('div', 'nhan-pt', pt, 'Gly · mắt xích 1 <span class="dk">α ' + CHECK.replace('width="40" height="40"', 'width="24" height="24"') + '</span>'),
     n2: tao('div', 'nhan-pt', pt, 'Gly · mắt xích 2 <span class="dk">α ' + CHECK.replace('width="40" height="40"', 'width="24" height="24"') + '</span>'),
-    a1: m('a1', 'H₂N-CH₂-CO'), b1: m('b1', 'OH'), b2: m('b2', 'H'), a2: m('a2', 'NH-CH₂-COOH'), gach: m('gach', '-'),
+    a1: m('a1', 'H₂N-CH₂-CO'), b1: m('b1', 'OH'), b2: m('b2', 'H-'), a2: m('a2', 'NH-CH₂-COOH'), gach: m('gach', '-'),
     lk: tao('div', 'lienket', pt), nlk: tao('div', 'nhan-lk', pt, 'liên kết peptide'),
     nuoc: tao('div', 'nuoc', pt, 'H₂O'), nnuoc: tao('div', 'nhan-nuoc', pt, 'mất 1 H₂O'),
   }
@@ -153,7 +159,7 @@ function vePhanTu(d, t) {
   const dat = (e, x, y, s = 1, o = 1) => { e.style.transform = `translate(${x}px,${y}px) scale(${s})`; e.style.opacity = o }
   const p1 = vao('hien'), p2 = vao('hien', 0.25)
   hien(P.a1, daHien('hien')); dat(P.a1, lerp(X0, xNoiA1, noi), lerp(R1, RS, noi) + (1 - p1) * 30, 1, kep(p1 * 1.5))
-  hien(P.a2, daHien('hien')); dat(P.a2, lerp(X0 + W.b2 + 2, xNoiA2, noi), lerp(R2, RS, noi) + (1 - p2) * 30, 1, kep(p2 * 1.5))
+  hien(P.a2, daHien('hien')); dat(P.a2, lerp(X0 + W.b2 + 4, xNoiA2, noi), lerp(R2, RS, noi) + (1 - p2) * 30, 1, kep(p2 * 1.5))
   // OH, H: đỏ lên, tách ra, rồi bay vào bong bóng
   const xOH = X0 + W.a1 + tachOH * 26, yOH = R1 - tachOH * 34, xH = X0 - tachH * 26, yH = R2 - tachH * 34
   const nhay = (k) => 1 + 0.25 * Math.sin(Math.PI * tien(t, c[k], 0.35))
@@ -183,6 +189,7 @@ function dungDoVui(d) {
   mini.style.setProperty('--mau', MAU.vang)
   v.mini = mini; v.miniO = v.luaChon.map(([chu, gt, dung]) => { const e = tao('div', '', mini.querySelector('.mini-lc'), `<b style="opacity:.6;font-size:20px">${chu}</b> ${gt}`); e.style.cssText = 'flex:1;text-align:center;padding:10px 0;border-radius:16px;background:rgba(255,255,255,.07);font-size:30px;font-weight:800'; e.dataset.dung = dung ? '1' : ''; return e })
   d.the.unshift({ el: mini, su: { loai: 'the' }, t: v.t1 })
+  if (d.hoatEl) d.hoatEl.style.display = ''
   // hạt pháo giấy (cố định theo hạt giống)
   v.phao = Array.from({ length: 110 }, (_, i) => ({ g: -Math.PI / 2 + (hat(i) - 0.5) * 2.2, v: 650 + hat(i + 1) * 900, q: hat(i + 2) * 8, m: ['#ffd27a', '#6ee7b7', '#fda4af', '#8fb6ff', '#f4efe4'][i % 5], w: 10 + hat(i + 3) * 10, h: 6 + hat(i + 4) * 8 }))
 }
@@ -218,7 +225,7 @@ function veDoVui(d, t) {
 }
 
 // ── THẺ CHƯƠNG ──
-function dungChuong() { const c = $('#chuong'); for (let i = 0; i < 3; i++) tao('div', 'phien', c) ; c.appendChild($('#chuong-noi')) }
+function dungChuong() { const c = $('#chuong'); for (let i = 0; i < 3; i++) tao('div', 'phien', c) ; c.appendChild($('#chuong-noi')); tao('i', 'quet', $('#chuong-noi')) }
 function veChuong(d, t) {
   const c = $('#chuong'); c.classList.remove('an')
   const mau = MAU_PHU[d.mau] || MAU_PHU.vang
@@ -237,6 +244,7 @@ function veChuong(d, t) {
     ten.dataset.id = d.so + d.tieuDe; so.textContent = d.so === '?' ? '?' : d.so; ke.textContent = d.so === '?' ? 'THỬ SỨC' : `PHẦN ${d.so}`
     ten.innerHTML = d.tieuDe.split(/\s+/).map((w) => `<span class="tu">${thoat(w)} </span>`).join('')
   }
+  $('#chuong-noi .quet').style.left = `${lerp(-500, 2300, eInOut(tien(t, d.t0 + 0.6, 1.1)))}px`
   const ps = lo(t - d.t0 - 0.35, 1.6, 0.6); so.style.transform = `translateX(${(1 - ps) * -120}px)`; so.style.opacity = kep(ps * 1.3)
   ke.style.opacity = tien(t, d.t0 + 0.45, 0.3); ke.style.letterSpacing = `${0.6 - 0.32 * eOut(tien(t, d.t0 + 0.45, 0.7))}em`
   ten.querySelectorAll('.tu').forEach((w, j) => { const p = lo(t - d.t0 - 0.5 - j * 0.055, 2.2, 0.55); w.style.transform = `translateY(${(1 - p) * 60}px)`; w.style.opacity = kep(p * 1.5); w.style.filter = `blur(${Math.max(0, (1 - p * 1.4) * 10)}px)` })
@@ -330,17 +338,19 @@ function veCanh(d, t) {
   const vao = eOut(tien(t, d.t0 - 0.45, 0.95))
   let nhan = 0; for (const w of d.nhanManh) nhan = Math.max(nhan, Math.min(eOut(tien(t, w.t0, 0.35)), 1 - eInOut(tien(t, w.t1 - 0.3, 0.7))))
   let rung = 0; if (d.dau) { const tau = t - d.dau.t; if (tau > 0.18 && tau < 0.5) rung = Math.sin(tau * 90) * 7 * (1 - (tau - 0.18) / 0.32) }
-  $('#canh').style.transform = `translate(${rung}px,${rung * 0.6}px) scale(${(1.1 - 0.1 * vao) * (1 + 0.032 * nhan)})`
+  const S = (1.1 - 0.1 * vao) * (1 + 0.032 * nhan)
+  $('#canh').style.transform = `translate(${rung}px,${rung * 0.6}px) scale(${S})`
+  const bienDoi = (x, y) => [960 + S * (x - 960) + rung, 496.8 + S * (y - 496.8) + rung * 0.6]
   veBang(d, t)
   // thẻ cột phải
   let cuon = 0, cuonTruoc = 0, tCuon = -1
   for (const th of d.the) {
     const on = t >= th.t; th.el.classList.toggle('an', !on); if (!on) continue
     if (th.cuon !== cuon) { cuonTruoc = cuon; cuon = th.cuon; tCuon = th.t }
-    const tau = t - th.t, p = lo(tau, 2.1, 0.55)
-    th.el.style.top = `${th.y}px`; th.el.style.opacity = kep(tau / 0.22)
+    const tau = t - th.t, p = th.coDinh ? 1 : lo(tau, 2.1, 0.55)
+    th.el.style.top = `${th.y}px`; th.el.style.opacity = th.coDinh ? 1 : kep(tau / 0.22)
     th.el.style.transform = `translateX(${(1 - p) * 80}px) scale(${0.9 + 0.1 * p})`
-    th.el.style.filter = tau < 0.3 ? `blur(${(1 - tau / 0.3) * 8}px)` : ''
+    th.el.style.filter = !th.coDinh && tau < 0.3 ? `blur(${(1 - tau / 0.3) * 8}px)` : ''
     const bong = th.el.querySelector('.bong'); if (bong) bong.style.left = `${-200 + (tau - 0.25) * 1500}px`
     const gach = th.el.querySelector('.gach'); if (gach) gach.style.width = `${eOut(tien(tau, 0.3, 0.6)) * Math.min(560, th.el.querySelector('em') ? 360 : 300)}px`
   }
@@ -348,7 +358,7 @@ function veCanh(d, t) {
   $('#cot-trong').style.transform = `translateY(${-cuonNay}px)`
   // dấu "PHẢI THUỘC"
   const dauEl = $('#dau')
-  if (d.dau && t >= d.dau.t) { dauEl.classList.remove('an'); dauEl.textContent = d.dau.chu; const p = eOut(tien(t, d.dau.t, 0.2)); dauEl.style.transform = `rotate(-9deg) scale(${2.6 - 1.6 * p})`; dauEl.style.opacity = kep(p * 1.6) } else dauEl.classList.add('an')
+  if (d.dau && t >= d.dau.t) { dauEl.classList.remove('an'); dauEl.textContent = d.dau.chu; const p = eOut(tien(t, d.dau.t, 0.2)); dauEl.style.transform = `rotate(-9deg) scale(${2.6 - 1.6 * p})`; dauEl.style.opacity = kep(p * 1.6); const lech = 8 * Math.exp(-Math.max(0, t - d.dau.t - 0.18) * 7); dauEl.style.textShadow = `${lech}px 0 rgba(255,70,90,.7), ${-lech}px 0 rgba(70,210,255,.7)` } else dauEl.classList.add('an')
   // điểm nhấn lớn giữa màn
   const lonEl = $('#lon'); let coLon = false
   for (const l of d.lon) {
@@ -358,6 +368,7 @@ function veCanh(d, t) {
     const vao2 = lo(tau, 1.9, 0.5), ra = eInOut(tien(tau, 2.25, 0.45))
     $('#lon-nen').style.opacity = kep(tau / 0.25) * (1 - ra)
     $('#lon-chu').style.transform = `translate(${ra * 560}px,${ra * -120}px) scale(${(0.55 + 0.45 * vao2) * (1 - 0.6 * ra)})`; $('#lon-chu').style.opacity = kep(vao2 * 1.5) * (1 - ra)
+    const lech = 9 * Math.exp(-tau * 8); $('#lon-chu').style.textShadow = `${lech}px 0 rgba(255,70,90,.6), ${-lech}px 0 rgba(70,210,255,.6), 0 10px 40px rgba(0,0,0,.5)`
   }
   if (!coLon) lonEl.classList.add('an')
   // phụ đề
@@ -371,12 +382,21 @@ function veCanh(d, t) {
   }
   if (!qDang || (d.doVui && t >= d.doVui.t0 && t < d.doVui.t1)) nen.style.opacity = 0
   if (d.phanTu) vePhanTu(d, t)
+  if (d.hoat && HOAT[d.hoat.loai]) {
+    HOAT[d.hoat.loai][1](d, t)
+    const m = d.hoat.moc, r = (e) => e.getBoundingClientRect()
+    if (d.tv) for (const hg of d.tv) { const tau = t - m[hg.k]; if (tau >= 0 && tau < 0.8) { const b = r(hg.h); lapLanh(hoaCtx, b.left + 50, b.top + b.height / 2, tau, d.mauHex) } }
+    if (d.ct) { const tau = t - m.noi - 1.2; if (tau >= 0 && tau < 0.8) { const b = r(d.ct.lkMoi); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#ffd27a', 16) } }
+    if (d.cq) { const tau = t - m.tong; if (tau >= 0 && tau < 0.8) { const b = r(d.cq.dem.querySelector('.dem i:last-child')); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#8fb6ff', 14) } }
+  }
+  veDanhDau(d, t, camera(d, t), bienDoi)
   if (d.doVui) veDoVui(d, t); else $('#dv').classList.add('an')
 }
 
 function ve(t) {
   veNen(t)
   hoaCtx.clearRect(0, 0, 1920, 1080)
+  document.getElementById('danh-dau').innerHTML = ''
   for (const id of ['#mo', '#chuong', '#canh', '#ket', '#lon', '#dv']) $(id).classList.add('an')
   $('#den').style.opacity = 0
   const i = DOAN.findIndex((x) => t >= x.t0 && t < x.t1), d = DOAN[i === -1 ? DOAN.length - 1 : i]

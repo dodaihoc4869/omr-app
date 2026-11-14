@@ -163,7 +163,22 @@ def bot():
     n = int(0.12 * SR); t = np.arange(n) / SR; f = 300 + 1400 * (t / t[-1]) ** 1.3
     y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * t / t[-1]) ** 0.6
     return np.stack([y, y], 1) * 0.3
-MAU = {'vut': vut(), 'vut-ra': vut(0.5, False), 'bop': bop(), 'dap': dap(), 'tich': tich(), 'tich-cuoi': tich(True), 'dung': dung(), 'bot': bot()}
+def bip():
+    n = int(0.09 * SR); t = np.arange(n) / SR; f = 1500 + 400 * np.exp(-t * 40)
+    y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 45)
+    return np.stack([y, y], 1) * 0.12
+def dung_nhe():
+    n = int(0.9 * SR); y = np.zeros(n)
+    for k, f0 in enumerate([1318.5, 1760.0]):
+        o = int(k * 0.09 * SR); t = np.arange(n - o) / SR
+        y[o:] += np.sin(2 * np.pi * f0 * t) * np.exp(-t * 5) + 0.3 * np.sin(2 * np.pi * f0 * 2 * t) * np.exp(-t * 8)
+    return np.stack([y, y], 1) * 0.1
+def ve():  # tiếng bút dạ quệt
+    n = int(0.32 * SR); x = rng.standard_normal(n); u = np.linspace(0, 1, n)
+    y = loc_thap(x, 2500 + 2500 * u) - loc_thap(x, 900)
+    y = bao(y, 0.05, 0.18); y /= np.max(np.abs(y)) + 1e-9
+    return np.stack([y * (1 - u * 0.5), y * (0.5 + u * 0.5)], 1) * 0.16
+MAU = {'bip': bip(), 'dung-nhe': dung_nhe(), 've': ve(), 'vut': vut(), 'vut-ra': vut(0.5, False), 'bop': bop(), 'dap': dap(), 'tich': tich(), 'tich-cuoi': tich(True), 'dung': dung(), 'bot': bot()}
 sfx = np.zeros((N + SR * 2, 2))
 for s in kb['sfx']:
     x = MAU.get(s['loai'])

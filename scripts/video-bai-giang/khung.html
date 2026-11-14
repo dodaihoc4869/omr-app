@@ -23,6 +23,8 @@
     <div id="dv-dem"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="rgba(11,20,24,.85)" stroke="rgba(255,255,255,.12)" stroke-width="9"/><circle class="vong" cx="75" cy="75" r="70" fill="none" stroke="#ffd27a" stroke-width="9" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="0"/></svg><b>5</b></div>
     <div id="dv-goi">Em chọn trước khi Thầy giải nhé</div>
   </div>
+  <svg id="dd-defs" width="0" height="0" style="position:absolute"><defs><filter id="dd-sang" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>
+  <svg id="danh-dau" width="1920" height="1080" style="position:absolute;left:0;top:0;pointer-events:none"></svg>
   <canvas id="hoa"></canvas>
   <div id="mo" class="an"><div id="mo-ke"></div><div id="mo-ten"></div><div id="mo-gach"></div><div id="mo-phu"></div><div id="mo-thay"></div></div>
   <div id="chuong" class="an"><div id="chuong-noi"><div id="chuong-so"></div><div id="chuong-ke"></div><div id="chuong-ten"></div></div></div>
@@ -32,5 +34,6 @@
   <div id="den"></div>
 </div>
 <script src="khung.js"></script>
+<script src="hoat-hoa.js"></script>
 </body>
 </html>

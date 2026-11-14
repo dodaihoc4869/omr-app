@@ -109,7 +109,30 @@ for (const cc of ch.canh) {
   canh.t1 = t
   // sự kiện hiện thẻ / điểm nhấn / phân tử theo đầu câu
   const dauCau = (i) => canh.cau.find((x) => x.i === i)
-  for (const s of cc.su ?? []) { const q = dauCau(s.dong); if (!q) continue; canh.su.push({ ...s, t: q.t0 + 0.35 }); sfx.push({ t: q.t0 + 0.35, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
+  const moc = (dong, frac) => { const q = dauCau(dong); return q ? q.t0 + (frac != null ? frac * (q.t1 - q.t0) : 0.35) : null }
+  for (const s of cc.su ?? []) { const tt = moc(s.dong, s.frac); if (tt == null) continue; canh.su.push({ ...s, t: tt }); sfx.push({ t: tt, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
+  // HOẠT HOẠ chi tiết của cảnh: mốc = [câu, phần trăm độ dài câu] ⇒ giây trên video
+  if (cc.hoat) {
+    canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, [dong, frac]]) => [k, moc(dong, frac)])) }
+    const TD = { 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, chuoi: { hien: 'vut', cat: 'bot', n1: 'bip', n2: 'bip', n3: 'bip', n4: 'bip', tong: 'dap', hcl: 'vut', lys: 'bop' } }[cc.hoat.loai] ?? {}
+    for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
+    if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
+    if (cc.hoat.loai === 'chuoi') sfx.push({ t: canh.hoat.moc.cat + 0.55, loai: 'bot' })
+  }
+  // KHOANH TRÊN BẢNG: vùng nét Thầy viết trong câu ⇒ viền phát sáng + đường nối tới hình minh hoạ
+  canh.danhDau = []
+  for (const dd of cc.danhDau ?? []) {
+    const q = dauCau(dd.dong); if (!q) continue
+    const h = hopNet(q.s0 - 1, q.s1); if (!h || h.n < 2) continue
+    // chỉ khoanh khi Thầy đã viết xong ~80 % nét của câu (giờ nét trên tiếng gốc ⇒ giờ video qua bảng mảnh)
+    const ket = netBox.filter((b) => b.t1 >= q.s0 - 1 && b.t0 <= q.s1).map((b) => b.t1).sort((a, b) => a - b)
+    const sXong = ket[Math.min(ket.length - 1, Math.floor(ket.length * 0.8))]
+    const raGio = (sv) => { for (const m of canh.manh) if (sv >= m.s0 && sv <= m.s1 && m.s1 > m.s0) return m.t0 + ((sv - m.s0) / (m.s1 - m.s0)) * (m.t1 - m.t0); return null }
+    let t0 = Math.max(q.t0 + (dd.frac ?? 0.15) * (q.t1 - q.t0), raGio(sXong) ?? 0)
+    const t1 = Math.max(q.t1 + 0.25, t0 + 1.6)
+    canh.danhDau.push({ t0, t1, neo: [h.x0, h.y0, h.x1, h.y1], toi: dd.toi })
+    sfx.push({ t: t0, loai: 've' })
+  }
   for (const i of cc.nhan ?? []) { const q = dauCau(i); if (q) canh.nhanManh.push({ t0: q.t0, t1: q.t1 }) }
   if (cc.phanTu) { canh.phanTu = Object.fromEntries(Object.entries(cc.phanTu).map(([k, i]) => [k, dauCau(i).t0 + 0.4])); for (const k of ['hien', 'matOH', 'matH']) sfx.push({ t: canh.phanTu[k], loai: 'bop' }); sfx.push({ t: canh.phanTu.noi + 0.9, loai: 'dap' }, { t: canh.phanTu.nuoc + 1.2, loai: 'bot' }) }
   if (canh.doVui) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t0 + 1.0; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
