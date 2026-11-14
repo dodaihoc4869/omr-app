@@ -1,0 +1,16 @@
+{
+  "lo": 437,
+  "main": "41ec9c7bc9920a1f27a26f6f97d37ed31dd90afe",
+  "previousMain": "4365aca9b5d270a86a93dfc6590d21106f7d0d55",
+  "diffStat": "8 files changed, 274 insertions(+), 21 deletions(-)",
+  "appChanged": true,
+  "serverChanged": true,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "SinhTồn ĐộiXthắngn/mván+Thiđua tuần+nhật ký; app-server đổi/Vite-DDHfont-mốc nguyênbyte. Chưa gộp/latestmainfullBYNAME-buildspeed trướcmerge-release."
+}

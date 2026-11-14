@@ -1,0 +1,700 @@
+{
+  "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+  "native": [
+    1526,
+    265
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C4-D2-II-2",
+      "de": "Poly(ethylene terephthalate) (viết tắt là PET) được điều chế theo sơ đồ phản ứng trong hình dưới đây. PET có mã số kí hiệu trên sản phẩm là số 1 và thuộc loại polymer nhiệt dẻo phổ biến nhất, có thể tái chế và được sử dụng để dệt sợi may quần áo, thảm, đồ hộp đựng chất lỏng và thực phẩm.",
+      "refs": [
+        {
+          "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+          "where": "12-KT-C4-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "af5336c1372f809dcab657382f81cd7ba349451a8e82c04beffe6dbfb72f0031"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "20knownCmotif12OinclterminalOH-water-symbolicnNOTmoleculartotal/2Ph6innerCCdouble4COcontactseparatefeet/1OPENVrightheadshaftTIP/EXACT2,7–5,5bar-220–260°C/nHO–[CH2]2–OH-H…OH-+(2n–1)H2O/2innerSQUAREpairs1outerSQUARE+nSUB-DAMITALIC/chemicalTRUEdamUPRIGHT-conditionsregularUPRIGHT/4TOPinternalUNKNOWNfragmentgroupsKEEP/noaddedH-catalyst-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1de12-KT-C4-D2-II-2/left-arrow-right3x/n8x-TOP8x-CO8x. Rootcorrected sourceagent approximatefeet BEFORE firstbuilder: pairs contact respective native arms, fractions CALCULATED fromapproxslopes NOTmeasuredsubpixel; noextra crossbar. Rootn actualDAMITALIC/allchemicalTRUEdamUPRIGHT/conditionsregularUPRIGHT. Source20knownCmotifs12Oinclwater+terminalOH, unknownnnotmoleculartotal.4internalTOPunknownfragmentgroups retain no restore.",
+  "independentSource": {
+    "i": 994,
+    "assetIndex": 716,
+    "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe.png",
+    "size": [
+      1526,
+      265
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C4-D2-II-2",
+        "de": "Poly(ethylene terephthalate) (viết tắt là PET) được điều chế theo sơ đồ phản ứng trong hình dưới đây. PET có mã số kí hiệu trên sản phẩm là số 1 và thuộc loại polymer nhiệt dẻo phổ biến nhất, có thể tái chế và được sử dụng để dệt sợi may quần áo, thảm, đồ hộp đựng chất lỏng và thực phẩm.",
+        "allHinh": [
+          {
+            "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+            "where": "12-KT-C4-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "af5336c1372f809dcab657382f81cd7ba349451a8e82c04beffe6dbfb72f0031"
+          }
+        ],
+        "missingHashes": [
+          "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/437-994-full3x.png",
+        "/workspace/scratch/437-994-left.png",
+        "/workspace/scratch/437-994-mid.png",
+        "/workspace/scratch/437-994-product.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "leftRing": {
+        "vertices": [
+          [
+            169,
+            130
+          ],
+          [
+            191,
+            86
+          ],
+          [
+            234,
+            86
+          ],
+          [
+            256,
+            130
+          ],
+          [
+            235,
+            173
+          ],
+          [
+            191,
+            173
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              194,
+              93
+            ],
+            [
+              231,
+              93
+            ]
+          ],
+          [
+            [
+              247,
+              130
+            ],
+            [
+              231,
+              165
+            ]
+          ],
+          [
+            [
+              178,
+              130
+            ],
+            [
+              195,
+              165
+            ]
+          ]
+        ]
+      },
+      "productRing": {
+        "vertices": [
+          [
+            938,
+            124
+          ],
+          [
+            958,
+            87
+          ],
+          [
+            1001,
+            87
+          ],
+          [
+            1022,
+            124
+          ],
+          [
+            1001,
+            160
+          ],
+          [
+            958,
+            160
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              961,
+              94
+            ],
+            [
+              997,
+              94
+            ]
+          ],
+          [
+            [
+              1013,
+              124
+            ],
+            [
+              997,
+              153
+            ]
+          ],
+          [
+            [
+              947,
+              124
+            ],
+            [
+              962,
+              153
+            ]
+          ]
+        ]
+      },
+      "leftBonds": [
+        [
+          [
+            126,
+            130
+          ],
+          [
+            169,
+            130
+          ]
+        ],
+        [
+          [
+            256,
+            130
+          ],
+          [
+            300,
+            130
+          ]
+        ],
+        [
+          [
+            126,
+            130
+          ],
+          [
+            113,
+            158
+          ]
+        ],
+        [
+          [
+            300,
+            130
+          ],
+          [
+            314,
+            158
+          ]
+        ]
+      ],
+      "productBonds": [
+        [
+          [
+            896,
+            124
+          ],
+          [
+            938,
+            124
+          ]
+        ],
+        [
+          [
+            1022,
+            124
+          ],
+          [
+            1064,
+            124
+          ]
+        ],
+        [
+          [
+            896,
+            124
+          ],
+          [
+            880,
+            150
+          ]
+        ],
+        [
+          [
+            1064,
+            124
+          ],
+          [
+            1078,
+            149
+          ]
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            124,
+            128
+          ],
+          [
+            109,
+            102
+          ]
+        ],
+        [
+          [
+            129,
+            127
+          ],
+          [
+            116,
+            99
+          ]
+        ],
+        [
+          [
+            298,
+            127
+          ],
+          [
+            311,
+            99
+          ]
+        ],
+        [
+          [
+            304,
+            129
+          ],
+          [
+            317,
+            103
+          ]
+        ],
+        [
+          [
+            893,
+            122
+          ],
+          [
+            878,
+            101
+          ]
+        ],
+        [
+          [
+            898,
+            121
+          ],
+          [
+            884,
+            97
+          ]
+        ],
+        [
+          [
+            1062,
+            121
+          ],
+          [
+            1076,
+            97
+          ]
+        ],
+        [
+          [
+            1067,
+            124
+          ],
+          [
+            1082,
+            101
+          ]
+        ]
+      ],
+      "carbonylFootTopology": "Each pair contacts two distinct arms at bare carbon junction; no added explicit C glyph, no vertical crossbar. Left/top rays traced separately and not mirrored.",
+      "arrow": {
+        "shaft": [
+          [
+            627,
+            124
+          ],
+          [
+            787,
+            123
+          ]
+        ],
+        "headOpenV": [
+          [
+            778,
+            115
+          ],
+          [
+            787,
+            123
+          ],
+          [
+            778,
+            132
+          ]
+        ],
+        "classification": "OPEN V stroke legs+shaft to tip, no closed-base triangle"
+      },
+      "conditions": [
+        {
+          "literal": "2,7 – 5,5 bar",
+          "bbox": [
+            645,
+            98,
+            761,
+            117
+          ],
+          "baseline": 115
+        },
+        {
+          "literal": "220 – 260°C",
+          "bbox": [
+            646,
+            130,
+            765,
+            150
+          ],
+          "baseline": 148
+        }
+      ],
+      "labels": [
+        {
+          "literal": "n",
+          "bbox": [
+            55,
+            121,
+            73,
+            141
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            94,
+            76,
+            115,
+            99
+          ]
+        },
+        {
+          "literal": "HO",
+          "bbox": [
+            75,
+            161,
+            113,
+            186
+          ],
+          "anchor": "last O"
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            310,
+            75,
+            330,
+            98
+          ]
+        },
+        {
+          "literal": "OH",
+          "bbox": [
+            310,
+            161,
+            349,
+            185
+          ],
+          "anchor": "first O"
+        },
+        {
+          "literal": "+ nHO–[CH₂]₂–OH",
+          "bbox": [
+            358,
+            110,
+            612,
+            143
+          ],
+          "baseline": 137
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            810,
+            150,
+            829,
+            173
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            864,
+            77,
+            883,
+            99
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            864,
+            150,
+            883,
+            172
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            1076,
+            76,
+            1097,
+            98
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            1076,
+            149,
+            1097,
+            171
+          ]
+        },
+        {
+          "literal": "[CH₂]₂",
+          "bbox": [
+            1124,
+            144,
+            1206,
+            175
+          ]
+        },
+        {
+          "literal": "OH",
+          "bbox": [
+            1235,
+            149,
+            1274,
+            171
+          ]
+        },
+        {
+          "literal": "n",
+          "bbox": [
+            1224,
+            192,
+            1241,
+            210
+          ],
+          "style": "italic lowered subscript"
+        },
+        {
+          "literal": "+ (2n – 1)H₂O",
+          "bbox": [
+            1285,
+            110,
+            1477,
+            141
+          ]
+        }
+      ],
+      "productSquareBracket": {
+        "left": [
+          [
+            850,
+            70
+          ],
+          [
+            840,
+            70
+          ],
+          [
+            840,
+            201
+          ],
+          [
+            850,
+            201
+          ]
+        ],
+        "right": [
+          [
+            1212,
+            68
+          ],
+          [
+            1223,
+            68
+          ],
+          [
+            1223,
+            199
+          ],
+          [
+            1213,
+            199
+          ]
+        ]
+      },
+      "productEndBonds": [
+        [
+          [
+            831,
+            161
+          ],
+          [
+            860,
+            161
+          ]
+        ],
+        [
+          [
+            1101,
+            160
+          ],
+          [
+            1122,
+            160
+          ]
+        ],
+        [
+          [
+            1210,
+            160
+          ],
+          [
+            1231,
+            160
+          ]
+        ]
+      ],
+      "counts": {
+        "knownCUnitGlyphsAndVertices": 20,
+        "OIncludingWater": 12,
+        "PhRings": 2,
+        "aromaticInnerDoubles": 6,
+        "COdouble": 4,
+        "explanation": "Printed known motifs: left8C4O + glycol2C2O + whole visible product10C5O(includes right terminalOH) + water1O =20C12O. Coefficients n/(2n−1) symbolic; not molecular totals across variable polymer."
+      },
+      "styles": {
+        "chemical": "upright sans visibly heavy/bold rounded O/H/n/CH; use actual bold rather than infer from bondwidth alone",
+        "conditions": "upright compact serif, pressure/temperature strong stems; no italic observed",
+        "productLowerN": "italic lowered n, visibly heavy but raster alone does not securely distinguish truebolditalic from regularitalic; preserve native shape, no forced upright",
+        "captions": "NONE",
+        "bonds": "black 2–3px approx"
+      },
+      "unknownTopMarks": {
+        "classification": "faint incomplete background fragments above chemistry, do not restore or assign conditions; retain if reproducing full native ink",
+        "approxBboxes": [
+          [
+            184,
+            49,
+            196,
+            56
+          ],
+          [
+            216,
+            49,
+            225,
+            56
+          ],
+          [
+            270,
+            49,
+            281,
+            54
+          ],
+          [
+            422,
+            49,
+            447,
+            58
+          ]
+        ]
+      },
+      "crop": "Main formula complete; no edge-clipped chemical atom. Unknown faint marks internal above left reagent."
+    },
+    "measurementLimits": "Nativeapprox ±1–2px independently read per ring/COpair; no affine copy/symmetric normalize. Counts explicitly symbolic coefficient limitations. Pressure commas literal; temperature ° before C; product outerSQUARE nsub distinct innerSQUARE [CH2]2.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "hashSvg": "478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01",
+    "nativeFull": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": "/workspace/scratch/root437-994.png",
+    "ownMacros": [
+      "left",
+      "glycol",
+      "arrow",
+      "product",
+      "water",
+      "top"
+    ],
+    "verdict": "Đạt root final freshALL after initial textcollisions/defaultblue rejected: glyphgaps/4COcontact/OPENV/3SQUAREpairs2inner1outer/nDAMITALIC/4TOPunknowns.",
+    "oldNewXmlRead": {
+      "oldHash": "8465f838606d7ea067cc352efe8bbd173717f6abbe3a6c08994801dd2b0b4d04",
+      "newHash": "478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01",
+      "childrenOldNew": [
+        28,
+        28
+      ],
+      "changedChildren": [
+        10,
+        12,
+        14,
+        19,
+        21,
+        22,
+        24,
+        25
+      ],
+      "scope": "Only2HO/OH compound sizes,glycolsize,2productOverticalanchors,repeat/watersizes,nfill. ALLbondpaths-COfootfractions-arrow-brackets-unknownfragments EXACT; ALLinnerglyphd EXACT."
+    },
+    "measurementLimits": "COfeet124134.3076923/129130/298130/304138/893128.875/898124/1062124/1067129.3571429 CALCULATED from respective approxnativearms, not measured subpixel; sourceagentfeet beforefirstbuilder wrong corrected root.4unknownTOPgroups internal notedgecropped/retain not restore."
+  },
+  "readonlyRuntime": {
+    "sha256": "288b73e19a0148707946805aa6a7004963ffb575446a58dcb6aacf948a9e0806",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/pet994-native-ddh-478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01.svg 478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01\n994 { x: 0, y: 0, width: 1526, height: 265 }\n\nPOSTSHOT_SHA 478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01\nCOMMAND node /workspace/scratch/agent-render437.cjs\nCONTEXT 12-KT-C4-D2-II-2.hinh.0.du_lieu public de/one ref only; no answers.\n"
+  }
+}

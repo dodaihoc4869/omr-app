@@ -1,0 +1,29 @@
+[
+  {
+    "i": 994,
+    "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+    "fileNguon": "anh/b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe.png",
+    "svg": "pet994-native-ddh-478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01.svg",
+    "hashSvg": "478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01",
+    "byteSvg": 31516,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D2-II-2",
+        "de": "Poly(ethylene terephthalate) (viết tắt là PET) được điều chế theo sơ đồ phản ứng trong hình dưới đây. PET có mã số kí hiệu trên sản phẩm là số 1 và thuộc loại polymer nhiệt dẻo phổ biến nhất, có thể tái chế và được sử dụng để dệt sợi may quần áo, thảm, đồ hộp đựng chất lỏng và thực phẩm.",
+        "refs": [
+          {
+            "hash": "b28a7e6b2ff347968070f5117aca5cf6f9d471fc0aeb7fd0073bf49bcdd791fe",
+            "where": "12-KT-C4-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "af5336c1372f809dcab657382f81cd7ba349451a8e82c04beffe6dbfb72f0031"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "20knownCmotif12OinclterminalOH-water-symbolicnNOTmoleculartotal/2Ph6innerCCdouble4COcontactseparatefeet/1OPENVrightheadshaftTIP/EXACT2,7–5,5bar-220–260°C/nHO–[CH2]2–OH-H…OH-+(2n–1)H2O/2innerSQUAREpairs1outerSQUARE+nSUB-DAMITALIC/chemicalTRUEdamUPRIGHT-conditionsregularUPRIGHT/4TOPinternalUNKNOWNfragmentgroupsKEEP/noaddedH-catalyst-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "478bae201085f968130fbad1162b36db1188884d7fae24c91e45728cb1d85a01",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
