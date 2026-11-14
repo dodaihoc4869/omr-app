@@ -4070,7 +4070,7 @@ const boXuLy = {
       // CÔNG TẮC THƯỞNG PHẠT (thầy tắt được từng phần): thân rỗng ⇒ đọc; {khoa, giaTri: 'bat'|'tat'} ⇒ ghi. Khoá lạ ⇒ 400. Mặc định 'bat'.
       if (p === '/gv/thuong/cong-tac') { const kq = await import('./thuong-d1').then((m) => m.gvCongTacThuong(env, b)); return ra(kq, 'loi400' in kq ? 400 : 200) }
       // THƯỞNG PHẠT phần B: bảng thi đua tuần của một lớp (nguyên tử Học thật / bị loại, hạng giải, chuỗi, nhãn, học cùng). ĐỌC-CHỈ, một batch.
-      if (p === '/gv/thi-dua-tuan') return ra(await import('./thuong-gv-ph').then((m) => m.gvThiDuaTuanDem(envDoc, { ...b, lop: b.lop ?? url.searchParams.get('lop') ?? '' })))
+      if (p === '/gv/thi-dua-tuan') return ra(await import('./thuong-gv-ph').then((m) => m.gvThiDuaTuan(envDoc, { ...b, lop: b.lop ?? url.searchParams.get('lop') ?? '' })))
       // HÔM NAY · 4 BẢNG Học thật / Học đối phó / Chăm / Lười (thầy chốt bản vẽ 01/11; bon-chi-so-d1.ts): đọc bảng tính sẵn ⇒ 4 bảng đã xếp; một em ⇒ bằng chứng.
       if (p === '/gv/bon-bang') return ra(await import('./bon-chi-so-d1').then((m) => m.gvBonBang(envDoc, b)))
       if (p === '/gv/bon-bang/em') return ra(await import('./bon-chi-so-d1').then((m) => m.gvBonBangEm(env, b)))

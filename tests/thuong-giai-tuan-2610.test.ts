@@ -9,7 +9,7 @@ import {
   chonNhom, chotNhom, cronGiaiTuan, hsGiai, laKhoanHoTro, nguyenTuThat, tomTatGiaiEm, xepNhomCho, xoaNhoGiai,
 } from '../server/src/thuong-giai-tuan'
 import { tuanCuaNgay, hetHanGiayCua } from '../server/src/thuong-b-chung'
-import { DEM_TD_MS, gvThiDuaTuan, gvThiDuaTuanDem, tuanThuongPh } from '../server/src/thuong-gv-ph'
+import { DEM_TD_MS, gvThiDuaTuan as gvThiDuaTuanDem, gvThiDuaTuanTinh as gvThiDuaTuan, tuanThuongPh } from '../server/src/thuong-gv-ph'
 import { phBaoCaoTuan } from '../server/src/bao-cao-tuan'
 
 const VN = (s: string): number => Date.parse(`${s}+07:00`)
