@@ -376,6 +376,7 @@ export default defineConfig({
           '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroSinhTon,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
           '**/{TuDoBeMa,XemBeMa,tu-do,tu-do-api,sinh-ton-hinh,be-ma-mac,ThiDuaTuanThay}-*.{js,css}', // Sinh Tồn đợt 4: tủ đồ bé ma + hình nướng dùng chung (ghép: trò cũng vẽ đồ ⇒ mảnh chung `be-ma-mac` + danh mục đồ `tu-do` — chỉ mảnh lười nhập) + thi đua tuần máy thầy — mảnh lười, tải lúc cần
           '**/patrick-hand-*.woff2', // phông viết tay trò Sinh Tồn «Trang vở» (13/11) — chỉ tờ kiểu của mảnh lười TroSinhTon khai, tải lúc mở trò
+          '**/dong-bo-ngam-*.js', // 14/11 đồng bộ ngầm kho đề máy thầy (src/lib/dong-bo-ngam.ts) — CHỈ app thầy, nạp lười ⇒ kho chạy-lúc (giữ trần 170 tệp precache)
           // Máy tính «Đỗ Đại Học FX4869» (12/11): chỉ hiện trong buổi live (đang có mạng) ⇒ kho chạy-lúc. `dong-bo-????????` = mảnh chung mặt máy + CSS (8 dấu ? = đúng mã băm, không bắt nhầm `dong-bo-thu-muc-*`).
           '**/{MayTinhThay,MayTinhEm}-*.js', '**/dong-bo-????????.{js,css}',
           '**/{HoiHieuThay,HoiHieuEm,hoi-hieu,LuatRoiThay,LuatRoiEm,luat-roi}-*.{js,css}', // phím / «Hiểu chưa?» (12/11) — cũng chỉ dùng lúc live
