@@ -172,7 +172,7 @@ function dungCanh() {
       q.tu = tu.map((w) => {
         const s = tao('span', 'tu', el, thoat(w) + (d.phuDe ? '' : ' ')); if (d.phuDe) el.append(' ')
         const sach = w.toLowerCase().replace(/[.,:;!?()]/g, ''); if (TU_KHOA.test(sach) || khoa.has(sach)) s.classList.add('k')
-        if (d.phuDe && /^\d/.test(sach)) s.classList.add('nb')
+        if (d.phuDe && /^\d/.test(sach) && !/[()]/.test(w)) s.classList.add('nb') // số trong biểu thức «(n - 1)» không đóng ô (ô chỉ cho con số đứng riêng)
         return s
       })
       q.el = el

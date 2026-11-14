@@ -222,12 +222,25 @@ for (const cc of ch.canh) {
     canh.phuDe = []
     for (const q of canh.cau) {
       const tu = q.chu.split(/\s+/), cum = []; let bd = 0
-      tu.forEach((w, j) => { if (/[,;:]$/.test(w) || j === tu.length - 1) { cum.push([bd, j + 1]); bd = j + 1 } })
-      // cụm dài > 8 chữ tách đôi ở chỗ ngắt tự nhiên gần giữa nhất (trước «mà, thì, nên, còn, là, với, khi, để, vì»), không thì ở giữa
+      // CHỖ ĐƯỢC NGẮT (thầy 14/11 «chú ý ngắt câu phụ đề cho chuẩn» — từng ra cụm «- 1) liên kết peptide»): không ngắt trong ngoặc «(n - 1)», không ngắt
+      // sát dấu phép tính / mũi tên / dấu nối «Gly - Ala» (dấu luôn đi cùng hai vế), không để một cụm chỉ còn một chữ lẻ
+      const PHEP = /^([-−+=×:⇒→←≤≥<>]|\.\.\.)$/
+      const sau = []; let sau0 = 0; for (const w of tu) { sau0 += (w.match(/\(/g) || []).length - (w.match(/\)/g) || []).length; sau.push(sau0) }
+      const ngatDuoc = (j) => j > 0 && j < tu.length && sau[j - 1] <= 0 && !PHEP.test(tu[j]) && !PHEP.test(tu[j - 1]) && !/^[)\]]/.test(tu[j])
+      tu.forEach((w, j) => { if ((/[,;:]$/.test(w) && ngatDuoc(j + 1)) || j === tu.length - 1) { cum.push([bd, j + 1]); bd = j + 1 } })
+      // cụm 1 chữ (vd. «Ala,» trong một chuỗi kể, «base.» cuối câu) ⇒ gộp vào cụm bên cạnh cùng câu nếu gộp xong ≤ 10 chữ
+      for (let i = 0; i < cum.length; i++) {
+        if (cum[i][1] - cum[i][0] > 1 || cum.length < 2) continue
+        const tr2 = cum[i - 1], sa2 = cum[i + 1]
+        if (tr2 && cum[i][1] - tr2[0] <= 10) { tr2[1] = cum[i][1]; cum.splice(i, 1); i-- } else if (sa2 && sa2[1] - cum[i][0] <= 10) { sa2[0] = cum[i][0]; cum.splice(i, 1); i-- }
+      }
+      // cụm dài > 8 chữ tách đôi ở chỗ ngắt tự nhiên gần giữa nhất (trước «mà, thì, nên, còn, là, với, khi, để, vì»), không thì ở chỗ được ngắt gần giữa nhất
       const NGAT = /^(mà|thì|nên|còn|là|với|khi|để|vì)$/i
       const tach = []; for (const [x, y] of cum) {
         if (y - x <= 8) { tach.push([x, y]); continue }
-        let g = x + Math.ceil((y - x) / 2), tot = 1e9; for (let j = x + 2; j <= y - 2; j++) if (NGAT.test(tu[j]) && Math.abs(j - (x + y) / 2) < tot) { tot = Math.abs(j - (x + y) / 2); g = j }
+        let g = -1, tot = 1e9; for (let j = x + 2; j <= y - 2; j++) if (ngatDuoc(j) && NGAT.test(tu[j]) && Math.abs(j - (x + y) / 2) < tot) { tot = Math.abs(j - (x + y) / 2); g = j }
+        if (g < 0) for (let j = x + 2; j <= y - 2; j++) if (ngatDuoc(j) && Math.abs(j - (x + y) / 2) <= tot) { tot = Math.abs(j - (x + y) / 2); g = j }
+        if (g < 0) { tach.push([x, y]); continue }
         tach.push([x, g], [g, y])
       }
       tach.forEach(([x, y]) => { const t0 = Math.max(q.t0, (gioChu(q, x) ?? q.t0) - 0.1); canh.phuDe.push({ chu: tu.slice(x, y).join(' '), t0, cau: q, x, y }) })
