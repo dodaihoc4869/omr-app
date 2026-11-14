@@ -146,6 +146,8 @@ function dungCanh() {
       const tu = q.chu.split(/\s+/)
       q.tu = tu.map((w) => { const s = tao('span', 'tu', el, thoat(w) + ' '); const sach = w.toLowerCase().replace(/[.,:;!?()]/g, ''); if (TU_KHOA.test(sach) || khoa.has(sach)) s.classList.add('k'); return s })
       q.el = el
+      // phụ đề theo cụm (kịch bản có q.tw): mỗi chữ hiện theo giờ cụm của nó, lần lượt 0,04 s trong cụm
+      if (q.tw) q.tj = q.tw.map((g, j) => g + 0.04 * (j - q.tw.indexOf(g)))
     }
     if (d.doVui) dungDoVui(d)
     if (d.phanTu) dungPhanTu(d)
@@ -489,7 +491,7 @@ function veCanh(d, t) {
   for (const q of d.cau) {
     const on = q === qDang && !(d.doVui && t >= d.doVui.t0 && t < d.doVui.t1); q.el.classList.toggle('an', !on); if (!on) continue
     const ra = tien(t, q.t1 - 0.06, 0.18)
-    q.tu.forEach((w, j) => { const tj = q.t0 + j * 0.04, p = lo(t - tj, 2.6, 0.55); w.style.transform = `translateY(${(1 - p) * 20 - ra * 10}px) scale(${0.88 + 0.12 * p})`; w.style.opacity = kep((t - tj) / 0.14) * (1 - ra) })
+    q.tu.forEach((w, j) => { const tj = q.tj ? q.tj[j] : q.t0 + j * 0.04, p = lo(t - tj, 2.6, 0.55); w.style.transform = `translateY(${(1 - p) * 20 - ra * 10}px) scale(${0.88 + 0.12 * p})`; w.style.opacity = kep((t - tj) / 0.14) * (1 - ra) })
     nen.style.width = `${q.rong}px`; nen.style.height = `${q.cao}px`; nen.style.opacity = 1 - ra
   }
   if (!qDang || (d.doVui && t >= d.doVui.t0 && t < d.doVui.t1)) nen.style.opacity = 0
@@ -499,6 +501,7 @@ function veCanh(d, t) {
     const m = d.hoat.moc, r = hopSan
     if (d.tv) for (const hg of d.tv) { const tau = t - m[hg.k]; if (tau >= 0 && tau < 0.8) { const b = r(hg.h); lapLanh(hoaCtx, b.left + 50, b.top + b.height / 2, tau, d.mauHex) } }
     if (d.ct) { const tau = t - m.noi - 1.2; if (tau >= 0 && tau < 0.8) { const b = r(d.ct.lkMoi); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#ffd27a', 16) } }
+    if (d.lap) for (const l of d.lap) { const tau = t - m[l.k] - (l.tre || 0); if (tau >= 0 && tau < 0.8) { const b = r(l.e); if (b.width) lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, l.mau || d.mauHex, l.n || 12) } }
     if (d.cq) { const tau = t - m.tong; if (tau >= 0 && tau < 0.8) { const b = r(d.cq.dem.querySelector('.dem i:last-child')); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#8fb6ff', 14) } }
   }
   veDanhDau(d, t, camera(d, t), bienDoi)

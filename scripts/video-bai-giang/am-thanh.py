@@ -180,7 +180,50 @@ def ve():  # tiếng bút dạ quệt
     y = loc_thap(x, 2500 + 2500 * u) - loc_thap(x, 900)
     y = bao(y, 0.05, 0.18); y /= np.max(np.abs(y)) + 1e-9
     return np.stack([y * (1 - u * 0.5), y * (0.5 + u * 0.5)], 1) * 0.16
-MAU = {'bip': bip(), 'dung-nhe': dung_nhe(), 've': ve(), 'vut': vut(), 'vut-ra': vut(0.5, False), 'bop': bop(), 'dap': dap(), 'tich': tich(), 'tich-cuoi': tich(True), 'dung': dung(), 'bot': bot()}
+# ── BỘ TIẾNG MINH HOẠ RIÊNG (thầy 14/11 «âm thanh minh hoạ thật xuất sắc»): mỗi hiện tượng hoá học một tiếng, đúng bản chất ──
+def chuong(f0, dai=0.5, tat=7.0, sang=1.0):  # tiếng gõ kiểu đàn mộc cầm: hoạ âm 1 · 3,9 · 9,2 tắt nhanh dần
+    n = int(dai * SR); t = np.arange(n) / SR; y = np.zeros(n)
+    for r, a, k in [(1, 1, 1), (3.9, 0.32 * sang, 2.6), (9.2, 0.1 * sang, 5)]: y += a * np.sin(2 * np.pi * f0 * r * t) * np.exp(-t * tat * k)
+    return y * np.minimum(1, t / 0.002)
+def giot():  # giọt nước: «bloop» tần số vọt lên + vang nhỏ
+    n = int(0.22 * SR); t = np.arange(n) / SR; f = 420 + 1300 * (1 - np.exp(-t * 38))
+    y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 22) * np.minimum(1, t / 0.004)
+    y += 0.25 * chuong(1900, 0.22, 14)
+    return np.stack([y * 0.9, y], 1) * 0.3
+def gay():  # liên kết đứt: tiếng «tách» giòn + tiếng trầm ngắn
+    n = int(0.25 * SR); t = np.arange(n) / SR
+    k = loc_thap(rng.standard_normal(n), 7000) - loc_thap(rng.standard_normal(n), 1200); k *= np.exp(-t * 90)
+    tr = np.sin(2 * np.pi * (90 + 120 * np.exp(-t * 30)) * t) * np.exp(-t * 18)
+    y = k * 0.9 + tr * 0.6
+    return np.stack([y, y * 0.85], 1) * 0.42
+def dem(bac):  # đếm 1 · 2 · 3: mỗi lần cao hơn (Đô - Mi - Son)
+    y = chuong([1046.5, 1318.5, 1568.0][bac], 0.45, 6)
+    return np.stack([y, y], 1) * 0.2
+def tong():  # «tổng lại»: hợp âm rải nhanh + lấp lánh
+    n = int(1.0 * SR); y = np.zeros(n)
+    for k, f0 in enumerate([1046.5, 1318.5, 1568.0, 2093.0]):
+        o = int(k * 0.05 * SR); x = chuong(f0, 1.0 - k * 0.05, 4.5); y[o:o + len(x)] += x[: n - o]
+    return np.stack([y, y], 1) * 0.12
+def gan():  # gắn vào (Na vào COO⁻): «cạch» kim loại hai lớp
+    y = chuong(2637, 0.3, 11, 0.6) + 0.7 * chuong(1760, 0.3, 13, 0.4)
+    o = int(0.04 * SR); y[o:] += 0.5 * chuong(3520, 0.3, 16, 0.3)[: len(y) - o]
+    return np.stack([y, y], 1) * 0.16
+def gach():  # gạch / triệt tiêu: tiếng quệt đi xuống
+    n = int(0.3 * SR); x = rng.standard_normal(n); u = np.linspace(0, 1, n)
+    y = loc_thap(x, 6000 - 4800 * u) - loc_thap(x, 500); y = bao(y, 0.02, 0.2); y /= np.max(np.abs(y)) + 1e-9
+    return np.stack([y * (0.6 + 0.4 * u), y * (1 - 0.4 * u)], 1) * 0.2
+def lap():  # lấp lánh: hạt chuông cao rải ngẫu nhiên
+    n = int(0.6 * SR); y = np.zeros(n)
+    for k in range(9):
+        o = int(rng.uniform(0, 0.35) * SR); x = chuong(rng.uniform(2600, 5200), 0.25, 18, 0.2) * rng.uniform(0.3, 1); y[o:o + len(x)] += x[: n - o]
+    return np.stack([y * 0.8, y], 1) * 0.07
+def nhay():  # H⁺ nhảy theo cung: trượt lên rồi đáp xuống (0,9 s)
+    n = int(0.9 * SR); t = np.arange(n) / SR; u = t / t[-1]; f = 520 + 900 * np.sin(np.pi * u) ** 1.2 - 200 * u
+    y = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * u) ** 0.7 * (1 - 0.4 * u)
+    y += 0.15 * np.sin(2 * np.pi * np.cumsum(f * 2) / SR) * np.sin(np.pi * u)
+    return np.stack([y * (1 - u * 0.6), y * (0.4 + u * 0.6)], 1) * 0.1
+MAU_MOI = {'giot': giot(), 'gay': gay(), 'dem1': dem(0), 'dem2': dem(1), 'dem3': dem(2), 'tong': tong(), 'gan': gan(), 'gach': gach(), 'lap': lap(), 'nhay': nhay()}
+MAU = {**MAU_MOI, 'bip': bip(), 'dung-nhe': dung_nhe(), 've': ve(), 'vut': vut(), 'vut-ra': vut(0.5, False), 'bop': bop(), 'dap': dap(), 'tich': tich(), 'tich-cuoi': tich(True), 'dung': dung(), 'bot': bot()}
 sfx = np.zeros((N + SR * 2, 2))
 for s in kb['sfx']:
     x = MAU.get(s['loai'])
@@ -191,10 +234,11 @@ ghi_wav(f'{ra}/sfx.wav', sfx[:N])
 
 # ── TRỘN ── nhạc né giọng (sidechain), giọng ở giữa, chuẩn -16 LUFS, cắt đúng độ dài video
 chay('ffmpeg', '-y', '-v', 'error', '-i', f'{ra}/giong.wav', '-i', f'{ra}/nhac-tho.wav', '-i', f'{ra}/sfx.wav', '-filter_complex',
-     f'[0:a]aresample={SR},asplit=2[g][gk];'
+     f'[0:a]aresample={SR},asplit=3[g][gk][gk2];'
      f'[1:a]aresample={SR},volume=1.0,afade=t=out:st={T - 1.6:.3f}:d=1.5[n];'
      f'[n][gk]sidechaincompress=threshold=0.03:ratio=4:attack=25:release=480:makeup=1[nd];'
      f'[g]pan=stereo|c0=c0|c1=c0[gs];'
-     f'[gs][nd][2:a]amix=inputs=3:normalize=0:duration=first,loudnorm=I=-16:TP=-1.5:LRA=11,atrim=0:{T:.3f},apad=whole_dur={T:.3f}[o]',
+     f'[2:a]aresample={SR}[sx];[sx][gk2]sidechaincompress=threshold=0.05:ratio=2.5:attack=8:release=260:makeup=1[sd];'
+     f'[gs][nd][sd]amix=inputs=3:normalize=0:duration=first,loudnorm=I=-16:TP=-1.5:LRA=11,atrim=0:{T:.3f},apad=whole_dur={T:.3f}[o]',
      '-map', '[o]', '-ar', str(SR), '-c:a', 'aac', '-b:a', '192k', f'{ra}/am-thanh.m4a')
 print('xong', f'{ra}/am-thanh.m4a')

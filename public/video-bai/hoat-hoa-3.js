@@ -59,6 +59,16 @@ function dungBazo(d, goc) {
     ala: E('bz-m ala', '<span>Ala-Na</span><i>M = 89</i><i>+ <em>22</em></i><i>= 111</i>', D),
   }
   d.bz = { pt, P, A, a, BC, khoi, lk, dauC, soC, naohT, demC, giotCan, giotSinh, can, sinh, triet, con, D, dd, bw, gap, W, giua }
+  // TIA LẤP LÁNH đúng khoảnh khắc (khung.js vẽ theo moc + trễ): nước thành · Na gắn · đếm 1-2-3 · tổng 3 · NaOH gắn · còn 1 nước · M = 97 · 111
+  const iDem = demC.querySelectorAll('i'), iM = dd.m.querySelectorAll('i'), iAla = dd.ala.querySelectorAll('i'), NUOC = '#8fd8ee', VANG = '#ffd27a'
+  d.lap = [
+    { k: 'a_nuoc', tre: 0.15, e: a.nuoc, mau: NUOC, n: 14 }, { k: 'a_coona', tre: 0.8, e: a.cooR, mau: VANG },
+    { k: 'b_c1', e: dauC[0] }, { k: 'b_c2', e: dauC[1] }, { k: 'b_c3', e: dauC[2] }, { k: 'b_tong', e: iDem[3], mau: VANG, n: 16 },
+    ...naohT.map((e, i) => ({ k: 'b_3a', tre: 0.6 + i * 0.18, e, mau: '#8fb6ff', n: 8 })),
+    { k: 'c_con', tre: 0.5, e: giotSinh[2], mau: NUOC, n: 14 }, { k: 'd_na', tre: 1.15, e: dd.na, mau: '#8fb6ff' },
+    { k: 'd_22', e: iM[3], mau: VANG, n: 16 }, { k: 'd_22', tre: 1.1, e: iM[4], mau: VANG }, { k: 'd_ala22', tre: 0.7, e: iAla[2], mau: VANG, n: 16 },
+    { k: 'pt_naoh', e: P.naoh, n: 10 }, { k: 'pt_nuoc', e: P.nuoc, n: 10 }, { k: 'pt_glyna', e: P.glyna, n: 10 }, { k: 'pt_alana', e: P.alana, n: 10 },
+  ]
   d.hoatNeo = {
     'pt-pep': P.pep, 'pt-naoh': P.naoh, 'pt-3a': P.naoh.querySelector('em'), 'pt-mui': P.mui, 'pt-nuoc': P.nuoc, 'pt-glyna': P.glyna, 'pt-alana': P.alana,
     'a-cooh': a.cooR, 'a-oh': a.oh, 'a-nuoc': a.nuoc, 'a-coona': a.cooR, 'b-dc': dauC[0], 'd-tru': dd.tru, 'd-m': dd.m, 'd-ala': dd.ala,
@@ -87,7 +97,7 @@ function veBazoA(Z, m, t) {
   if (!Z.wR) { const c0 = a.cooR.innerHTML, n0 = a.na.innerHTML; a.cooR.innerHTML = '-COO'; a.na.innerHTML = 'Na'; Z.wR = a.cooR.offsetWidth - 6; Z.wNa = a.na.offsetWidth - 6; a.cooR.innerHTML = c0; a.na.innerHTML = n0; if (!Z.wR) Z.wR = 0 }
   const xR = 40, wR = Z.wR || 150, xNa = W - 300, xOH = xNa + (Z.wNa || 74) + 44 * tach
   // H của COOH bay theo cung tới OH⁻ (khi Thầy vẽ mũi tên cong trên bảng)
-  const hx0 = xR + wR, hx1 = xOH - 40, cx = (hx0 + hx1) / 2, cy = Y - 150
+  const hx0 = xR + wR + 8, hx1 = xOH - 40, cx = (hx0 + hx1) / 2, cy = Y - 150
   const bx = (1 - bay) ** 2 * hx0 + 2 * (1 - bay) * bay * cx + bay ** 2 * hx1, by = (1 - bay) ** 2 * Y + 2 * (1 - bay) * bay * cy + bay ** 2 * Y
   // -COO đứng yên; Na⁺ rời OH⁻ (hạ xuống) rồi bay về gắn vào -COO⁻ ⇒ -COONa
   a.cooR.style.opacity = r3(kep(pC * 1.5)); datXY(a.cooR, xR, Y); a.cooR.style.transform = `scale(${r3(0.7 + 0.3 * kep(pC, 0, 1.2))})`
