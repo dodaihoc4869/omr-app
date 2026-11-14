@@ -130,7 +130,7 @@ const KIEU_TEP: Record<string, string> = { [TEP_LIVE.buoi]: 'application/json;ch
   'video-kb.json': 'application/json;charset=utf-8', 'video-net.json': 'application/json;charset=utf-8', 'video-am.m4a': 'audio/mp4' }
 // ── VIDEO TÓM TẮT (thầy 14/11 «Tạo luôn video tóm tắt trong phần live trên app hs»): máy em tự vẽ (public/video-bai/) từ 3 tệp của buổi — kịch bản, nét phấn,
 // tiếng đã trộn (giọng Thầy + nhạc + tiếng động). Bộ dựng (scripts/video-bai-giang/) tải lên bằng mã GV; máy em đọc qua /live-tep theo vé như các tệp khác.
-// POST /gv/live-video-ghi?id=<buổi>&tep=kb|net|am  (thân = nội dung tệp) · POST /gv/live-video-xoa?id=<buổi>
+// POST /gv/live-video-ghi?id=<buổi>&tep=kb|net|am  (thân = nội dung tệp) · POST /gv/live-video-xoa?id=<buổi> · POST /gv/live-nhat-ky-xoa?id=<buổi>
 const VIDEO_TEP: Record<string, { ten: string; toiDa: number }> = { kb: { ten: 'video-kb.json', toiDa: 3_000_000 }, net: { ten: 'video-net.json', toiDa: 6_000_000 }, am: { ten: 'video-am.m4a', toiDa: 40_000_000 } }
 async function videoLenh(req: Request, env: Env, url: URL, p: string): Promise<Response> {
   if (!laThay(req, env, {})) return json({ ok: false, error: 'Sai mã bí mật' }, 403)
@@ -138,6 +138,8 @@ async function videoLenh(req: Request, env: Env, url: URL, p: string): Promise<R
   if (!id) return json({ ok: false, lyDo: 'thieu', error: 'Thiếu mã buổi.' }, 400)
   if (!env.DE) return json({ ok: false, lyDo: 'khong-r2' }, 503)
   if (p === '/gv/live-video-xoa') { await env.DE.delete(Object.values(VIDEO_TEP).map((v) => khoaTep(id, v.ten))); return json({ ok: true, id }) }
+  // 14/11 thầy «xóa bỏ nhật kí ở 2 video live … giờ soạn video tóm tắt»: gỡ nhật ký bài dạy văn phòng đã đăng (thẻ «Nhật ký bài dạy» tự ẩn — app hỏi HEAD tệp)
+  if (p === '/gv/live-nhat-ky-xoa') { await env.DE.delete(['nhat-ky.json', 'nhat-ky-goc.json'].map((t) => khoaTep(id, t))); return json({ ok: true, id }) }
   const loai = VIDEO_TEP[url.searchParams.get('tep') ?? '']
   if (!loai) return json({ ok: false, lyDo: 'tep', error: 'Tệp phải là kb, net hoặc am.' }, 400)
   const dai = Number(req.headers.get('content-length') ?? 0)
@@ -330,7 +332,7 @@ export function cuaXemLai(req: Request, env: Env, ctx?: ExecutionContext): Promi
   const u = req.url
   if (!u.includes('/live-') && !u.includes('/bpu/live/ghi')) return null
   const url = new URL(u), p = url.pathname, m = req.method
-  const laGhi = p === '/bpu/live/ghi', laTep = p.startsWith('/live-tep/'), laVideo = p === '/gv/live-video-ghi' || p === '/gv/live-video-xoa'
+  const laGhi = p === '/bpu/live/ghi', laTep = p.startsWith('/live-tep/'), laVideo = p === '/gv/live-video-ghi' || p === '/gv/live-video-xoa' || p === '/gv/live-nhat-ky-xoa'
   const laLenh = p === '/hs/live-ds' || p === '/hs/live-buoi' || p === '/gv/live-ds' || p === '/gv/live-doi-ten' || p === '/gv/live-xoa' || p === '/gv/live-dat' || p === '/gv/live-dung-lai'
     || p === '/gv/live-nhat-ky-ds' || p === '/gv/live-nhat-ky-tu-lieu' || p === '/gv/live-nhat-ky-ghi'
   if (!laGhi && !laTep && !laLenh && !laVideo) return null

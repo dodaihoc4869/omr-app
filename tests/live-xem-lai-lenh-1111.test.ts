@@ -281,6 +281,15 @@ describe('VIDEO TÓM TẮT (14/11): tải 3 tệp bằng mã GV, máy em đọc 
     expect((await goi('/gv/live-video-xoa?id=b1', { method: 'POST', thay: true })).status).toBe(200)
     expect([...r2.du.keys()].filter((k) => k.includes('video-'))).toEqual([])
   })
+  it('gỡ nhật ký bài dạy đã đăng (14/11): cần mã GV; xoá nhat-ky.json + nhat-ky-goc.json, không đụng tệp khác của buổi', async () => {
+    themBuoi('b1')
+    await r2.be.put('live/b1/nhat-ky.json', '{}'); await r2.be.put('live/b1/nhat-ky-goc.json', '{}'); await r2.be.put('live/b1/video-kb.json', kb)
+    expect((await goi('/gv/live-nhat-ky-xoa?id=b1', { method: 'POST', thay: false })).status).toBe(403)
+    expect(r2.du.has('live/b1/nhat-ky.json')).toBe(true)
+    expect((await goi('/gv/live-nhat-ky-xoa?id=b1', { method: 'POST', thay: true })).status).toBe(200)
+    expect(r2.du.has('live/b1/nhat-ky.json') || r2.du.has('live/b1/nhat-ky-goc.json')).toBe(false)
+    expect(r2.du.has('live/b1/video-kb.json')).toBe(true)
+  })
 })
 
 describe('/gv/live-* — Lịch sử Live của thầy', () => {
