@@ -216,7 +216,9 @@ export async function nhatKyGhi(env: Env, b: Row, nay = Date.now()): Promise<Row
 /** 14/11 thầy «Tôi ko muốn văn phòng dựng nhật kí nữa» ⇒ mặc định văn phòng THÔI soạn: danh sách việc rỗng (`tat: true`), lệnh ghi bị từ chối.
  *  Tư liệu buổi (`tu-lieu`) vẫn mở cho bộ dựng video bài giảng (scripts/video-bai-giang). Bài đã đăng KHÔNG gỡ ở đây (xoá dữ liệu thật ⇒ chờ thầy quyết).
  *  Bật lại: biến Worker `NHAT_KY_VAN_PHONG=1`. */
-const vanPhongSoan = (env: Env): boolean => String(env.NHAT_KY_VAN_PHONG ?? '').trim() === '1'
+/** 14/11 thầy «ko muốn văn phòng dựng nhật kí nữa»: vắng / khác '1' ⇒ văn phòng thôi soạn. Khai báo tại chỗ (không thêm vào kieu.ts — tệp thuộc làn kiểm tra cá nhân, đổi là bước phát hành phải chờ). */
+type EnvNk = Env & { NHAT_KY_VAN_PHONG?: string }
+const vanPhongSoan = (env: EnvNk): boolean => String(env.NHAT_KY_VAN_PHONG ?? '').trim() === '1'
 const TAT_VAN_PHONG = { lyDo: 'thay-tat', error: 'Thầy đã dừng việc văn phòng soạn nhật ký bài dạy (14/11).' }
 export async function lenhNhatKy(env: Env, p: string, b: Row, cc: CongCuNhatKy): Promise<Row | null> {
   if (p === '/gv/live-nhat-ky-ds') return vanPhongSoan(env) ? nhatKyDs(env, b) : { ok: true, ds: [], moc: str(b.sau).trim().slice(0, 40), tat: true, ...TAT_VAN_PHONG }
