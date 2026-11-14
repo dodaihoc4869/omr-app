@@ -1,0 +1,29 @@
+[
+  {
+    "i": 820,
+    "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+    "fileNguon": "anh/984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91.png",
+    "svg": "isomers820-native-ddh-283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725.svg",
+    "hashSvg": "283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725",
+    "byteSvg": 22064,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C3-B13-I-1",
+        "de": "Cho các chất có công thức cấu tạo (1) đến (8) như hình dưới.\nTrong các phân tử trên, không có nhóm chức nào sau đây?",
+        "refs": [
+          {
+            "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+            "where": "11-C3-B13-I-1.hinh.0.du_lieu",
+            "hashDataUrl": "50c323f06698d2afce533aa4d5d69aa44a6f7792a178cb033b8ac17a13bcea0e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8individualstructures4-4-4-6-6-10-10-4C=48C10O2N/14CCdouble6Phinner8chain/2Ph3innerCCeach/2H2N-LASTN-SUB2-4HO-LASTO-2COOH-FIRSTC-CONDENSEDnoexpandedCO/8regularUPRIGHTparenthesizednums1..8/ALLregularUPRIGHTBLACKthinuniform/0stereo-heads-charge-crops/individualnonperiodicvertices-rays-noalias2-3-6-7/NOaddedH-formula-name-condition-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

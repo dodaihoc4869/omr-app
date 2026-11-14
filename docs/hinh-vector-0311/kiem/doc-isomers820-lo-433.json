@@ -1,0 +1,860 @@
+{
+  "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+  "native": [
+    1167,
+    442
+  ],
+  "questions": [
+    {
+      "qid": "11-C3-B13-I-1",
+      "de": "Cho các chất có công thức cấu tạo (1) đến (8) như hình dưới.\nTrong các phân tử trên, không có nhóm chức nào sau đây?",
+      "refs": [
+        {
+          "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+          "where": "11-C3-B13-I-1.hinh.0.du_lieu",
+          "hashDataUrl": "50c323f06698d2afce533aa4d5d69aa44a6f7792a178cb033b8ac17a13bcea0e"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "8individualstructures4-4-4-6-6-10-10-4C=48C10O2N/14CCdouble6Phinner8chain/2Ph3innerCCeach/2H2N-LASTN-SUB2-4HO-LASTO-2COOH-FIRSTC-CONDENSEDnoexpandedCO/8regularUPRIGHTparenthesizednums1..8/ALLregularUPRIGHTBLACKthinuniform/0stereo-heads-charge-crops/individualnonperiodicvertices-rays-noalias2-3-6-7/NOaddedH-formula-name-condition-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicde11-C3-B13-I-1; OWNtopL/topR/botL/botR3x. 48C10O2N; source2/3 and6/7 eachindividualnonperiodicgeometry/chainorientation. AllregularUPRIGHT including8nums. 2H2NlastN,4HOlastO,2COOHfirstC-condensed. Noanswers/addedH/stereo/crops.",
+  "independentSourceAudit": {
+    "i": 820,
+    "assetIndex": 107,
+    "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91.png",
+    "size": [
+      1167,
+      442
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "11-C3-B13-I-1",
+        "de": "Cho các chất có công thức cấu tạo (1) đến (8) như hình dưới.\nTrong các phân tử trên, không có nhóm chức nào sau đây?",
+        "allHinh": [
+          {
+            "hash": "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91",
+            "where": "11-C3-B13-I-1.hinh.0.du_lieu",
+            "hashDataUrl": "50c323f06698d2afce533aa4d5d69aa44a6f7792a178cb033b8ac17a13bcea0e"
+          }
+        ],
+        "missingHashes": [
+          "984d5c3d592d20b8f2c138c7ef03d814eb83448b3e521ddde11480a29f910d91"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfThisSourcePassed": 1,
+      "allAffectedQuestionsOnlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/433-820-full3x.png",
+        "/workspace/scratch/433-820-top.png",
+        "/workspace/scratch/433-820-bottom.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "panels": [
+        {
+          "panel": 1,
+          "orderedMainVertices": [
+            [
+              105,
+              117
+            ],
+            [
+              130,
+              133
+            ],
+            [
+              165,
+              112
+            ],
+            [
+              199,
+              132
+            ],
+            [
+              235,
+              116
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              166,
+              119
+            ],
+            [
+              195,
+              137
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "H₂N",
+              "bbox": [
+                50,
+                98,
+                102,
+                124
+              ],
+              "bondAnchor": "last N",
+              "bondStart": [
+                105,
+                117
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(1)",
+            "center": [
+              137,
+              187
+            ],
+            "baseline": 195
+          },
+          "counts": {
+            "C": 4,
+            "O": 0,
+            "N": 1
+          },
+          "extra": null
+        },
+        {
+          "panel": 2,
+          "orderedMainVertices": [
+            [
+              415,
+              100
+            ],
+            [
+              436,
+              110
+            ],
+            [
+              436,
+              145
+            ],
+            [
+              471,
+              165
+            ],
+            [
+              506,
+              147
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              442,
+              142
+            ],
+            [
+              472,
+              158
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "HO",
+              "bbox": [
+                370,
+                82,
+                410,
+                101
+              ],
+              "bondAnchor": "last O",
+              "bondStart": [
+                415,
+                100
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(2)",
+            "center": [
+              431,
+              187
+            ],
+            "baseline": 195
+          },
+          "counts": {
+            "C": 4,
+            "O": 1,
+            "N": 0
+          },
+          "extra": null
+        },
+        {
+          "panel": 3,
+          "orderedMainVertices": [
+            [
+              713,
+              115
+            ],
+            [
+              733,
+              126
+            ],
+            [
+              767,
+              108
+            ],
+            [
+              802,
+              126
+            ],
+            [
+              837,
+              108
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              767,
+              115
+            ],
+            [
+              798,
+              132
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "HO",
+              "bbox": [
+                668,
+                98,
+                708,
+                117
+              ],
+              "bondAnchor": "last O",
+              "bondStart": [
+                713,
+                115
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(3)",
+            "center": [
+              771,
+              187
+            ],
+            "baseline": 195
+          },
+          "counts": {
+            "C": 4,
+            "O": 1,
+            "N": 0
+          },
+          "extra": null
+        },
+        {
+          "panel": 4,
+          "orderedMainVertices": [
+            [
+              962,
+              121
+            ],
+            [
+              998,
+              100
+            ],
+            [
+              1032,
+              120
+            ],
+            [
+              1067,
+              104
+            ],
+            [
+              1068,
+              76
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              1003,
+              96
+            ],
+            [
+              1032,
+              113
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "COOH",
+              "bbox": [
+                1059,
+                53,
+                1135,
+                72
+              ],
+              "bondAnchor": "first C",
+              "bondEnd": [
+                1068,
+                76
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(4)",
+            "center": [
+              1040,
+              187
+            ],
+            "baseline": 195
+          },
+          "counts": {
+            "C": 6,
+            "O": 2,
+            "N": 0
+          },
+          "extra": {
+            "singleBranch": [
+              [
+                998,
+                100
+              ],
+              [
+                999,
+                64
+              ]
+            ]
+          }
+        },
+        {
+          "panel": 5,
+          "orderedMainVertices": [
+            [
+              59,
+              296
+            ],
+            [
+              95,
+              275
+            ],
+            [
+              129,
+              294
+            ],
+            [
+              164,
+              279
+            ],
+            [
+              184,
+              291
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              101,
+              271
+            ],
+            [
+              129,
+              287
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "COOH",
+              "bbox": [
+                187,
+                289,
+                264,
+                308
+              ],
+              "bondAnchor": "first C",
+              "bondEnd": [
+                184,
+                291
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(5)",
+            "center": [
+              127,
+              394
+            ],
+            "baseline": 402
+          },
+          "counts": {
+            "C": 6,
+            "O": 2,
+            "N": 0
+          },
+          "extra": {
+            "singleBranch": [
+              [
+                95,
+                275
+              ],
+              [
+                95,
+                239
+              ]
+            ]
+          }
+        },
+        {
+          "panel": 6,
+          "orderedMainVertices": [
+            [
+              422,
+              291
+            ],
+            [
+              442,
+              260
+            ],
+            [
+              482,
+              260
+            ],
+            [
+              502,
+              291
+            ],
+            [
+              482,
+              322
+            ],
+            [
+              442,
+              322
+            ],
+            [
+              422,
+              291
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              445,
+              266
+            ],
+            [
+              478,
+              266
+            ],
+            [
+              493,
+              291
+            ],
+            [
+              477,
+              315
+            ],
+            [
+              447,
+              315
+            ],
+            [
+              430,
+              291
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "HO",
+              "bbox": [
+                351,
+                281,
+                391,
+                300
+              ],
+              "bondAnchor": "last O",
+              "bondStart": [
+                395,
+                291
+              ]
+            },
+            {
+              "literal": "O",
+              "bbox": [
+                411,
+                344,
+                432,
+                363
+              ],
+              "center": [
+                421,
+                354
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(6)",
+            "center": [
+              466,
+              394
+            ],
+            "baseline": 402
+          },
+          "counts": {
+            "C": 10,
+            "O": 2,
+            "N": 0
+          },
+          "extra": {
+            "OHbond": [
+              [
+                395,
+                291
+              ],
+              [
+                422,
+                291
+              ]
+            ],
+            "sideChain": [
+              [
+                502,
+                291
+              ],
+              [
+                542,
+                291
+              ],
+              [
+                562,
+                260
+              ],
+              [
+                601,
+                260
+              ]
+            ],
+            "sideInnerDouble": [
+              [
+                548,
+                294
+              ],
+              [
+                568,
+                266
+              ]
+            ],
+            "methoxyRingBond": [
+              [
+                442,
+                322
+              ],
+              [
+                430,
+                341
+              ]
+            ],
+            "methoxyTerminalBond": [
+              [
+                408,
+                353
+              ],
+              [
+                382,
+                353
+              ]
+            ]
+          }
+        },
+        {
+          "panel": 7,
+          "orderedMainVertices": [
+            [
+              741,
+              302
+            ],
+            [
+              761,
+              271
+            ],
+            [
+              801,
+              271
+            ],
+            [
+              821,
+              302
+            ],
+            [
+              801,
+              333
+            ],
+            [
+              761,
+              333
+            ],
+            [
+              741,
+              302
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              764,
+              277
+            ],
+            [
+              797,
+              277
+            ],
+            [
+              812,
+              302
+            ],
+            [
+              797,
+              326
+            ],
+            [
+              766,
+              326
+            ],
+            [
+              749,
+              302
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "HO",
+              "bbox": [
+                672,
+                292,
+                711,
+                311
+              ],
+              "bondAnchor": "last O",
+              "bondStart": [
+                716,
+                302
+              ]
+            },
+            {
+              "literal": "O",
+              "bbox": [
+                731,
+                354,
+                751,
+                373
+              ],
+              "center": [
+                741,
+                364
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(7)",
+            "center": [
+              775,
+              394
+            ],
+            "baseline": 402
+          },
+          "counts": {
+            "C": 10,
+            "O": 2,
+            "N": 0
+          },
+          "extra": {
+            "OHbond": [
+              [
+                716,
+                302
+              ],
+              [
+                741,
+                302
+              ]
+            ],
+            "sideChain": [
+              [
+                821,
+                302
+              ],
+              [
+                860,
+                302
+              ],
+              [
+                880,
+                271
+              ],
+              [
+                855,
+                236
+              ]
+            ],
+            "sideInnerDouble": [
+              [
+                856,
+                296
+              ],
+              [
+                873,
+                271
+              ]
+            ],
+            "methoxyRingBond": [
+              [
+                761,
+                333
+              ],
+              [
+                749,
+                351
+              ]
+            ],
+            "methoxyTerminalBond": [
+              [
+                727,
+                364
+              ],
+              [
+                701,
+                364
+              ]
+            ]
+          }
+        },
+        {
+          "panel": 8,
+          "orderedMainVertices": [
+            [
+              1019,
+              307
+            ],
+            [
+              1032,
+              288
+            ],
+            [
+              1071,
+              288
+            ],
+            [
+              1091,
+              257
+            ],
+            [
+              1072,
+              226
+            ]
+          ],
+          "separateDoubleRays": [
+            [
+              1067,
+              282
+            ],
+            [
+              1084,
+              257
+            ]
+          ],
+          "labels": [
+            {
+              "literal": "H₂N",
+              "bbox": [
+                970,
+                311,
+                1019,
+                336
+              ],
+              "bondAnchor": "last N",
+              "bondStart": [
+                1019,
+                307
+              ]
+            }
+          ],
+          "caption": {
+            "literal": "(8)",
+            "center": [
+              1038,
+              394
+            ],
+            "baseline": 402
+          },
+          "counts": {
+            "C": 4,
+            "O": 0,
+            "N": 1
+          },
+          "extra": null
+        }
+      ],
+      "counts": {
+        "C": 48,
+        "O": 10,
+        "N": 2,
+        "CCdouble": 14,
+        "phenylRings": 2,
+        "COOHcondensedGroups": 2,
+        "HOlabels": 4,
+        "H2Nlabels": 2
+      },
+      "styles": {
+        "allLabels": "regular upright sans, including (1)..(8); no true bold or italic observed",
+        "bonds": "black uniform thin about1.2–1.5nativepx, no wedges/tapers/stereo/charges",
+        "captions": "regular upright sans about24nativepx"
+      },
+      "layout": "two rows of four unframed panels; no table border/arrow/condition/title",
+      "crops": "No figure glyph or chain cropped; no ambiguous edge fragment seen",
+      "anchorRules": "HO uses last O; H₂N uses last N; COOH first C. Condensed COOH not expanded to drawn carbonyl rays."
+    },
+    "measurementLimits": "Coordinates individually read from native FULL and independent top/bottom enlargements, approximate ±1–2nativepx. No periodic/symmetric normalization. In ring inner rays arrays contain three consecutive endpoint pairs, not connected polyline. Carbon counts from visible vertices plus explicit condensed first C; no implicit H count inferred.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "hashSvg": "283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725",
+    "nativeFullOpened": true,
+    "allPublicDeOpened": [
+      "11-C3-B13-I-1"
+    ],
+    "freshChromium3xFullOpened": "/workspace/scratch/root433-820.png",
+    "macrosOpened": [
+      "/workspace/scratch/root433-topL.png",
+      "/workspace/scratch/root433-topR.png",
+      "/workspace/scratch/root433-botL.png",
+      "/workspace/scratch/root433-botR.png"
+    ],
+    "ketQua": "Đạt root own freshFULL+4quadrants encompassingall8panels. 48C10O2N/14CCdouble=6Phinner+8chain;2COOHcondensednoexpand/2H2NlastN4HOlastO. 2vs3 and6vs7 separatechainorientations. AllregularUPRIGHT8parenthesizednums. Allglyphbondwhitegapsinclsub2/lastN and COOHfirstC; noextrastereochargeheadsHnamesanswers. NoSVGnegativefoundthisbatch. NativeapproxNOTsubpixel."
+  },
+  "readonlyRuntime": {
+    "sha256": "b1045babacff2f299788808b5f92f678b62bde8fc911dafdfd796d71360abc7d",
+    "rawLog": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/isomers820-native-ddh-283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725.svg 283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725\n820 { x: 0, y: 0, width: 1167, height: 442 }\n\nPOSTSHOT_SHA 283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725\nCOMMAND node /workspace/scratch/agent-render433.cjs\nCONTEXT 11-C3-B13-I-1.hinh.0.du_lieu public de/one ref only; no answers.\n"
+  },
+  "readonlyFinalReview": [
+    {
+      "i": 820,
+      "hashSvg": "283c3149dac0a1f0a9985ec2e5dcbcda2b1631df32394dc230663a53ee2b1725",
+      "nguoiSoat": "soat_hinh_vector",
+      "ketQua": "Đạt: own native FULL/public de-ref và fresh Chromium3x FULL/từng8panelmacro. Tự đếm4-4-4-6-6-10-10-4C=48C10O2N, 14CCdouble gồm6Phinner và8chain; haiPh3innerCCeach, khác hướng2/3và6/7 giữ riêng không alias. HaiH₂NlastN/sub2whitegap,4HOlastO,2COOHfirstCcondensed đúng; methoxy/branchC/số(1)..(8) nguyên vị trí/thứ tự. Allchemical+numsregularuprightblackthin, C-O/C-N/sub2/nums/bondgaps sạch không crop/chạm/tràn; không thêm tên/đáp án/charge/stereo/arrow. RuntimeSHApre/post khớp.",
+      "render": "/workspace/scratch/soat433-820-fresh.png",
+      "macro": [
+        "/workspace/scratch/isomers820-1.png",
+        "/workspace/scratch/isomers820-2.png",
+        "/workspace/scratch/isomers820-3.png",
+        "/workspace/scratch/isomers820-4.png",
+        "/workspace/scratch/isomers820-5.png",
+        "/workspace/scratch/isomers820-6.png",
+        "/workspace/scratch/isomers820-7.png",
+        "/workspace/scratch/isomers820-8.png"
+      ]
+    }
+  ]
+}
