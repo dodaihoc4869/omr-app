@@ -1,0 +1,180 @@
+{
+  "ten": "Peptide",
+  "lop": "Live Khối 12",
+  "ngay": "Thứ Sáu 13/11/2026",
+  "moDau": {
+    "kicker": "LIVE KHỐI 12 · THỨ SÁU 13/11",
+    "tieuDe": "PEPTIDE",
+    "phu": "Liên kết peptide · Thuỷ phân · Phản ứng màu biuret",
+    "thay": "Thầy Đỗ Đại Học"
+  },
+  "mucLuc": [
+    ["01–04", "Liên kết peptide", "vang"],
+    ["05–06", "Tên gọi, M và đồng phân", "hong"],
+    ["07–10", "Thuỷ phân trong acid, base", "ngoc"],
+    ["11", "Phản ứng màu biuret", "xanh"]
+  ],
+  "canh": [
+    {
+      "id": "c1", "so": "01", "tieuDe": "Năm α-amino acid phải thuộc", "mau": "vang",
+      "dong": [0, 1, 2, 3, 4],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "5 α-amino acid **phải thuộc**" },
+        { "dong": 4, "loai": "dau", "chu": "PHẢI THUỘC" }
+      ],
+      "hoat": { "loai": "thu-vien", "cao": 650, "moc": { "hien": [0, 0.3], "ala": [1, 0.02], "gly": [1, 0.1], "val": [1, 0.2], "lys": [2, 0.02], "lysN2": [2, 0.45], "glu": [3, 0.02], "gluC2": [3, 0.72], "sang": [4, 0.0] } },
+      "danhDau": [{ "dong": 1, "toi": "val", "frac": 0.25 }, { "dong": 2, "toi": "lys", "frac": 0.1 }, { "dong": 3, "toi": "glu", "frac": 0.1 }],
+      "nhan": [0, 4]
+    },
+    {
+      "id": "c2", "so": "02", "tieuDe": "Khái niệm peptide", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4],
+      "su": [{ "dong": 0, "loai": "tieu-de", "chu": "Peptide: **2 đến 50** mắt xích α-amino acid" }],
+      "hoat": { "loai": "hat", "cao": 610, "moc": { "hien": [0, 0.05], "dem50": [0, 0.5], "mau": [1, 0.35], "lk": [2, 0.3], "oligo": [3, 0.3], "poly": [4, 0.3] } },
+      "nhan": [0]
+    },
+    {
+      "id": "c3", "so": "03", "tieuDe": "Hai điều kiện tạo liên kết peptide", "mau": "hong",
+      "dong": [0, 1, 2, 3, 4, 5, 6],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "**2 điều kiện** tạo 1 liên kết peptide" },
+        { "dong": 6, "loai": "lon", "frac": 0.55, "chu": "1 liên kết peptide ⇒ **mất 1 H₂O**", "vaoCot": false }
+      ],
+      "hoat": { "loai": "cau-truc", "cao": 640, "moc": { "hien": [1, 0.04], "dk1": [1, 0.55], "alpha": [3, 0.08], "matOH": [4, 0.3], "matH": [5, 0.3], "noi": [6, 0.0] } },
+      "danhDau": [{ "dong": 4, "toi": "oh", "frac": 0.35 }, { "dong": 5, "toi": "h2", "frac": 0.35 }],
+      "nhan": [0, 6]
+    },
+    {
+      "id": "c4", "so": "04", "tieuDe": "Ví dụ: hai Gly nối thành liên kết peptide", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4, 5],
+      "phanTu": { "hien": 0, "dk1": 1, "matOH": 2, "matH": 3, "noi": 4, "nuoc": 5 },
+      "nhan": [4]
+    },
+    {
+      "id": "c5", "so": "05", "tieuDe": "Gọi tên, tính M và ký hiệu peptide", "mau": "hong",
+      "dong": [0, 1, 2, 3, 4, 5, 6, 7],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "Tên gọi, **M** và ký hiệu peptide" },
+        { "dong": 4, "loai": "the", "so": "", "chu": "**Dipeptide X₂**: 2 mắt xích, 1 liên kết peptide" },
+        { "dong": 6, "loai": "the", "so": "", "chu": "**Tripeptide X₃**: 3 mắt xích, 2 liên kết peptide" },
+        { "dong": 7, "loai": "the", "so": "", "chu": "**Xn**: n mắt xích, **(n-1)** liên kết peptide" }
+      ],
+      "hoat": { "loai": "phuong-trinh", "cao": 240, "p": { "tk": [
+        { "chu": "**Gly - Gly**", "moc": "ten", "duoi": "mắt xích 1 - mắt xích 2" },
+        { "chu": "M = 75", "moc": "m1", "duoi": "Gly" },
+        { "chu": "+ 75", "moc": "m2", "duoi": "Gly" },
+        { "chu": "− 18", "moc": "tru", "lop": "dau", "duoi": "mất 1 H₂O" },
+        { "chu": "= 132", "moc": "kq", "lop": "kq" }
+      ] }, "moc": { "ten": [0, 0.55], "m1": [1, 0.15], "m2": [1, 0.55], "tru": [2, 0.6], "kq": [3, 0.7] } },
+      "nhan": [3, 7]
+    },
+    {
+      "id": "c6", "so": "06", "tieuDe": "Đồng phân, đầu N và đầu C", "mau": "hong",
+      "dong": [0, 1, 2, 3, 4, 5],
+      "su": [{ "dong": 0, "loai": "tieu-de", "chu": "**Đồng phân** và hai đầu của peptide" }],
+      "hoat": { "loai": "dong-phan", "cao": 600, "moc": { "hien": [0, 0.3], "doi": [1, 0.3], "so": [2, 0.25], "quy": [3, 0.35], "giu": [4, 0.2], "dau": [5, 0.3] } },
+      "nhan": [3, 5]
+    },
+    {
+      "id": "c7", "so": "07", "tieuDe": "Nguyên lý thuỷ phân peptide", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4, 5, 6, 7],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "Nguyên lý **thuỷ phân**" },
+        { "dong": 4, "loai": "lon", "frac": 0.35, "chu": "Cắt đứt **liên kết peptide** trước, rồi mới phản ứng", "vaoCot": false }
+      ],
+      "hoat": { "loai": "cat-lk", "cao": 610, "moc": { "hien": [0, 0.15], "nuoc": [1, 0.45], "tach": [2, 0.15], "mt": [3, 0.35], "hoan": [5, 0.25], "khong": [6, 0.25] } },
+      "nhan": [1]
+    },
+    {
+      "id": "c8", "so": "08", "tieuDe": "Phương trình thuỷ phân tổng quát của Xn", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4, 5],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "Phương trình thuỷ phân **Xn**" },
+        { "dong": 3, "loai": "the", "so": "", "chu": "α-amino acid luôn có **đầu N** và **đầu C**" },
+        { "dong": 4, "loai": "the", "so": "", "chu": "Đầu N nhận **1 H⁺**, đầu C nhận **1 OH⁻**" },
+        { "dong": 5, "loai": "ghi", "chu": "Đó là tính **lưỡng tính** của amino acid" }
+      ],
+      "hoat": { "loai": "phuong-trinh", "cao": 240, "p": { "tk": [
+        { "chu": "**Xn**", "moc": "xn", "duoi": "n mắt xích · (n-1) liên kết" },
+        { "chu": "+ (n-1) H₂O", "moc": "nuoc", "duoi": "trả lại nước" },
+        { "chu": "→", "moc": "mui", "lop": "dau" },
+        { "chu": "n α-amino acid", "moc": "aa", "lop": "kq" }
+      ] }, "moc": { "xn": [0, 0.25], "nuoc": [1, 0.45], "mui": [2, 0.1], "aa": [2, 0.35] } },
+      "nhan": [1]
+    },
+    {
+      "id": "c9", "so": "09", "tieuDe": "Môi trường acid: Gly - Ala - Gly với HCl", "mau": "vang",
+      "dong": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      "su": [{ "dong": 0, "loai": "tieu-de", "chu": "Môi trường **acid**: HCl đếm **N**" }],
+      "hoat": { "loai": "chuoi", "cao": 660, "p": { "khoi": [["Gly", 1, 1], ["Ala", 1, 1], ["Gly", 1, 1]], "mt": "acid", "muoi": ["**Gly-HCl** : 2a (M = 75 + 36,5)", "**Ala-HCl** : a (M = 89 + 36,5)"] },
+        "moc": { "hien": [1, 0.25], "cat": [2, 0.35], "d1": [5, 0.12], "d2": [5, 0.2], "d3": [5, 0.28], "tong": [5, 0.4], "thuoc": [5, 0.62], "m1": [6, 0.3], "m2": [7, 0.3] } },
+      "danhDau": [{ "dong": 5, "toi": "dem", "frac": 0.3 }],
+      "nhan": [4, 5]
+    },
+    {
+      "id": "c10", "so": "?", "tieuDe": "Đoán nhanh: Gly - Lys - Gly với HCl", "mau": "vang",
+      "dong": [0, 1, 2, 3, 4],
+      "doVui": {
+        "sauDong": 0, "giay": 6,
+        "hoi": "Thuỷ phân hoàn toàn **Gly - Lys - Gly : a** trong dung dịch HCl. Cần bao nhiêu mol HCl?",
+        "luaChon": [["A", "2a", false], ["B", "3a", false], ["C", "4a", true]],
+        "moDong": 3, "tom": "Gly - Lys - Gly : a + HCl ⇒ cần **? mol HCl**"
+      },
+      "su": [],
+      "hoat": { "loai": "chuoi", "cao": 600, "p": { "khoi": [["Gly", 1, 1], ["Lys", 2, 1], ["Gly", 1, 1]], "mt": "acid", "nhan": "Lys có 2 N ⇒ gắn **2 HCl**" },
+        "moc": { "hien": [1, 0.0], "cat": [1, 0.3], "d1": [2, 0.3], "d2": [2, 0.48], "d3": [2, 0.54], "d4": [2, 0.72], "tong": [2, 0.9], "thuoc": [3, 0.0], "nhan": [4, 0.25] } },
+      "danhDau": [{ "dong": 1, "toi": "nuoc", "frac": 0.45 }, { "dong": 2, "toi": "dem", "frac": 0.25 }],
+      "nhan": [3]
+    },
+    {
+      "id": "c11", "so": "10", "tieuDe": "Môi trường base: Gly - Ala - Gly với NaOH", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "Môi trường **base**: NaOH đếm **đầu C**" },
+        { "dong": 2, "loai": "lon", "frac": 0.35, "chu": "1 COOH + 1 NaOH → **COONa + H₂O**", "vaoCot": false },
+        { "dong": 8, "loai": "lon", "frac": 0.55, "chu": "COOH ⇒ COONa: M **+ 22**", "vaoCot": false }
+      ],
+      "hoat": { "loai": "chuoi", "cao": 660, "p": { "khoi": [["Gly", 1, 1], ["Ala", 1, 1], ["Gly", 1, 1]], "mt": "base", "muoi": ["**Gly-Na** : 2a (M = 75 + 22)", "**Ala-Na** : a (M = 89 + 22)"] },
+        "moc": { "hien": [3, 0.2], "d1": [4, 0.25], "d2": [4, 0.45], "d3": [4, 0.65], "tong": [4, 0.82], "thuoc": [4, 0.92], "cat": [5, 0.15], "sinh": [5, 0.5], "con": [6, 0.55], "m1": [7, 0.3], "m2": [9, 0.3] } },
+      "danhDau": [{ "dong": 4, "toi": "dem", "frac": 0.3 }],
+      "nhan": [3, 5]
+    },
+    {
+      "id": "c12", "so": "?", "tieuDe": "Đoán nhanh: Gly - Glu - Gly - Ala với NaOH", "mau": "ngoc",
+      "dong": [0, 1, 2, 3, 4],
+      "doVui": {
+        "sauDong": -1, "giay": 6,
+        "hoi": "Thuỷ phân hoàn toàn **Gly - Glu - Gly - Ala : a** trong dung dịch NaOH. Cần bao nhiêu mol NaOH?",
+        "luaChon": [["A", "4a", false], ["B", "5a", true], ["C", "6a", false]],
+        "moDong": 0, "tom": "Gly - Glu - Gly - Ala : a + NaOH ⇒ cần **? mol NaOH**"
+      },
+      "su": [],
+      "hoat": { "loai": "chuoi", "cao": 600, "p": { "khoi": [["Gly", 1, 1], ["Glu", 1, 2], ["Gly", 1, 1], ["Ala", 1, 1]], "mt": "base", "nhan": "Glu có 2 đầu C ⇒ gắn **2 Na**: M = 147 + 44" },
+        "moc": { "hien": [0, 0.0], "d1": [0, 0.08], "d2": [0, 0.16], "d3": [0, 0.22], "d4": [0, 0.3], "d5": [0, 0.38], "tong": [0, 0.48], "thuoc": [0, 0.6], "sinh": [1, 0.7], "cat": [2, 0.15], "con": [2, 0.7], "nhan": [3, 0.4] } },
+      "danhDau": [{ "dong": 1, "toi": "thuoc", "frac": 0.4 }],
+      "nhan": [0]
+    },
+    {
+      "id": "c13", "so": "11", "tieuDe": "Phản ứng màu biuret", "mau": "xanh",
+      "dong": [0, 1, 2, 3, 4, 5, 6],
+      "su": [
+        { "dong": 0, "loai": "tieu-de", "chu": "Phản ứng màu **biuret**" },
+        { "dong": 6, "loai": "the", "so": "", "chu": "Protein, enzyme: đọc **sách giáo khoa** để thuộc" }
+      ],
+      "hoat": { "loai": "biuret", "cao": 540, "moc": { "hien": [0, 0.05], "thuoc": [0, 0.45], "x3": [3, 0.2], "tim": [5, 0.25] } },
+      "nhan": [3, 5]
+    }
+  ],
+  "ket": {
+    "tieuDe": "Ghi nhớ",
+    "y": [
+      "Peptide gồm **2 đến 50** mắt xích α-amino acid, nối nhau bằng liên kết peptide",
+      "1 liên kết peptide: mắt xích 1 mất OH, mắt xích 2 mất H, **mất 1 H₂O**",
+      "Xn có n mắt xích, (n-1) liên kết: **Xn + (n-1)H₂O → n α-amino acid**",
+      "Môi trường acid: HCl **đếm N**",
+      "Môi trường base: NaOH **đếm đầu C**; nước còn = nước sinh − nước cần để cắt",
+      "Từ **X₃ trở lên** có phản ứng màu biuret, **màu tím**"
+    ],
+    "cuoi": "Xem lại cả buổi trong app · Thầy Đỗ Đại Học"
+  }
+}
