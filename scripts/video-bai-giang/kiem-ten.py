@@ -2,8 +2,10 @@
 import json,sys,unicodedata
 kb=json.load(open(sys.argv[1])); asr=json.load(open(sys.argv[2]))
 TEN={'hưng','angola','angô','angela','long','đao','bảo','kiên','yến','hoàng','minh','trường','cao','kiều','chiêu','ngọc','thiên','khánh','hà','trần','đào','nhật','hùng','iran','thịnh','vượng','tiến','thanh','la'}
-for l in open(sys.argv[3]):
-  for w in l.split(): TEN.add(w.lower())
+import os
+if len(sys.argv) > 3 and os.path.exists(sys.argv[3]):
+  for l in open(sys.argv[3]):
+    for w in l.split(): TEN.add(w.lower())
 ws=[w for s in asr for w in s['tu']]
 bad=0
 for g in kb['giong']:
