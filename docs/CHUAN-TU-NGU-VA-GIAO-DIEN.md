@@ -81,6 +81,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Thiết bị phát tiếng của máy khi live (thầy 11/11 «chọn đầu ra âm thanh») | **Loa** — thầy: ô «Loa: Mặc định của máy — …» + nút **Thử loa** («Đã phát tiếng thử ra loa này», «Chưa phát được ra loa này — thử chọn loa khác»); em: hàng **Loa** trong khay (chỉ hiện khi máy chọn được và có từ hai loa). «Tiếng» vẫn là tên công tắc bật / tắt tiếng thầy trên máy em | đầu ra, output, thiết bị âm thanh, sink, headphone |
 | Xem lại buổi đã live (thầy chốt build 11/11, `docs/dac-ta-live-xem-lai-1011.md`) | **Xem lại Live** (nút ở Thêm và nút ở Hôm nay của thầy: «Live») | replay, video, phát lại |
 | Một buổi đã ghi | **Buổi live** («7 buổi», «Xem buổi này», «Xoá 3 buổi live?») | bài live, video, bản ghi |
+| Bài hoạt hoạ tóm tắt một buổi live, máy em tự vẽ theo giọng Thầy (thầy 14/11 «video tóm tắt») | **Video tóm tắt** (thẻ trong trang buổi live: «Video tóm tắt · hoạt hoạ theo giọng Thầy»); bên trong: **Phần** («Phần 03»), **Mục lục**, **Đoán nhanh** | nhật ký bài dạy (văn phòng đã thôi soạn 14/11), video bài giảng, bản hoạt hoạ, chương |
 | Một khúc xem lại | **Đoạn** («5 đoạn», «Đoạn 3/5», cột «Số đoạn») | clip, phân cảnh, chương |
 | Đoạn app tự chọn | **Đoạn đáng xem** («Đáng xem nhất · cả lớp sai nhiều nhất») | highlight, đoạn hay |
 | Danh sách các buổi live của thầy | **Lịch sử Live** («7 buổi · 121 MB đã lưu», «Chọn buổi cũ hơn 120 ngày», «Đổi tên buổi live», «Dựng lại») | quản lý video |

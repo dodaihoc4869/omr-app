@@ -277,3 +277,6 @@ em, .nhan { font-style: normal; color: var(--mau, var(--vang)); font-weight: 800
 .cl-f .do { color: #fda4af; }
 .cq .cq-hcl { white-space: nowrap; }
 .cq-n.c ~ .cq-hcl { font-size: 20px; padding: 4px 9px; }
+
+/* chế độ nhẹ (máy yếu): bỏ bộ lọc phát sáng SVG — Gaussian blur mỗi khung */
+html.nhe .ct-svg [filter], html.nhe #danh-dau [filter], html.nhe .bi-svg [filter] { filter: none; }

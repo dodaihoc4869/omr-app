@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Video tóm tắt</title>
+<link rel="stylesheet" href="khung.css">
+<link rel="stylesheet" href="xem.css">
+</head>
+<body>
+<!-- Sân khấu: giữ KHỚP với khung.html (bộ quay video dùng tệp ấy) -->
+<div id="san">
+  <div id="nen"></div>
+  <div id="canh" class="an">
+    <div id="thanh-tren"><span id="nhan-chuong"></span><div id="tien-do"><i></i></div><span id="ten-bai"></span></div>
+    <div id="bang"><canvas id="phan"></canvas><span id="nhan-bang"><i></i>Bảng của Thầy · nét phấn thật</span></div>
+    <div id="cot"><div id="cot-trong"></div></div>
+    <div id="pt" class="an"></div>
+    <div id="dau" class="an"></div>
+    <div id="phu-de"><div id="phu-de-nen"></div></div>
+  </div>
+  <div id="lon" class="an"><div id="lon-nen"></div><div id="lon-chu"></div></div>
+  <div id="dv" class="an">
+    <div id="dv-nen"></div>
+    <div id="dv-hop"><div id="dv-ke">ĐOÁN NHANH</div><div id="dv-hoi"></div><div id="dv-lc"></div></div>
+    <div id="dv-dem"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="rgba(11,20,24,.85)" stroke="rgba(255,255,255,.12)" stroke-width="9"/><circle class="vong" cx="75" cy="75" r="70" fill="none" stroke="#ffd27a" stroke-width="9" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="0"/></svg><b>5</b></div>
+    <div id="dv-goi">Em chọn trước khi Thầy giải nhé</div>
+  </div>
+  <svg id="dd-defs" width="0" height="0" style="position:absolute"><defs><filter id="dd-sang" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg>
+  <svg id="danh-dau" width="1920" height="1080" style="position:absolute;left:0;top:0;pointer-events:none"></svg>
+  <canvas id="hoa"></canvas>
+  <div id="mo" class="an"><div id="mo-dau-khoi"><div id="mo-ke"></div><div id="mo-ten"></div><div id="mo-gach"></div></div><div id="mo-phu"></div><div id="mo-thay"></div><div id="mo-muc"></div></div>
+  <div id="chuong" class="an"><div id="chuong-noi"><div id="chuong-so"></div><div id="chuong-ke"></div><div id="chuong-ten"></div></div></div>
+  <div id="ket" class="an"><div id="ket-ten"></div><div id="ket-cuoi"></div></div>
+  <div id="hat"></div>
+  <div id="toi-goc"></div>
+  <div id="den"></div>
+</div>
+
+<div id="vao"><div id="vao-hop"><div id="vao-ten">Video tóm tắt</div><div id="vao-phu"></div><div id="vao-tai">Đang tải…</div>
+  <button id="nut-xem" class="an-ui" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Xem</button></div></div>
+<div id="dk" class="an-ui">
+  <button id="dk-phat" class="nut-dk" type="button" aria-label="Phát"></button>
+  <span id="dk-gio">0:00</span>
+  <div id="dk-thanh"><div id="dk-ray"><div id="dk-da"></div></div><div id="dk-vach"></div><input id="dk-tua" type="range" min="0" max="1000" value="0" aria-label="Tua"></div>
+  <button id="dk-toc" class="nut-dk" type="button" aria-label="Tốc độ">1×</button>
+  <button id="dk-muc" class="nut-dk" type="button">Mục lục</button>
+</div>
+<div id="muc" class="an-ui"></div>
+<div id="chon" class="an-ui"><span>Em chạm vào đáp án em chọn</span><button type="button">Bỏ qua</button></div>
+<button id="dong" type="button" aria-label="Đóng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+<div id="xoay">Xoay ngang để xem to hơn</div>
+<div id="bao" class="an-ui"></div>
+<audio id="am" playsinline></audio>
+<script src="khung.js"></script>
+<script src="hoat-hoa.js"></script>
+<script src="hoat-hoa-2.js"></script>
+<script src="xem.js"></script>
+</body>
+</html>

@@ -28,8 +28,10 @@ let KB = null, NET = null, CANH = [], DOAN = []
 // CHẾ ĐỘ (video tóm tắt trong app, 14/11): `trucTiep` = phát trên máy em (bỏ hạt phim hoà trộn toàn màn + bụi phấn trôi — vẽ lại cả lớp nền mỗi khung);
 // `nhe` = máy yếu (thêm: bỏ phát sáng nét phấn, bỏ làm mờ lúc chuyển). Bộ quay video để cả hai TẮT ⇒ video y như trước.
 const _q = new URLSearchParams(location.search)
-const CHE_DO = { trucTiep: _q.has('truc-tiep') || _q.has('nhe'), nhe: _q.has('nhe') }
+const CHE_DO = { trucTiep: _q.has('truc-tiep') || _q.has('nhe') || !/khung\.html$/.test(location.pathname), nhe: _q.has('nhe') }
+try { if (CHE_DO.trucTiep && localStorage.getItem('ddh.mayYeu') === '1') CHE_DO.nhe = true } catch { /* chặn kho máy ⇒ giữ mặc định */ }
 window.CHE_DO = CHE_DO
+document.documentElement.classList.toggle('nhe', CHE_DO.nhe)
 let QUANG = [], BUI = []
 const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
@@ -326,17 +328,45 @@ function nguon(d, t) {
 }
 function camera(d, t) {
   const ks = d.khung; let i = 0; while (i + 1 < ks.length && ks[i + 1].t <= t) i++
-  const truoc = ks[Math.max(0, i - 1)].k, nay = ks[i].k, q = i === 0 ? 1 : eInOut(tien(t, ks[i].t, 1.1))
+  const truoc = ks[Math.max(0, i - 1)].k, nay = ks[i].k, q = i === 0 ? 1 : eInOut(tien(t, ks[i].t, CHE_DO.nhe ? 0.6 : 1.1))
   const c = [0, 1, 2, 3].map((j) => lerp(truoc[j], nay[j], q))
   // đẩy máy chậm vào giữa hai khung (Ken Burns)
-  const den = ks[i + 1] ? ks[i + 1].t : d.t1, z = 1 - 0.045 * eInOut(tien(t, ks[i].t, Math.max(1, den - ks[i].t)))
+  const den = ks[i + 1] ? ks[i + 1].t : d.t1, z = CHE_DO.nhe ? 1 : 1 - 0.045 * eInOut(tien(t, ks[i].t, Math.max(1, den - ks[i].t)))
   const cx = c[0] + c[2] / 2, cy = c[1] + c[3] / 2
   return [cx - (c[2] * z) / 2, cy - (c[3] * z) / 2, c[2] * z, c[3] * z]
+}
+// CHẾ ĐỘ NHẸ: máy quay ĐỨNG YÊN giữa hai khung (không đẩy chậm, chuyển 0,6 s) ⇒ nét đã xong vẽ một lần lên tấm đệm cỡ khung bảng theo đúng góc máy;
+// mỗi khung chỉ dán tấm đệm (không co giãn) + vẽ nét đang viết dở. Máy quay đổi / đổi cảnh / tua lùi ⇒ vẽ lại tấm đệm. Máy khoẻ + bộ quay video: vectơ từng khung như cũ.
+const DEM = { cv: null, c: null, khoa: '', i: 0, s: -1 }
+function napDem(d, s, s0, cx, cy, k) {
+  if (!DEM.cv) { DEM.cv = document.createElement('canvas'); DEM.cv.width = BANG.w; DEM.cv.height = BANG.h; DEM.c = DEM.cv.getContext('2d') }
+  const khoa = `${d.id}|${cx.toFixed(1)}|${cy.toFixed(1)}|${k.toFixed(4)}`
+  if (DEM.khoa !== khoa || s < DEM.s) { DEM.c.setTransform(1, 0, 0, 1, 0, 0); DEM.c.clearRect(0, 0, BANG.w, BANG.h); DEM.khoa = khoa; DEM.i = 0 }
+  const c = DEM.c, net = NET.net, x1 = cx + BANG.w / k, y1 = cy + BANG.h / k
+  c.setTransform(k, 0, 0, k, -cx * k, -cy * k); c.lineCap = 'round'; c.lineJoin = 'round'
+  while (DEM.i < net.length && net[DEM.i].ket <= s) {
+    const n = net[DEM.i++], h = n.hop
+    if (h[2] < cx - 20 || h[0] > x1 + 20 || h[3] < cy - 20 || h[1] > y1 + 20) continue
+    c.globalAlpha = n.ket < s0 ? 0.38 : 1; c.strokeStyle = n.mauVe; c.lineWidth = Math.max(1.6 / k, n.c * 1.05); c.stroke(n.duong)
+  }
+  DEM.s = s
 }
 function veBang(d, t) {
   const s = nguon(d, t) * 1000, s0 = d.cau[0].s0 * 1000 - 2000
   const [cx, cy, cw] = camera(d, t), k = BANG.w / cw
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, BANG.w, BANG.h)
+  if (CHE_DO.nhe) {
+    napDem(d, s, s0, cx, cy, k)
+    ctx.drawImage(DEM.cv, 0, 0)
+    ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k); ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+    for (let i = DEM.i; i < NET.net.length; i++) {
+      const n = NET.net[i]; if (n.t > s) break
+      const da = s - n.t; ctx.globalAlpha = 1; ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05); ctx.beginPath(); let lx = 0, ly = 0
+      for (let j = 0; j < n.p.length; j += 3) { if (n.p[j + 2] > da) break; lx = n.p[j] / 4; ly = n.p[j + 1] / 4; if (j === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly) }
+      ctx.stroke(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(lx, ly, 7 / k, 0, Math.PI * 2); ctx.fill()
+    }
+    return
+  }
   ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k)
   ctx.lineCap = 'round'; ctx.lineJoin = 'round'
   const x1 = cx + cw, y1 = cy + BANG.h / k
