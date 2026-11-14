@@ -1,0 +1,319 @@
+{
+  "hash": "1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405",
+  "native": [
+    802,
+    161
+  ],
+  "questions": [
+    {
+      "qid": "12-C1-B1-D2-II-23",
+      "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau:",
+      "refs": [
+        {
+          "hash": "1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405",
+          "where": "12-C1-B1-D2-II-23.hinh.0.du_lieu",
+          "hashDataUrl": "48ab91a36ae4cf59ce632ce7030544ee9e89d9eda722a007b8691b510b8119ec"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "22bareC2O6CCdouble1COdoubleDOWN2verticalraysBOTHnativeWHITEGAP/HOlastO-ALLregularUPRIGHT/individualnonperiodicvertices-rays-RIGHTfreeUP/0stereo-arrows-caption-nums/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicde/CO6x/FULL/all1publicde.22vertices/6CC/2O. CO gap native row78WHITE; no forced contact. Independently read source445.json; native drift retained; no alias1115. High contrast native serif regular. Background scan flecks not chemical particles/charges. No answers.",
+  "sourceIndependentAudit": {
+    "i": 167,
+    "assetIndex": 271,
+    "hash": "1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405.png",
+    "size": [
+      802,
+      161
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C1-B1-D2-II-23",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau:",
+        "allHinh": [
+          {
+            "hash": "1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405",
+            "where": "12-C1-B1-D2-II-23.hinh.0.du_lieu",
+            "hashDataUrl": "48ab91a36ae4cf59ce632ce7030544ee9e89d9eda722a007b8691b510b8119ec"
+          }
+        ],
+        "missingHashes": [
+          "1ce5ad4bf99d1760a45949902a20d162fcf535907e62120fcb7820f1b8ef7405"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/445-167-full3x.png",
+        "/workspace/scratch/445-167-CO6x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "orderedCarbonVertices": [
+        [
+          99,
+          77
+        ],
+        [
+          132,
+          41
+        ],
+        [
+          158,
+          77
+        ],
+        [
+          192,
+          42
+        ],
+        [
+          226,
+          42
+        ],
+        [
+          254,
+          78
+        ],
+        [
+          287,
+          43
+        ],
+        [
+          322,
+          43
+        ],
+        [
+          349,
+          78
+        ],
+        [
+          382,
+          43
+        ],
+        [
+          416,
+          43
+        ],
+        [
+          442,
+          79
+        ],
+        [
+          475,
+          44
+        ],
+        [
+          509,
+          44
+        ],
+        [
+          536,
+          80
+        ],
+        [
+          570,
+          45
+        ],
+        [
+          605,
+          45
+        ],
+        [
+          632,
+          81
+        ],
+        [
+          666,
+          46
+        ],
+        [
+          700,
+          46
+        ],
+        [
+          727,
+          82
+        ],
+        [
+          762,
+          46
+        ]
+      ],
+      "CCdoubleInnerRays": [
+        [
+          [
+            193,
+            49
+          ],
+          [
+            225,
+            49
+          ]
+        ],
+        [
+          [
+            288,
+            50
+          ],
+          [
+            322,
+            50
+          ]
+        ],
+        [
+          [
+            383,
+            50
+          ],
+          [
+            416,
+            50
+          ]
+        ],
+        [
+          [
+            476,
+            51
+          ],
+          [
+            509,
+            51
+          ]
+        ],
+        [
+          [
+            571,
+            52
+          ],
+          [
+            604,
+            52
+          ]
+        ],
+        [
+          [
+            667,
+            53
+          ],
+          [
+            700,
+            53
+          ]
+        ]
+      ],
+      "HOarm": [
+        [
+          72,
+          43
+        ],
+        [
+          99,
+          77
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            95.5,
+            80
+          ],
+          [
+            95.5,
+            110
+          ]
+        ],
+        [
+          [
+            102,
+            80
+          ],
+          [
+            102,
+            110
+          ]
+        ]
+      ],
+      "carbonylFootAudit": {
+        "apexDarkLastRow": 77,
+        "fullWhiteRow78": true,
+        "firstRayDarkAt79": true,
+        "interpretation": "BothCOdownrays separated from Vcarbonvertex by nativewhitegap, preserve no crossbar/no forced contact. Ray tips y79 faint, useguide80substantialstroke; stroke caps must not bridgewhitegap."
+      },
+      "labels": [
+        {
+          "literal": "HO",
+          "bbox": [
+            35,
+            31,
+            70,
+            50
+          ],
+          "anchor": "last O",
+          "armStart": [
+            72,
+            43
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            91,
+            113,
+            108,
+            131
+          ],
+          "center": [
+            99.5,
+            122
+          ]
+        }
+      ],
+      "counts": {
+        "C": 22,
+        "O": 2,
+        "CCdouble": 6,
+        "COdouble": 1,
+        "explicitHydroxylH": 1,
+        "implicitHydrogenTotal": "not inferred"
+      },
+      "styles": {
+        "chemical": "regular upright serif HO/O, Hstrongserif contrast not enough to callbold; no italic",
+        "bonds": "black scan about1.5–2px; no stereo",
+        "caption": "NONE"
+      },
+      "crop": "No chemical glyph/bond clipped; no topfragment/caption",
+      "background": "Sparse irregular grayscale scan flecks in blank background, no connected chemical marks or particle/radical count inferred"
+    },
+    "measurementLimits": "Every apex/trough read independently from this native, ±1–2px. Source slight top42→46/trough77→82 drift retained; no translation/scaling from1115. COwhitegap independently pixelchecked. Count22fromvertices not DHA name/publicstatement.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "render": "/workspace/scratch/root445-167.png",
+    "macro": "/workspace/scratch/root445-co.png",
+    "hashSvg": "c670df0c7e1bf4f72a5ebcc03233bed2506d224089868480acf5422939e3c317",
+    "imgDecode": [
+      802,
+      161
+    ],
+    "ketQua": "Đạt: 22 đỉnh carbon đọc riêng, 6 CC đôi, CO dưới giữ khoảng trắng, HO neo O cuối, không suy từ tên/không alias1115. No SVG negative found445.",
+    "readonlyProof": "/workspace/scratch/soat-dha167-lo445.json"
+  },
+  "metadataCorrection": "Agent phát hiện root thay162→161 khi đổi dimensions làm sai hash mapping; đã sửa đúng d162 và rerun builder, questions1ref. SVG bytes/SHA unchanged; metadata lỗi không được admit/count.",
+  "readonlyRuntime": {
+    "sha256": "8642c56182ef58f7c00dab8a4407a20486a41e9e382c7cb0573a89d6b42ddd42",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/dha167-native-ddh-c670df0c7e1bf4f72a5ebcc03233bed2506d224089868480acf5422939e3c317.svg c670df0c7e1bf4f72a5ebcc03233bed2506d224089868480acf5422939e3c317\nIMGDECODE [ 802, 161 ]\n167 { x: 0, y: 0, width: 802, height: 161 }\n\nPOSTSHOT_SHA c670df0c7e1bf4f72a5ebcc03233bed2506d224089868480acf5422939e3c317\nCOMMAND node /workspace/scratch/agent-render445.cjs\nCONTEXT correct sourcehashd162/ref12-C1-B1-D2-II-23.hinh.0.du_lieu public de only; no answers; IMGdecode success. Metadata initiallyd161wrongsource/questionsEmpty correctedbyroot, SVGunchanged.\n"
+  }
+}

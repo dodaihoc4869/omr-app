@@ -1,0 +1,32 @@
+{
+  "lo": 445,
+  "main": "d6453489b4479fa2a0c294b1315a8747ad0687ac",
+  "previousMain": "9e50886554ddccbd620cde9983096be80d4ca389",
+  "diffStat": " .claude/skills/video-tom-tat/SKILL.md              |  28 +-\n DIEU-PHOI.md                                       |   2 +\n public/video-bai/hoat-hoa-5.js                     | 147 +++++++++\n public/video-bai/index.html                        |   1 +\n public/video-bai/khung.css                         |  25 ++\n public/video-bai/khung.html                        |   1 +\n scripts/video-bai-giang/do-nhip-truc-tiep.mjs      |   1 +\n scripts/video-bai-giang/dung-kich-ban.mjs          |  15 +-\n scripts/video-bai-giang/hoan-tat-buoi.sh           |  11 +-\n scripts/video-bai-giang/kiem-hoat.mjs              |  63 ++++\n scripts/video-bai-giang/kiem-ten.py                |   6 +-\n scripts/video-bai-giang/thu-trang-xem.mjs          |  24 +-\n .../video-bai-giang/vi-du/mau-tu-do-k10-c2.json    | 356 +++++++++++++++++++++\n 13 files changed, 659 insertions(+), 21 deletions(-)\n",
+  "files": [
+    ".claude/skills/video-tom-tat/SKILL.md",
+    "DIEU-PHOI.md",
+    "public/video-bai/hoat-hoa-5.js",
+    "public/video-bai/index.html",
+    "public/video-bai/khung.css",
+    "public/video-bai/khung.html",
+    "scripts/video-bai-giang/do-nhip-truc-tiep.mjs",
+    "scripts/video-bai-giang/dung-kich-ban.mjs",
+    "scripts/video-bai-giang/hoan-tat-buoi.sh",
+    "scripts/video-bai-giang/kiem-hoat.mjs",
+    "scripts/video-bai-giang/kiem-ten.py",
+    "scripts/video-bai-giang/thu-trang-xem.mjs",
+    "scripts/video-bai-giang/vi-du/mau-tu-do-k10-c2.json"
+  ],
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "13files659insert21delete/publicvideo-scripts-skill-journalchanged/appsrc-server-Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/377 baseline RED; no gate raised.",
+  "ketLuan": "13files659insert21delete/publicvideo-scripts-skill-journalchanged/appsrc-server-Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/377 baseline RED; no gate raised."
+}

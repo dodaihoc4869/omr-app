@@ -1,0 +1,81 @@
+{
+  "lo": 445,
+  "main": "d6453489b4479fa2a0c294b1315a8747ad0687ac",
+  "sourcePngHashPassed": 1078,
+  "svgHashXmlSelfcontainedPassed": 821,
+  "pythonAstPassed": 471,
+  "productionSharedDiffEmpty": true,
+  "build": true,
+  "precacheFiles": 170,
+  "precacheKiB": 2613.23,
+  "speed": "21/21",
+  "sw": "14/14",
+  "serverTsc": true,
+  "chromium": "821/821",
+  "checkmau": true,
+  "sizeBaselineRed": 297644,
+  "colorLatestMainBaselineRed": {
+    "violations": 2011,
+    "checkerFiles": 377
+  },
+  "fullRerun": false,
+  "reason": "Only builders/assets/docs/diagnosticCLI;production shared/font/generator/tests/harness unchanged. Keep full26316/5 and8baseline and2browser26pendingCDN403;latestmainfull/namecomparison requiredbeforemerge-release.",
+  "font": "Lô445 không tạo candidate WOFF/không lặp quét đã negative. Chưa có hướng repair mới đủ cơ sở thiết kế/readability sau277;giữ5uppercaseHOLD,DeẪ269scopedpositiveexactSHA và276DeỖdesignnegative/14pxclip riêng. Bằng chứng pairalignment277 là mô tảthiếtkế,khôngnewnumericgate/globalimpossible/repairpositive. Prod4WOFF2NAamr35100Bnguyênbyte,cốýkhácrawmainfontlỗi;khôngcopyrawmain/adoptpartialfont. Trướcadoptvẫncầnfullatlas/allVN/NFCNFD/CDP/appsizes/lineheight/epsilon/latestmainbuild-speed vàfreshreadonlytừngnative-allrefs-exactSVGnewhash. Giữ phát hiện286δU+03B4thiếu cả4WOFF2 tại1025,F.labeltừchối;giữsource-onlyHOLD/khôngfallback/khôngcount/khôngnewcandidate. Lô430đãpháthiệnnguồn822hash9862acmicro-shapedunit:μU03BCvàµU00B5đềuthiếuALL4WOFF2/strictF.labeltừchối. RasterkhôngphânbiệtUnicode2biếnthể;giữsourceonlyHOLD/noSVG/noCount/khôngLatinureplace-fallback-omit/khôngnewcandidate.",
+  "appIntegrated": false,
+  "actualAppOffline": false,
+  "released": false,
+  "buildLog": {
+    "sha256": "706f1c7c3b39abca263ccc94e25e2d740049d904a9d8d00549cc430fa212dfdc",
+    "tail": "c/components/hoc-tap/HoSoCuaEmHs.tsx, src/components/hoc-tap/HocTapHomNay.tsx, src/components/hoc-tap/ManTuChua.tsx, src/components/hoc-tap/TheMoiTuSua.tsx, src/components/hoc-tap/TrongHs.tsx, ..., dynamic import will not move module into another chunk.\n\n[plugin builtin:vite-reporter] \n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n\u001b[33m[INEFFECTIVE_DYNAMIC_IMPORT] \u001b[0msrc/lib/may-chu-moi.ts is dynamically imported by src/components/chien-dich/ghi-to-chieu.ts, src/lib/exam-db.ts but also statically imported by src/components/BaiNopBtvn.tsx, src/components/KhoiMayChuMoi.tsx, src/components/luyen-de/dung-luyen-de.ts, src/components/phong-cho/DauIon.tsx, src/lib/bai-bo-sung.ts, ..., dynamic import will not move module into another chunk.\n\n\u001b[33m[INEFFECTIVE_DYNAMIC_IMPORT] \u001b[0msrc/lib/dia-chi-may-chu.ts is dynamically imported by src/lib/exam-db.ts but also statically imported by src/AppHocSinh.tsx, src/components/BangVinhDanh.tsx, src/components/KhoiKhacPhuc3CheDo.tsx, src/components/ThongBaoHocSinh.tsx, src/components/bang-nhiem-vu/cau-on-api.ts, ..., dynamic import will not move module into another chunk.\n\n✓ built in 2.38s\n\nPWA v1.3.0\nBuilding src/sw.ts service worker (\"iife\" format)...\nvite v8.2.2 building client environment for production...\ntransforming...\n✓ 88 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/sw.js  26.22 kB │ gzip: 8.83 kB\n\n✓ built in 55ms\n\nPWA v1.3.0\nmode      injectManifest\nformat:   iife\nprecache  170 entries (2613.23 KiB)\nfiles generated\n  dist/sw.js\n"
+  },
+  "speedLog": {
+    "sha256": "d920bacf59c61871f94a54bffef8e5206fd5f1f03eddfabc582bcca9ba28c6b6",
+    "tail": "k/22860\",\"600s/5000=24k/24\",\"600s/5000=24k/24\",\"60s/150=6k/6\",\"300s/100/6000=1k/6\",\"60s/3000=2k/2\",\"5s/4=1k/1\",\"60s/2=1k/1\"],\"khac\":{\"cham.phien\":3,\"cham.cau\":8,\"cham.em\":1,\"cham.bienNhan\":7,\"lap7\":0}}\n\nstdout | tests/san-sang-2710.test.ts > câu cuối chặng ⇒ chuẩn bị nền: Sảnh ≤ 1 đợt, mở chặng ≤ 2 đợt, không phát lại câu vừa làm; cron đêm ⇒ Sảnh đầu ngày ≤ 1 đợt\n[bo-nho] {\"tuoiPhut\":-46147,\"dang\":1,\"dinh\":1,\"soYc\":3,\"heapMb\":126,\"dem\":[\"60s/300/3000000=6k/22860\",\"600s/5000=24k/24\",\"600s/5000=24k/24\",\"60s/150=6k/6\",\"300s/100/6000=1k/6\",\"30s/2000=3k/3\",\"60s/3000=2k/2\",\"5s/4=1k/1\"],\"khac\":{\"cham.phien\":4,\"cham.cau\":13,\"cham.em\":1,\"cham.bienNhan\":7,\"lap7\":0}}\n\n····stdout | tests/toc-do-may-chu-lenh-nong-1310.test.ts > bốn lệnh nóng của học sinh: số đợt chờ D1 không vượt mốc bản trước\n[bo-nho] {\"tuoiPhut\":-47527,\"dang\":1,\"dinh\":1,\"soYc\":1,\"heapMb\":114,\"dem\":[],\"khac\":{\"cham.phien\":0,\"cham.cau\":0,\"cham.em\":0,\"cham.bienNhan\":0,\"lap7\":0}}\n\nstdout | tests/toc-do-may-chu-lenh-nong-1310.test.ts > bốn lệnh nóng của học sinh: số đợt chờ D1 không vượt mốc bản trước\n[bo-nho] {\"tuoiPhut\":-47526,\"dang\":1,\"dinh\":1,\"soYc\":3,\"heapMb\":124,\"dem\":[\"60s/300/3000000=6k/22860\",\"600s/5000=24k/24\",\"600s/5000=24k/24\",\"5s/4=1k/1\",\"60s/3000=1k/1\",\"60s/2=1k/1\",\"30s/2000=1k/1\",\"30s/200=1k/1\"],\"khac\":{\"cham.phien\":1,\"cham.cau\":6,\"cham.em\":1,\"cham.bienNhan\":0,\"lap7\":0}}\n\nstdout | tests/toc-do-may-chu-lenh-nong-1310.test.ts > bốn lệnh nóng của học sinh: số đợt chờ D1 không vượt mốc bản trước\nNhanh hơn mốc — hạ mốc trong docs/moc-toc-do.json:\n  sanh-lan-dau: 12 đợt / 20 lệnh (mốc 12 / 25)\n  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  21 passed (21)\n   Start at  13:37:10\n   Duration  6.01s (transform 10.77s, setup 751ms, import 13.25s, tests 2.56s, environment 0ms)\n\n"
+  },
+  "swLog": {
+    "sha256": "9ec46fe8d6ba4654306f03f3f3a1b160ea5ce93144057654b1fc4c4175ae852d",
+    "tail": "  ✓  danh sách tệp đã được chèn và đủ đóng khởi động ba cổng\n  ✓  dạng IIFE, không phải ES module\n  ✓  có đường lui ra mạng cho lượt điều hướng\n  ✓  có đường lui cuối vào CacheStorage\n  ✓  trang app là index.html\n  ✓  chiếm quyền ngay\n  ✓  KHÔNG tự gỡ đăng ký service worker\n  ✓  KHÔNG xoá sạch CacheStorage\n  ✓  KHÔNG ép tab đang mở điều hướng lại\n  ✓  precache nhỏ (170 tệp / 2794 KB; trần 170 tệp / 3000 KB)\n  ✓  có kho chạy-lúc cho mảnh ngoài precache\n  ✓  kho chạy-lúc KHÔNG cất trang HTML dưới tên mảnh\n  ✓  kho tải ngầm học sinh chỉ ghi tệp có thật (202 mục)\n  ✓  có chốt tự sửa khi app trắng màn\nKẾT LUẬN SERVICE WORKER: ĐẠT  14/14\n"
+  },
+  "serverLog": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": ""
+  },
+  "checkmauLog": {
+    "sha256": "9c404626b4a8464e8e262094548224072a3da29d6ec61b36a2339b08e700bd70",
+    "tail": "\n> omr-app@0.0.0 check:mau\n> node scripts/check-mau.mjs\n\n✅ Không có mã màu # nào ngoài src/styles/tokens.css\n"
+  },
+  "mauLog": {
+    "sha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+    "tail": "-bai.css · box-shadow: inset 0 0 0 2px var(--tr-dung-nut), 0 4px 0 var(--tr-dung-nut) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: inset 0 0 0 2px var(--tr-sai), 0 4px 0 var(--tr-sai) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: 0 5px 0 var(--tr-dung-day) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: 0 5px 0 var(--tr-sai-day) · giảm 2\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: 0 5px 0 var(--tr-tin-day) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: inset 0 0 0 2px var(--tr-sao), 0 5px 0 var(--tr-sao-day) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · background: color-mix(in oklab, var(--tr-mat) 55%, transparent) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-lam-bai.css · box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 6px 18px -16px var(--tr-phu) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · background: var(--tr-mat) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · color: var(--tr-sai-chu) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · background: var(--tr-chinh-nhat) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · color: var(--tr-chinh-chu) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · color: var(--tr-dung-chu) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong-quan-ly-theo-doi.css · background: var(--tr-sai-nhat) · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong.css · --tr-mat-2: #263840 · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong.css · --tr-vien-2: #52656d · giảm 1\n  ĐỔI/XOÁ màu đang có · src/styles/trong.css · --tr-chu: #f1f7fb · giảm 1\n"
+  },
+  "cotepLog": {
+    "sha256": "43ebaccb91ef9781c4c9989749504e546b5e947dc91a3aeddad374b69b4fda06",
+    "tail": "\n> omr-app@0.0.0 kiem:co-tep\n> node scripts/kiem-co-tep.mjs\n\n✗ server/src/index.ts: 297644 B > mốc 295021 B + 2048 B — tách bớt sang tệp khác rồi mới đẩy\nkiem-co-tep: 1 tệp vượt (ngưỡng 60 KB, dư 2 KB trên mốc).\n"
+  },
+  "browserLog": {
+    "sha256": "195082bb17c97007e2ec29ef1496c87cd77a4be1b2835cf55507bc10bd7b92eb",
+    "tail": "{\n  svgRieng: 821,\n  daGiaiMa: 821,\n  loiJs: [],\n  offlineDocByteCucBo: true,\n  khung360Va1080KhongTran: true,\n  gioiHan: 'Trang kiểm tài sản SVG, chưa phải kiểm service worker/tải sẵn/reload offline trong app học sinh.'\n}\n"
+  },
+  "speed269Historical": {
+    "firstRedGv": 182835,
+    "repeatPassGv": 182804,
+    "baseline": 182769,
+    "allowedDelta": 64
+  },
+  "speed425FirstRedRepeatPassProof": "toc-do-lo-425-first-red-repeat-pass.json",
+  "speed425Limits": "First182839delta70RED64; oneboundedrepeatSAMEHEAD182819delta50PASS21/21. Bothrawlogs retained; noallflaky/noharnessmocappchange/noCausalClaim.",
+  "rootReview445": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "render": "/workspace/scratch/root445-167.png",
+    "macro": "/workspace/scratch/root445-co.png",
+    "hashSvg": "c670df0c7e1bf4f72a5ebcc03233bed2506d224089868480acf5422939e3c317",
+    "imgDecode": [
+      802,
+      161
+    ],
+    "ketQua": "Đạt: 22 đỉnh carbon đọc riêng, 6 CC đôi, CO dưới giữ khoảng trắng, HO neo O cuối, không suy từ tên/không alias1115. No SVG negative found445.",
+    "readonlyProof": "/workspace/scratch/soat-dha167-lo445.json",
+    "negativeHistory": "Không SVG negative found445; native independently read, no alias1115."
+  }
+}
