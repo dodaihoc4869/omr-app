@@ -3,7 +3,7 @@
 // khoá kế hoạch truy vấn (lệnh lập kế hoạch không còn chạm bảng cạnh từng em khi bảng cộng sẵn đã dựng).
 import { describe, it, expect } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { SQL_CANH_LOP_CU, SQL_CANH_LOP_DOC, docCanhLopMotLuot, dungCanhLopNeuCu, HAN_DUNG_CANH_LOP_MS, chuKyDungCanhLop, SQL_DUNG_CANH_LOP } from '../server/src/hanh-trinh-canh-lop'
+import { SQL_CANH_LOP_CU, SQL_CANH_LOP_DOC, SQL_CANH_LOP_DOC_1211, docCanhLopMotLuot, dungCanhLopNeuCu, HAN_DUNG_CANH_LOP_MS, chuKyDungCanhLop, SQL_DUNG_CANH_LOP } from '../server/src/hanh-trinh-canh-lop'
 import { canhDangHoc, CANH_HOC_TOI_THIEU, type CanhHoc } from '../server/src/do-thi-tien-quyet'
 
 const NGAY = 86_400_000
@@ -98,13 +98,32 @@ describe('cạnh tiên quyết cả lớp cộng sẵn (G1 12/11)', () => {
     expect(chuKyDungCanhLop(Date.UTC(2026, 10, 12, 3, 0, 0))).toBe(7_200_000) // 10:00 VN
   })
 
+  it('14/11 bảng gộp theo den: đọc y hệt nhánh cạnh từng dòng; bảng gộp rỗng (vừa phát hành) ⇒ nhánh cạnh từng dòng; bảng gộp chưa có ⇒ câu 12/11', async () => {
+    const d = taoD1That(); napDuLieu(d.sql)
+    await dungCanhLopNeuCu(d.env, T)
+    expect((d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v4_canh_lop_den').get() as { n: number }).n).toBeGreaterThan(0)
+    const gop = await docCanhLopMotLuot(d.env, DENS, T + 1000, 0)
+    const tungDong = (d.sql.prepare(SQL_CANH_LOP_DOC_1211).all(JSON.stringify(DENS), T + 1000 - HAN_DUNG_CANH_LOP_MS, 0) as ({ nguon: number } & CanhHoc)[]).filter((x) => x.nguon === 1).map(({ nguon: _, ...c }) => c)
+    expect(gop.tong).toBe(true)
+    expect(sap(gop.ds)).toEqual(sap(tungDong))
+    d.sql.exec('DELETE FROM hanh_trinh_v4_canh_lop_den')
+    const rong = await docCanhLopMotLuot(d.env, DENS, T + 1000, 0)
+    expect(sap(rong.ds)).toEqual(sap(tungDong))
+    d.sql.exec('DROP TABLE hanh_trinh_v4_canh_lop_den')
+    const mat = await docCanhLopMotLuot(d.env, DENS, T + 1000, 0)
+    expect(mat.tong).toBe(true)
+    expect(sap(mat.ds)).toEqual(sap(tungDong))
+  })
+
   it('kế hoạch truy vấn: nhánh cộng sẵn SEARCH theo khoá chính (den,tu); dòng mốc theo khoá chính; không SCAN bảng nào', () => {
     const d = taoD1That()
     expect(SQL_CANH_LOP_DOC).toMatch(/^SELECT\b/) // lớp gộp đọc theo lượt chỉ coi câu SELECT là câu đọc (WITH ⇒ bị coi là ghi, thêm một đợt chờ)
     const ke = keHoach(d.sql, SQL_CANH_LOP_DOC)
     expect(ke.some((x) => /^SEARCH hanh_trinh_v4_canh_lop USING (COVERING )?INDEX sqlite_autoindex_hanh_trinh_v4_canh_lop_1 \(den=\?\)/.test(x))).toBe(true)
     expect(ke.some((x) => /SEARCH hanh_trinh_v4_canh_lop_moc USING INTEGER PRIMARY KEY/.test(x))).toBe(true)
-    expect(ke.filter((x) => /^SCAN /.test(x) && !/json_each/.test(x))).toEqual([])
+    // 14/11: nhánh gộp theo den dò khoá chính; phép «bảng gộp đã có dòng chưa» chỉ đọc tối đa MỘT dòng (SQLite ghi SCAN cho EXISTS không điều kiện).
+    expect(ke.some((x) => /SEARCH hanh_trinh_v4_canh_lop_den USING INDEX sqlite_autoindex_hanh_trinh_v4_canh_lop_den_1 \(den=\?\)/.test(x))).toBe(true)
+    expect(ke.filter((x) => /^SCAN /.test(x) && !/json_each/.test(x) && !/^SCAN hanh_trinh_v4_canh_lop_den( USING COVERING INDEX \w+)?$/.test(x))).toEqual([])
     // Nhánh câu cũ (chỉ chạy khi chưa dựng) vẫn đi chỉ mục theo den như trước.
     expect(ke.some((x) => /SEARCH hanh_trinh_v4_canh USING (COVERING )?INDEX hanh_trinh_v4_canh_den/.test(x))).toBe(true)
   })
