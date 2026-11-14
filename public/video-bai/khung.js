@@ -162,6 +162,8 @@ function dungCanh() {
       const sauTieuDe = d.the.findIndex((x) => x.su.loai !== 'tieu-de')
       d.the.splice(sauTieuDe < 0 ? d.the.length : sauTieuDe, 0, { el, su: { loai: 'hoat' }, t: d.t0 - 0.2, coDinh: true })
     }
+    // Máy em chưa có mô-đun hoạt hoạ của cảnh (kịch bản mới hơn app đang chạy) ⇒ KHÔNG để cột minh hoạ trống: bảng to cả cảnh (thầy 14/11 «nếu ko có thì để full bảng»).
+    if (d.hoat && !HOAT[d.hoat.loai] && d.cheDo) d.cheDo = d.cheDo.map((k) => ({ ...k, p: 1 }))
     d.lon = d.su.filter((s) => s.loai === 'lon')
     // phụ đề: mỗi câu một dòng, mỗi chữ một ô
     // PHỤ ĐỀ CỤM (kịch bản có d.phuDe — thầy 14/11 «phụ đề siêu cuốn»): mỗi lần một cụm ngắn ≤ 2 dòng, chữ bật lên theo nhịp nói, từ khoá nảy mạnh, con số
