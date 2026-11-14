@@ -19,7 +19,7 @@ if [ ! -x "$CC/wv/bin/python" ]; then python3 -m venv "$CC/wv" && "$CC/wv/bin/pi
 if [ ! -f "$CC/pho-medium/model.bin" ]; then
   HF_HUB_DISABLE_TELEMETRY=1 "$CC/wv/bin/python" -c "from huggingface_hub import snapshot_download; snapshot_download('mad1999/pho-whisper-medium-ct2', local_dir='$CC/pho-medium')"
 fi
-command -v fluidsynth >/dev/null && [ -f /usr/share/sounds/sf2/FluidR3_GM.sf2 ] || { (apt-get install -y -q fluidsynth fluid-soundfont-gm >/dev/null 2>&1 || sudo apt-get install -y -q fluidsynth fluid-soundfont-gm >/dev/null 2>&1) || echo "CẢNH BÁO: chưa cài được fluidsynth (nhạc nền)"; }
+command -v fluidsynth >/dev/null && [ -f /usr/share/sounds/sf2/FluidR3_GM.sf2 ] || { ( (apt-get update -q && apt-get install -y -q fluidsynth fluid-soundfont-gm) >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q fluidsynth fluid-soundfont-gm) >/dev/null 2>&1) || echo "CẢNH BÁO: chưa cài được fluidsynth (nhạc nền)"; }
 [ -d "$REPO/node_modules" ] || (cd "$REPO" && npm ci --silent)
 "$CC/wv/bin/python" -c "import numpy" 2>/dev/null || "$CC/wv/bin/pip" install -q numpy
 
