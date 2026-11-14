@@ -703,6 +703,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457": {
+      "tep": "metenkefalin804-native-ddh-b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c.svg",
+      "hashSvg": "b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c",
+      "byteSvg": 12478,
+      "byteGzip": 1742,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "d724c0472331486f2d8cd729949a2500e3a0aef465fb1aa49d28839bcfb0e3df": {
       "tep": "tinh-bot-ddh-08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a.svg",
       "hashSvg": "08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a",
@@ -15867,6 +15876,20 @@
       ]
     },
     {
+      "qid": "12-KT-C1234-D2-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+          "where": "12-KT-C1234-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b",
+          "vector": "metenkefalin804-native-ddh-b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D4-I-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -24071,6 +24094,20 @@
           "where": "DB-12-B9-P2-D1-I-111.hinh.0.du_lieu",
           "hashDataUrl": "61f5f2d6a1e6083d3e4769d1fb1abf822e8aef300a4626bf27f7f6ec1db0ac96",
           "vector": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P2-D1-II-116",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+          "where": "DB-12-B9-P2-D1-II-116.hinh.0.du_lieu",
+          "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b",
+          "vector": "metenkefalin804-native-ddh-b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c.svg"
         }
       ]
     },
@@ -32800,6 +32837,7 @@
     "12-KT-C1234-D2-I-2",
     "12-KT-C1234-D2-I-5",
     "12-KT-C1234-D2-II-2",
+    "12-KT-C1234-D2-II-3",
     "12-KT-C2-D4-I-3",
     "12-KT-C2-D4-I-5",
     "12-KT-C2-D4-I-8",
@@ -33323,6 +33361,7 @@
     "DB-12-B9-P2-D1-III-106",
     "DB-12-B9-P2-D1-II-110",
     "DB-12-B9-P2-D1-I-111",
+    "DB-12-B9-P2-D1-II-116",
     "DB-12-B9-P2-D1-III-123",
     "DB-12-B9-P2-D1-I-124",
     "DB-12-B9-P2-D1-I-129",

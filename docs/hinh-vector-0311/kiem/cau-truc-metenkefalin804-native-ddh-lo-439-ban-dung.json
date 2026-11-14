@@ -1,0 +1,40 @@
+[
+  {
+    "i": 804,
+    "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+    "fileNguon": "anh/958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457.png",
+    "svg": "metenkefalin804-native-ddh-b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c.svg",
+    "hashSvg": "b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c",
+    "byteSvg": 12478,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D2-II-3",
+        "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+        "refs": [
+          {
+            "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+            "where": "12-KT-C1234-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-II-116",
+        "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+        "refs": [
+          {
+            "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+            "where": "DB-12-B9-P2-D1-II-116.hinh.0.du_lieu",
+            "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "27C5N7O1S/2Ph6innerCCdouble5COdouble-contact/3individualSOLIDwedges/4NHseparateH-NOdrawnNHstroke/1NH2FIRSTN-HOlastO-OHfirstO/ALLregularUPRIGHT/individualnonperiodicvertices/0arrows-captions-charges/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

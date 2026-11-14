@@ -1,0 +1,719 @@
+{
+  "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+  "native": [
+    807,
+    281
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C1234-D2-II-3",
+      "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+      "refs": [
+        {
+          "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+          "where": "12-KT-C1234-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P2-D1-II-116",
+      "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+      "refs": [
+        {
+          "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+          "where": "DB-12-B9-P2-D1-II-116.hinh.0.du_lieu",
+          "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "27C5N7O1S/2Ph6innerCCdouble5COdouble-contact/3individualSOLIDwedges/4NHseparateH-NOdrawnNHstroke/1NH2FIRSTN-HOlastO-OHfirstO/ALLregularUPRIGHT/individualnonperiodicvertices/0arrows-captions-charges/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+  "independentSourceAudit": {
+    "i": 804,
+    "assetIndex": 619,
+    "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457.png",
+    "size": [
+      807,
+      281
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C1234-D2-II-3",
+        "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+        "allHinh": [
+          {
+            "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+            "where": "12-KT-C1234-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+          }
+        ],
+        "missingHashes": [
+          "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-II-116",
+        "de": "Metenkefalin là một peptide giảm đau nội sinh tự nhiên, có tác dụng trong thời gian tương đối ngắn.\nCông thức cấu tạo của metenkefalin như hình dưới.",
+        "allHinh": [
+          {
+            "hash": "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457",
+            "where": "DB-12-B9-P2-D1-II-116.hinh.0.du_lieu",
+            "hashDataUrl": "23468bf11b953fa186c1a5119de99835066a221269bb7f94f4350e07c70d691b"
+          }
+        ],
+        "missingHashes": [
+          "958879717d75ab58834aa2708e51bd34f3f462520127b3f0f7f98c3a6ba18457"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 2,
+      "allAffectedQuestionsOnlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/439-804-full3x.png",
+        "/workspace/scratch/439-804-left.png",
+        "/workspace/scratch/439-804-mid.png",
+        "/workspace/scratch/439-804-right.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "leftRing": {
+        "vertices": [
+          [
+            106,
+            174
+          ],
+          [
+            138,
+            156
+          ],
+          [
+            171,
+            174
+          ],
+          [
+            171,
+            210
+          ],
+          [
+            138,
+            228
+          ],
+          [
+            106,
+            210
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              113,
+              178
+            ],
+            [
+              113,
+              207
+            ]
+          ],
+          [
+            [
+              139,
+              164
+            ],
+            [
+              164,
+              179
+            ]
+          ],
+          [
+            [
+              139,
+              220
+            ],
+            [
+              164,
+              205
+            ]
+          ]
+        ]
+      },
+      "rightRing": {
+        "vertices": [
+          [
+            565,
+            65
+          ],
+          [
+            597,
+            47
+          ],
+          [
+            630,
+            65
+          ],
+          [
+            630,
+            101
+          ],
+          [
+            597,
+            119
+          ],
+          [
+            565,
+            101
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              572,
+              69
+            ],
+            [
+              597,
+              54
+            ]
+          ],
+          [
+            [
+              623,
+              69
+            ],
+            [
+              623,
+              97
+            ]
+          ],
+          [
+            [
+              572,
+              97
+            ],
+            [
+              597,
+              112
+            ]
+          ]
+        ]
+      },
+      "backboneIndividualPaths": [
+        [
+          [
+            171,
+            174
+          ],
+          [
+            204,
+            156
+          ],
+          [
+            237,
+            174
+          ],
+          [
+            269,
+            156
+          ],
+          [
+            289,
+            167
+          ]
+        ],
+        [
+          [
+            316,
+            166
+          ],
+          [
+            334,
+            156
+          ],
+          [
+            367,
+            174
+          ],
+          [
+            387,
+            164
+          ]
+        ],
+        [
+          [
+            414,
+            165
+          ],
+          [
+            433,
+            174
+          ],
+          [
+            466,
+            156
+          ],
+          [
+            486,
+            166
+          ]
+        ],
+        [
+          [
+            513,
+            165
+          ],
+          [
+            532,
+            156
+          ],
+          [
+            565,
+            174
+          ],
+          [
+            585,
+            164
+          ]
+        ],
+        [
+          [
+            612,
+            165
+          ],
+          [
+            630,
+            174
+          ],
+          [
+            663,
+            156
+          ],
+          [
+            696,
+            174
+          ],
+          [
+            716,
+            164
+          ]
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            267,
+            157
+          ],
+          [
+            267,
+            133
+          ]
+        ],
+        [
+          [
+            273,
+            158
+          ],
+          [
+            273,
+            133
+          ]
+        ],
+        [
+          [
+            365,
+            174
+          ],
+          [
+            365,
+            196
+          ]
+        ],
+        [
+          [
+            371,
+            175
+          ],
+          [
+            371,
+            196
+          ]
+        ],
+        [
+          [
+            463,
+            157
+          ],
+          [
+            463,
+            133
+          ]
+        ],
+        [
+          [
+            470,
+            158
+          ],
+          [
+            470,
+            133
+          ]
+        ],
+        [
+          [
+            562,
+            174
+          ],
+          [
+            562,
+            196
+          ]
+        ],
+        [
+          [
+            568,
+            175
+          ],
+          [
+            568,
+            196
+          ]
+        ],
+        [
+          [
+            628,
+            208
+          ],
+          [
+            608,
+            220
+          ]
+        ],
+        [
+          [
+            632,
+            214
+          ],
+          [
+            611,
+            226
+          ]
+        ]
+      ],
+      "COfootNotes": [
+        "first pair joins distinct left/right slopes near apex269156; no horizontalbridge added",
+        "second down pair joins distinct arms365/371 around367174",
+        "third pair distinct arm contacts463/470 around466156",
+        "fourth down pair contacts562/568 around565174",
+        "last diagonal pair one foot on leftincoming wedge-apex flank628208, other on outgoingOHarm632214; no verticalbridge"
+      ],
+      "solidWedges": [
+        {
+          "tip": [
+            237,
+            174
+          ],
+          "broadFeet": [
+            [
+              234,
+              196
+            ],
+            [
+              241,
+              196
+            ]
+          ],
+          "connects": "NH₂ firstN"
+        },
+        {
+          "tip": [
+            532,
+            156
+          ],
+          "broadFeet": [
+            [
+              529,
+              120
+            ],
+            [
+              536,
+              116
+            ]
+          ],
+          "connects": "bareCH2upper leading phenyl"
+        },
+        {
+          "tip": [
+            630,
+            174
+          ],
+          "broadFeet": [
+            [
+              627,
+              207
+            ],
+            [
+              634,
+              211
+            ]
+          ],
+          "connects": "bareCOOHcarbon lower"
+        }
+      ],
+      "additionalBonds": [
+        [
+          [
+            86,
+            220
+          ],
+          [
+            106,
+            210
+          ]
+        ],
+        [
+          [
+            533,
+            119
+          ],
+          [
+            565,
+            101
+          ]
+        ],
+        [
+          [
+            630,
+            210
+          ],
+          [
+            650,
+            222
+          ]
+        ],
+        [
+          [
+            740,
+            164
+          ],
+          [
+            761,
+            175
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "literal": "HO",
+          "bbox": [
+            44,
+            219,
+            83,
+            240
+          ],
+          "anchor": "last O"
+        },
+        {
+          "literal": "NH₂",
+          "bbox": [
+            228,
+            201,
+            276,
+            224
+          ],
+          "anchor": "first N"
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            260,
+            110,
+            280,
+            130
+          ]
+        },
+        {
+          "literal": "N",
+          "bbox": [
+            294,
+            165,
+            313,
+            184
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            294,
+            186,
+            313,
+            205
+          ],
+          "separateNoBond": true
+        },
+        {
+          "literal": "N",
+          "bbox": [
+            392,
+            147,
+            412,
+            165
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            392,
+            125,
+            412,
+            144
+          ],
+          "separateNoBond": true
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            358,
+            200,
+            378,
+            221
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            457,
+            110,
+            477,
+            130
+          ]
+        },
+        {
+          "literal": "N",
+          "bbox": [
+            491,
+            165,
+            510,
+            184
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            491,
+            186,
+            510,
+            205
+          ],
+          "separateNoBond": true
+        },
+        {
+          "literal": "N",
+          "bbox": [
+            589,
+            147,
+            609,
+            165
+          ]
+        },
+        {
+          "literal": "H",
+          "bbox": [
+            589,
+            125,
+            609,
+            144
+          ],
+          "separateNoBond": true
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            556,
+            200,
+            576,
+            221
+          ]
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            588,
+            219,
+            608,
+            240
+          ]
+        },
+        {
+          "literal": "OH",
+          "bbox": [
+            652,
+            219,
+            691,
+            240
+          ],
+          "anchor": "first O"
+        },
+        {
+          "literal": "S",
+          "bbox": [
+            720,
+            147,
+            738,
+            165
+          ]
+        }
+      ],
+      "counts": {
+        "C": 27,
+        "N": 5,
+        "O": 7,
+        "S": 1,
+        "COdouble": 5,
+        "phenylRings": 2,
+        "aromaticInnerDoubles": 6,
+        "solidWedges": 3,
+        "NHseparateGroups": 4,
+        "NH2groups": 1,
+        "explanation": "backbone5alpha+5CO=10C; two rings12C; two ring-sideCH2=2C; Ssidechain2CH2+terminalCH3=3C =>27C. No implicit totalH inferred."
+      },
+      "styles": {
+        "labels": "regular upright sans all chemical atoms; no truebold/italic observed",
+        "bonds": "black uniform thin about1.2–1.5px apart from three filled triangles",
+        "captions": "NONE"
+      },
+      "crop": "No clipped chemical glyph/branch; all molecule within canvas"
+    },
+    "measurementLimits": "Nativeapprox ±1–2px each path/vertex/ray separately. Solidwedge feet individually native slanted or horizontal, NOT generic verticalfoot template. Four H labels sit separately above/below N WITHOUT N-H drawn stroke. NH2 is one condensed token. No theory stereodescriptors inferred.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "RootOWNnativeFULL3x/all2publicde/left-mid-right-top5x/CO2-CO4-CO5own12x. Count27C=12ring+5alpha+5CO+2ring-side+3S-side. 5N7O1S/4NHseparateH without drawnN-Hstroke/1NH2/3SOLIDwedges individualslantedfeet. ALLregularUPRIGHT. No answers. Sourceagentfeet CO2right371175 andCO4right568175 belowarms corrected BEFOREfirstbuilder to shortroundedjoins365173Q368175371173 and562173Q565175568173 nativeownmacros; CO5rightfoot extended sameangle to OHarm intersection634.390244,212.634146 CALCULATEDfromapproxarmsNOTnativeSubpixel. No forcedcrossbar at otherCO. Nativegeometry approximation not exactpixel reproduction.",
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicRefsRead": [
+      "12-KT-C1234-D2-II-3.hinh.0.du_lieu",
+      "DB-12-B9-P2-D1-II-116.hinh.0.du_lieu"
+    ],
+    "freshChromium3xFull": "/workspace/scratch/root439-804.png",
+    "macrosOpened": [
+      "/workspace/scratch/root439-left.png",
+      "/workspace/scratch/root439-mid.png",
+      "/workspace/scratch/root439-right.png",
+      "/workspace/scratch/root439-top.png"
+    ],
+    "hashSvg": "b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c",
+    "verdict": "Đạt root nativeALL2de/freshFULL3x/macros.27C5N7O1S/2Ph6innerCC/5COcontact/3individualsolidwedges/4NHseparateHwithoutNHbond/1NH2firstN-HOlastO-OHfirstO/ALLregularupright/noaddedH-caption-name-answer. Vertical N-H ink gaps visible; no collision/crop. SourceguidesfeetcorrectedBEFOREbuilder, noSVGnegativefound439."
+  },
+  "readonlyRuntime": {
+    "sha256": "bae003b7562d9f30eb1d47cdefd568d5466d064a818496bf95e639c1c8b8d823",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/metenkefalin804-native-ddh-b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c.svg b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c\nIMGDECODE [ 807, 281 ]\n804 { x: 0, y: 0, width: 807, height: 281 }\n\nPOSTSHOT_SHA b3d0d230346f50828c2eb9813891acdd5b3f7822682f1c7147adc6d2972bc46c\nCOMMAND node /workspace/scratch/agent-render439.cjs\nCONTEXT all2publicde-refs12-KT-C1234-D2-II-3/DB-12-B9-P2-D1-II-116 only, no answers; actual IMG.decode success.\n"
+  }
+}
