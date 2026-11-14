@@ -174,7 +174,7 @@ for (const cc of ch.canh) {
   // sự kiện hiện thẻ / điểm nhấn / phân tử theo đầu câu
   const dauCau = (i) => canh.cau.find((x) => x.i === i)
   // LỘ ĐÁP ÁN đúng lúc Thầy nói chữ cuối câu ("…là 4a"): đáy đoạn giọng cuối của câu − 0,55 s
-  if (canh.doVui) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t1 - 0.55; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
+  if (canh.doVui && cc.doVui.moLuc == null) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t1 - 0.55; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
   const moc = (dong, frac) => { const q = dauCau(dong); return q ? q.t0 + (frac != null ? frac * (q.t1 - q.t0) : 0.35) : null }
   // GIỜ TỪNG CHỮ của phụ đề từ lời nguyên văn (gióng hàng khop-loi.mjs)
   if (AM_ASR) for (const q of canh.cau) {
@@ -252,7 +252,9 @@ for (const cc of ch.canh) {
     if (v && typeof v === 'object' && 's' in v) return raGioCanh(v.s) + (v.lech ?? 0)
     return null
   }
-  for (const s of cc.su ?? []) { const tt = moc(s.dong, s.frac); if (tt == null) continue; canh.su.push({ ...s, t: tt }); sfx.push({ t: tt, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
+  // lộ đáp án đố vui đúng lúc Thầy NÓI đáp số (moLuc: mốc lời) thay vì cuối câu
+  if (canh.doVui && cc.doVui.moLuc != null) { canh.doVui.tMo = mocTu(cc.doVui.moLuc); sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
+  for (const s of cc.su ?? []) { const tt = s.luc != null ? mocTu(s.luc) : moc(s.dong, s.frac); if (tt == null) continue; canh.su.push({ ...s, t: tt }); sfx.push({ t: tt, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
   // HOẠT HOẠ chi tiết của cảnh: mốc = [câu, phần trăm độ dài câu] ⇒ giây trên video
   if (cc.hoat) {
     canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, p: cc.hoat.p, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, v]) => [k, mocTu(v)])) }
@@ -272,6 +274,8 @@ for (const cc of ch.canh) {
   // KHOANH TRÊN BẢNG: vùng nét Thầy viết trong câu ⇒ viền phát sáng + đường nối tới hình minh hoạ
   canh.danhDau = []
   for (const dd of cc.danhDau ?? []) {
+    // vùng khoanh cho sẵn (neo: [x0, y0, x1, y1] toạ độ bảng) + mốc lời (luc) — dùng khi chuyển cấu hình cũ sang lời riêng
+    if (dd.neo && dd.luc != null) { const t0 = mocTu(dd.luc) + (dd.lech ?? 0); if (t0 != null) { canh.danhDau.push({ t0, t1: t0 + (dd.dai ?? 2.4), neo: dd.neo, toi: dd.toi }); sfx.push({ t: t0, loai: 've' }) } continue }
     // khoanh theo GIỜ VIẾT (tuS…denS trên tiếng gốc): vùng đúng các nét Thầy viết trong khoảng ấy, hiện ngay khi viết xong vế đó
     if (dd.tuS != null) {
       const h = hopNet(dd.tuS - 0.05, dd.denS); if (!h) continue
@@ -291,7 +295,7 @@ for (const cc of ch.canh) {
     sfx.push({ t: t0, loai: 've' })
   }
   for (const i of cc.nhan ?? []) { const q = dauCau(i); if (q) canh.nhanManh.push({ t0: q.t0, t1: q.t1 }) }
-  if (cc.phanTu) { canh.phanTu = Object.fromEntries(Object.entries(cc.phanTu).map(([k, i]) => [k, dauCau(i).t0 + 0.4])); for (const k of ['hien', 'matOH', 'matH']) sfx.push({ t: canh.phanTu[k], loai: 'bop' }); sfx.push({ t: canh.phanTu.noi + 0.9, loai: 'dap' }, { t: canh.phanTu.nuoc + 1.2, loai: 'bot' }) }
+  if (cc.phanTu) { canh.phanTu = Object.fromEntries(Object.entries(cc.phanTu).map(([k, i]) => [k, typeof i === 'number' ? dauCau(i).t0 + 0.4 : mocTu(i)])); for (const k of ['hien', 'matOH', 'matH']) sfx.push({ t: canh.phanTu[k], loai: 'bop' }); sfx.push({ t: canh.phanTu.noi + 0.9, loai: 'dap' }, { t: canh.phanTu.nuoc + 1.2, loai: 'bot' }) }
   // khung máy quay: theo nét Thầy viết quanh từng câu; câu không viết ⇒ giữ khung trước
   const hopCanh = hopNet(canh.cau[0].s0 - 25, canh.cau[canh.cau.length - 1].s1) ?? hopNet(canh.cau[0].s0 - 120, canh.cau[0].s0)
   let kTruoc = hopCanh ? khungQuay(hopCanh) : [0, 0, BANG_W, BANG_W / KHUNG_TI]

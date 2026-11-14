@@ -10,7 +10,7 @@ const MAU = [ // [các cách máy nghe ra (đã thường hoá), âm chuẩn]
   [['g li', 'gờ li', 'gi li', 'gli', 'gly'], 'gly'], [['a la', 'ala'], 'ala'], [['ba giờ', 'ba zơ', 'bazơ', 'bazo', 'base'], 'base'], [['axit', 'a xít', 'acid'], 'acid'],
   [['blue stress', 'bờ ron stết', 'brønsted', 'bronsted'], 'bronsted'], [['hát cờ lờ', 'hcl'], 'hcl'],
   [['bảy mươi lăm', 'bảy năm', '75'], '75'], [['hai mươi ba', 'hai ba', '23'], '23'], [['hai mươi hai', 'hai hai', '22'], '22'], [['tám mươi chín', '89'], '89'],
-  [['ba a'], '3a'], [['n à', 'n a', 'na'], 'na'], [['cờ'], 'c'], [['nờ'], 'n'], [['mờ'], 'm'], [['hát'], 'h'], [['pép tít', 'pep tít', 'peptide'], 'peptide'],
+  [['ba a'], '3a'], [['ly sin', 'li sin', 'lisin', 'lysine', 'lys'], 'lys'], [['ni tơ', 'nitơ', 'nitrogen'], 'nitrogen'], [['gờ lu', 'glu'], 'glu'], [['va lin', 'valin', 'val'], 'val'], [['bốn a'], '4a'], [['năm a'], '5a'], [['hai a'], '2a'], [['n à', 'n a', 'na'], 'na'], [['cờ'], 'c'], [['nờ'], 'n'], [['mờ'], 'm'], [['hát'], 'h'], [['pép tít', 'pep tít', 'peptide'], 'peptide'],
 ].map(([ds, chuan]) => [ds.map((x) => x.split(' ')), chuan]).sort((a, b) => Math.max(...b[0].map((x) => x.length)) - Math.max(...a[0].map((x) => x.length)))
 const thuong = (w) => w.toLowerCase().normalize('NFC').replace(/[.,:;!?()«»"…]/g, '')
 /** Lời nguyên văn [[giây đầu, giây cuối, chữ], …] ⇒ dãy âm chuẩn [{ a, t }]. */
@@ -27,9 +27,9 @@ const SO = { 0: 'không', 1: 'một', 2: 'hai', 3: 'ba', 4: 'bốn', 5: 'năm', 
 /** Một chữ của phụ đề ⇒ các âm chuẩn của nó. */
 export function amPhuDe(w) {
   const c = thuong(w).replace(/₂/g, '2').replace(/⁺/g, '+').replace(/⁻/g, '-')
-  const dac = { cooh: 'cooh', coona: 'coona', naoh: 'naoh', 'oh-': 'oh-', oh: 'oh', 'h+': 'h+', gly: 'gly', ala: 'ala', base: 'base', acid: 'acid', 'brønsted': 'bronsted', hcl: 'hcl', na: 'na', c: 'c', n: 'n', m: 'm', h: 'h', h2o: 'nước', peptide: 'peptide' }
+  const dac = { cooh: 'cooh', coona: 'coona', naoh: 'naoh', 'oh-': 'oh-', oh: 'oh', 'h+': 'h+', gly: 'gly', ala: 'ala', base: 'base', acid: 'acid', 'brønsted': 'bronsted', hcl: 'hcl', na: 'na', c: 'c', n: 'n', m: 'm', h: 'h', h2o: 'nước', peptide: 'peptide', lysine: 'lys', lys: 'lys', nitrogen: 'nitrogen', glu: 'glu', val: 'val' }
   if (dac[c]) return [dac[c]]
-  if (/^(75|23|22|89|3a)$/.test(c)) return [c]
+  if (/^(75|23|22|89|2a|3a|4a|5a)$/.test(c)) return [c]
   const m = c.match(/^(\d+)([a-z]*)$/); if (m) { const n = Number(m[1]); return [...(SO[n] ? [SO[n]] : [m[1]]), ...(m[2] ? [m[2]] : [])] }
   return [c]
 }
