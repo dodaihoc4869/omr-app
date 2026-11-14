@@ -1,0 +1,71 @@
+# ĐO CA LIVE TỐI 14/11 (CHỈ ĐỌC, GraphQL Analytics — KHÔNG truy vấn D1 nào) — thầy 14/11 ~22:00: «ca live vừa kết thúc nhiều học sinh kêu bị lag kiểm tra kĩ và tối ưu tức thì».
+# In theo khung 19:30–22:15 giờ VN: D1 theo phút (đọc/ghi, hàng đọc, tổng giây chạy, lô p50/p90) + nhóm truy vấn tốn nhất · Worker omr theo 5 phút (yêu cầu, lỗi,
+# p50–p99, CPU p99) + trạng thái lỗi · Durable Object (phòng live) theo 5 phút. Chỉ số đếm + SQL rút gọn (tham số ?), không tên / SBD.
+name: Đo ca live tối 14/11 (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/live-streaming-classroom-e4juo5]
+    paths: ['.github/workflows/do-live-lag-1411.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+      TU: '2026-11-14T12:30:00Z'
+      DEN: '2026-11-14T15:15:00Z'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: D1 + Worker + phòng live trong ca
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, DB_ID, TU, DEN } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 700)); return j.data
+          }
+          const v = { acc: ACC, db: DB_ID, tu: TU, den: DEN }
+          const vn = (s) => new Date(Date.parse(s) + 7 * 3600e3).toISOString().slice(11, 16)
+          const p = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1AnalyticsAdaptiveGroups(limit:300,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeMinute_ASC]){
+            dimensions{datetimeMinute} sum{readQueries writeQueries rowsRead rowsWritten queryBatchTimeMs} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90}}}}}`, v)
+          console.log('=== D1 theo phút VN: đọc · ghi · hàng đọc · tổng giây · lô p50/p90 ms (★ = tổng giây ≥ 20 hoặc p90 ≥ 300) ===')
+          for (const x of p?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? []) { const s = x.sum.queryBatchTimeMs / 1000, p90 = Math.round(x.quantiles.queryBatchTimeMsP90); console.log((s >= 20 || p90 >= 300 ? '★ ' : '  ') + vn(x.dimensions.datetimeMinute), x.sum.readQueries, x.sum.writeQueries, x.sum.rowsRead, s.toFixed(1), Math.round(x.quantiles.queryBatchTimeMsP50), p90) }
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:60,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+            count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          console.log(`=== D1: nhóm tốn nhất cả ca · tổng ${Math.round(ds.reduce((n, x) => n + x.sum.queryDurationMs, 0) / 1000)} s ===`)
+          for (const x of ds.slice(0, 30)) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').replace(/\d{5,}/g, '<so>').slice(0, 240)].join(' '))
+          const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:60,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+            dimensions{datetimeFiveMinutes} sum{requests errors subrequests} quantiles{durationP50 durationP90 durationP99 cpuTimeP99}}}}}`, v)
+          console.log('=== Worker omr theo 5 phút VN: yêu cầu · lỗi · thời gian p50/p90/p99 ms · CPU p99 ms ===')
+          for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(vn(x.dimensions.datetimeFiveMinutes), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`)
+          const st = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:100,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den,status_neq:"success"}){dimensions{status datetimeFiveMinutes} sum{requests}}}}}`, v)
+          console.log('=== Worker omr: trạng thái KHÁC success theo 5 phút ===')
+          for (const x of (st?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []).sort((a, b) => a.dimensions.datetimeFiveMinutes.localeCompare(b.dimensions.datetimeFiveMinutes))) console.log(vn(x.dimensions.datetimeFiveMinutes), x.dimensions.status, x.sum.requests)
+          const dob = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            durableObjectsInvocationsAdaptiveGroups(limit:200,filter:{datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+            dimensions{datetimeFiveMinutes namespaceId} sum{requests errors} quantiles{wallTimeP50 wallTimeP99}}}}}`, v)
+          console.log('=== Durable Object theo 5 phút VN: vùng tên (6 kí tự) · yêu cầu · lỗi · wall p50/p99 ms ===')
+          for (const x of dob?.viewer?.accounts?.[0]?.durableObjectsInvocationsAdaptiveGroups ?? []) console.log(vn(x.dimensions.datetimeFiveMinutes), String(x.dimensions.namespaceId).slice(0, 6), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.wallTimeP50)}`, `p99=${Math.round(x.quantiles.wallTimeP99)}`)
+          const dop = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            durableObjectsPeriodicGroups(limit:300,filter:{datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeMinute_ASC]){
+            dimensions{datetimeMinute namespaceId} sum{cpuTime activeTime inboundWebsocketMsgCount outboundWebsocketMsgCount exceededCpuErrors exceededMemoryErrors fatalInternalErrors subrequests}}}}}`, v)
+          console.log('=== Durable Object theo phút VN: vùng tên · CPU ms · tin WS vào · tin WS ra · vượt CPU · vượt bộ nhớ · lỗi trong ===')
+          for (const x of dop?.viewer?.accounts?.[0]?.durableObjectsPeriodicGroups ?? []) console.log(vn(x.dimensions.datetimeMinute), String(x.dimensions.namespaceId).slice(0, 6), Math.round(x.sum.cpuTime / 1000), x.sum.inboundWebsocketMsgCount, x.sum.outboundWebsocketMsgCount, x.sum.exceededCpuErrors, x.sum.exceededMemoryErrors, x.sum.fatalInternalErrors)
+          JS
