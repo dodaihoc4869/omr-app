@@ -312,6 +312,31 @@ export class PhongBinhPhanUng {
   private st: L.TrangThaiPhong | null | undefined = undefined
   private henGui: ReturnType<typeof setTimeout> | null = null
   private lucPhat = 0
+  /** ĐỀ GỬI MỘT LẦN MỖI LƯỢT (14/11, thầy «sửa triệt để hiện tượng lag, sửa tận gốc»): mỗi view của em từng mang NGUYÊN đề của lượt (chữ, phương án, ảnh nhúng)
+   *  và phòng phát lại view tới MỌI máy em mỗi lần có em nộp / rời / về / vào (gom tối đa ~8 lần/giây) ⇒ lớp 100 em = hàng chục nghìn bản đề / phút (đo 14/11:
+   *  phút gửi 20–70 nghìn tin) — máy em phải tải + đọc lại cả đề liên tục. Nay: máy em báo `cg: 1` trong `chao` (biết giữ đề) ⇒ đề chỉ đi MỘT lần mỗi lượt / mỗi
+   *  kết nối, các view sau mang `luot.cau = null` + `luot.ck` (khoá đề); view y hệt lần trước của chính em ⇒ KHÔNG gửi lại. Máy em bản cũ (không báo `cg`) ⇒ như cũ.
+   *  Chỉ trong bộ nhớ (phòng ngủ dậy ⇒ quên ⇒ gửi đủ lại, đúng). Máy em thiếu đề ⇒ `xin-view` ⇒ gửi đủ. */
+  private viewDaGui = new WeakMap<WsMayChu, { json: string; ck: string }>()
+  private biDe = new WeakSet<WsMayChu>()
+  /** Khoá đề của lượt (tính MỘT lần mỗi lần phát): số lượt + giờ mở + băm FNV-1a của đề đã lọc. */
+  private khoaDe(st: L.TrangThaiPhong): string {
+    const l = st.luot
+    if (!l) return ''
+    const s = JSON.stringify(l.cau ?? null)
+    let h = 0x811c9dc5
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) }
+    return `${l.so}:${l.batDau}:${(h >>> 0).toString(36)}:${s.length}`
+  }
+  /** Gửi view của MỘT máy em (đường duy nhất tới máy em): `ep` ⇒ gửi đủ đề, kể cả khi trùng lần trước (chao / xin-view). */
+  private guiViewEm(ws: WsMayChu, s: string, st: L.TrangThaiPhong, ck: string, ep = false): void {
+    const v = L.viewEm(st, s), cu = this.viewDaGui.get(ws)
+    const gon = !ep && !!v.luot && !!ck && this.biDe.has(ws) && cu?.ck === ck
+    const json = JSON.stringify(v.luot && ck ? { ...v, luot: { ...v.luot, ck, ...(gon ? { cau: null } : {}) } } : v)
+    if (!ep && cu?.json === json) return
+    this.gui(ws, json)
+    this.viewDaGui.set(ws, { json, ck: v.luot ? ck : '' })
+  }
   /** LIVE BẢNG (10/11, phong-live.ts): sổ nét, lô điểm đang viết, số em đang xem. */
   private live: LiveMay
   /** XEM LẠI LIVE (11/11, live-xem-lai.ts): nhật ký sự kiện + nét, chốt buổi ở máy chủ. Lỗi ở đây không bao giờ làm hỏng live. */
@@ -409,7 +434,8 @@ export class PhongBinhPhanUng {
     const hs = this.ctx.getWebSockets('hs'), kem = hs.map((ws) => ws.deserializeAttachment() as KemBpu | null)
     const bang = JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st, kem) : undefined))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
-    for (let i = 0; i < hs.length; i++) { const a = kem[i]; if (a?.s) this.gui(hs[i]!, JSON.stringify(L.viewEm(st, a.s))) }
+    const ck = this.khoaDe(st)
+    for (let i = 0; i < hs.length; i++) { const a = kem[i]; if (a?.s) this.guiViewEm(hs[i]!, a.s, st, ck) }
   }
   /** Nhiều em NỘP DỒN (10/11, tác tử tốc độ): mỗi bài nộp từng phát view tới thầy + MỌI máy em (N em nộp = N×N tin, mỗi tin mang cả đề) ⇒ bảng vẽ lại mỗi tin.
    *  Nhịp: tin đầu đi NGAY (em nộp lẻ không trễ), các tin kế trong 120 ms gom thành MỘT lần phát (đúng trạng thái mới nhất). Em nộp vẫn nhận `tra-kq` ngay. */
@@ -564,11 +590,13 @@ export class PhongBinhPhanUng {
       // LIVE: thầy bỏ quên live quá 15 phút ⇒ tắt trước khi trả view; em kèm `net` (số thứ tự nét cuối đã có) ⇒ gửi bù phần sổ nét còn thiếu sau view.
       if (st.live?.bat && !st.ketThuc) await this.live.tuTat(st, nay)
       const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay)
-      this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st) : undefined) : L.viewEm(st, a.s)))
+      if (a.v === 'gv') this.gui(ws, JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st) : undefined)))
+      else { if (j.cg === 1) this.biDe.add(ws); this.guiViewEm(ws, a.s, st, this.khoaDe(st), true) }
       if (a.v === 'hs' && a.s && typeof j.net === 'number' && !st.ketThuc) await this.live.guiBu(st, ws, j.net)
       if (!veLai) return
       j = { t: 'chao-ve' } as Row
     }
+    if (j.t === 'xin-view') { if (a.v === 'hs' && a.s) this.guiViewEm(ws, a.s, st, this.khoaDe(st), true); return }
     if (st.ketThuc) return
     // Xem lại Live (13/11): máy tính FX4869 của thầy đi qua kênh lớp ⇒ ghi vào nhật ký buổi (chỉ bộ nhớ, ghi gom nền) rồi mới chuyển tiếp như cũ
     if (j.t === 'lop' && j.k === 'mt' && a.v === 'gv') { try { this.xl.mayTinh(st, j.x, nay) } catch { /* lỗi ghi nhật ký không chặn kênh lớp */ } }

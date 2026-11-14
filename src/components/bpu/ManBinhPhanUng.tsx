@@ -239,6 +239,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
    *  vẫn chưa ghi ⇒ GỬI BÙ `roi` (rồi `ve` nếu em đã quay lại). Chưa nối (`gui` trả false) ⇒ tin nằm hàng chờ, nối lại tự gửi — không cần bù. */
   const buRoi = useRef<number | null>(null)
   const kiemBu = useRef(false)
+  /** ĐỀ CỦA LƯỢT GIỮ TRÊN MÁY (14/11 sửa lag tận gốc): phòng chỉ gửi đề MỘT lần mỗi lượt (`luot.ck` = khoá đề); view sau mang `cau: null` ⇒ lấy đề đang giữ. */
+  const deGiu = useRef<{ ck: string; cau: unknown } | null>(null)
   /** Kiểu của lần rời gần nhất (11/11, `KIEU_ROI` ở phong.ts) — gửi kèm `roi` và tin bù. */
   const kieuRoi = useRef<KieuRoi>('an')
   /** BÁO RỜI: gửi `roi` ngay (đồng bộ). Một lần cho tới khi về lại (phòng cũng chặn trùng). `kieu` vắng ⇒ cửa sổ nổi `noi`; trang ẩn: `thoat` nếu máy
@@ -307,7 +309,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           cauLive.current.noiLai?.()
           kiemBu.current = buRoi.current != null
           if (!xa) w.send(JSON.stringify({ t: 'vao' })) // em ở xa không điểm danh (phòng cũng bỏ `vao` của vé «em ở xa»)
-          w.send(JSON.stringify({ t: 'chao' }))
+          w.send(JSON.stringify({ t: 'chao', cg: 1 })) // cg: máy này giữ được đề của lượt ⇒ phòng không gửi lại đề trong mọi view
           const cho = choGui.current.splice(0); for (const t of cho) { try { w.send(JSON.stringify(t)) } catch { /* rớt */ } }
           clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000)
         }
@@ -317,6 +319,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           let m: Tin
           try { m = JSON.parse(e.data) as Tin } catch { return }
           if (m.t === 'em') {
+            // Đề gửi một lần mỗi lượt: có đề ⇒ giữ; `cau: null` + đúng khoá ⇒ dùng đề đang giữ; lệch khoá (vừa nối lại, mất tin) ⇒ xin lại cả view, bỏ tin này.
+            const vl = (m as unknown as { luot?: { ck?: string; cau?: unknown } | null }).luot
+            if (vl?.ck) {
+              if (vl.cau != null) deGiu.current = { ck: vl.ck, cau: vl.cau }
+              else if (deGiu.current?.ck === vl.ck) vl.cau = deGiu.current.cau
+              else { try { w.send('{"t":"xin-view"}') } catch { /* rớt */ } return }
+            }
             phongRoi.current = (m as unknown as ViewEm).em?.dangRoi === true
             if (!phongRoi.current) choVe.current = 0 // phòng xác nhận em không còn «đang rời» (phòng đời cũ không có cờ ⇒ tin nào về cũng là kết nối còn sống)
             const so = (m as unknown as ViewEm).em?.roi
