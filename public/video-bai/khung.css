@@ -358,7 +358,7 @@ html.nhe .ct-svg [filter], html.nhe #danh-dau [filter], html.nhe .bi-svg [filter
 .bz-khung { position: absolute; border: 4px solid #8fd8ee; border-radius: 12px; box-shadow: 0 0 24px rgba(143, 216, 238, .45); pointer-events: none; }
 html.nhe .bz-bay { filter: none; }
 /* phụ đề cụm (thầy 14/11 «phụ đề siêu cuốn»): chữ to đậm, viền tối cho nổi trên mọi nền, từ khoá màu cảnh, con số có ô dạ quang */
-.dong.cum { font-size: 46px; font-weight: 800; line-height: 1.24; letter-spacing: .005em; text-shadow: 0 3px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(0, 0, 0, .55); }
+.dong.cum { font-size: 46px; font-weight: 800; line-height: 1.24; letter-spacing: .005em; }
 .dong.cum .tu { transform-origin: 50% 75%; }
 .dong.cum .tu.k { color: var(--mau, var(--vang)); }
 .dong.cum .tu.nb { color: #172126; background: var(--vang); border-radius: 12px; padding: 0 10px; text-shadow: none; box-shadow: 0 6px 18px rgba(255, 210, 122, .35); }

@@ -33,6 +33,8 @@ const CHE_DO = { trucTiep: _q.has('truc-tiep') || _q.has('nhe') || !/khung\.html
 try { if (CHE_DO.trucTiep && localStorage.getItem('ddh.mayYeu') === '1') CHE_DO.nhe = true } catch { /* chặn kho máy ⇒ giữ mặc định */ }
 window.CHE_DO = CHE_DO
 document.documentElement.classList.toggle('nhe', CHE_DO.nhe)
+/** Dùng tấm đệm nét (máy quay đứng giữa hai khung): chế độ nhẹ + trang xem trong app. Đo 14/11: vẽ lại mọi nét mỗi khung là phần nặng nhất trên máy em. */
+const dungDem = () => CHE_DO.nhe || CHE_DO.trucTiep
 let QUANG = [], BUI = []
 const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 // eslint-disable-next-line no-unused-vars -- dùng ở hoat-hoa*.js (cùng phạm vi toàn cục)
@@ -102,7 +104,7 @@ function nap(kb, net) {
   // KHUNG ĐỘNG (kịch bản có cảnh mang cheDo): bảng giãn từ bề rộng thường tới gần cả màn ⇒ canvas cỡ lớn nhất, khung bảng cắt theo bề rộng hiện tại
   KHUNG_DONG = kb.doan.some((d) => d.cheDo)
   if (KHUNG_DONG) {
-    BANG.w0 = BANG.w; BANG.wMax = 1920 - 2 * BANG.x; Object.assign($('#phan').style, { width: `${BANG.wMax}px`, right: 'auto' })
+    BANG.w0 = BANG.w; BANG.wMax = 1920 - 2 * BANG.x; Object.assign($('#phan').style, { right: 'auto' })
     if (!$('#nham')) {
       const s2 = $('#san')
       tao('div', 'an', s2, '<div class="nh-hop"><div class="nh-ke">EM NHẨM TRƯỚC</div><div class="nh-hoi"></div><div class="nh-dem"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="66" fill="rgba(11,20,24,.9)" stroke="rgba(255,255,255,.12)" stroke-width="9"/><circle class="vong" cx="75" cy="75" r="66" fill="none" stroke="#ffd27a" stroke-width="9" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" transform="rotate(-90 75 75)"/></svg><b>3</b></div><div class="nh-goi"></div></div>').id = 'nham'
@@ -111,7 +113,7 @@ function nap(kb, net) {
   }
   $('#ten-bai').textContent = `${String(kb.ten || '').toUpperCase()} · ${String(kb.lop || '').replace(/^Live Khối /, 'K')}`
   dungNen(); dungCanh(); dungMoDau(); dungKet(); dungChuong()
-  const c = $('#phan'); c.width = KHUNG_DONG ? BANG.wMax : BANG.w; c.height = BANG.h; ctx = c.getContext('2d')
+  const c = $('#phan'); c.width = BANG.w; c.height = BANG.h; ctx = c.getContext('2d')
   const h = $('#hoa'); h.width = 1920; h.height = 1080; hoaCtx = h.getContext('2d')
   return document.fonts.ready.then(() => { doCo(); return { tong: KB.tong } })
 }
@@ -393,10 +395,10 @@ function nguon(d, t) {
 }
 function camera(d, t) {
   const ks = d.khung; let i = 0; while (i + 1 < ks.length && ks[i + 1].t <= t) i++
-  const truoc = ks[Math.max(0, i - 1)].k, nay = ks[i].k, q = i === 0 ? 1 : eInOut(tien(t, ks[i].t, CHE_DO.nhe ? 0.6 : 1.1))
+  const truoc = ks[Math.max(0, i - 1)].k, nay = ks[i].k, q = i === 0 ? 1 : eInOut(tien(t, ks[i].t, dungDem() ? 0.7 : 1.1))
   const c = [0, 1, 2, 3].map((j) => lerp(truoc[j], nay[j], q))
   // đẩy máy chậm vào giữa hai khung (Ken Burns)
-  const den = ks[i + 1] ? ks[i + 1].t : d.t1, z = CHE_DO.nhe ? 1 : 1 - 0.045 * eInOut(tien(t, ks[i].t, Math.max(1, den - ks[i].t)))
+  const den = ks[i + 1] ? ks[i + 1].t : d.t1, z = dungDem() ? 1 : 1 - 0.045 * eInOut(tien(t, ks[i].t, Math.max(1, den - ks[i].t)))
   const cx = c[0] + c[2] / 2, cy = c[1] + c[3] / 2
   if (d.cheDo && BANG.w0) { const s = ((c[2] * z) / BANG.w0) * lerp(1, 0.74, d.pNay || 0), W = BANG.w * s, H = BANG.h * s; return [cx - W / 2, cy - H / 2, W, H] }
   return [cx - (c[2] * z) / 2, cy - (c[3] * z) / 2, c[2] * z, c[3] * z]
@@ -435,6 +437,12 @@ function veTheNoi(d, t) {
 // CHẾ ĐỘ NHẸ: máy quay ĐỨNG YÊN giữa hai khung (không đẩy chậm, chuyển 0,6 s) ⇒ nét đã xong vẽ một lần lên tấm đệm cỡ khung bảng theo đúng góc máy;
 // mỗi khung chỉ dán tấm đệm (không co giãn) + vẽ nét đang viết dở. Máy quay đổi / đổi cảnh / tua lùi ⇒ vẽ lại tấm đệm. Máy khoẻ + bộ quay video: vectơ từng khung như cũ.
 const DEM = { cv: null, c: null, khoa: '', i: 0, s: -1 }
+/** Canvas bảng (và tấm đệm) đúng bề rộng bảng đang đứng; đang chuyển khung thì giữ cỡ lớn nhất ⇒ mỗi lần chuyển chỉ cấp phát lại 2 lần, không phải mỗi khung hình. */
+function doiCoBang(dangDoi) {
+  const cv = ctx.canvas, w = dangDoi ? BANG.wMax : BANG.w; if (cv.width === w) return
+  cv.width = w; cv.style.width = `${w}px`
+  if (DEM.cv) { DEM.cv.width = w; DEM.khoa = '' }
+}
 function napDem(d, s, s0, cx, cy, k) {
   if (!DEM.cv) { DEM.cv = document.createElement('canvas'); DEM.cv.width = ctx.canvas.width; DEM.cv.height = BANG.h; DEM.c = DEM.cv.getContext('2d') }
   const khoa = `${d.id}|${cx.toFixed(1)}|${cy.toFixed(1)}|${k.toFixed(4)}`
@@ -498,14 +506,16 @@ function veBang(d, t) {
   const [cx, cy, cw] = camera(d, t), k = BANG.w / cw
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, BANG.h)
   let dau = null, mauDau = '', truoc = null, sau = null
-  if (CHE_DO.nhe) {
+  if (dungDem()) {
     napDem(d, s, s0, cx, cy, k)
     ctx.drawImage(DEM.cv, 0, 0)
     ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k); ctx.lineCap = 'round'; ctx.lineJoin = 'round'
     if (DEM.i > 0) truoc = NET.net[DEM.i - 1]
     for (let i = DEM.i; i < NET.net.length; i++) {
       const n = NET.net[i]; if (n.t > s) { sau = n; break }
+      if (!CHE_DO.nhe) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 } // nét đang viết vẫn sáng (trang xem, không phải máy yếu)
       const e = veNetDo(ctx, n, s - n.t, k); if (e) { dau = e; mauDau = n.mauVe }
+      ctx.shadowBlur = 0
     }
   } else {
     ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k)
@@ -541,9 +551,9 @@ function veCanh(d, t) {
     $('#pt').classList.toggle('an', !d.phanTu); $('#cot').classList.toggle('an', !!d.phanTu)
   }
   if (d.cheDo) {
-    const p = (d.pNay = pKhung(d, t)); BANG.w = Math.round(lerp(BANG.w0, BANG.wMax, p)); $('#bang').style.width = `${BANG.w}px`
+    const p = (d.pNay = pKhung(d, t)); BANG.w = Math.round(lerp(BANG.w0, BANG.wMax, p)); $('#bang').style.width = `${BANG.w}px`; doiCoBang(p > 0 && p < 1)
     const cot = $('#cot'); cot.style.transform = `translateX(${Math.round(p * (COT.w + 140))}px)`; cot.style.opacity = r2(1 - p)
-  } else if (BANG.w0 && BANG.w !== BANG.w0) { BANG.w = BANG.w0; $('#bang').style.width = `${BANG.w}px`; $('#cot').style.transform = ''; $('#cot').style.opacity = '' }
+  } else if (BANG.w0 && BANG.w !== BANG.w0) { BANG.w = BANG.w0; $('#bang').style.width = `${BANG.w}px`; $('#cot').style.transform = ''; $('#cot').style.opacity = ''; doiCoBang() }
   const a = CANH[0].t0, b = CANH[CANH.length - 1].t1
   $('#tien-do i').style.transform = `scaleX(${Math.round(kep((t - a) / (b - a)) * 1000) / 1000})`
   // vào cảnh: phóng 1,1 ⇒ 1 khi phiến thẻ chương rút; điểm nhấn: phóng nhẹ cả sân
