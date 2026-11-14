@@ -1,0 +1,312 @@
+{
+ "ten": "Peptide",
+ "lop": "Live Khối 12",
+ "ngay": "Thứ Sáu 13/11/2026",
+ "moDau": {
+  "kicker": "LIVE KHỐI 12 · THỨ SÁU 13/11",
+  "tieuDe": "PEPTIDE",
+  "phu": "Thuỷ phân trong môi trường base",
+  "thay": "Thầy Đỗ Đại Học"
+ },
+ "mucLuc": [
+  [
+   "10",
+   "Gly - Ala - Gly với NaOH: đếm đầu C, cân bằng nước, tính M muối",
+   "ngoc"
+  ]
+ ],
+ "canh": [
+  {
+   "id": "c11",
+   "so": "10",
+   "tieuDe": "Môi trường base: Gly - Ala - Gly với NaOH",
+   "mau": "ngoc",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "su": [
+    {
+     "dong": 0,
+     "loai": "tieu-de",
+     "chu": "Môi trường **base**: NaOH đếm **đầu C**"
+    }
+   ],
+   "hoat": {
+    "loai": "bazo",
+    "cao": 640,
+    "moc": {
+     "a_cooh": {
+      "s": 2779.2
+     },
+     "a_naoh": {
+      "s": 2785.6
+     },
+     "a_acid": [
+      1,
+      "nhường"
+     ],
+     "a_base": [
+      1,
+      "nhận"
+     ],
+     "a_bay": {
+      "s": 2795.6
+     },
+     "a_nuoc": {
+      "s": 2807.0
+     },
+     "a_coona": {
+      "s": 2813.8
+     },
+     "a_tom": {
+      "s": 2816.5
+     },
+     "b_hien": {
+      "s": 2832.3
+     },
+     "pt_pep": {
+      "s": 2832.67
+     },
+     "b_gly1": {
+      "s": 2832.67
+     },
+     "b_ala": {
+      "s": 2835.49
+     },
+     "b_gly2": {
+      "s": 2837.82
+     },
+     "pt_a": {
+      "s": 2841.72
+     },
+     "pt_naoh": {
+      "s": 2850.7
+     },
+     "b_dem": {
+      "s": 2859.2
+     },
+     "b_c1": [
+      4,
+      "Gly"
+     ],
+     "b_c2": [
+      4,
+      "Ala"
+     ],
+     "b_c3": [
+      4,
+      "Gly",
+      0,
+      2
+     ],
+     "b_tong": [
+      4,
+      "tổng"
+     ],
+     "b_3a": {
+      "s": 2898.6
+     },
+     "pt_mui": {
+      "s": 2914.4
+     },
+     "c_can": [
+      5,
+      "cần"
+     ],
+     "c_sinh": [
+      5,
+      "sinh"
+     ],
+     "c_triet": [
+      5,
+      "triệt"
+     ],
+     "c_trai": [
+      6,
+      "không"
+     ],
+     "c_con": [
+      6,
+      "còn"
+     ],
+     "pt_nuoc": {
+      "s": 2940.6
+     },
+     "d_hien": {
+      "s": 2957.68,
+      "lech": -0.5
+     },
+     "pt_glyna": {
+      "s": 2957.7
+     },
+     "d_na": {
+      "s": 2962.8,
+      "lech": -0.3
+     },
+     "d_coona": [
+      7,
+      "COONa"
+     ],
+     "d_75": {
+      "s": 2975.0,
+      "lech": -0.2
+     },
+     "d_tru1": {
+      "s": 2984.7
+     },
+     "d_cong23": {
+      "s": 2986.9
+     },
+     "d_22": {
+      "s": 2997.3,
+      "lech": -0.2
+     },
+     "d_ala": {
+      "s": 3000.6
+     },
+     "d_ala22": {
+      "s": 3007.11,
+      "lech": -0.2
+     },
+     "pt_alana": {
+      "s": 3000.6
+     },
+     "d_ala89": {
+      "s": 3005.76,
+      "lech": -0.2
+     }
+    }
+   },
+   "danhDau": [
+    {
+     "tuS": 2779.1,
+     "denS": 2788.0,
+     "toi": "a-cooh"
+    },
+    {
+     "tuS": 2795.4,
+     "denS": 2803.0,
+     "toi": "a-oh"
+    },
+    {
+     "tuS": 2806.9,
+     "denS": 2808.4,
+     "toi": "a-nuoc"
+    },
+    {
+     "tuS": 2813.7,
+     "denS": 2815.6,
+     "toi": "a-coona"
+    },
+    {
+     "tuS": 2832.6,
+     "denS": 2842.5,
+     "toi": "pt-pep"
+    },
+    {
+     "tuS": 2850.6,
+     "denS": 2853.4,
+     "toi": "pt-naoh"
+    },
+    {
+     "tuS": 2859.1,
+     "denS": 2865.3,
+     "toi": "b-dc"
+    },
+    {
+     "tuS": 2898.5,
+     "denS": 2900.8,
+     "toi": "pt-3a"
+    },
+    {
+     "tuS": 2940.5,
+     "denS": 2942.2,
+     "toi": "pt-nuoc"
+    },
+    {
+     "tuS": 2957.6,
+     "denS": 2964.7,
+     "toi": "pt-glyna"
+    },
+    {
+     "tuS": 2971.5,
+     "denS": 2977.4,
+     "toi": "d-m"
+    },
+    {
+     "tuS": 2984.6,
+     "denS": 2993.5,
+     "toi": "d-tru"
+    },
+    {
+     "tuS": 3000.5,
+     "denS": 3007.8,
+     "toi": "d-ala"
+    }
+   ],
+   "nhan": [
+    3,
+    5
+   ],
+   "duoi": 2.6,
+   "phuDeCum": true,
+   "ghimCum": [
+    [
+     2,
+     1,
+     2813.3
+    ],
+    [
+     3,
+     1,
+     2858.8
+    ],
+    [
+     4,
+     4,
+     2897.6
+    ],
+    [
+     8,
+     1,
+     2984.3
+    ],
+    [
+     8,
+     2,
+     2986.5
+    ],
+    [
+     8,
+     3,
+     2996.6
+    ],
+    [
+     9,
+     1,
+     3004.0
+    ]
+   ]
+  }
+ ],
+ "ket": {
+  "tieuDe": "Ghi nhớ",
+  "y": [
+   "Môi trường base: NaOH **đếm đầu C** (mỗi COOH cần 1 NaOH)",
+   "Nước còn = nước sinh − nước cần để cắt",
+   "COOH ⇒ COONa: M **+ 22**"
+  ],
+  "cuoi": "Xem lại cả buổi trong app · Thầy Đỗ Đại Học"
+ }
+}
