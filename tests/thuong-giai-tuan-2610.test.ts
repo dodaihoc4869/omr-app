@@ -9,7 +9,7 @@ import {
   chonNhom, chotNhom, cronGiaiTuan, hsGiai, laKhoanHoTro, nguyenTuThat, tomTatGiaiEm, xepNhomCho, xoaNhoGiai,
 } from '../server/src/thuong-giai-tuan'
 import { tuanCuaNgay, hetHanGiayCua } from '../server/src/thuong-b-chung'
-import { gvThiDuaTuan, tuanThuongPh } from '../server/src/thuong-gv-ph'
+import { DEM_TD_MS, gvThiDuaTuan, gvThiDuaTuanDem, tuanThuongPh } from '../server/src/thuong-gv-ph'
 import { phBaoCaoTuan } from '../server/src/bao-cao-tuan'
 
 const VN = (s: string): number => Date.parse(`${s}+07:00`)
@@ -220,6 +220,19 @@ describe('chốt tuần (cron thứ Hai 00:05)', () => {
 })
 
 describe('thầy + phụ huynh', () => {
+  it('/gv/thi-dua-tuan ĐỆM 3 phút theo lớp (14/11 ca live lag: mỗi lần mở đọc 120 ngày cả lớp ≈ 6,4 s D1): mở lại ⇒ 0 lệnh D1; quá hạn / moi / lớp khác ⇒ đọc lại', async () => {
+    const d = taoD1That()
+    themEm(d, 'H1', 'Đỗ Văn Một', '10D1')
+    const b0 = d.soLenh.batch
+    const a = await gvThiDuaTuanDem(d.env, { lop: '10D1' }, NOW)
+    const b = await gvThiDuaTuanDem(d.env, { lop: '10D1' }, NOW + 60_000)
+    expect(b).toBe(a)
+    expect(d.soLenh.batch - b0).toBe(1)
+    await gvThiDuaTuanDem(d.env, { lop: '10D1', moi: true }, NOW + 61_000)
+    await gvThiDuaTuanDem(d.env, { lop: '10D2' }, NOW + 62_000)
+    await gvThiDuaTuanDem(d.env, { lop: '10D1' }, NOW + 61_000 + DEM_TD_MS + 1)
+    expect(d.soLenh.batch - b0).toBe(4)
+  })
   it('/gv/thi-dua-tuan: nguyên tử thật / bị loại, hạng + thứ hạng, nhãn, bậc dưới, học cùng — đúng hợp đồng', async () => {
     const d = taoD1That()
     themEm(d, 'G1', 'Đỗ Văn Một', '12A1'); themEm(d, 'G2', 'Đỗ Văn Hai', '12A1'); themEm(d, 'G3', 'Đỗ Văn Ba', '11B2')

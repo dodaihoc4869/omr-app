@@ -29,6 +29,22 @@ export interface DongThiDuaTuan {
   hocCung: HocCungGv[]
 }
 
+/** ĐỆM BẢNG THI ĐUA THEO LỚP (14/11 — ca live tối, học sinh kêu lag): mỗi lần mở «Thi đua tuần» đọc chuỗi SO_NGAY_NHIEU_EM ngày của CẢ LỚP ≈ 6,4 giây D1
+ *  (≈ 227 nghìn dòng; đo GraphQL 14/11: 45 lần trong ca tối, 5 lần đúng giờ chuyển ca 21:00–21:20). Giữ kết quả DEM_TD_MS trong isolate (workers.dev không dùng được
+ *  Cache API) + GỘP lượt gọi trùng đang chạy (cùng lớp, cùng ngày); kết quả lỗi không giữ. `moi: true` ⇒ bỏ đệm. Bảng thi đua tuần chậm 3 phút không sai luật nào. */
+const DEM_TD = new Map<string, { het: number; kq: Promise<Row> }>()
+export const DEM_TD_MS = 180_000
+export function gvThiDuaTuanDem(env: Env, b: Row, nowMs: number = Date.now()): Promise<Row> {
+  const k = `${str(b.lop).slice(0, 60)}|${ngayVn(nowMs)}`
+  const c = DEM_TD.get(k)
+  if (c && c.het > nowMs && b.moi !== true) return c.kq
+  const kq = gvThiDuaTuan(env, b, nowMs)
+  DEM_TD.set(k, { het: nowMs + DEM_TD_MS, kq })
+  kq.then((r) => { if (r.ok !== true) DEM_TD.delete(k) }, () => DEM_TD.delete(k))
+  if (DEM_TD.size > 100) for (const [kk, v] of DEM_TD) if (v.het <= nowMs) DEM_TD.delete(kk)
+  return kq
+}
+
 /**
  * `POST /gv/thi-dua-tuan {lop}` (hợp đồng «GET /gv/thi-dua-tuan?lop=»; router chỉ nhận POST, nhận cả `?lop=` trên URL) →
  * `{ok, lop, tuan, ds: DongThiDuaTuan[]}`. Cổng thầy ở router. MỘT batch 8 câu: em của lớp, dòng giải tuần (cả nhóm để xếp thứ hạng), bậc xếp mới nhất,

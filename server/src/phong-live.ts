@@ -37,6 +37,9 @@ export const KHUNG_MOI_MANH = 32
 /** Sổ quá dài ⇒ xin máy thầy gửi ẢNH TRẠNG THÁI (xoá hết + các nét đang có) để sổ gọn lại; quá trần cứng ⇒ vẫn chuyển cho máy em nhưng không lưu thêm. */
 export const SO_MEM = { muc: 3000, byte: 4_000_000 }
 export const SO_CUNG = { muc: 6000, byte: 8_000_000 }
+/** Chốt chặn gửi bù (14/11): xin lại CÙNG số thứ tự trong 8 giây ⇒ bỏ; bù CẢ SỔ cho một kết nối tối đa một lần mỗi 12 giây. */
+export const BU_LAP_MS = 8_000
+export const BU_LAM_LAI_MS = 12_000
 const GOM_LUU_SO_MS = 1000
 const GOM_XEM_MS = 300
 const LAM_MOI_DS_MS = 5000
@@ -82,7 +85,7 @@ export class LiveMay {
   private lucGoiXa = 0
   private soNk = 0
   /** Bộ đếm cho bài đo tải: số lô điểm đã chuyển + số lệnh gửi. */
-  dem = { lo: 0, gui: 0, boVuot: 0 }
+  dem = { lo: 0, gui: 0, boVuot: 0, boBu: 0 }
 
   constructor(private chu: ChuPhong) {}
 
@@ -176,13 +179,21 @@ export class LiveMay {
   }
   /** Gửi bù sổ nét cho MỘT máy em: `net` = số thứ tự cuối em đã có. Khớp một mục trong sổ (hoặc ngay trước mục đầu) ⇒ chỉ gửi phần sau;
    *  không khớp (em vào muộn sau khi sổ dọn, phòng khởi động lại, sổ của buổi khác) ⇒ `lamLai` + cả sổ. */
+  /** CHỐT CHẶN GỬI BÙ (14/11 — ca live tối, học sinh kêu lag: phòng có phút gửi 20–70 nghìn tin, lúc nhiều máy em nối lại / xin bù dồn; mỗi lần bù cả sổ
+   *  = 700–1 400 khung cho MỘT máy). Theo TỪNG kết nối: xin lại CÙNG số thứ tự trong BU_LAP_MS ⇒ bỏ (máy em đang áp dở lần trước; máy em bản nào cũng tự xin
+   *  lại sau 5 giây, `choSo` vẫn bật); gửi lại CẢ SỔ (`lamLai`) tối đa một lần mỗi BU_LAM_LAI_MS. Kết nối MỚI (em nối lại) luôn được bù ngay. */
+  private buGan = new WeakMap<WsMayChu, { net: number; luc: number; lamLaiLuc: number }>()
   async guiBu(st: TrangThaiPhong, ws: WsMayChu, net: unknown): Promise<void> {
     if (!st.live?.cho) return
     const ds = await this.docSo(st), co = Math.max(0, Math.floor(Number(net) || 0))
+    const nay = Date.now(), cu = this.buGan.get(ws)
+    if (cu && cu.net === co && nay - cu.luc < BU_LAP_MS) { this.dem.boBu += 1; return }
     const dau = ds.length ? LL.docStt(ds[0]!) : st.live.soNet + 1
     let tu = co === dau - 1 ? 0 : -1
     if (tu < 0) { const i = ds.findIndex((k) => LL.docStt(k) === co); if (i >= 0) tu = i + 1 }
     const lamLai = tu < 0
+    if (lamLai && cu && nay - cu.lamLaiLuc < BU_LAM_LAI_MS) { this.dem.boBu += 1; return }
+    this.buGan.set(ws, { net: co, luc: nay, lamLaiLuc: lamLai ? nay : cu?.lamLaiLuc ?? 0 })
     this.gui(ws, JSON.stringify({ t: 'live-so', lamLai, soNet: st.live.soNet, muc: lamLai ? ds.length : ds.length - tu }))
     for (let i = lamLai ? 0 : tu; i < ds.length; i++) this.gui(ws, ds[i]!)
   }

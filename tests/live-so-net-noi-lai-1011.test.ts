@@ -103,6 +103,37 @@ describe('sổ nét của phòng', () => {
     await ph.gui(e1, { t: 'live-bu', net: 5 })
     expect(chu(e1).filter((m) => m.t === 'live-so').pop()).toEqual({ t: 'live-so', lamLai: false, soNet: 7, muc: 2 })
   })
+  it('CHỐT CHẶN GỬI BÙ (14/11 ca live tối lag): cùng kết nối xin lại cùng số trong 8 giây ⇒ bỏ; bù cả sổ tối đa 1 lần / 12 giây; kết nối mới luôn được bù', async () => {
+    const ph = taoPhongGia()
+    await ph.khoi([{ sbd: 'S1' }])
+    const gv = await ph.noi('gv'), e1 = await ph.noi('hs', 'S1')
+    for (const x of ['a', 'b', 'c']) await ph.guiNp(gv, k1(net(x)))
+    const soBu = (ws: WsGia) => chu(ws).filter((m) => m.t === 'live-so').length
+    const truoc = nhiPhan(e1).length
+    await ph.gui(e1, { t: 'live-bu', net: 1 })
+    await ph.gui(e1, { t: 'live-bu', net: 1 }) // máy em còn áp dở lần trước ⇒ bỏ, không gửi lại 2 khung
+    expect(soBu(e1)).toBe(1)
+    expect(nhiPhan(e1).length - truoc).toBe(2)
+    await ph.gui(e1, { t: 'live-bu', net: 3 }) // số khác (đã tiến) ⇒ trả ngay
+    expect(soBu(e1)).toBe(2)
+    vi.advanceTimersByTime(8_001)
+    await ph.gui(e1, { t: 'live-bu', net: 1 }) // quá 8 giây ⇒ được bù lại
+    expect(soBu(e1)).toBe(3)
+    // Bù CẢ SỔ (số lạ): lần đầu trả, lần thứ hai trong 12 giây bỏ, quá 12 giây trả.
+    await ph.gui(e1, { t: 'live-bu', net: 999 })
+    expect(chu(e1).filter((m) => m.t === 'live-so').pop()).toMatchObject({ lamLai: true })
+    await ph.gui(e1, { t: 'live-bu', net: 998 })
+    expect(soBu(e1)).toBe(4)
+    vi.advanceTimersByTime(12_001)
+    await ph.gui(e1, { t: 'live-bu', net: 998 })
+    expect(soBu(e1)).toBe(5)
+    // Em NỐI LẠI (kết nối mới) ⇒ bù ngay dù vừa xin trên kết nối cũ.
+    await ph.dong(e1)
+    const e1b = await ph.noi('hs', 'S1')
+    await ph.gui(e1b, { t: 'live-bu', net: 998 })
+    expect(chu(e1b).filter((m) => m.t === 'live-so')).toEqual([{ t: 'live-so', lamLai: true, soNet: 3, muc: 3 }])
+    expect(bangCua(e1b).ds.map((x) => x.id)).toEqual(['a', 'b', 'c'])
+  })
   it('sổ ghi storage GOM (không theo từng khung); phòng ngủ rồi thức lại vẫn còn sổ, số thứ tự đi tiếp; sổ nhiều mảnh', async () => {
     const ph = taoPhongGia()
     await ph.khoi([{ sbd: 'S1' }])
