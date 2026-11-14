@@ -13,7 +13,8 @@ import { amNguyenVan, gioTungChu } from './khop-loi.mjs'
 const [duLieu, cauHinhTep, ra] = process.argv.slice(2)
 if (!duLieu || !cauHinhTep || !ra) { console.error('dùng: node dung-kich-ban.mjs <tư liệu> <cau-hinh.json> <ra>'); process.exit(1) }
 mkdirSync(ra, { recursive: true })
-const nk = JSON.parse(readFileSync(join(duLieu, 'nhat-ky.json'), 'utf8'))
+// nhật ký văn phòng (cũ, thầy dừng 14/11) — KHÔNG bắt buộc: cảnh nào có lời riêng (loiRieng) thì không cần
+const nk = existsSync(join(duLieu, 'nhat-ky.json')) ? JSON.parse(readFileSync(join(duLieu, 'nhat-ky.json'), 'utf8')) : { canh: [] }
 const trang = JSON.parse(readFileSync(join(duLieu, 'trang.json'), 'utf8'))
 const ch = JSON.parse(readFileSync(cauHinhTep, 'utf8'))
 // LỜI NGUYÊN VĂN có giờ từng chữ (PhoWhisper chạy trên máy; «loiAsr»: tên tệp trong thư mục tư liệu) — CHỈ để lấy GIỜ, chữ không bao giờ ra màn hình
@@ -129,7 +130,7 @@ muc.forEach((_, i) => sfx.push({ t: 5.05 + i * 0.32, loai: 'bip' }))
 t = MO_DAU
 for (const cc of ch.canh) {
   const c = nk.canh.find((x) => x.id === cc.id)
-  if (!c) throw new Error(`thiếu cảnh ${cc.id}`)
+  if (!c && !cc.loiRieng) throw new Error(`cảnh ${cc.id}: không có lời riêng (loiRieng) và không có nhật ký văn phòng`)
   // thẻ chương
   doan.push({ loai: 'the-chuong', t0: t, t1: t + THE_CHUONG, so: cc.so, tieuDe: cc.tieuDe, mau: cc.mau }); sfx.push({ t: t + 0.02, loai: 'vut' }, { t: t + 0.55, loai: 'bop' }, { t: t + THE_CHUONG - 0.42, loai: 'vut-ra' })
   t += THE_CHUONG

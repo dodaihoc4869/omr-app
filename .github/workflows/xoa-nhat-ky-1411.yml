@@ -28,5 +28,5 @@ jobs:
           echo "Buổi có nhật ký: $(echo "$ds" | grep -c . || true)"
           for b in $ds; do
             echo "── $b"
-            for t in nhat-ky.json nhat-ky-goc.json; do npx -y wrangler@4 r2 object delete "omr-de/live/$b/$t" --remote 2>&1 | tail -1; done
+            for t in nhat-ky.json nhat-ky-goc.json; do npx -y wrangler@4 r2 object delete "omr-de/live/$b/$t" --remote 2>&1 | grep -v "Logs were written" | grep -v '^$' | sed -e 's/[0-9a-f]\{32\}/<id>/g' | tail -4 || true; done
           done
