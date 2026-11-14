@@ -9,7 +9,11 @@ import type { CauDayHoc } from '../day-hoc-len-bang'
 let kho: TeacherExamSource[] | null = null
 let dangNap: Promise<TeacherExamSource[]> | null = null
 /** Kho Dạy học của máy này (đọc một lần mỗi phiên; lỗi ⇒ ném để nơi gọi báo và cho thử lại). */
+let ngheKho = false
 export function napKhoDayHoc(): Promise<TeacherExamSource[]> {
+  // Đồng bộ ngầm kho máy thầy (14/11 — bảng chiếu bản cũ «3%» trong khi máy em «1%»): có đề đổi ⇒ bỏ bản đã đọc, lần chọn câu sau đọc lại.
+  if (!ngheKho) { ngheKho = true; void import('../dong-bo-ngam').then((m) => { m.khiKhoDoi(() => { kho = null }); void m.dongBoNgam() }).catch(() => {}) }
+  else void import('../dong-bo-ngam').then((m) => m.dongBoNgam()).catch(() => {})
   if (kho) return Promise.resolve(kho)
   if (dangNap) return dangNap
   dangNap = (async () => {

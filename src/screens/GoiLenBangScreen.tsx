@@ -312,6 +312,16 @@ function GoiLenBangCu() {
   useEffect(() => {
     void loadExamSources().then((ds) => setKhoDe(khuTrungNguon(ds).nguon))
   }, [])
+  // Đồng bộ ngầm kho máy thầy (thầy 14/11 «đề trên app gv thì là 3% còn app hs là 1%»): có đề đổi ⇒ đọc lại kho cho hộp chọn bài + rút theo dạng.
+  useEffect(() => {
+    let go: (() => void) | null = null, con = true
+    void import('../lib/dong-bo-ngam').then((m) => {
+      if (!con) return
+      go = m.khiKhoDoi(() => void loadExamSources().then((ds) => { if (!con) return; setDeDaLuu(tachNhieuTheoPhan(ds)); setKhoDe(khuTrungNguon(ds).nguon) }))
+      void m.dongBoNgam()
+    }).catch(() => {})
+    return () => { con = false; go?.() }
+  }, [])
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)

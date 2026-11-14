@@ -159,9 +159,12 @@ type CuaSoCoCauNoi = Window & { [TEN_CAU_NOI]?: CauNoiDdh }
 /** GẮN cầu nối. Gọi khi app vào trạng thái đã mở khoá. */
 export function ganCauNoi(w: Window = window): void {
   ;(w as CuaSoCoCauNoi)[TEN_CAU_NOI] = dungCauNoi()
+  // Cùng lúc thầy mở khoá app (lúc rảnh): bật ĐỒNG BỘ NGẦM kho đề máy thầy (thầy 14/11 «đề trên app gv thì là 3% còn app hs là 1%») — src/lib/dong-bo-ngam.ts.
+  void import('./dong-bo-ngam').then((m) => m.batDongBoNgam()).catch(() => {})
 }
 
 /** GỠ cầu nối. Gọi khi khoá lại, hết hạn hỏi lại, hoặc rời app quản lý. */
 export function goCauNoi(w: Window = window): void {
   delete (w as CuaSoCoCauNoi)[TEN_CAU_NOI]
+  void import('./dong-bo-ngam').then((m) => m.tatDongBoNgam()).catch(() => {})
 }

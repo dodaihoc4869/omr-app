@@ -156,6 +156,12 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, sauBaiHomNay, onTrangThai }: Omi
   useEffect(() => {
     if (maChon.size && !kho) void napKho()
   }, [maChon, kho, napKho])
+  // Đồng bộ ngầm kho máy thầy (thầy 14/11 «đề trên app gv thì là 3% còn app hs là 1%»): mở bảng ⇒ kéo đề vừa sửa trên máy chủ; có đề đổi ⇒ đọc lại kho.
+  useEffect(() => {
+    let go: (() => void) | null = null, con = true
+    void import('../../lib/dong-bo-ngam').then((m) => { if (!con) return; go = m.khiKhoDoi(() => setKho(null)); void m.dongBoNgam() }).catch(() => {})
+    return () => { con = false; go?.() }
+  }, [])
   // ───── 4 · BÀI HÔM NAY (OMNI 3) — dùng chung kho Dạy học đã nạp; ẩn hẳn khi OMNI tắt. Nhúng ở Hành trình ⇒ không có bước này, không đọc cờ. ─────
   const bhn = useBaiHomNay(dd, kho, napKho, { docCo: !nhung })
 

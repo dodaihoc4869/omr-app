@@ -4,7 +4,6 @@
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { chuongCuaDe, thuMucCuaDe } from './cay-chon-de'
 import { laCauTuLuan } from './cau-tu-luan'
-import { laMucDayHocDacBiet } from './tach-phan-de'
 import { qidMayChuCuaIdCau } from './lich-su-cau-len-bang'
 import { khoaCau } from './khu-trung-cau'
 import type { MucDo } from './chon-em-day-hoc'
@@ -29,37 +28,21 @@ function chuanHoaDeDayHoc(s: TeacherExamSource): TeacherExamSource {
   return { ...s, nhom: `${khoi ? `${khoi} · ` : ''}${TEN_THU_MUC_DAY_HOC}/${ch}` }
 }
 
-/** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, bảo tồn các mục chuyên biệt (Ví dụ minh hoạ, Dạng toán trọng tâm)
- *  để không bị đề toàn bài nuốt mất câu, khử trùng câu giữa các đề phổ thông trong nhánh ấy, rồi tách theo phần.
+/** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, rồi khử câu trùng NỘI DUNG TRONG TỪNG ĐỀ (không giữa các đề), rồi tách theo phần.
  *  LỖI 28/09 (thầy báo "cây thiếu lớp 10"): bản đầu khử trùng trên CẢ KHO rồi mới lọc — câu Dạy học trùng với "Bộ đề" (hạng ưu tiên cao hơn) hoặc
  *  với cây bài `10-…/11-…/12-…` (cùng hạng nhưng đứng trước theo mã đề) bị nhánh kia giành, nên kho thật 845 / 972 / 1542 câu (khối 10 / 11 / 12)
- *  chỉ còn 0 / 80 / 120 và cả Khối 10 biến mất. Bảng Dạy học chỉ chiếu nhánh này nên không có gì để "nhường" cho nhánh khác. */
+ *  chỉ còn 0 / 80 / 120 và cả Khối 10 biến mất. Bảng Dạy học chỉ chiếu nhánh này nên không có gì để "nhường" cho nhánh khác.
+ *  LỖI 14/11 (thầy «đề hiển thị trên app gv nhiều câu bị thiếu, app hs thì đủ … kiểm tra kĩ khắc phục triệt để»): bản sau vẫn khử trùng GIỮA các đề
+ *  phổ thông của nhánh («cùng hạng thì bản tới trước giữ», IndexedDB trả đề theo mã) ⇒ đề ôn `-D1/-D2` chép câu từ các bài trước bị rút ruột: đo trên
+ *  kho máy chủ 14/11 (workflow do-de-thieu-cau-1411.yml) 21 đề mất 83 câu, vd DH-12-C1-B3-D1 còn 17/28, DH-10-C1-B4-D1 còn 11/18, trong khi máy em
+ *  (kho máy chủ) đủ. Nay MỖI ĐỀ GIỮ ĐỦ CÂU CỦA NÓ Y NHƯ KHO MÁY CHỦ (máy em) — kể cả 6 câu chép lặp ngay trong một đề; câu trùng nội dung (trong
+ *  một đề hay giữa các đề thầy tích cùng lúc) chỉ hiện MỘT lần ở bước chọn (`cauTuDeChon`, thầy 05/10). Tham số `_khuTrung` giữ cho nơi gọi cũ. */
 export function khoDayHoc(
   ds: readonly TeacherExamSource[],
-  khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] },
+  _khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] },
   tach: (x: TeacherExamSource[]) => TeacherExamSource[],
 ): TeacherExamSource[] {
-  const dayHoc = locDeDayHoc(ds).map(chuanHoaDeDayHoc)
-  const dacBiet = dayHoc.filter(laMucDayHocDacBiet)
-  const phoThong = dayHoc.filter((s) => !laMucDayHocDacBiet(s))
-  const phoThongKhuMap = new Map(khuTrung(phoThong).nguon.map((s) => [s.maDe, s]))
-  const dacBietKhuMap = new Map(
-    dacBiet.map((s) => {
-      const kq = khuTrung([s]).nguon[0] ?? s
-      return [s.maDe, kq]
-    }),
-  )
-  const ketQua: TeacherExamSource[] = []
-  for (const s of dayHoc) {
-    if (laMucDayHocDacBiet(s)) {
-      const db = dacBietKhuMap.get(s.maDe) ?? s
-      ketQua.push(db)
-    } else {
-      const pt = phoThongKhuMap.get(s.maDe)
-      if (pt) ketQua.push(pt)
-    }
-  }
-  return locDeDayHoc(tach(ketQua))
+  return locDeDayHoc(tach(locDeDayHoc(ds).map(chuanHoaDeDayHoc)))
 }
 
 export type CauGocDayHoc = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion

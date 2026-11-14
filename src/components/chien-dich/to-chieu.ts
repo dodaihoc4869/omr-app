@@ -90,10 +90,7 @@ export function noiDungCua(tra: ReadonlyMap<string, CauGoc>, qid: string): NoiDu
 /** Nạp Ngân hàng đề của máy này (IndexedDB) và dựng bảng tra. Hỏng ⇒ bảng rỗng (tờ vẫn mở bằng dòng thay thế). */
 export async function napBangTra(): Promise<Map<string, CauGoc>> {
   try {
-    const [{ loadExamSources, loadAllSessionTeacherBanks }, { khuTrungNguon }] = await Promise.all([
-      import('../../lib/exam-db'),
-      import('../../lib/khu-trung-cau'),
-    ])
+    const { loadExamSources, loadAllSessionTeacherBanks } = await import('../../lib/exam-db')
     const [sources, sessionBanks] = await Promise.all([
       loadExamSources().catch(() => []),
       loadAllSessionTeacherBanks().catch(() => []),
@@ -106,7 +103,9 @@ export async function napBangTra(): Promise<Map<string, CauGoc>> {
         }
       }
     }
-    return dungBangTra(khuTrungNguon(all).nguon)
+    // KHÔNG khử trùng (thầy 14/11 «nhiều câu bị thiếu đề»): đây là bảng TRA THEO MÃ CÂU. Khử trùng nội dung bỏ mất mã của bản chép ở đề thứ hai
+    // (giữ bản ở Bộ đề / đề đứng trước) ⇒ tra đúng mã đó ra rỗng ⇒ tờ chiếu chữa hiện dòng thay thế, mất đề. Câu trùng không hại gì cho việc tra.
+    return dungBangTra(all)
   } catch {
     return new Map()
   }

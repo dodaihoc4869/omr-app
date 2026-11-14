@@ -150,7 +150,18 @@ export function chonDeCanTai(
   return { moi, capNhat }
 }
 
-export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai = false): Promise<KetQuaDongBo> {
+/** ĐỀ ĐỔI TRONG LÚC ĐỒNG BỘ NGẦM mà CHƯA đẩy sang các ca đã mở (`capNhatCaDaMo`) — chờ lần đồng bộ thầy chủ động (Mở ca / Ngân hàng đề / nút Đồng bộ). */
+const KHOA_CA_CHO = 'ddh.caChoCapNhatDe'
+const docCaCho = (): string[] => {
+  try { const a = JSON.parse(localStorage.getItem(KHOA_CA_CHO) || '[]'); return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : [] } catch { return [] }
+}
+const ghiCaCho = (ds: readonly string[]): void => {
+  try { if (ds.length) localStorage.setItem(KHOA_CA_CHO, JSON.stringify([...new Set(ds)])); else localStorage.removeItem(KHOA_CA_CHO) } catch { /* máy chặn bộ nhớ: bỏ qua */ }
+}
+
+/** `ngam` (thầy 14/11 «đề trên app gv thì là 3% còn app hs là 1%»): đồng bộ NGẦM khi mở app / mở bảng — CHỈ làm mới kho đề trên máy thầy,
+ *  KHÔNG đụng các ca đã mở (không đổi đáp án ca giữa lúc có thể đang thi); mã đề đổi được ghi lại, lần đồng bộ thầy chủ động mới đẩy sang ca. */
+export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai = false, tuyChon: { ngam?: boolean } = {}): Promise<KetQuaDongBo> {
   const danhSach = await danhSachDe(scriptUrl, secret)
   const local = await loadExamSources()
   const soSua = await loadSoSuaDang()
@@ -188,15 +199,33 @@ export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai
         kq.capNhat.push(item.maDe)
         // Đề đã có bản mới (vd lời giải viết lại): cập nhật luôn các ca ĐÃ MỞ
         // dùng đề này để học sinh xem lại thấy bản mới. Lỗi không chặn đồng bộ.
-        try {
-          kq.caCapNhat += await capNhatCaDaMo(scriptUrl, secret, source)
-        } catch (e) {
-          kq.loi.push(`Đề ${item.maDe}: cập nhật ca đã mở thất bại — ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
+        // Đồng bộ NGẦM: chỉ ghi lại, lần thầy chủ động đồng bộ mới đẩy sang ca (dưới).
+        if (tuyChon.ngam) ghiCaCho([...docCaCho(), item.maDe])
+        else {
+          try {
+            kq.caCapNhat += await capNhatCaDaMo(scriptUrl, secret, source)
+          } catch (e) {
+            kq.loi.push(`Đề ${item.maDe}: cập nhật ca đã mở thất bại — ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
+          }
         }
       }
       for (const c of canXemList) kq.canXem.push(`${item.maDe} — ${c}`)
     } catch (e) {
       kq.loi.push(`Đề ${item.maDe}: ${e instanceof Error ? e.message : 'lỗi không rõ'}`)
+    }
+  }
+  // Đề đã đổi ở các lượt đồng bộ ngầm trước ⇒ giờ (thầy chủ động) mới đẩy sang các ca đã mở. Lỗi ⇒ giữ lại chờ lần sau.
+  if (!tuyChon.ngam) {
+    const cho = docCaCho().filter((m) => !kq.capNhat.includes(m))
+    if (cho.length) {
+      const conCho: string[] = []
+      const local2 = new Map((await loadExamSources()).map((s) => [s.maDe, s]))
+      for (const m of cho) {
+        const src = local2.get(m)
+        if (!src) continue
+        try { kq.caCapNhat += await capNhatCaDaMo(scriptUrl, secret, src) } catch { conCho.push(m) }
+      }
+      ghiCaCho(conCho)
     }
   }
   return kq
