@@ -36,7 +36,7 @@ describe('phòng Bình Phản Ứng — đề gửi một lần mỗi lượt', 
     const dsMoi = viewEm(moi), sauMoi = dsMoi.slice(dsMoi.findIndex((v) => v.luot?.cau != null) + 1) // sau bản view mang đề của lượt
     expect(sauMoi.length).toBeGreaterThan(0)
     // Máy mới: không bản view nào sau lượt mở mang đề; khoá đề giữ nguyên; mỗi bản nhỏ hơn hẳn view đủ đề.
-    expect(sauMoi.every((v) => v.luot?.cau === null && v.luot?.ck === ck)).toBe(true)
+    expect(sauMoi.every((v) => v.luot?.cau === null && v.luot?.ck === ck && (v.luot as { gon?: number }).gon === 1)).toBe(true)
     expect(Math.max(...sauMoi.map((v) => JSON.stringify(v).length)) * 3).toBeLessThan(deDu)
     // Nộp bài đổi «đã gửi» của mọi em ⇒ máy cũ nhận view (vẫn ĐỦ đề), máy mới nhận view gọn.
     await ph.gui(e3, { t: 'tra', chon: 'A' }); vi.advanceTimersByTime(200)
@@ -55,6 +55,26 @@ describe('phòng Bình Phản Ứng — đề gửi một lần mỗi lượt', 
     expect(viewEm(moi).pop()!.luot).toMatchObject({ so: 2, cau: null, ck: l2.ck })
   })
 
+  it('BẤT BIẾN chống vòng xin lại: mọi view lược đề (gon) trên một kết nối đều có khoá đã đi kèm đề ĐỦ trước đó trên CHÍNH kết nối ấy (kể cả lượt đề rỗng)', async () => {
+    const ph = taoPhongGia()
+    await ph.khoi([{ sbd: 'S1' }, { sbd: 'S2' }, { sbd: 'S3' }, { sbd: 'S4' }], null)
+    const ds = [await ph.noi('hs', 'S1'), await ph.noi('hs', 'S2'), await ph.noi('hs', 'S3'), await ph.noi('hs', 'S4')]
+    for (const w of ds) await ph.gui(w, { t: 'chao', cg: 1 })
+    for (const c of [{ ...cau('q0'), cau: null }, cau('q1'), { ...cau('q2'), bo: true }]) {
+      await ph.post('/luot', c)
+      for (const w of ds.slice(1)) { await ph.gui(w, { t: 'roi', k: 'an' }); await ph.gui(w, { t: 've' }) }
+      await ph.gui(ds[2]!, { t: 'tra', chon: 'B' }); vi.advanceTimersByTime(200)
+    }
+    for (const w of ds) {
+      const daCo = new Set<string>()
+      for (const v of viewEm(w)) {
+        const l = v.luot as { ck?: string; cau: unknown; gon?: number } | null | undefined
+        if (!l?.ck) continue
+        if (l.gon === 1) expect(daCo.has(l.ck)).toBe(true)
+        else { expect(l.cau).not.toBeNull(); daCo.add(l.ck) }
+      }
+    }
+  })
   it('kết nối mới của cùng em (nối lại) ⇒ chao nhận ĐỦ đề dù kết nối cũ đã có', async () => {
     const ph = taoPhongGia()
     await ph.khoi([{ sbd: 'S1' }, { sbd: 'S2' }], null)

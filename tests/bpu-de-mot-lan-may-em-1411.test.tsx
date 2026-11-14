@@ -39,12 +39,16 @@ describe('máy em — đề của lượt giữ trên máy', () => {
     ws.nhan({ ...v, luot: { ...v.luot, ck: 'k1' } })
     await waitFor(() => expect(document.body.textContent).toContain('Đề riêng của q1'))
     // View gọn: không kèm đề, đúng khoá ⇒ đề vẫn hiện, không xin lại.
-    ws.nhan({ ...v, luot: { ...v.luot, ck: 'k1', cau: null, daGui: 1 } })
+    ws.nhan({ ...v, luot: { ...v.luot, ck: 'k1', cau: null, gon: 1, daGui: 1 } })
     expect(document.body.textContent).toContain('Đề riêng của q1')
     expect(ws.daGui.some((d) => d.includes('xin-view'))).toBe(false)
     // Lệch khoá (lượt mới mà máy chưa có đề) ⇒ xin lại cả view; màn không đổi sang màn thiếu đề.
-    ws.nhan({ ...v, luot: { ...v.luot, so: 2, ck: 'k2', cau: null } })
+    ws.nhan({ ...v, luot: { ...v.luot, so: 2, ck: 'k2', cau: null, gon: 1 } })
     expect(ws.daGui.filter((d) => d.includes('xin-view'))).toHaveLength(1)
     expect(document.body.textContent).toContain('Đề riêng của q1')
+    // Vẫn lệch cùng khoá ⇒ KHÔNG xin lần hai (không vòng); view không có dấu gon (lượt không có đề) ⇒ không bao giờ xin.
+    ws.nhan({ ...v, luot: { ...v.luot, so: 2, ck: 'k2', cau: null, gon: 1 } })
+    ws.nhan({ ...v, luot: { ...v.luot, so: 3, ck: 'k3', cau: null } })
+    expect(ws.daGui.filter((d) => d.includes('xin-view'))).toHaveLength(1)
   })
 })

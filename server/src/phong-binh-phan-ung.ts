@@ -23,6 +23,8 @@ import { KenhLopMay } from './kenh-lop-may'
 import { noiDuLieuSt } from './sinh-ton-du-lieu'
 import { NAP_LAM_MOI_MS, chupAnToan, conKhop, docBan, docNap, duocNhanh, locMaCau, type AnToanNap, type CauNap } from './bpu-nap-san'
 
+/** Băm FNV-1a 32 bit (chuỗi ⇒ cơ số 36) — so view / đề đã gửi mà không giữ cả chuỗi. */
+const bamFnv = (s: string): string => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) } return (h >>> 0).toString(36) }
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
 
@@ -317,25 +319,26 @@ export class PhongBinhPhanUng {
    *  phút gửi 20–70 nghìn tin) — máy em phải tải + đọc lại cả đề liên tục. Nay: máy em báo `cg: 1` trong `chao` (biết giữ đề) ⇒ đề chỉ đi MỘT lần mỗi lượt / mỗi
    *  kết nối, các view sau mang `luot.cau = null` + `luot.ck` (khoá đề); view y hệt lần trước của chính em ⇒ KHÔNG gửi lại. Máy em bản cũ (không báo `cg`) ⇒ như cũ.
    *  Chỉ trong bộ nhớ (phòng ngủ dậy ⇒ quên ⇒ gửi đủ lại, đúng). Máy em thiếu đề ⇒ `xin-view` ⇒ gửi đủ. */
-  private viewDaGui = new WeakMap<WsMayChu, { json: string; ck: string }>()
+  private viewDaGui = new WeakMap<WsMayChu, { bam: string; ck: string }>()
   private biDe = new WeakSet<WsMayChu>()
-  /** Khoá đề của lượt (tính MỘT lần mỗi lần phát): số lượt + giờ mở + băm FNV-1a của đề đã lọc. */
+  /** Khoá đề của lượt (tính MỘT lần mỗi lần phát): số lượt + giờ mở + băm FNV-1a của đề đã lọc. Lượt KHÔNG có đề ⇒ '' (không bao giờ lược đề). */
   private khoaDe(st: L.TrangThaiPhong): string {
     const l = st.luot
-    if (!l) return ''
-    const s = JSON.stringify(l.cau ?? null)
-    let h = 0x811c9dc5
-    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) }
-    return `${l.so}:${l.batDau}:${(h >>> 0).toString(36)}:${s.length}`
+    if (!l || l.cau == null) return ''
+    const s = JSON.stringify(l.cau)
+    return `${l.so}:${l.batDau}:${bamFnv(s)}:${s.length}`
   }
   /** Gửi view của MỘT máy em (đường duy nhất tới máy em): `ep` ⇒ gửi đủ đề, kể cả khi trùng lần trước (chao / xin-view). */
   private guiViewEm(ws: WsMayChu, s: string, st: L.TrangThaiPhong, ck: string, ep = false): void {
     const v = L.viewEm(st, s), cu = this.viewDaGui.get(ws)
     const gon = !ep && !!v.luot && !!ck && this.biDe.has(ws) && cu?.ck === ck
-    const json = JSON.stringify(v.luot && ck ? { ...v, luot: { ...v.luot, ck, ...(gon ? { cau: null } : {}) } } : v)
-    if (!ep && cu?.json === json) return
+    // `gon: 1` = view ĐÃ LƯỢC đề (máy em chỉ ghép đề / xin lại khi thấy dấu này — lượt không có đề không bao giờ mang dấu ⇒ không có vòng xin lại).
+    const json = JSON.stringify(v.luot && ck ? { ...v, luot: { ...v.luot, ck, ...(gon ? { cau: null, gon: 1 } : {}) } } : v)
+    // Nhớ BĂM + độ dài (không giữ cả chuỗi: view đủ đề có ảnh nhúng × trăm máy ⇒ phình bộ nhớ phòng).
+    const bam = `${bamFnv(json)}:${json.length}`
+    if (!ep && cu?.bam === bam) return
     this.gui(ws, json)
-    this.viewDaGui.set(ws, { json, ck: v.luot ? ck : '' })
+    this.viewDaGui.set(ws, { bam, ck: v.luot ? ck : '' })
   }
   /** LIVE BẢNG (10/11, phong-live.ts): sổ nét, lô điểm đang viết, số em đang xem. */
   private live: LiveMay
