@@ -366,3 +366,18 @@ html.nhe .bz-bay { filter: none; }
 .bz-nh s, .bz-tom s { text-decoration-color: var(--hong); text-decoration-thickness: 3px; opacity: .7; }
 .bz-lk.sang { box-shadow: 0 0 0 3px #8fd8ee, 0 0 24px rgba(143, 216, 238, .8); }
 .bz-pt.sang { box-shadow: inset 0 0 0 3px var(--vang), 0 0 34px rgba(255, 210, 122, .45); }
+/* khung động (thầy 14/11 «không cần minh hoạ hết những cái thầy đã minh hoạ rõ thì phóng to bảng»): cột minh hoạ trượt ra / vào */
+#cot { will-change: transform, opacity; }
+/* EM NHẨM TRƯỚC: dừng hình cho em tự nhẩm (đếm 3-2-1) rồi mới nghe Thầy giải */
+#nham { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.nh-hop { display: grid; justify-items: center; gap: 22px; padding: 38px 56px 34px; min-width: 900px; max-width: 1240px; border-radius: 40px; background: linear-gradient(165deg, rgba(36, 52, 59, .98), rgba(22, 33, 38, .98)); box-shadow: 0 30px 80px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--vang); text-align: center; }
+.nh-ke { font-size: 30px; font-weight: 900; letter-spacing: .24em; color: var(--vang); }
+.nh-hoi { font-size: 52px; font-weight: 800; line-height: 1.25; color: var(--phan); }
+.nh-hoi .nhan, .nh-hoi em { color: var(--vang); }
+.nh-dem { position: relative; width: 150px; height: 150px; }
+.nh-dem svg { width: 150px; height: 150px; }
+.nh-dem b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 72px; font-weight: 900; color: var(--vang); }
+.nh-goi { font-size: 30px; font-weight: 700; color: var(--phan-mo); }
+/* thẻ nổi trên bảng (khung «bang») */
+#the-noi { position: absolute; padding: 18px 28px; border-radius: 22px; background: rgba(22, 33, 38, .96); box-shadow: inset 0 0 0 2.5px var(--ngoc), 0 16px 40px rgba(0, 0, 0, .45); font-size: 38px; font-weight: 800; color: var(--phan); white-space: nowrap; }
+#the-noi .nhan { color: var(--ngoc); }

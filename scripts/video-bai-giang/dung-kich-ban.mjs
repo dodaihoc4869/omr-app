@@ -132,6 +132,9 @@ for (const cc of ch.canh) {
   const loiCanh = cc.loiRieng ? JSON.parse(readFileSync(join(duLieu, cc.loiRieng), 'utf8')) : c.loi
   const cauGoc = cc.dong.map((i) => ({ i, ...loiCanh[i] }))
   let trc = null
+  canh.nham = []
+  // PHÁT CHẬM (cc.cham: [[câu, tốc độ]]) — câu nhẩm số dày đặc chạy chậm lại cả giọng (giữ cao độ) lẫn nét bảng
+  const tocCau = new Map((cc.cham ?? []).map(([i, k]) => [i, k]))
   const chenDoVui = (sMoc) => {
     const dv = cc.doVui
     canh.manh.push({ t0: t, t1: t + dv.giay, s0: sMoc, s1: sMoc, giong: false, dung: true })
@@ -147,10 +150,18 @@ for (const cc of ch.canh) {
       if (cc.vietThat) for (const m of chiaNoi(trc, a, NOI_CAU)) { canh.manh.push({ t0: t, t1: t + m.dai, s0: m.s0, s1: m.s1, giong: false }); t += m.dai }
       else { canh.manh.push({ t0: t, t1: t + NOI_CAU, s0: trc, s1: a, giong: false }); t += NOI_CAU }
     }
+    // EM NHẨM TRƯỚC (cc.nham: [{ truocDong, giay, hoi }]) — ngay trước câu Thầy nói đáp số: dừng hình, câu hỏi + đếm ngược 3-2-1 cho em tự nhẩm
+    for (const nh of (cc.nham ?? []).filter((x) => x.truocDong === cg.i)) {
+      canh.manh.push({ t0: t, t1: t + nh.giay, s0: a, s1: a, giong: false, dung: true })
+      canh.nham.push({ t0: t, t1: t + nh.giay, hoi: nh.hoi, goi: nh.goi ?? 'Nghe Thầy giải' })
+      sfx.push({ t: t + 0.02, loai: 'vut' }, { t: t + 0.45, loai: 'bop' }); for (let g = 0; g < 3; g++) sfx.push({ t: t + nh.giay - 3.6 + g, loai: g === 2 ? 'tich-cuoi' : 'tich' })
+      t += nh.giay
+    }
     const cau = { i: cg.i, chu: cg.chu, t0: t, s0: a, s1: b }
+    const toc = tocCau.get(cg.i) ?? 1
     for (const m of catCau(a, b, !!cc.vietThat)) {
-      const d = m.giong ? m.s1 - m.s0 : m.dai
-      canh.manh.push({ t0: t, t1: t + d, s0: m.s0, s1: m.s1, giong: m.giong }); if (m.giong) giong.push({ t0: t, s0: m.s0, s1: m.s1 }); t += d
+      const d = m.giong ? (m.s1 - m.s0) / toc : m.dai
+      canh.manh.push({ t0: t, t1: t + d, s0: m.s0, s1: m.s1, giong: m.giong }); if (m.giong) giong.push({ t0: t, s0: m.s0, s1: m.s1, ...(toc !== 1 ? { k: toc } : {}) }); t += d
     }
     cau.t1 = t; canh.cau.push(cau); trc = b
     // ĐỐ VUI chèn sau câu `sauDong`: bảng đứng, giọng tắt, thẻ câu hỏi + đếm ngược
@@ -316,6 +327,11 @@ for (const cc of ch.canh) {
     if (!sau || sau.t > dd.t1 + 1.4) ks.splice(i + 2, 0, { t: dd.t1 + 0.2, k })
   }
   canh.vung = hopCanh ? khungQuay(hopCanh) : kTruoc
+  // KHUNG ĐỘNG (cc.cheDo: [[mốc, 'bang' | 'minh']]): «bang» = bảng mở rộng gần cả màn, phóng to chữ (chỗ Thầy đã viết / vẽ rõ); «minh» = bảng + cột hoạt hoạ
+  if (cc.cheDo) canh.cheDo = cc.cheDo.map(([moc2, che]) => ({ t: moc2 === 'dau' ? canh.t0 : mocTu(moc2), p: che === 'bang' ? 1 : 0 })).filter((x) => x.t != null).sort((x, y) => x.t - y.t)
+  // THẺ NỔI trên bảng (cc.theNoi: [{ luc, giay, chu }]) — ý chốt khi đang ở khung «bang»
+  if (cc.theNoi) canh.theNoi = cc.theNoi.map((x) => { const t0 = mocTu(x.luc); return { t0, t1: t0 + (x.giay ?? 5), chu: x.chu } })
+  if (!canh.nham.length) delete canh.nham
   doan.push(canh)
 }
 // kết

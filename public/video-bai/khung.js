@@ -37,7 +37,7 @@ let QUANG = [], BUI = []
 const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 // eslint-disable-next-line no-unused-vars -- dùng ở hoat-hoa*.js (cùng phạm vi toàn cục)
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
-let ctx = null, hoaCtx = null
+let ctx = null, hoaCtx = null, KHUNG_DONG = false
 
 /** Khung một phần tử theo toạ độ SÂN KHẤU 1920×1080. Trang xem trong app co sân khấu vừa màn máy em ⇒ toạ độ màn khác toạ độ sân;
  *  đường nối bảng → hình, tia lấp lánh, pháo giấy vẽ theo toạ độ sân nên phải đổi về (bộ quay video: sân ở 0,0 tỉ lệ 1 ⇒ không đổi). */
@@ -99,9 +99,19 @@ function nap(kb, net) {
     Object.assign($('#phan').style, { width: `${bw}px`, height: `${bh}px` })
     Object.assign($('#dau').style, { left: `${bx + bw - 470}px`, top: `${by + bh - 190}px`, right: 'auto' })
   }
+  // KHUNG ĐỘNG (kịch bản có cảnh mang cheDo): bảng giãn từ bề rộng thường tới gần cả màn ⇒ canvas cỡ lớn nhất, khung bảng cắt theo bề rộng hiện tại
+  KHUNG_DONG = kb.doan.some((d) => d.cheDo)
+  if (KHUNG_DONG) {
+    BANG.w0 = BANG.w; BANG.wMax = 1920 - 2 * BANG.x; Object.assign($('#phan').style, { width: `${BANG.wMax}px`, right: 'auto' })
+    if (!$('#nham')) {
+      const s2 = $('#san')
+      tao('div', 'an', s2, '<div class="nh-hop"><div class="nh-ke">EM NHẨM TRƯỚC</div><div class="nh-hoi"></div><div class="nh-dem"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="66" fill="rgba(11,20,24,.9)" stroke="rgba(255,255,255,.12)" stroke-width="9"/><circle class="vong" cx="75" cy="75" r="66" fill="none" stroke="#ffd27a" stroke-width="9" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" transform="rotate(-90 75 75)"/></svg><b>3</b></div><div class="nh-goi"></div></div>').id = 'nham'
+      tao('div', 'an', $('#canh')).id = 'the-noi'
+    }
+  }
   $('#ten-bai').textContent = `${String(kb.ten || '').toUpperCase()} · ${String(kb.lop || '').replace(/^Live Khối /, 'K')}`
   dungNen(); dungCanh(); dungMoDau(); dungKet(); dungChuong()
-  const c = $('#phan'); c.width = BANG.w; c.height = BANG.h; ctx = c.getContext('2d')
+  const c = $('#phan'); c.width = KHUNG_DONG ? BANG.wMax : BANG.w; c.height = BANG.h; ctx = c.getContext('2d')
   const h = $('#hoa'); h.width = 1920; h.height = 1080; hoaCtx = h.getContext('2d')
   return document.fonts.ready.then(() => { doCo(); return { tong: KB.tong } })
 }
@@ -388,15 +398,47 @@ function camera(d, t) {
   // đẩy máy chậm vào giữa hai khung (Ken Burns)
   const den = ks[i + 1] ? ks[i + 1].t : d.t1, z = CHE_DO.nhe ? 1 : 1 - 0.045 * eInOut(tien(t, ks[i].t, Math.max(1, den - ks[i].t)))
   const cx = c[0] + c[2] / 2, cy = c[1] + c[3] / 2
+  if (d.cheDo && BANG.w0) { const s = ((c[2] * z) / BANG.w0) * lerp(1, 0.74, d.pNay || 0), W = BANG.w * s, H = BANG.h * s; return [cx - W / 2, cy - H / 2, W, H] }
   return [cx - (c[2] * z) / 2, cy - (c[3] * z) / 2, c[2] * z, c[3] * z]
+}
+/** Khung động: 0 = bảng + cột minh hoạ · 1 = bảng gần cả màn. Đổi êm 0,75 s. */
+function pKhung(d, t) {
+  const ks = d.cheDo; let i = -1; for (let j = 0; j < ks.length; j++) if (ks[j].t <= t) i = j
+  if (i < 0) return ks[0].p
+  const truoc = i > 0 ? ks[i - 1].p : ks[i].p
+  return lerp(truoc, ks[i].p, eInOut(tien(t, ks[i].t, 0.75)))
+}
+/** EM NHẨM TRƯỚC: thẻ câu hỏi giữa màn, sân tối nhẹ, vòng đếm 3-2-1 rồi nhường lời Thầy giải. */
+function veNham(d, t) {
+  const el = $('#nham'), n = d.nham.find((x) => t >= x.t0 && t < x.t1)
+  if (!n) { el.classList.add('an'); return }
+  el.classList.remove('an')
+  if (el.dataset.t0 !== String(n.t0)) { el.dataset.t0 = String(n.t0); el.querySelector('.nh-hoi').innerHTML = dam(n.hoi).replace(/\n/g, '<br>'); el.querySelector('.nh-goi').textContent = n.goi }
+  const vao = lo(t - n.t0, 2.4, 0.6), ra = tien(t, n.t1 - 0.4, 0.4), hop = el.querySelector('.nh-hop')
+  hop.style.opacity = r2(kep(vao * 1.5) * (1 - ra)); hop.style.transform = `translateY(${r2((1 - vao) * 40)}px) scale(${r2(0.9 + 0.1 * kep(vao, 0, 1.2))})`
+  $('#den').style.opacity = r2(0.42 * kep((t - n.t0) / 0.35) * (1 - ra))
+  const dem0 = n.t1 - 3.6, con = kep((t - dem0) / 3), so = Math.max(1, 3 - Math.floor(Math.max(0, t - dem0)))
+  el.querySelector('.nh-dem b').textContent = t < dem0 ? '3' : String(so)
+  el.querySelector('.nh-dem .vong').setAttribute('stroke-dashoffset', String(r2(con)))
+  el.querySelector('.nh-dem').style.transform = `scale(${r2(t >= dem0 ? 1 + 0.12 * ex(-((t - dem0) % 1) * 6) : 1)})`
+  el.querySelector('.nh-goi').style.opacity = r2(tien(t, n.t1 - 0.9, 0.3))
+}
+/** Thẻ nổi ở góc dưới bảng (khung «bang»): ý chốt Thầy vừa nói. */
+function veTheNoi(d, t) {
+  const el = $('#the-noi'), n = d.theNoi.find((x) => t >= x.t0 - 0.2 && t < x.t1 + 0.4)
+  if (!n) { el.classList.add('an'); return }
+  el.classList.remove('an'); if (el.dataset.t0 !== String(n.t0)) { el.dataset.t0 = String(n.t0); el.innerHTML = dam(n.chu) }
+  const p = lo(t - n.t0, 2.3, 0.55), ra = tien(t, n.t1, 0.4)
+  el.style.left = `${BANG.x + 40}px`; el.style.top = `${BANG.y + BANG.h - 118}px`
+  el.style.opacity = r2(kep(p * 1.5) * (1 - ra)); el.style.transform = `translateY(${r2((1 - p) * 24)}px)`
 }
 // CHẾ ĐỘ NHẸ: máy quay ĐỨNG YÊN giữa hai khung (không đẩy chậm, chuyển 0,6 s) ⇒ nét đã xong vẽ một lần lên tấm đệm cỡ khung bảng theo đúng góc máy;
 // mỗi khung chỉ dán tấm đệm (không co giãn) + vẽ nét đang viết dở. Máy quay đổi / đổi cảnh / tua lùi ⇒ vẽ lại tấm đệm. Máy khoẻ + bộ quay video: vectơ từng khung như cũ.
 const DEM = { cv: null, c: null, khoa: '', i: 0, s: -1 }
 function napDem(d, s, s0, cx, cy, k) {
-  if (!DEM.cv) { DEM.cv = document.createElement('canvas'); DEM.cv.width = BANG.w; DEM.cv.height = BANG.h; DEM.c = DEM.cv.getContext('2d') }
+  if (!DEM.cv) { DEM.cv = document.createElement('canvas'); DEM.cv.width = ctx.canvas.width; DEM.cv.height = BANG.h; DEM.c = DEM.cv.getContext('2d') }
   const khoa = `${d.id}|${cx.toFixed(1)}|${cy.toFixed(1)}|${k.toFixed(4)}`
-  if (DEM.khoa !== khoa || s < DEM.s) { DEM.c.setTransform(1, 0, 0, 1, 0, 0); DEM.c.clearRect(0, 0, BANG.w, BANG.h); DEM.khoa = khoa; DEM.i = 0 }
+  if (DEM.khoa !== khoa || s < DEM.s) { DEM.c.setTransform(1, 0, 0, 1, 0, 0); DEM.c.clearRect(0, 0, DEM.cv.width, BANG.h); DEM.khoa = khoa; DEM.i = 0 }
   const c = DEM.c, net = NET.net, x1 = cx + BANG.w / k, y1 = cy + BANG.h / k
   c.setTransform(k, 0, 0, k, -cx * k, -cy * k); c.lineCap = 'round'; c.lineJoin = 'round'
   while (DEM.i < net.length && net[DEM.i].ket <= s) {
@@ -454,7 +496,7 @@ function viTriBut(s, dau, mauDau, truoc, sau) {
 function veBang(d, t) {
   const s = nguon(d, t) * 1000, s0 = d.cau[0].s0 * 1000 - 2000
   const [cx, cy, cw] = camera(d, t), k = BANG.w / cw
-  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, BANG.w, BANG.h)
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, BANG.h)
   let dau = null, mauDau = '', truoc = null, sau = null
   if (CHE_DO.nhe) {
     napDem(d, s, s0, cx, cy, k)
@@ -498,6 +540,10 @@ function veCanh(d, t) {
     document.querySelectorAll('#cot-trong > .the, .dong').forEach((e) => e.classList.add('an'))
     $('#pt').classList.toggle('an', !d.phanTu); $('#cot').classList.toggle('an', !!d.phanTu)
   }
+  if (d.cheDo) {
+    const p = (d.pNay = pKhung(d, t)); BANG.w = Math.round(lerp(BANG.w0, BANG.wMax, p)); $('#bang').style.width = `${BANG.w}px`
+    const cot = $('#cot'); cot.style.transform = `translateX(${Math.round(p * (COT.w + 140))}px)`; cot.style.opacity = r2(1 - p)
+  } else if (BANG.w0 && BANG.w !== BANG.w0) { BANG.w = BANG.w0; $('#bang').style.width = `${BANG.w}px`; $('#cot').style.transform = ''; $('#cot').style.opacity = '' }
   const a = CANH[0].t0, b = CANH[CANH.length - 1].t1
   $('#tien-do i').style.transform = `scaleX(${Math.round(kep((t - a) / (b - a)) * 1000) / 1000})`
   // vào cảnh: phóng 1,1 ⇒ 1 khi phiến thẻ chương rút; điểm nhấn: phóng nhẹ cả sân
@@ -555,10 +601,12 @@ function veCanh(d, t) {
     const m = d.hoat.moc, r = hopSan
     if (d.tv) for (const hg of d.tv) { const tau = t - m[hg.k]; if (tau >= 0 && tau < 0.8) { const b = r(hg.h); lapLanh(hoaCtx, b.left + 50, b.top + b.height / 2, tau, d.mauHex) } }
     if (d.ct) { const tau = t - m.noi - 1.2; if (tau >= 0 && tau < 0.8) { const b = r(d.ct.lkMoi); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#ffd27a', 16) } }
-    if (d.lap) for (const l of d.lap) { const tau = t - m[l.k] - (l.tre || 0); if (tau >= 0 && tau < 0.8) { const b = r(l.e); if (b.width) lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, l.mau || d.mauHex, l.n || 12) } }
+    if (d.lap && !(d.pNay > 0.5)) for (const l of d.lap) { const tau = t - m[l.k] - (l.tre || 0); if (tau >= 0 && tau < 0.8) { const b = r(l.e); if (b.width) lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, l.mau || d.mauHex, l.n || 12) } }
     if (d.cq) { const tau = t - m.tong; if (tau >= 0 && tau < 0.8) { const b = r(d.cq.dem.querySelector('.dem i:last-child')); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#8fb6ff', 14) } }
   }
   veDanhDau(d, t, camera(d, t), bienDoi)
+  if (d.nham) veNham(d, t); else if (KHUNG_DONG) $('#nham').classList.add('an')
+  if (d.theNoi) veTheNoi(d, t); else if (KHUNG_DONG) $('#the-noi').classList.add('an')
   if (d.doVui) veDoVui(d, t); else $('#dv').classList.add('an')
 }
 

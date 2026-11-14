@@ -34,6 +34,9 @@ for m in kb['giong']:
     a, b, o = int(m['s0'] * SR), int(m['s1'] * SR), int(m['t0'] * SR)
     if a < 0 or b > len(goc) or b <= a: continue
     doan = goc[a:b].copy()
+    # PHÁT CHẬM chỗ nhẩm số (thầy 14/11): mảnh có 'k' < 1 giãn thời gian, GIỮ cao độ giọng (atempo)
+    if m.get('k') and abs(m['k'] - 1) > 1e-3:
+        doan = np.frombuffer(subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', '-af', f"atempo={m['k']}", '-f', 'f32le', '-'], input=doan.astype('<f4').tobytes(), capture_output=True, check=True).stdout, dtype='<f4').copy()
     k = min(mem, len(doan) // 2)
     doan[:k] *= np.linspace(0, 1, k); doan[len(doan) - k:] *= np.linspace(1, 0, k)
     e = min(N, o + len(doan)); giong[o:e] += doan[:e - o]

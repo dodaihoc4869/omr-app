@@ -236,7 +236,7 @@ function veDanhDau(d, t, cam, bienDoi) {
     const mau = d.mauHex
     const r = svgEl('rect', { x: a[0], y: a[1], width: b[0] - a[0], height: b[1] - a[1], rx: 22, fill: `${mau}14`, stroke: mau, 'stroke-width': 5, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 - ve, opacity: mo, filter: 'url(#dd-sang)' }, svg)
     void r
-    const dich = d.hoatNeo && d.hoatNeo[dd.toi]
+    const dich = d.hoatNeo && !(d.pNay > 0.5) && d.hoatNeo[dd.toi] // khung «bang»: cột minh hoạ đã trượt đi ⇒ chỉ khoanh, không nối
     if (dich) {
       const rr = hopSan(dich), laNt = dich instanceof SVGElement
       const ex = laNt ? rr.left + rr.width / 2 : rr.left - 10, ey = laNt ? rr.top - 8 : rr.top + rr.height / 2
