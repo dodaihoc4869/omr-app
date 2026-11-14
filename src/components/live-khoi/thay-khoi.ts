@@ -37,6 +37,7 @@ export const layDangMo = (): number | null => dangMo
 export const layView = (): ViewBang | null => view
 /** Sinh Tồn đợt 4: đồ + danh hiệu từng em (từ `lop-ds` phòng phát cả máy thầy) ⇒ máy chiếu vẽ đồ / danh hiệu như máy em. Đổi ⇒ tạo Map mới (useSyncExternalStore). */
 let doLop: ReadonlyMap<string, { c?: string; dh?: number }> = new Map()
+let phongXin: unknown = null
 export const layDoLop = (): ReadonlyMap<string, { c?: string; dh?: number }> => doLop
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
@@ -135,6 +136,9 @@ function nhan(tin: unknown): void {
     // Buổi đã kết thúc, hoặc bảng vừa chuyển sang buổi trên lớp (không cờ khối) ⇒ gỡ lớp live.
     if (view.ketThuc || (!view.live?.khoi && dangMo == null && !phienCua(view.buoiId))) { go(); phatDoi(); return }
     soat(); soatTieng(); apChe()
+    // Sinh Tồn đợt 4: nối mới (tải lại trang giữa buổi) ⇒ xin danh sách MỘT lần để máy chiếu có đồ + danh hiệu ngay (phòng chỉ tự phát khi sĩ số đổi).
+    const ph = layPhong()
+    if (view.live?.khoi && ph && ph !== phongXin) { phongXin = ph; ph.gui({ t: 'lop-xin' }) }
     if (view.live?.khoi && dangMo != null) datDangMo(null)
     gan(); phatDoi()
   }

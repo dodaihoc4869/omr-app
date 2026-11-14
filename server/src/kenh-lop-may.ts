@@ -87,7 +87,10 @@ export class KenhLopMay {
     if (dau === this.dauDs) return
     this.dauDs = dau
     if (!st.ketThuc) this.soatDo(st)
-    this.moiMay(this.dsLop(st), this.doEm.size > 0)
+    // Máy thầy (máy chiếu) chỉ cần danh sách khi có em mặc đồ / có danh hiệu (đồ trên bé ma); không ai có ⇒ như cũ, không gửi.
+    let coDo = false
+    for (const d of this.doEm.values()) if (d.c || d.dh >= 0) { coDo = true; break }
+    this.moiMay(this.dsLop(st), coDo)
   }
   /** Tin `lop` / `lop-xin`. Trả true nếu là tin của kênh lớp (đã xử lý hoặc đã bỏ). */
   tin(ws: WsMayChu, a: KemBpu, j: Row, st: TrangThaiPhong, nay: number): boolean {
