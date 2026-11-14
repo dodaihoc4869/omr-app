@@ -312,7 +312,8 @@ describe('trang buổi live', () => {
     await screen.findByText('Phát cả 5 đoạn · 29 phút')
     const ds = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.map((c) => String(c[0]))
     // 13/11 SỬA CÓ CHỦ ĐÍCH: thêm đúng một lượt HEAD hỏi «buổi có Nhật ký bài dạy không» (cùng gốc, cùng vé, 0 lệnh D1)
-    expect(ds).toEqual([`https://goc-thay.test/live-tep/${ID_BUOI_GIA}/buoi.json?ve=ve-thay`, `https://goc-thay.test/live-tep/${ID_BUOI_GIA}/nhat-ky.json?ve=ve-thay`])
+    // 14/11 SỬA CÓ CHỦ ĐÍCH: thêm lượt HEAD hỏi «buổi có Video tóm tắt không» (cùng gốc, cùng vé, song song, 0 lệnh D1)
+    expect(ds).toEqual([`https://goc-thay.test/live-tep/${ID_BUOI_GIA}/buoi.json?ve=ve-thay`, `https://goc-thay.test/live-tep/${ID_BUOI_GIA}/video-kb.json?ve=ve-thay`, `https://goc-thay.test/live-tep/${ID_BUOI_GIA}/nhat-ky.json?ve=ve-thay`])
     expect(screen.queryByText('Em chưa đúng')).toBeNull(); expect(screen.queryByText('Câu em chưa đúng')).toBeNull(); expect(screen.queryByText('Em lên bảng')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Về Lịch sử Live' }))
     expect(onDong).toHaveBeenCalledOnce()
@@ -439,6 +440,7 @@ describe('nhật ký bài dạy trên trang buổi', () => {
     const goc = fetch as unknown as (a: RequestInfo | URL, b?: RequestInit) => Promise<Response>, hoi: string[] = []
     vi.stubGlobal('fetch', vi.fn(async (u: RequestInfo | URL, k?: RequestInit) => {
       if (/\/nhat-ky\.json/.test(String(u))) { hoi.push(`${k?.method ?? 'GET'} ${new URL(String(u)).pathname}`); return new Response(null, { status: coNk ? 200 : 404 }) }
+      if (/\/video-kb\.json/.test(String(u))) return new Response(null, { status: 404 })
       return goc(u, k)
     }))
     localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: TOKEN }))
@@ -463,5 +465,33 @@ describe('nhật ký bài dạy trên trang buổi', () => {
     await vao(false)
     expect(screen.queryByRole('button', { name: /Nhật ký bài dạy/ })).toBeNull()
     expect(screen.queryByRole('dialog', { name: 'Nhật ký bài dạy' })).toBeNull()
+  })
+})
+
+// VIDEO TÓM TẮT (thầy 14/11 «Tạo luôn video tóm tắt trong phần live trên app hs»): buổi có video-kb.json ⇒ thẻ «Video tóm tắt» ở bìa, đứng TRÊN thẻ
+// nhật ký; bấm ⇒ khung phủ kín mở /video-bai/ bằng vé của buổi; trang báo «dong» ⇒ đóng.
+describe('video tóm tắt trên trang buổi', () => {
+  it('có video ⇒ thẻ «Video tóm tắt» trên thẻ nhật ký; bấm ⇒ /video-bai/ đúng vé; «dong» ⇒ đóng; chưa có ⇒ không thẻ', async () => {
+    const { buoi } = taoBuoiGia()
+    datMayChu({ rieng: () => taoRiengGia(buoi), buoi: () => buoi })
+    const goc = fetch as unknown as (a: RequestInfo | URL, b?: RequestInit) => Promise<Response>
+    vi.stubGlobal('fetch', vi.fn(async (u: RequestInfo | URL, k?: RequestInit) => {
+      if (/\/(video-kb|nhat-ky)\.json/.test(String(u))) return new Response(null, { status: k?.method === 'HEAD' ? 200 : 405 })
+      return goc(u, k)
+    }))
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: TOKEN }))
+    render(<XemBuoiLive id={ID_BUOI_GIA} ve="ve-gia" nguon="hs" dong={() => {}} />)
+    await screen.findByText(/^Phát cả \d+ đoạn/)
+    await cho(30)
+    const vd = await screen.findByRole('button', { name: /Video tóm tắt/ }), nk = screen.getByRole('button', { name: /Nhật ký bài dạy/ })
+    expect(vd.compareDocumentPosition(nk) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    fireEvent.click(vd)
+    const khung = await screen.findByRole('dialog', { name: 'Video tóm tắt' })
+    const src = khung.querySelector('iframe')!.getAttribute('src')!
+    expect(src.startsWith('/video-bai/?')).toBe(true)
+    const q = new URLSearchParams(src.slice(src.indexOf('?')))
+    expect(q.get('id')).toBe(ID_BUOI_GIA); expect(q.get('ve')).toBeTruthy(); expect(q.get('goc')).toMatch(/^https?:\/\//)
+    await act(async () => { window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'video-bai', loai: 'dong' } })) })
+    expect(screen.queryByRole('dialog', { name: 'Video tóm tắt' })).toBeNull()
   })
 })

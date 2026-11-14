@@ -126,7 +126,35 @@ async function ghiKhucLenh(req: Request, env: Env, url: URL): Promise<Response> 
 }
 
 // ── GET /live-tep/<id>/<tệp>?ve= ──
-const KIEU_TEP: Record<string, string> = { [TEP_LIVE.buoi]: 'application/json;charset=utf-8', [TEP_LIVE.net]: 'application/octet-stream', [TEP_LIVE.tieng]: 'audio/mpeg', 'nhat-ky.json': 'application/json;charset=utf-8' }
+const KIEU_TEP: Record<string, string> = { [TEP_LIVE.buoi]: 'application/json;charset=utf-8', [TEP_LIVE.net]: 'application/octet-stream', [TEP_LIVE.tieng]: 'audio/mpeg', 'nhat-ky.json': 'application/json;charset=utf-8',
+  'video-kb.json': 'application/json;charset=utf-8', 'video-net.json': 'application/json;charset=utf-8', 'video-am.m4a': 'audio/mp4' }
+// ── VIDEO TÓM TẮT (thầy 14/11 «Tạo luôn video tóm tắt trong phần live trên app hs»): máy em tự vẽ (public/video-bai/) từ 3 tệp của buổi — kịch bản, nét phấn,
+// tiếng đã trộn (giọng Thầy + nhạc + tiếng động). Bộ dựng (scripts/video-bai-giang/) tải lên bằng mã GV; máy em đọc qua /live-tep theo vé như các tệp khác.
+// POST /gv/live-video-ghi?id=<buổi>&tep=kb|net|am  (thân = nội dung tệp) · POST /gv/live-video-xoa?id=<buổi>
+const VIDEO_TEP: Record<string, { ten: string; toiDa: number }> = { kb: { ten: 'video-kb.json', toiDa: 3_000_000 }, net: { ten: 'video-net.json', toiDa: 6_000_000 }, am: { ten: 'video-am.m4a', toiDa: 40_000_000 } }
+async function videoLenh(req: Request, env: Env, url: URL, p: string): Promise<Response> {
+  if (!laThay(req, env, {})) return json({ ok: false, error: 'Sai mã bí mật' }, 403)
+  const id = buoiHop(url.searchParams.get('id'))
+  if (!id) return json({ ok: false, lyDo: 'thieu', error: 'Thiếu mã buổi.' }, 400)
+  if (!env.DE) return json({ ok: false, lyDo: 'khong-r2' }, 503)
+  if (p === '/gv/live-video-xoa') { await env.DE.delete(Object.values(VIDEO_TEP).map((v) => khoaTep(id, v.ten))); return json({ ok: true, id }) }
+  const loai = VIDEO_TEP[url.searchParams.get('tep') ?? '']
+  if (!loai) return json({ ok: false, lyDo: 'tep', error: 'Tệp phải là kb, net hoặc am.' }, 400)
+  const dai = Number(req.headers.get('content-length') ?? 0)
+  if (dai > loai.toiDa) return json({ ok: false, lyDo: 'qua-co', error: 'Tệp quá cỡ.' }, 413)
+  const dong = await env.DB.prepare("SELECT id FROM live_buoi WHERE id = ? AND trang_thai <> 'dang_xoa'").bind(id).first<Row>().catch(() => null)
+  if (!dong) return json({ ok: false, lyDo: 'khong-co', error: 'Không tìm thấy buổi live này.' }, 404)
+  const du = new Uint8Array(await req.arrayBuffer())
+  if (!du.length || du.length > loai.toiDa) return json({ ok: false, lyDo: 'qua-co', error: 'Tệp rỗng hoặc quá cỡ.' }, 413)
+  if (loai.ten.endsWith('.json')) {
+    let j: unknown = null
+    try { j = JSON.parse(new TextDecoder().decode(du)) } catch { /* sai dạng */ }
+    const hop = loai.ten === 'video-kb.json' ? !!j && Array.isArray((j as Row).doan) && typeof (j as Row).tong === 'number' : !!j && Array.isArray((j as Row).net)
+    if (!hop) return json({ ok: false, lyDo: 'sai-dang', error: 'Tệp JSON không đúng dạng.' }, 400)
+  } else if (String.fromCharCode(...du.subarray(4, 8)) !== 'ftyp') return json({ ok: false, lyDo: 'sai-dang', error: 'Tiếng phải là tệp m4a.' }, 400)
+  await env.DE.put(khoaTep(id, loai.ten), du, { httpMetadata: { contentType: KIEU_TEP[loai.ten]! } })
+  return json({ ok: true, id, tep: loai.ten, byte: du.length })
+}
 const DAU_TEP = { ...CORS, 'access-control-expose-headers': 'content-range, accept-ranges, content-length, etag', 'accept-ranges': 'bytes', 'cache-control': 'private, max-age=3600' }
 /** `Range: bytes=a-b | a- | -n` ⇒ khoảng đọc của R2 (một lần đọc, không cần biết cỡ tệp trước); không có / sai dạng ⇒ null (trả cả tệp). */
 export function docRange(dau: string | null): { offset: number; length?: number } | { suffix: number } | null {
@@ -302,14 +330,15 @@ export function cuaXemLai(req: Request, env: Env, ctx?: ExecutionContext): Promi
   const u = req.url
   if (!u.includes('/live-') && !u.includes('/bpu/live/ghi')) return null
   const url = new URL(u), p = url.pathname, m = req.method
-  const laGhi = p === '/bpu/live/ghi', laTep = p.startsWith('/live-tep/')
+  const laGhi = p === '/bpu/live/ghi', laTep = p.startsWith('/live-tep/'), laVideo = p === '/gv/live-video-ghi' || p === '/gv/live-video-xoa'
   const laLenh = p === '/hs/live-ds' || p === '/hs/live-buoi' || p === '/gv/live-ds' || p === '/gv/live-doi-ten' || p === '/gv/live-xoa' || p === '/gv/live-dat' || p === '/gv/live-dung-lai'
     || p === '/gv/live-nhat-ky-ds' || p === '/gv/live-nhat-ky-tu-lieu' || p === '/gv/live-nhat-ky-ghi'
-  if (!laGhi && !laTep && !laLenh) return null
+  if (!laGhi && !laTep && !laLenh && !laVideo) return null
   if (m === 'OPTIONS') return Promise.resolve(new Response(null, { status: 204, headers: CORS }))
   const bat = (f: () => Promise<Response>): Promise<Response> => f().catch((e) => { console.error('[live-xem-lai] lệnh lỗi:', p, e instanceof Error ? e.message : e); return json({ ok: false, error: 'Máy chủ chưa làm được việc này. Thử lại sau ít phút.' }, 500) })
   if (laGhi) return m === 'POST' ? bat(() => ghiKhucLenh(req, env, url)) : null
   if (laTep) return m === 'GET' || m === 'HEAD' ? bat(() => tepLenh(req, env, url)) : null
+  if (laVideo) return m === 'POST' ? bat(() => videoLenh(req, env, url, p)) : null
   if (m !== 'GET' && m !== 'POST') return null
   return bat(async () => {
     const b = await than(req, url, p === '/gv/live-nhat-ky-ghi' ? 400_000 : 20_000), nay = Date.now()

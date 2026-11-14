@@ -90,21 +90,24 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
   const hang = useMemo(() => (buoi ? doanHopLe(buoi) : []), [buoi])
   // NHẬT KÝ BÀI DẠY (thầy 13/11): buổi đã có bài hoạt hoạ văn phòng soạn (máy chủ cất `nhat-ky.json` khi qua cổng tự kiểm) ⇒ thẻ mở trang tĩnh /nhat-ky/
   // trong khung phủ kín. Hỏi bằng HEAD theo vé tệp (0 lệnh D1); chưa có ⇒ không hiện gì.
-  const [coNk, setCoNk] = useState(false), [moNk, setMoNk] = useState(false)
+  // VIDEO TÓM TẮT (thầy 14/11 «Tạo luôn video tóm tắt trong phần live trên app hs»): máy em tự vẽ bài hoạt hoạ (trang tĩnh /video-bai/) theo tiếng đã
+  // trộn sẵn; buổi có `video-kb.json` ⇒ thẻ đứng TRÊN thẻ nhật ký. Cùng cách hỏi: HEAD theo vé tệp, song song (0 lệnh D1).
+  const [coNk, setCoNk] = useState(false), [coVd, setCoVd] = useState(false), [mo, setMo] = useState<'' | 'nk' | 'vd'>('')
   const veNk = tt.loai === 'ok' ? tt.ve : '', gocNk = tt.loai === 'ok' ? tt.goc : ''
   useEffect(() => {
     if (!veNk || !gocNk) return
     let huy = false
-    fetch(`${gocNk}/live-tep/${encodeURIComponent(id)}/nhat-ky.json?ve=${encodeURIComponent(veNk)}`, { method: 'HEAD', cache: 'no-store' }).then((r) => { if (!huy) setCoNk(r.ok) }, () => {})
+    const hoi = (tep: string, dat: (co: boolean) => void) => fetch(`${gocNk}/live-tep/${encodeURIComponent(id)}/${tep}?ve=${encodeURIComponent(veNk)}`, { method: 'HEAD', cache: 'no-store' }).then((r) => { if (!huy) dat(r.ok) }, () => {})
+    hoi('video-kb.json', setCoVd); hoi('nhat-ky.json', setCoNk)
     return () => { huy = true }
   }, [id, veNk, gocNk])
   useEffect(() => {
-    if (!moNk) return
-    const f = (e: MessageEvent) => { const d = e.data as { nguon?: unknown; loai?: unknown } | null; if (d && d.nguon === 'nhat-ky' && d.loai === 'dong') setMoNk(false) }
-    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setMoNk(false) }
+    if (!mo) return
+    const f = (e: MessageEvent) => { const d = e.data as { nguon?: unknown; loai?: unknown } | null; if (d && (d.nguon === 'nhat-ky' || d.nguon === 'video-bai') && d.loai === 'dong') setMo('') }
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setMo('') }
     window.addEventListener('message', f); window.addEventListener('keydown', k)
     return () => { window.removeEventListener('message', f); window.removeEventListener('keydown', k) }
-  }, [moNk])
+  }, [mo])
 
   const dau = (chu?: string) => <header className="xl-dau">
     <button type="button" className="xl-lui" onClick={dong} aria-label={nhanLui}><BtLui /></button>
@@ -141,7 +144,8 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
     <div className="xl-so so"><div><b>{sl.cau}</b><span>câu</span></div><div><b>{sl.phutLive}</b><span>phút live</span></div><div><b>{sl.doan}</b><span>đoạn xem lại</span></div></div>
     {hang.length ? <button type="button" className="xl-nut" onClick={() => phatDoan(hang[0]!)}><BtPhat s={20} />{hang.length > 1 ? `Phát cả ${hang.length} đoạn` : 'Phát đoạn chữa bài'} · {sl.phutDoan} phút</button> : <p>Buổi này chưa có đoạn chữa bài nào.</p>}
     {nhat ? <button type="button" className="xl-nen" onClick={() => phatDoan(nhat.doan)}><BtSao /><span>{nhat.chu}</span><BtMui s={18} /></button> : null}
-    {coNk ? <button type="button" className="xl-nen xl-nk-mo" onClick={() => setMoNk(true)}><BtPhat s={18} /><span>Nhật ký bài dạy · bài hoạt hoạ theo giọng Thầy</span><BtMui s={18} /></button> : null}
+    {coVd ? <button type="button" className="xl-nen xl-nk-mo xl-vd-mo" onClick={() => setMo('vd')}><BtPhat s={18} /><span>Video tóm tắt · hoạt hoạ theo giọng Thầy</span><BtMui s={18} /></button> : null}
+    {coNk ? <button type="button" className="xl-nen xl-nk-mo" onClick={() => setMo('nk')}><BtPhat s={18} /><span>Nhật ký bài dạy · bài hoạt hoạ theo giọng Thầy</span><BtMui s={18} /></button> : null}
   </section>
   const khuc = dongThoiGian(buoi)
   const dongTg = <section className="xl-kinh xl-the"><h2>Dòng thời gian<small className="so">{sl.phutLive} phút</small></h2>
@@ -183,7 +187,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
         </> : null}
         {buoi.cau.filter((c) => !hang.length || c.so !== soDang).map((c) => theCau(c.so))}{chan}
       </div>
-      {moNk ? <div className="xl-nk" role="dialog" aria-modal="true" aria-label="Nhật ký bài dạy"><iframe title="Nhật ký bài dạy" src={`/nhat-ky/?id=${encodeURIComponent(id)}&ve=${encodeURIComponent(ve)}&goc=${encodeURIComponent(goc)}`} allow="autoplay" /></div> : null}
+      {mo ? <PhuBaiPhu loai={mo} id={id} ve={ve} goc={goc} /> : null}
     </main>
     
   }
@@ -192,6 +196,12 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, do
       <div className="xl-hai"><div>{bia}{dongTg}{bangVang}</div><div>{dsDoan}{buoi.cau.map((c) => theCau(c.so))}{chan}</div></div>
     </main>
     {phat ? <Suspense fallback={null}><TrinhPhat goc={goc} buoi={buoi} ve={ve} hang={hang} batDau={phat.vt} tuPhat LC={LC} tenDoi={tenDoi} dong={() => setPhat(null)} khiXem={khiXem} khiGo={khiGo} /></Suspense> : null}
-    {moNk ? <div className="xl-nk" role="dialog" aria-modal="true" aria-label="Nhật ký bài dạy"><iframe title="Nhật ký bài dạy" src={`/nhat-ky/?id=${encodeURIComponent(id)}&ve=${encodeURIComponent(ve)}&goc=${encodeURIComponent(goc)}`} allow="autoplay" /></div> : null}
+    {mo ? <PhuBaiPhu loai={mo} id={id} ve={ve} goc={goc} /> : null}
   </>
+}
+
+/** Lớp phủ kín màn mở trang tĩnh của bài phụ: video tóm tắt (/video-bai/) hoặc nhật ký bài dạy (/nhat-ky/). */
+function PhuBaiPhu({ loai, id, ve, goc }: { loai: 'nk' | 'vd'; id: string; ve: string; goc: string }) {
+  const ten = loai === 'vd' ? 'Video tóm tắt' : 'Nhật ký bài dạy', duong = loai === 'vd' ? '/video-bai/' : '/nhat-ky/'
+  return <div className="xl-nk" role="dialog" aria-modal="true" aria-label={ten}><iframe title={ten} src={`${duong}?id=${encodeURIComponent(id)}&ve=${encodeURIComponent(ve)}&goc=${encodeURIComponent(goc)}`} allow="autoplay; fullscreen" /></div>
 }

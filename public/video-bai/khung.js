@@ -34,6 +34,7 @@ window.CHE_DO = CHE_DO
 document.documentElement.classList.toggle('nhe', CHE_DO.nhe)
 let QUANG = [], BUI = []
 const BANG = { x: 56, y: 118, w: 1140, h: 760 }
+// eslint-disable-next-line no-unused-vars -- dùng ở hoat-hoa*.js (cùng phạm vi toàn cục)
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
 let ctx = null, hoaCtx = null
 

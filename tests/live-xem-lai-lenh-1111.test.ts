@@ -253,6 +253,36 @@ describe('Buổi đã live nhưng chưa có đoạn xem lại (11/11)', () => {
   })
 })
 
+describe('VIDEO TÓM TẮT (14/11): tải 3 tệp bằng mã GV, máy em đọc theo vé', () => {
+  const tai = (q: string, body: BodyInit, thay = true) => goi(`/gv/live-video-ghi?${q}`, { method: 'POST', thay, body })
+  const kb = JSON.stringify({ tong: 12.5, doan: [{ loai: 'mo-dau', t0: 0, t1: 12.5 }] })
+  const m4a = new Uint8Array([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70, 0x4d, 0x34, 0x41, 0x20, ...new Array(200).fill(7)])
+  it('không mã GV ⇒ 403; tệp lạ / sai dạng / không phải m4a / buổi không có ⇒ từ chối, không ghi gì', async () => {
+    themBuoi('b1')
+    expect((await tai('id=b1&tep=kb', kb, false)).status).toBe(403)
+    expect((await tai('id=b1&tep=xx', kb)).status).toBe(400)
+    expect((await tai('id=b1&tep=kb', '{"khong":1}')).status).toBe(400)
+    expect((await tai('id=b1&tep=am', new Uint8Array(40))).status).toBe(400)
+    expect((await tai('id=b9&tep=kb', kb)).status).toBe(404)
+    expect([...r2.du.keys()].filter((k) => k.includes('video-'))).toEqual([])
+  })
+  it('tải đủ 3 tệp ⇒ cất R2 đúng khoá + kiểu; máy em đọc bằng vé (HEAD / GET / Range 206), vé sai 403; xoá ⇒ hết tệp', async () => {
+    themBuoi('b1')
+    for (const [tep, than] of [['kb', kb], ['net', '{"net":[]}'], ['am', m4a]] as const) expect(((await (await tai(`id=b1&tep=${tep}`, than)).json()) as { ok: boolean }).ok).toBe(true)
+    expect(r2.du.has('live/b1/video-kb.json') && r2.du.has('live/b1/video-net.json') && r2.du.has('live/b1/video-am.m4a')).toBe(true)
+    const ve = await kyVeLive('bi-mat-thu', 'b1', 'A1', hanVeLive(Date.now()), 2)
+    const doc = (tep: string, o: RequestInit = {}) => goi(`/live-tep/b1/${tep}?ve=${encodeURIComponent(ve)}`, o)
+    expect((await doc('video-kb.json', { method: 'HEAD' })).status).toBe(200)
+    expect(await (await doc('video-kb.json')).json()).toMatchObject({ tong: 12.5 })
+    const r = await doc('video-am.m4a', { headers: { range: 'bytes=0-15' } })
+    expect(r.status).toBe(206); expect(r.headers.get('content-type')).toBe('audio/mp4')
+    expect((await goi('/live-tep/b1/video-kb.json?ve=sai')).status).toBe(403)
+    expect((await goi('/gv/live-video-xoa?id=b1', { method: 'POST', thay: false })).status).toBe(403)
+    expect((await goi('/gv/live-video-xoa?id=b1', { method: 'POST', thay: true })).status).toBe(200)
+    expect([...r2.du.keys()].filter((k) => k.includes('video-'))).toEqual([])
+  })
+})
+
 describe('/gv/live-* — Lịch sử Live của thầy', () => {
   it('cần mã bí mật; danh sách có trạng thái, tiến độ, dung lượng, tổng dung lượng; không trả buổi đang xoá', async () => {
     themBuoi('b1', { byte: 19_000_000 }); themBuoi('b9', { tt: 'dang_xu_ly', ngay: '2026-11-11', byte: 0 }); themBuoi('bl', { tt: 'loi', ngay: '2026-11-08', byte: 500 }); themBuoi('bx', { tt: 'dang_xoa' })
