@@ -16,7 +16,16 @@ const cdp = await trang.context().newCDPSession(trang)
 await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(hamS) })
 const c = (id) => kb.doan.find((d) => d.id === id)
 const b = c('c11')?.hoat?.loai === 'bazo' && !c('c2') ? c('c11').hoat.moc : null // kịch bản thử phần 10 (peptide + NaOH)
-const DOAN = b ? { 'bút + mũi tên cong': b.a_cung0 - 0.5, 'H₂O thành': b.a_gH2O - 0.3, 'NaOH gắn đầu C': b.b_3a, 'nước rơi + đứt': b.c_can, 'Na gắn Gly': b.d_na } : {
+const k10 = c('c1')?.hoat?.loai === 'keo-co' // bài K10 liên kết cộng hoá trị (hoat-hoa-4.js)
+const DOAN = k10 ? Object.fromEntries(Object.entries({
+  'thẻ chương': c('c2')?.t0 - 2.4,
+  'kéo co c1': c('c1')?.hoat.moc.lech - 0.3,
+  'thang Δχ c6': c('c6')?.hoat.moc.v2 - 0.3,
+  'ion c7': c('c7')?.hoat.moc.lech - 0.3,
+  'kim Δχ c8': c('c8')?.hoat.moc.kim - 0.3,
+  'CO₂ triệt tiêu c10': c('c10')?.hoat.moc.triet - 0.3,
+  'σ π c12': c('c12')?.hoat.moc.pp - 0.3,
+}).filter(([, v]) => Number.isFinite(v))) : b ? { 'bút + mũi tên cong': b.a_cung0 - 0.5, 'H₂O thành': b.a_gH2O - 0.3, 'NaOH gắn đầu C': b.b_3a, 'nước rơi + đứt': b.c_can, 'Na gắn Gly': b.d_na } : {
   'thẻ chương': c('c2').t0 - 2.4,
   'chuỗi hạt c2': c('c2').hoat.moc.dem50,
   'quả cầu - que c3': c('c3').hoat.moc.noi - 0.3,

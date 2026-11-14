@@ -409,3 +409,18 @@ html.nhe .bz-bay { filter: none; }
 .bz-bay.so.sai.gach::after { content: ''; position: absolute; left: -4px; right: -4px; top: 52%; height: 5px; border-radius: 3px; background: var(--hong); transform: rotate(-14deg); }
 .bz-k.bong { opacity: 0; }
 .bz-bay { z-index: 3; }
+/* HOẠT HOẠ K10 (hoat-hoa-4.js, thầy 14/11 «video tóm tắt bản live lớp 10»): kéo co cặp electron, thang Δχ, công thức electron, xen phủ AO */
+.lk4 { display: flex; flex-direction: column; }
+.lk4 svg { display: block; overflow: visible; }
+.lk4-chip { align-self: center; margin-top: auto; padding: 14px 26px; border-radius: 18px; font-size: 32px; font-weight: 700; line-height: 1.25; text-align: center; color: #eef3f4; background: rgba(255, 210, 122, .1); box-shadow: inset 0 0 0 2px rgba(255, 210, 122, .55); }
+.lk4-chip b { color: #ffd27a; font-weight: 800; }
+.lk4-tinh { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 6px; }
+.lk4-ky { font-size: 58px; font-weight: 800; color: #eef3f4; }
+.lk4-chi { display: flex; gap: 26px; font-size: 38px; font-weight: 700; }
+.lk4-chi span { padding: 6px 18px; border-radius: 14px; background: rgba(255, 255, 255, .06); }
+.lk4-chi .a b { color: #fda4af; } .lk4-chi .b b { color: #8fb6ff; }
+.lk4-pt { display: flex; gap: 12px; align-items: baseline; font-size: 46px; font-weight: 800; color: #eef3f4; }
+.lk4-pt i { font-style: normal; display: inline-block; }
+.lk4-pt i:first-child { color: #ffd27a; }
+.lk4-pt .kq { color: #172126; background: #ffd27a; border-radius: 12px; padding: 0 12px; }
+.lk4-thang { margin-top: 8px; }

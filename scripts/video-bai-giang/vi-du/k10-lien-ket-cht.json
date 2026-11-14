@@ -1,0 +1,1347 @@
+{
+ "ten": "Liên kết cộng hoá trị phân cực, không phân cực",
+ "lop": "Live Khối 10",
+ "ngay": "Thứ Năm 12/11/2026",
+ "moDau": {
+  "kicker": "LIVE KHỐI 10 · THỨ NĂM 12/11",
+  "tieuDe": "LIÊN KẾT CỘNG HOÁ TRỊ",
+  "phu": "Phân cực · Không phân cực · Hiệu độ âm điện · Liên kết σ, π",
+  "thay": "Thầy Đỗ Đại Học"
+ },
+ "mucLuc": [
+  [
+   "01–04",
+   "Kéo co cặp electron, cách nhìn định tính",
+   "vang"
+  ],
+  [
+   "05–06",
+   "Hiệu độ âm điện Δχ và ba quy tắc",
+   "hong"
+  ],
+  [
+   "07–09",
+   "Ví dụ CH₄, CO₂, H₂O (có Đoán nhanh)",
+   "ngoc"
+  ],
+  [
+   "10–11",
+   "Liên kết σ và liên kết π",
+   "xanh"
+  ]
+ ],
+ "ket": {
+  "tieuDe": "Ghi nhớ",
+  "y": [
+   "Cặp electron dùng chung lệch về phía nguyên tử nào ⇒ liên kết cộng hoá trị **phân cực**",
+   "Hai nguyên tố giống nhau ⇒ cặp electron đứng giữa ⇒ **không phân cực**",
+   "**Δχ** = độ âm điện lớn − độ âm điện nhỏ",
+   "Δχ ≤ 0,4: **không phân cực** · 0,4 < Δχ ≤ 1,7: **phân cực** · Δχ > 1,7: **ion**",
+   "CO₂ có liên kết phân cực nhưng **phân tử không phân cực**",
+   "Nối đơn **1σ** · nối đôi **1σ + 1π** · nối ba **1σ + 2π**"
+  ]
+ },
+ "netCoGio": true,
+ "loiAsr": "loi-asr-all.json",
+ "anNet": [
+  [
+   222,
+   200,
+   352,
+   260
+  ],
+  [
+   440,
+   208,
+   532,
+   248
+  ],
+  [
+   238,
+   728,
+   374,
+   770
+  ],
+  [
+   452,
+   736,
+   598,
+   776
+  ]
+ ],
+ "canh": [
+  {
+   "id": "c1",
+   "so": "01",
+   "tieuDe": "Kéo co lệch sức: cặp electron lệch về bên mạnh",
+   "mau": "vang",
+   "loiRieng": "loi-sach-c1.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "su": [],
+   "hoat": {
+    "loai": "keo-co",
+    "cao": 600,
+    "p": {
+     "trai": {
+      "ky": "A",
+      "nhan": "Δ₁"
+     },
+     "phai": {
+      "ky": "B",
+      "nhan": "Δ₂"
+     },
+     "manh": "trai",
+     "kieu": "phan-cuc",
+     "so": ">",
+     "ket": "Liên kết cộng hoá trị **phân cực**"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Độ"
+     ],
+     "keo": [
+      0,
+      "lực"
+     ],
+     "so": [
+      3,
+      "lớn"
+     ],
+     "lech": [
+      3,
+      "lệch"
+     ],
+     "delta": [
+      4,
+      "nguyên"
+     ],
+     "ket": [
+      4,
+      "phân"
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      363,
+      163,
+      397,
+      224
+     ],
+     "luc": [
+      1,
+      "vạch"
+     ],
+     "toi": "capE",
+     "dai": 3
+    },
+    {
+     "neo": [
+      180,
+      309,
+      953,
+      357
+     ],
+     "luc": [
+      4,
+      "lệch"
+     ],
+     "toi": "ket",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c2",
+   "so": "02",
+   "tieuDe": "Cách nhìn định tính: hai nguyên tố khác nhau",
+   "mau": "hong",
+   "loiRieng": "loi-sach-c2.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "danhDau": [
+    {
+     "neo": [
+      280,
+      380,
+      627,
+      411
+     ],
+     "luc": [
+      2,
+      "hai"
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      193,
+      411,
+      967,
+      527
+     ],
+     "luc": [
+      3,
+      "HCl:"
+     ],
+     "dai": 4
+    },
+    {
+     "neo": [
+      200,
+      567,
+      1033,
+      653
+     ],
+     "luc": [
+      10,
+      "CH₄"
+     ],
+     "dai": 4
+    }
+   ],
+   "theNoi": [
+    {
+     "luc": [
+      5,
+      "định"
+     ],
+     "giay": 5,
+     "chu": "Định tính: nhìn bằng cảm tính, **không đo đạc**"
+    },
+    {
+     "luc": [
+      11,
+      "định"
+     ],
+     "giay": 5,
+     "chu": "Định lượng: quy thành **số** ⇒ không thể sai"
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "bang"
+    ]
+   ]
+  },
+  {
+   "id": "c3",
+   "so": "03",
+   "tieuDe": "Kéo co ngang sức: cặp electron đứng giữa",
+   "mau": "ngoc",
+   "loiRieng": "loi-sach-c3.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "keo-co",
+    "cao": 600,
+    "p": {
+     "trai": {
+      "ky": "A",
+      "nhan": "Δ₁"
+     },
+     "phai": {
+      "ky": "B",
+      "nhan": "Δ₂"
+     },
+     "manh": null,
+     "kieu": "khong-phan-cuc",
+     "so": "=",
+     "ket": "Liên kết cộng hoá trị **không phân cực**"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Thế"
+     ],
+     "so": [
+      1,
+      "giống"
+     ],
+     "keo": [
+      2,
+      "lực"
+     ],
+     "lech": [
+      3,
+      "không"
+     ],
+     "ket": [
+      4,
+      "không"
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      220,
+      693,
+      573,
+      807
+     ],
+     "luc": [
+      1,
+      "giống"
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      673,
+      667,
+      963,
+      747
+     ],
+     "luc": [
+      4,
+      "liên"
+     ],
+     "toi": "ket",
+     "dai": 3
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c4",
+   "so": "04",
+   "tieuDe": "Hai nguyên tố giống nhau: O₂",
+   "mau": "xanh",
+   "loiRieng": "loi-sach-c4.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "lewis",
+    "cao": 560,
+    "p": {
+     "ct": "O2",
+     "ket": "2 cặp chung **đứng giữa** ⇒ không phân cực"
+    },
+    "moc": {
+     "hien": [
+      2,
+      "O₂."
+     ],
+     "chung": [
+      3,
+      "công"
+     ],
+     "gach": [
+      4,
+      "không",
+      0.3
+     ],
+     "ket": [
+      5,
+      "không"
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      220,
+      827,
+      1020,
+      867
+     ],
+     "luc": [
+      1,
+      "không"
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      247,
+      887,
+      820,
+      933
+     ],
+     "luc": [
+      4,
+      "cặp"
+     ],
+     "toi": "lk",
+     "dai": 3
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "bang"
+    ],
+    [
+     [
+      2,
+      "O₂."
+     ],
+     "minh"
+    ],
+    [
+     [
+      6,
+      "Tuy"
+     ],
+     "bang"
+    ]
+   ]
+  },
+  {
+   "id": "c6",
+   "so": "05",
+   "tieuDe": "Hiệu độ âm điện Δχ và ba quy tắc",
+   "mau": "hong",
+   "loiRieng": "loi-sach-c6.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "thang-delta",
+    "cao": 420,
+    "p": {
+     "max": 3,
+     "ket": "Δχ = độ âm điện **lớn** − độ âm điện **nhỏ**"
+    },
+    "moc": {
+     "hien": [
+      5,
+      "Quy"
+     ],
+     "v1": [
+      5,
+      "0,4,"
+     ],
+     "v2": [
+      11,
+      "lớn"
+     ],
+     "ket": [
+      2,
+      "Δχ"
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      1087,
+      20,
+      1573,
+      147
+     ],
+     "luc": [
+      0,
+      "hiệu"
+     ],
+     "dai": 4
+    },
+    {
+     "neo": [
+      1087,
+      187,
+      1447,
+      260
+     ],
+     "luc": [
+      2,
+      "bằng"
+     ],
+     "toi": "ket",
+     "dai": 4
+    },
+    {
+     "neo": [
+      1080,
+      273,
+      1573,
+      473
+     ],
+     "luc": [
+      5,
+      "0,4,"
+     ],
+     "toi": "thang",
+     "dai": 4
+    },
+    {
+     "neo": [
+      1080,
+      500,
+      1573,
+      700
+     ],
+     "luc": [
+      11,
+      "1,7,"
+     ],
+     "toi": "thang",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "bang"
+    ],
+    [
+     [
+      5,
+      "Quy"
+     ],
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c7",
+   "so": "06",
+   "tieuDe": "Chênh lệch hẳn: thành liên kết ion",
+   "mau": "hong",
+   "loiRieng": "loi-sach-c7.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "keo-co",
+    "cao": 600,
+    "p": {
+     "trai": {
+      "ky": "A",
+      "nhan": "Δ₁"
+     },
+     "phai": {
+      "ky": "B",
+      "nhan": "Δ₂"
+     },
+     "manh": "trai",
+     "kieu": "ion",
+     "so": "≫",
+     "ket": "**Liên kết ion**: một bên nhường, một bên nhận electron"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Quy"
+     ],
+     "so": [
+      1,
+      "1,7,"
+     ],
+     "keo": [
+      2,
+      "lực"
+     ],
+     "lech": [
+      3,
+      "hẳn"
+     ],
+     "delta": [
+      5,
+      "nhường"
+     ],
+     "ket": [
+      6,
+      "ion."
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      1080,
+      727,
+      1533,
+      827
+     ],
+     "luc": [
+      1,
+      "1,7,"
+     ],
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c8",
+   "so": "07",
+   "tieuDe": "Ví dụ 1: CH₄",
+   "mau": "ngoc",
+   "loiRieng": "loi-sach-c8.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "thang-delta",
+    "cao": 600,
+    "p": {
+     "max": 3,
+     "ky": "CH₄",
+     "a": [
+      "C",
+      2.55
+     ],
+     "b": [
+      "H",
+      2.2
+     ],
+     "ket": "Δχ = 0,35 ≤ 0,4 ⇒ cộng hoá trị **không phân cực**"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Ví"
+     ],
+     "a": [
+      1,
+      "C"
+     ],
+     "b": [
+      1,
+      "H"
+     ],
+     "tinh": [
+      4,
+      "2,55"
+     ],
+     "kq": [
+      5,
+      "0,35."
+     ],
+     "kim": [
+      6,
+      "nằm"
+     ],
+     "ket": [
+      7,
+      "không"
+     ]
+    }
+   },
+   "nham": [
+    {
+     "truocDong": 5,
+     "giay": 6,
+     "hoi": "Δχ của CH₄ = 2,55 − 2,2 = ?"
+    }
+   ],
+   "danhDau": [
+    {
+     "neo": [
+      1080,
+      867,
+      1573,
+      1013
+     ],
+     "luc": [
+      6,
+      "0,4."
+     ],
+     "toi": "ket",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c9",
+   "so": "08",
+   "tieuDe": "Ví dụ 2: liên kết C=O trong CO₂",
+   "mau": "xanh",
+   "loiRieng": "loi-sach-c9.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "thang-delta",
+    "cao": 600,
+    "p": {
+     "max": 3,
+     "ky": "C=O",
+     "a": [
+      "O",
+      3.44
+     ],
+     "b": [
+      "C",
+      2.55
+     ],
+     "ket": "Δχ = 0,89 ⇒ liên kết C=O **phân cực**, lệch về phía O"
+    },
+    "moc": {
+     "hien": [
+      5,
+      "Để"
+     ],
+     "a": [
+      6,
+      "O"
+     ],
+     "b": [
+      6,
+      "C"
+     ],
+     "tinh": [
+      8,
+      "3,44"
+     ],
+     "kq": [
+      9,
+      "0,89."
+     ],
+     "kim": [
+      10,
+      "nằm"
+     ],
+     "ket": [
+      11,
+      "lệch"
+     ]
+    }
+   },
+   "nham": [
+    {
+     "truocDong": 9,
+     "giay": 6,
+     "hoi": "Δχ của liên kết C=O = 3,44 − 2,55 = ?"
+    }
+   ],
+   "danhDau": [
+    {
+     "neo": [
+      1087,
+      1050,
+      1580,
+      1197
+     ],
+     "luc": [
+      3,
+      "hai"
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      1087,
+      1243,
+      1520,
+      1357
+     ],
+     "luc": [
+      8,
+      "3,44"
+     ],
+     "toi": "pt",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "bang"
+    ],
+    [
+     [
+      5,
+      "Để"
+     ],
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c10",
+   "so": "?",
+   "tieuDe": "Đoán nhanh: phân tử CO₂ có phân cực không?",
+   "mau": "vang",
+   "loiRieng": "loi-sach-c10.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "lewis",
+    "cao": 600,
+    "p": {
+     "ct": "CO2",
+     "luc": true,
+     "ket": "Liên kết phân cực nhưng **phân tử không phân cực**"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Câu"
+     ],
+     "chung": [
+      2,
+      "Vì"
+     ],
+     "gach": [
+      2,
+      "C=O"
+     ],
+     "luc": [
+      6,
+      "kéo"
+     ],
+     "triet": [
+      7,
+      "tổng"
+     ],
+     "ket": [
+      8,
+      "không"
+     ]
+    }
+   },
+   "doVui": {
+    "sauDong": 4,
+    "giay": 6,
+    "hoi": "Phân tử **CO₂** (có 2 liên kết C=O phân cực) có phân cực không?",
+    "luaChon": [
+     [
+      "A",
+      "Có",
+      false
+     ],
+     [
+      "B",
+      "Không",
+      true
+     ]
+    ],
+    "moDong": 9,
+    "tom": "Phân tử CO₂: **phân cực hay không?**",
+    "moLuc": [
+     9,
+     "không",
+     0,
+     2
+    ]
+   },
+   "danhDau": [
+    {
+     "neo": [
+      1087,
+      1370,
+      1547,
+      1410
+     ],
+     "luc": [
+      1,
+      "có."
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      1160,
+      1543,
+      1427,
+      1657
+     ],
+     "luc": [
+      6,
+      "kéo"
+     ],
+     "dai": 4
+    },
+    {
+     "neo": [
+      1113,
+      1457,
+      1573,
+      1517
+     ],
+     "luc": [
+      9,
+      "không",
+      0,
+      2
+     ],
+     "toi": "ket",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c11",
+   "so": "09",
+   "tieuDe": "Ví dụ 3: H₂O trên thang Δχ",
+   "mau": "ngoc",
+   "loiRieng": "loi-sach-c11.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "thang-delta",
+    "cao": 600,
+    "p": {
+     "max": 3,
+     "ky": "H₂O",
+     "a": [
+      "O",
+      3.44
+     ],
+     "b": [
+      "H",
+      2.2
+     ],
+     "ket": "Δχ = 1,24 ⇒ cộng hoá trị **phân cực**"
+    },
+    "moc": {
+     "hien": [
+      0,
+      "Ví"
+     ],
+     "a": [
+      2,
+      "O"
+     ],
+     "b": [
+      2,
+      "H"
+     ],
+     "tinh": [
+      3,
+      "trừ"
+     ],
+     "kq": [
+      4,
+      "1,24."
+     ],
+     "kim": [
+      6,
+      "khoảng"
+     ],
+     "ket": [
+      7,
+      "Phân"
+     ]
+    }
+   },
+   "nham": [
+    {
+     "truocDong": 4,
+     "giay": 6,
+     "hoi": "Δχ của H₂O = 3,44 − 2,2 = ?"
+    }
+   ],
+   "danhDau": [
+    {
+     "neo": [
+      140,
+      1083,
+      1060,
+      1210
+     ],
+     "luc": [
+      5,
+      "1,24,"
+     ],
+     "toi": "pt",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c12",
+   "so": "10",
+   "tieuDe": "Liên kết σ và liên kết π",
+   "mau": "xanh",
+   "loiRieng": "loi-sach-c12.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "obitan",
+    "cao": 640,
+    "p": {
+     "ket": "σ: xen phủ **trục** · π: xen phủ **bên**"
+    },
+    "moc": {
+     "s": [
+      6,
+      "cầu,"
+     ],
+     "p": [
+      6,
+      "tám"
+     ],
+     "sp": [
+      8,
+      "tròn",
+      0.4
+     ],
+     "ss": [
+      10,
+      "tròn",
+      0.4
+     ],
+     "pp": [
+      11,
+      "tám",
+      0.3
+     ],
+     "pi": [
+      13,
+      "bên"
+     ],
+     "ket": [
+      14,
+      "bên."
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      73,
+      1263,
+      1033,
+      1337
+     ],
+     "luc": [
+      0,
+      "hữu"
+     ],
+     "dai": 4
+    },
+    {
+     "neo": [
+      107,
+      1370,
+      1040,
+      1437
+     ],
+     "luc": [
+      4,
+      "trục,"
+     ],
+     "toi": "sigma",
+     "dai": 4
+    },
+    {
+     "neo": [
+      133,
+      1457,
+      787,
+      1523
+     ],
+     "luc": [
+      6,
+      "cầu,"
+     ],
+     "dai": 4
+    },
+    {
+     "neo": [
+      133,
+      1863,
+      1027,
+      1910
+     ],
+     "luc": [
+      13,
+      "bên"
+     ],
+     "toi": "pi",
+     "dai": 4
+    },
+    {
+     "neo": [
+      467,
+      1917,
+      627,
+      2043
+     ],
+     "luc": [
+      14,
+      "π,"
+     ],
+     "toi": "pi",
+     "dai": 3
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "bang"
+    ],
+    [
+     [
+      4,
+      "Liên"
+     ],
+     "minh"
+    ]
+   ]
+  },
+  {
+   "id": "c13",
+   "so": "11",
+   "tieuDe": "Nối đơn, nối đôi, nối ba có mấy σ, mấy π",
+   "mau": "vang",
+   "loiRieng": "loi-sach-c13.json",
+   "dong": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "vietThat": true,
+   "khungNet": true,
+   "phuDeCum": true,
+   "hoat": {
+    "loai": "dem-lk",
+    "cao": 560,
+    "p": {
+     "ket": "Nét thứ nhất là **σ**, các nét thêm là **π**"
+    },
+    "moc": {
+     "don": [
+      1,
+      "Một"
+     ],
+     "doi": [
+      2,
+      "hai"
+     ],
+     "ba": [
+      3,
+      "ba"
+     ],
+     "kq1": [
+      5,
+      "1σ."
+     ],
+     "kq2": [
+      6,
+      "π."
+     ],
+     "kq3": [
+      7,
+      "π."
+     ],
+     "ket": [
+      8,
+      "nắm"
+     ]
+    }
+   },
+   "danhDau": [
+    {
+     "neo": [
+      1127,
+      1670,
+      1287,
+      1743
+     ],
+     "luc": [
+      0,
+      "Tổng"
+     ],
+     "dai": 3
+    },
+    {
+     "neo": [
+      1107,
+      1743,
+      1467,
+      1983
+     ],
+     "luc": [
+      5,
+      "σ,"
+     ],
+     "toi": "don",
+     "dai": 4
+    }
+   ],
+   "cheDo": [
+    [
+     "dau",
+     "minh"
+    ]
+   ]
+  }
+ ]
+}

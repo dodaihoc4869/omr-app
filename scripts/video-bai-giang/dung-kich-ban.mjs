@@ -62,6 +62,13 @@ function catCau(a, b, vietThat = false) {
 const tr0 = trang.trang.find((t) => t.net.length > 100) ?? trang.trang[trang.trang.length - 1]
 // NÉT CÓ GIỜ THẬT TỪNG ĐIỂM (net-co-gio.ts dựng từ net.bin): có thì dùng cho cả phân tích (cụm nét, giờ viết xong) lẫn bộ khung (dạng 2, bộ máy bút live)
 const NET_GIO = ch.netCoGio && existsSync(join(duLieu, 'net-gio.json')) ? JSON.parse(readFileSync(join(duLieu, 'net-gio.json'), 'utf8')) : null // bật bằng «netCoGio»: true trong cấu hình
+// CHE NÉT (ch.anNet: [[x0, y0, x1, y1]] toạ độ bảng rộng 1600): nét có tâm trong vùng ⇒ bỏ hẳn khỏi video — tên người Thầy viết khi minh hoạ (bài K10: kéo co)
+if (NET_GIO && ch.anNet) NET_GIO.net = NET_GIO.net.filter((n) => {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9
+  for (let i = 0; i < n.d.length; i += 4) { const x = n.d[i] * 1600, y = (n.d[i + 1] * 1600) / NET_GIO.tiLe; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y) }
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2
+  return !ch.anNet.some(([a, b, c, e]) => cx >= a && cx <= c && cy >= b && cy <= e)
+})
 const tr = NET_GIO ? { ...tr0, net: NET_GIO.net.map((n) => { const p = []; for (let i = 0; i < n.d.length; i += 4) p.push(Math.round(n.d[i] * 6400), Math.round((n.d[i + 1] * 6400) / NET_GIO.tiLe), n.d[i + 3]); return { t: n.t, p } }) } : tr0
 const netBox = tr.net.map((n) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y } return { t0: n.t / 1000, t1: (n.t + (n.p[n.p.length - 1] || 0)) / 1000, x0, y0, x1, y1 } })
 // GIỮ NHỊP VIẾT THẬT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): khoảng không có lời mà Thầy ĐANG VIẾT thì không tua vụt — đoạn đang
@@ -145,7 +152,8 @@ for (const cc of ch.canh) {
   }
   if (cc.doVui && cc.doVui.sauDong === -1) chenDoVui(batDau(cauGoc[0].tu))
   for (const [k, cg] of cauGoc.entries()) {
-    const a = batDau(cg.tu), b = ketThuc(cg.den)
+    // CẮT CỨNG (tuCung / denCung trong lời riêng): đúng giây cho sẵn, không bám khoảng lặng — để cắt bỏ chữ liền kề (tên người) mà không có quãng nghỉ
+    const a = cg.tuCung ? cg.tu : batDau(cg.tu), b = cg.denCung ? cg.den : ketThuc(cg.den)
     if (trc != null && a > trc) {
       if (cc.vietThat) for (const m of chiaNoi(trc, a, NOI_CAU)) { canh.manh.push({ t0: t, t1: t + m.dai, s0: m.s0, s1: m.s1, giong: false }); t += m.dai }
       else { canh.manh.push({ t0: t, t1: t + NOI_CAU, s0: trc, s1: a, giong: false }); t += NOI_CAU }
@@ -273,7 +281,7 @@ for (const cc of ch.canh) {
     canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, p: cc.hoat.p, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, v]) => [k, mocTu(v)])) }
     // 4 HCl bay vào + bộ đếm lên đủ 4a NGAY TRƯỚC lúc lộ đáp án (không lướt qua «3a» khi thẻ đã sáng)
     if (canh.doVui && 'thuoc' in canh.hoat.moc) canh.hoat.moc.thuoc = Math.max(canh.doVui.tMo - 1.35, (canh.hoat.moc.tong ?? 0) + 0.3)
-    const TD = { hat: { hien: 'bip', dem50: 'vut', mau: 'bop', lk: 've', oligo: 'bop', poly: 'bop' }, 'dong-phan': { hien: 'vut', doi: 'vut', so: 'dap', quy: 'bop', giu: 'bip', dau: 'bop' }, 'cat-lk': { hien: 'vut', nuoc: 'bot', tach: 'dap', mt: 'bop', hoan: 'bop', khong: 'bop' }, biuret: { thuoc: 'bot', x3: 'bip', tim: 'dung-nhe' }, 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, bazo: { a_g1: 'bop', a_g1b: 'bop', a_acid: 'bip', a_base: 'bip', a_cung0: 'nhay', a_nuoc: 'giot', a_hop: 've', a_coona: 'lap', a_tom: 'bop', b_hien: 'vut', b_gly1: 'bop', b_ala: 'bop', b_gly2: 'bop', b_dem: 'bip', b_c1: 'dem1', b_c2: 'dem2', b_c3: 'dem3', b_tong: 'tong', b_3a: 'vut', c_can: 'giot', c_sinh: 'giot', c_triet: 'gach', c_con: 'dung-nhe', d_hien: 'vut', d_na: 'bop', d_coona: 'lap', d_tru1: 'bip', d_cong23: 'bip', d_22: 'tong', d_ala22: 'bip' }, chuoi: { hien: 'vut', cat: 'bot', d1: 'bip', d2: 'bip', d3: 'bip', d4: 'bip', d5: 'bip', tong: 'dap', thuoc: 'vut', sinh: 'bot', con: 'bop', nhan: 'bop', m1: 'bop', m2: 'bop' } }[cc.hoat.loai] ?? {}
+    const TD = { hat: { hien: 'bip', dem50: 'vut', mau: 'bop', lk: 've', oligo: 'bop', poly: 'bop' }, 'dong-phan': { hien: 'vut', doi: 'vut', so: 'dap', quy: 'bop', giu: 'bip', dau: 'bop' }, 'cat-lk': { hien: 'vut', nuoc: 'bot', tach: 'dap', mt: 'bop', hoan: 'bop', khong: 'bop' }, biuret: { thuoc: 'bot', x3: 'bip', tim: 'dung-nhe' }, 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, bazo: { a_g1: 'bop', a_g1b: 'bop', a_acid: 'bip', a_base: 'bip', a_cung0: 'nhay', a_nuoc: 'giot', a_hop: 've', a_coona: 'lap', a_tom: 'bop', b_hien: 'vut', b_gly1: 'bop', b_ala: 'bop', b_gly2: 'bop', b_dem: 'bip', b_c1: 'dem1', b_c2: 'dem2', b_c3: 'dem3', b_tong: 'tong', b_3a: 'vut', c_can: 'giot', c_sinh: 'giot', c_triet: 'gach', c_con: 'dung-nhe', d_hien: 'vut', d_na: 'bop', d_coona: 'lap', d_tru1: 'bip', d_cong23: 'bip', d_22: 'tong', d_ala22: 'bip' }, chuoi: { hien: 'vut', cat: 'bot', d1: 'bip', d2: 'bip', d3: 'bip', d4: 'bip', d5: 'bip', tong: 'dap', thuoc: 'vut', sinh: 'bot', con: 'bop', nhan: 'bop', m1: 'bop', m2: 'bop' }, 'keo-co': { hien: 'vut', keo: 'bop', so: 'bip', lech: 'nhay', delta: 'bip', ket: 'tong' }, 'thang-delta': { hien: 'vut', v1: 'bip', v2: 'bip', v3: 'bip', a: 'bip', b: 'bip', tinh: 'bop', kq: 'dap', kim: 'vut', ket: 'tong' }, lewis: { hien: 'vut', chung: 'gan', gach: 've', luc: 'bop', triet: 'gach', ket: 'tong' }, obitan: { s: 'bop', p: 'bop', ss: 'gan', sp: 'gan', pp: 'gan', pi: 'gan', ket: 'tong' }, 'dem-lk': { don: 'bop', doi: 'bop', ba: 'bop', kq1: 'dem1', kq2: 'dem2', kq3: 'dem3', ket: 'tong' } }[cc.hoat.loai] ?? {}
     if (cc.hoat.loai === 'phuong-trinh') for (const k of Object.keys(canh.hoat.moc)) TD[k] = 'bop'
     for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
     if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
