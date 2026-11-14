@@ -1,0 +1,328 @@
+{
+  "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+  "native": [
+    437,
+    315
+  ],
+  "questions": [
+    {
+      "qid": "12-C8-B27-I-26",
+      "de": "Phức chất [Fe(OH₂)₆]³⁺ có cấu tạo như hình bên dưới.\nSố liên kết cho – nhận mà nguyên tử trung tâm iron tạo được với các phối tử OH₂ là",
+      "refs": [
+        {
+          "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+          "where": "12-C8-B27-I-26.hinh.0.du_lieu",
+          "hashDataUrl": "d6c5c34dd8ea66347575f724f738f712d44fe63599dec8ae73116ac17a39e702"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "1Fe6O12H/6individualuniformsinglebonds/2LEFTliteralH₂O-LASTO-4TOPBOTTOMRIGHTliteralOH₂-FIRSTO/2SQUARE-3plusSUP/ALLregularUPRIGHT-SUB2/0arrows-wedges-caption/NOaddedliganddirection-answer/nativeapproxNOTsubpixel",
+  "sourceAudit": {
+    "i": 109,
+    "assetIndex": 515,
+    "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2.png",
+    "size": [
+      437,
+      315
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C8-B27-I-26",
+        "de": "Phức chất [Fe(OH₂)₆]³⁺ có cấu tạo như hình bên dưới.\nSố liên kết cho – nhận mà nguyên tử trung tâm iron tạo được với các phối tử OH₂ là",
+        "allHinh": [
+          {
+            "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+            "where": "12-C8-B27-I-26.hinh.0.du_lieu",
+            "hashDataUrl": "d6c5c34dd8ea66347575f724f738f712d44fe63599dec8ae73116ac17a39e702"
+          }
+        ],
+        "missingHashes": [
+          "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/449-109-full3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "centerAtom": {
+        "literal": "Fe",
+        "bbox": [
+          192,
+          142,
+          222,
+          163
+        ],
+        "center": [
+          207,
+          152.5
+        ]
+      },
+      "ligands": [
+        {
+          "position": "top",
+          "literal": "OH₂",
+          "bbox": [
+            196,
+            61,
+            249,
+            87
+          ],
+          "Ocenter": [
+            207,
+            72
+          ],
+          "anchor": "first O",
+          "bond": [
+            [
+              207,
+              87
+            ],
+            [
+              207,
+              139
+            ]
+          ]
+        },
+        {
+          "position": "upperleft",
+          "literal": "H₂O",
+          "bbox": [
+            97,
+            102,
+            147,
+            128
+          ],
+          "Ocenter": [
+            138,
+            112
+          ],
+          "anchor": "last O",
+          "bond": [
+            [
+              152,
+              119
+            ],
+            [
+              189,
+              141
+            ]
+          ]
+        },
+        {
+          "position": "lowerleft",
+          "literal": "H₂O",
+          "bbox": [
+            97,
+            181,
+            147,
+            208
+          ],
+          "Ocenter": [
+            138,
+            192
+          ],
+          "anchor": "last O",
+          "bond": [
+            [
+              151,
+              183
+            ],
+            [
+              189,
+              163
+            ]
+          ]
+        },
+        {
+          "position": "upperright",
+          "literal": "OH₂",
+          "bbox": [
+            276,
+            102,
+            326,
+            128
+          ],
+          "Ocenter": [
+            285,
+            112
+          ],
+          "anchor": "first O",
+          "bond": [
+            [
+              225,
+              145
+            ],
+            [
+              272,
+              119
+            ]
+          ]
+        },
+        {
+          "position": "lowerright",
+          "literal": "OH₂",
+          "bbox": [
+            276,
+            181,
+            326,
+            208
+          ],
+          "Ocenter": [
+            285,
+            192
+          ],
+          "anchor": "first O",
+          "bond": [
+            [
+              226,
+              161
+            ],
+            [
+              272,
+              183
+            ]
+          ]
+        },
+        {
+          "position": "bottom",
+          "literal": "OH₂",
+          "bbox": [
+            196,
+            222,
+            249,
+            248
+          ],
+          "Ocenter": [
+            207,
+            233
+          ],
+          "anchor": "first O",
+          "bond": [
+            [
+              207,
+              167
+            ],
+            [
+              207,
+              218
+            ]
+          ]
+        }
+      ],
+      "squareBrackets": {
+        "left": [
+          [
+            65,
+            45
+          ],
+          [
+            47,
+            45
+          ],
+          [
+            47,
+            273
+          ],
+          [
+            65,
+            273
+          ]
+        ],
+        "right": [
+          [
+            341,
+            44
+          ],
+          [
+            356,
+            44
+          ],
+          [
+            356,
+            272
+          ],
+          [
+            341,
+            272
+          ]
+        ],
+        "strokeWidth": 1.5
+      },
+      "charge": {
+        "literal": "3+",
+        "bbox": [
+          364,
+          42,
+          397,
+          63
+        ],
+        "baseline": 61,
+        "position": "superscript atupperright of square"
+      },
+      "counts": {
+        "Fe": 1,
+        "O": 6,
+        "H": 12,
+        "singleBonds": 6,
+        "squareBracketStrokes": 2,
+        "charge": "3+",
+        "wedge": 0,
+        "hashed": 0,
+        "heads": 0,
+        "explanation": "Two H₂O labels onleft andfourOH₂ top/bottom/right, exactsourceorder retained. All sixligandbondsuniformsingle lines, no dativedirectionhead added."
+      },
+      "styles": {
+        "labels": "regular upright sans Fe/H/O/3+, no truebold oritalic observed",
+        "subscript": "2lowered afterH",
+        "bonds": "grayblack about1.3–1.8px uniform",
+        "caption": "NONE"
+      },
+      "crop": "Allbrackets/countercharge/labels insidecanvas, no clippedfragments/UNKNOWNmarks"
+    },
+    "measurementLimits": "Nativeapprox±1–2px eachlabel/bond/bracket independently. No symmetricclone ofbonds: upperright/lowerright endpoint y145/161 asnative Feedge. LastOanchorforH2O, firstOforOH2; do not change OH2labels to conventionalH2O by theory.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "RootOWNnativeFULL/FULL3x/all1publicde. Fe6O12H six uniformsinglebonds, twoLEFT H₂O LASTO and fourOH₂ FIRSTO, squarepair and3plus superscript. AllregularUPRIGHT. No guessed dativedirection/arrows/wedges/answer. Geometry individual nativeapprox, not subpixel.",
+  "rootActualReview": {
+    "hashSvg": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab",
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "freshChromiumFull3x": "/workspace/scratch/root449-109.png",
+    "ownMacro": "/workspace/scratch/root449-109-labels.png",
+    "IMGdecode": [
+      437,
+      315
+    ],
+    "ketQua": "Đạt rootOWNnativeFULL/FULL3x/all1publicde/freshChromiumFULL3x/labels macro. Fe6O12H/6uniformsinglebonds/2H₂O-LASTO vs4OH₂-FIRSTO/2SQUARE3plusSUP. All glyph-bond gaps visible, no arrows/wedges/caption/answer. NativeapproxNOTsubpixel. NoSVGnegativefound449.",
+    "readonlyRuntime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/fe109-native-ddh-dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab.svg dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab\nIMGDECODE [ 437, 315 ]\n109 { x: 0, y: 0, width: 437, height: 315 }\nPOSTSHOT_SHA dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab\nCOMMAND node /workspace/scratch/agent-render449.cjs\nCONTEXT 12-C8-B27-I-26.hinh.0.du_lieu; public de/ref only, no answers; own native FULL/fresh FULL/macros viewed.\n",
+    "readonlyRuntimeSha256": "24a725de2c4840479179d7e0f85e7503211f57dc87ec8aebd891e2b6e99aa6c7",
+    "readonlyProof": [
+      {
+        "i": 109,
+        "hashSvg": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab",
+        "nguoiSoat": "soat_hinh_vector",
+        "ketQua": "Đạt: tự mở native FULL và public de/ref duy nhất; fresh OWN Chromium IMG.decode 437×315, FULL3× và macro core/nhãn/charge. Giữ 1Fe6O12H, sáu liên kết đơn nét đều với khe tới glyph Fe/O sạch; hai H₂O phía trái neo O cuối và bốn OH₂ trên/dưới/phải neo O đầu. Hai ngoặc vuông, 3+ superscript ngoài phải và sáu sub2 đúng nguồn; toàn chữ DDH regular upright. Không thêm arrowhead, wedge, caption hay suy chiều cho–nhận từ câu dẫn; không thấy chạm/cắt/tràn.",
+        "render": "/workspace/scratch/soat449-109-fresh.png",
+        "macro": [
+          "/workspace/scratch/fe109-core.png",
+          "/workspace/scratch/fe109-labels.png",
+          "/workspace/scratch/fe109-charge.png"
+        ]
+      }
+    ]
+  }
+}

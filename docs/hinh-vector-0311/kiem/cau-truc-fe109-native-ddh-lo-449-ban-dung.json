@@ -1,0 +1,29 @@
+[
+  {
+    "i": 109,
+    "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+    "fileNguon": "anh/1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2.png",
+    "svg": "fe109-native-ddh-dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab.svg",
+    "hashSvg": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab",
+    "byteSvg": 11479,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C8-B27-I-26",
+        "de": "Phức chất [Fe(OH₂)₆]³⁺ có cấu tạo như hình bên dưới.\nSố liên kết cho – nhận mà nguyên tử trung tâm iron tạo được với các phối tử OH₂ là",
+        "refs": [
+          {
+            "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+            "where": "12-C8-B27-I-26.hinh.0.du_lieu",
+            "hashDataUrl": "d6c5c34dd8ea66347575f724f738f712d44fe63599dec8ae73116ac17a39e702"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1Fe6O12H/6individualuniformsinglebonds/2LEFTliteralH₂O-LASTO-4TOPBOTTOMRIGHTliteralOH₂-FIRSTO/2SQUARE-3plusSUP/ALLregularUPRIGHT-SUB2/0arrows-wedges-caption/NOaddedliganddirection-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "i": 109,
+    "hashSvg": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL và public de/ref duy nhất; fresh OWN Chromium IMG.decode 437×315, FULL3× và macro core/nhãn/charge. Giữ 1Fe6O12H, sáu liên kết đơn nét đều với khe tới glyph Fe/O sạch; hai H₂O phía trái neo O cuối và bốn OH₂ trên/dưới/phải neo O đầu. Hai ngoặc vuông, 3+ superscript ngoài phải và sáu sub2 đúng nguồn; toàn chữ DDH regular upright. Không thêm arrowhead, wedge, caption hay suy chiều cho–nhận từ câu dẫn; không thấy chạm/cắt/tràn.",
+    "render": "/workspace/scratch/soat449-109-fresh.png",
+    "macro": [
+      "/workspace/scratch/fe109-core.png",
+      "/workspace/scratch/fe109-labels.png",
+      "/workspace/scratch/fe109-charge.png"
+    ],
+    "hash": "1498cb472401523071522452a43236405e6fb658eca546322f3bc2f08c4f24a2",
+    "hashSvgDaSoat": "dd8d01dfb23876aa1d134c8a9048aefa02d878ea8e09b8917b752b4c3a7f5dab"
+  }
+]

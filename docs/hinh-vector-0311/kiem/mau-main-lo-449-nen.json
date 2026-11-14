@@ -1,0 +1,18 @@
+{
+  "lo": 449,
+  "main": "05bac72320f757e4827ddb9d67c7ee6ce0ab65a3",
+  "previousMain": "05bac72320f757e4827ddb9d67c7ee6ce0ab65a3",
+  "diffStat": "",
+  "files": [],
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 382,
+  "colorLogSha256": "f4491b9314c0dc989ed8ae800f7fb6442263e024d83e7e28253201714f2576c6",
+  "release": "Main05bac7232 UNCHANGEDso448/appsrc-server-Vite-DDHfont-mốcunchanged/NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised.",
+  "ketLuan": "Main05bac7232 UNCHANGEDso448/appsrc-server-Vite-DDHfont-mốcunchanged/NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised."
+}
