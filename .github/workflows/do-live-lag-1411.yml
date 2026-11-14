@@ -53,6 +53,15 @@ jobs:
             count sum{queryDurationMs rowsRead} dimensions{query}}}}}`, hep)
           console.log('=== D1 nhóm tốn nhất 20:58–21:20 VN (SQL đầy đủ 700 kí tự) ===')
           for (const x of d1h?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []) console.log(`lan=${x.count} tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)} tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)} docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))} | ${String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 700)}`)
+          console.log('=== Đuôi SQL (300 kí tự cuối) của 3 nhóm tốn nhất 20:58–21:20 ===')
+          for (const x of (d1h?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []).slice(0, 3)) console.log(`tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(0)} … ${String(x.dimensions.query).replace(/\s+/g, ' ').slice(-300)}`)
+          try {
+            const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/durable_objects/namespaces?per_page=100`, { headers: H })
+            const j = await r.json()
+            console.log('=== Vùng tên Durable Object (6 kí tự đầu · lớp) ===')
+            for (const n of j.result ?? []) console.log(String(n.id).slice(0, 6), n.class ?? '', n.script ?? '')
+            if (!j.success) console.log('REST lỗi:', JSON.stringify(j.errors).slice(0, 300))
+          } catch (e) { console.log('REST lỗi:', String(e).slice(0, 200)) }
           const dom = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             durableObjectsInvocationsAdaptiveGroups(limit:200,filter:{datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeMinute_ASC]){
             dimensions{datetimeMinute namespaceId} sum{requests errors} quantiles{wallTimeP50 wallTimeP99}}}}}`, { ...v, tu: '2026-11-14T13:50:00Z', den: '2026-11-14T14:50:00Z' })
