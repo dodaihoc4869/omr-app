@@ -38,6 +38,33 @@ const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
 let ctx = null, hoaCtx = null
 
+// NÉT BÚT MƯỢT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): nối các điểm lấy mẫu bằng cung bậc hai qua trung điểm ⇒ không gãy khúc.
+function veTron(p, d) {
+  const n = d.length / 2; p.moveTo(d[0], d[1]); if (n === 1) { p.lineTo(d[0] + 0.1, d[1]); return }
+  if (n === 2) { p.lineTo(d[2], d[3]); return }
+  for (let j = 1; j < n - 1; j++) p.quadraticCurveTo(d[2 * j], d[2 * j + 1], (d[2 * j] + d[2 * j + 2]) / 2, (d[2 * j + 1] + d[2 * j + 3]) / 2)
+  p.lineTo(d[2 * n - 2], d[2 * n - 1])
+}
+/** Nét đang viết dở tới mốc `da` (ms từ đầu nét): điểm cuối nội suy giữa hai mẫu ⇒ đầu bút trôi đều, không nhảy cóc. */
+function diemDo(n, da) {
+  const d = []; let j = 0
+  for (; j < n.p.length; j += 3) { if (n.p[j + 2] > da) break; d.push(n.p[j] / 4, n.p[j + 1] / 4) }
+  if (j > 0 && j < n.p.length) { const t0 = n.p[j - 1], t1 = n.p[j + 2], q = t1 > t0 ? kep((da - t0) / (t1 - t0)) : 1; d.push(lerp(n.p[j - 3] / 4, n.p[j] / 4, q), lerp(n.p[j - 2] / 4, n.p[j + 1] / 4, q)) }
+  return d
+}
+/** Cây bút ở đầu nét (toạ độ màn bảng): thân nghiêng, ngòi màu phấn đang viết, nhấc lên khi di chuyển giữa hai nét. */
+function veBut(c, x, y, mau, nhac, mo) {
+  if (mo <= 0.01) return
+  c.save(); c.globalAlpha = mo; c.translate(x, y - nhac * 10); c.rotate(-0.95)
+  if (!CHE_DO.nhe) { c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 14; c.shadowOffsetY = 8 + nhac * 10 }
+  c.fillStyle = '#2b3c43'; c.beginPath(); c.moveTo(4, -9); c.lineTo(132, -9); c.arcTo(142, -9, 142, 0, 9); c.arcTo(142, 9, 132, 9, 9); c.lineTo(4, 9); c.closePath(); c.fill()
+  c.shadowBlur = 0; c.shadowOffsetY = 0
+  c.fillStyle = '#d8dee0'; c.beginPath(); c.moveTo(0, 0); c.lineTo(30, -9); c.lineTo(30, 9); c.closePath(); c.fill()
+  c.fillStyle = mau; c.beginPath(); c.moveTo(-1, 0); c.lineTo(11, -3.6); c.lineTo(11, 3.6); c.closePath(); c.fill()
+  c.fillStyle = 'rgba(244,239,228,.55)'; c.fillRect(34, -6, 92, 3)
+  c.fillStyle = mau; c.fillRect(100, -9, 8, 18)
+  c.restore()
+}
 function nap(kb, net) {
   KB = kb; NET = net; DOAN = kb.doan
   NET.net.sort((a, b) => a.t - b.t)
@@ -45,8 +72,8 @@ function nap(kb, net) {
     let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9
     for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y) }
     n.hop = [x0, y0, x1, y1]; n.ket = n.t + (n.p[n.p.length - 1] || 0); n.mauVe = (NET.mau[n.m] && NET.mau[n.m][0]) || '#f4efe4'
-    const p = new Path2D(); for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (i === 0) p.moveTo(x, y); else p.lineTo(x, y) } if (n.p.length === 3) p.lineTo(n.p[0] / 4 + 0.1, n.p[1] / 4)
-    n.duong = p
+    const p = new Path2D(), d = []; for (let i = 0; i < n.p.length; i += 3) d.push(n.p[i] / 4, n.p[i + 1] / 4)
+    veTron(p, d); n.duong = p
   }
   if (kb.bo) {
     const [bx, by, bw, bh] = kb.bo.bang, [cx, cy, cw, chh] = kb.bo.cot
@@ -356,38 +383,49 @@ function veBang(d, t) {
   const s = nguon(d, t) * 1000, s0 = d.cau[0].s0 * 1000 - 2000
   const [cx, cy, cw] = camera(d, t), k = BANG.w / cw
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, BANG.w, BANG.h)
+  let dau = null, truoc = null, sau = null
   if (CHE_DO.nhe) {
     napDem(d, s, s0, cx, cy, k)
     ctx.drawImage(DEM.cv, 0, 0)
     ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k); ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+    if (DEM.i > 0) truoc = NET.net[DEM.i - 1]
     for (let i = DEM.i; i < NET.net.length; i++) {
-      const n = NET.net[i]; if (n.t > s) break
-      const da = s - n.t; ctx.globalAlpha = 1; ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05); ctx.beginPath(); let lx = 0, ly = 0
-      for (let j = 0; j < n.p.length; j += 3) { if (n.p[j + 2] > da) break; lx = n.p[j] / 4; ly = n.p[j + 1] / 4; if (j === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly) }
-      ctx.stroke(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(lx, ly, 7 / k, 0, Math.PI * 2); ctx.fill()
+      const n = NET.net[i]; if (n.t > s) { sau = n; break }
+      const p = diemDo(n, s - n.t); if (!p.length) continue
+      ctx.globalAlpha = 1; ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05); ctx.beginPath(); veTron(ctx, p); ctx.stroke(); dau = [p[p.length - 2], p[p.length - 1], n.mauVe]
     }
-    return
-  }
-  ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k)
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round'
-  const x1 = cx + cw, y1 = cy + BANG.h / k
-  let dau = null
-  for (const n of NET.net) {
-    if (n.t > s) break
-    const h = n.hop; if (h[2] < cx - 20 || h[0] > x1 + 20 || h[3] < cy - 20 || h[1] > y1 + 20) continue
-    const xong = n.ket <= s, tuoi = (s - n.ket) / 1000
-    ctx.globalAlpha = n.ket < s0 ? 0.38 : 1
-    ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05)
-    if (!CHE_DO.nhe && (!xong || tuoi < 1.4)) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 * (xong ? 1 - tuoi / 1.4 : 1) } else ctx.shadowBlur = 0
-    if (xong) ctx.stroke(n.duong)
-    else {
-      const da = s - n.t; ctx.beginPath(); let lx = 0, ly = 0
-      for (let i = 0; i < n.p.length; i += 3) { if (n.p[i + 2] > da) break; lx = n.p[i] / 4; ly = n.p[i + 1] / 4; if (i === 0) ctx.moveTo(lx, ly); else ctx.lineTo(lx, ly) }
-      ctx.stroke(); dau = [lx, ly, n.mauVe]
+  } else {
+    ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k)
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+    const x1 = cx + cw, y1 = cy + BANG.h / k
+    for (const n of NET.net) {
+      if (n.t > s) { sau = n; break }
+      const xong = n.ket <= s, tuoi = (s - n.ket) / 1000
+      if (xong && (!truoc || n.ket >= truoc.ket)) truoc = n
+      const h = n.hop; if (h[2] < cx - 20 || h[0] > x1 + 20 || h[3] < cy - 20 || h[1] > y1 + 20) continue
+      ctx.globalAlpha = n.ket < s0 ? 0.38 : 1
+      ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05)
+      if (!xong || tuoi < 1.4) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 * (xong ? 1 - tuoi / 1.4 : 1) } else ctx.shadowBlur = 0
+      if (xong) ctx.stroke(n.duong)
+      else { const p = diemDo(n, s - n.t); if (p.length) { ctx.beginPath(); veTron(ctx, p); ctx.stroke(); dau = [p[p.length - 2], p[p.length - 1], n.mauVe] } }
     }
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1
   }
-  ctx.shadowBlur = 0; ctx.globalAlpha = 1
-  if (dau) { ctx.fillStyle = '#fff'; ctx.shadowColor = dau[2]; ctx.shadowBlur = CHE_DO.nhe ? 0 : 24; ctx.beginPath(); ctx.arc(dau[0], dau[1], 7 / k, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0 }
+  // CÂY BÚT theo tay Thầy: đang viết ⇒ ở đầu nét; giữa hai nét gần nhau ⇒ nhấc lên, lướt tới chỗ nét sau; nghỉ lâu ⇒ mờ đi
+  const ra = (x, y) => [(x - cx) * k, (y - cy) * k]
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  if (dau) {
+    const [x, y] = ra(dau[0], dau[1])
+    ctx.fillStyle = '#fff'; ctx.shadowColor = dau[2]; ctx.shadowBlur = CHE_DO.nhe ? 0 : 22; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0
+    veBut(ctx, x, y, dau[2], 0, 1)
+  } else if (truoc) {
+    const n = truoc, m = n.p.length, e = ra(n.p[m - 3] / 4, n.p[m - 2] / 4), nghi = s - n.ket
+    if (sau && sau.t - n.ket < 1500) {
+      const q = eInOut(kep(nghi / Math.max(1, sau.t - n.ket))), f = ra(sau.p[0] / 4, sau.p[1] / 4)
+      veBut(ctx, lerp(e[0], f[0], q), lerp(e[1], f[1], q), sau.mauVe, Math.sin(q * Math.PI), 1)
+    } else if (nghi < 700) veBut(ctx, e[0], e[1], n.mauVe, eOut(kep(nghi / 400)), 1 - kep((nghi - 250) / 450))
+    else if (sau && sau.t - s < 350) { const f = ra(sau.p[0] / 4, sau.p[1] / 4); veBut(ctx, f[0], f[1], sau.mauVe, kep((sau.t - s) / 350), 1 - kep((sau.t - s) / 350)) }
+  }
 }
 
 // ── VẼ CẢNH ──

@@ -280,3 +280,60 @@ em, .nhan { font-style: normal; color: var(--mau, var(--vang)); font-weight: 800
 
 /* chế độ nhẹ (máy yếu): bỏ bộ lọc phát sáng SVG — Gaussian blur mỗi khung */
 html.nhe .ct-svg [filter], html.nhe #danh-dau [filter], html.nhe .bi-svg [filter] { filter: none; }
+
+/* ═══ PHẦN 3 (thầy 14/11): peptide + NaOH từng bước — phương trình tổng ở đỉnh + sân hoạt hoạ 4 bước (hoat-hoa-3.js) ═══ */
+.bz-pt { position: absolute; left: 0; right: 0; top: 0; padding: 10px 16px; border-radius: 22px; background: rgba(28, 42, 48, .96); box-shadow: inset 0 0 0 1.5px var(--vien), 0 14px 34px rgba(0, 0, 0, .35); display: flex; flex-direction: column; gap: 4px; }
+.bz-h { display: flex; align-items: center; gap: 10px; height: 48px; white-space: nowrap; }
+.bz-o { font-size: 33px; font-weight: 700; color: var(--phan-mo); padding: 2px 10px; border-radius: 12px; transform-origin: 50% 70%; }
+.bz-o b { color: var(--phan); font-weight: 900; }
+.bz-o em { color: var(--vang); }
+.bz-o.dau { color: var(--phan-mo); padding: 2px 0; }
+.bz-o.mui { color: var(--vang); font-weight: 900; }
+.bz-o.moi { background: rgba(110, 231, 183, .16); box-shadow: 0 0 0 2.5px var(--ngoc), 0 0 26px rgba(110, 231, 183, .45); }
+.bz-san { position: absolute; left: 0; right: 0; top: 128px; height: 500px; }
+.bz-svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.bz-f { position: absolute; font-size: 58px; font-weight: 900; color: var(--phan); white-space: nowrap; line-height: 1; padding: 8px 4px; border-radius: 16px; transform-origin: 30% 60%; }
+.bz-f sup { font-size: .5em; vertical-align: 1em; margin-left: 2px; }
+.bz-f.h { color: var(--hong); }
+.bz-f.na { color: var(--xanh); }
+.bz-f.oh { color: var(--xanh); }
+.bz-f.sang { background: rgba(255, 210, 122, .12); box-shadow: 0 0 0 3px currentColor, 0 0 30px rgba(255, 210, 122, .35); }
+.bz-f.vua { font-size: 50px; }
+.bz-nh { position: absolute; font-size: 30px; font-weight: 700; color: var(--phan-mo); padding: 8px 16px; border-radius: 14px; background: rgba(28, 42, 48, .92); white-space: nowrap; transform-origin: 0 50%; }
+.bz-nh b { color: var(--phan); }
+.bz-nh.hong b { color: var(--hong); } .bz-nh.xanh b { color: var(--xanh); } .bz-nh.vang b { color: var(--vang); } .bz-nh.nuoc b { color: #8fd8ee; }
+.bz-giot { position: absolute; width: 64px; height: 74px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; display: grid; place-items: center; font-size: 19px; font-weight: 900; color: #0d2a33; background: radial-gradient(circle at 35% 30%, #e6fbff, #8fd8ee 55%, #4fb3d1); box-shadow: 0 0 24px rgba(143, 216, 238, .6); transform-origin: 50% 60%; }
+.bz-giot.lon { width: 92px; height: 104px; font-size: 26px; }
+.bz-giot.gach::after { content: ''; position: absolute; left: -6px; right: -6px; top: 50%; height: 6px; margin-top: -3px; border-radius: 4px; background: var(--hong); transform: rotate(-28deg); }
+.bz-tom { position: absolute; left: 0; right: 0; padding: 16px 22px; border-radius: 20px; background: rgba(28, 42, 48, .96); box-shadow: inset 0 0 0 2.5px var(--ngoc); text-align: center; font-size: 33px; font-weight: 800; color: var(--phan); }
+.bz-tom b { color: var(--ngoc); }
+.bz-k { position: absolute; width: 196px; height: 100px; border-radius: 26px; display: grid; place-items: center; background: linear-gradient(170deg, #3a4f58, #26363d); box-shadow: 0 14px 30px rgba(0, 0, 0, .4), inset 0 0 0 2.5px rgba(255, 210, 122, .45); transform-origin: 50% 50%; }
+.bz-k b { font-size: 46px; font-weight: 900; color: var(--vang); }
+.bz-lk { position: absolute; height: 10px; border-radius: 6px; background: var(--vang); transform-origin: 50% 50%; }
+.bz-dc { position: absolute; width: 120px; padding: 6px 0; border-radius: 14px; text-align: center; font-size: 28px; font-weight: 900; color: var(--phan-mo); background: #2b3c43; box-shadow: inset 0 0 0 2px var(--vien); transform-origin: 50% 50%; }
+.bz-dc.sang { color: #172126; background: var(--ngoc); box-shadow: 0 0 26px rgba(110, 231, 183, .7); }
+.bz-so { position: absolute; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; font-weight: 900; color: #172126; background: var(--vang); }
+.bz-tag { position: absolute; width: 116px; padding: 4px 0; border-radius: 12px; text-align: center; font-size: 24px; font-weight: 900; color: #10203a; background: linear-gradient(170deg, #dfe9ff, #8fb6ff); }
+.bz-dem { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-radius: 18px; background: rgba(36, 52, 59, .95); font-size: 31px; font-weight: 900; white-space: nowrap; }
+.bz-dem span { color: var(--phan-mo); font-size: 26px; font-weight: 700; margin-right: 4px; }
+.bz-dem i { font-style: normal; display: inline-block; color: var(--ngoc); }
+.bz-dem i:last-child { color: var(--phan); margin-left: 6px; }
+.bz-dem.xong { box-shadow: 0 0 0 3px var(--vang), 0 0 30px rgba(255, 210, 122, .4); }
+.bz-hop { position: absolute; width: 394px; padding: 10px 16px; border-radius: 18px; background: rgba(36, 52, 59, .95); display: flex; flex-direction: column; gap: 2px; transform-origin: 50% 50%; }
+.bz-hop span { font-size: 25px; font-weight: 700; color: var(--phan-mo); }
+.bz-hop b { font-size: 38px; font-weight: 900; color: #8fd8ee; }
+.bz-hop.gach b { text-decoration: line-through; text-decoration-color: var(--hong); text-decoration-thickness: 5px; opacity: .55; }
+.bz-hop.sang { box-shadow: 0 0 0 3px #8fd8ee, 0 0 30px rgba(143, 216, 238, .45); }
+.bz-triet, .bz-con { position: absolute; padding: 10px 18px; border-radius: 16px; font-size: 30px; font-weight: 800; white-space: nowrap; background: rgba(28, 42, 48, .96); transform-origin: 0 50%; }
+.bz-triet b { color: var(--hong); }
+.bz-con { box-shadow: inset 0 0 0 2.5px var(--ngoc); }
+.bz-con b { color: #8fd8ee; }
+.bz-m { position: absolute; left: 0; right: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; padding: 14px 20px; border-radius: 20px; background: rgba(36, 52, 59, .96); font-size: 36px; font-weight: 900; }
+.bz-m span { font-size: 28px; font-weight: 800; color: var(--vang); margin-right: 6px; }
+.bz-m i { font-style: normal; display: inline-block; transform-origin: 50% 60%; }
+.bz-m i:nth-of-type(2) { color: var(--hong); } .bz-m i:nth-of-type(3) { color: var(--xanh); }
+.bz-m.ala { box-shadow: inset 0 0 0 2.5px var(--ngoc); }
+.bz-m.ala i:nth-of-type(2) { color: var(--phan); }
+.bz-giot.nho { width: 50px; height: 58px; font-size: 15px; }
+.bz-giot.sang { box-shadow: 0 0 0 3px var(--vang), 0 0 30px rgba(255, 210, 122, .6); }
+.bz-giot { z-index: 2; }
