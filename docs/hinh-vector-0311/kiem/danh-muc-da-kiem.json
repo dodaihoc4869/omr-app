@@ -6742,6 +6742,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5": {
+      "tep": "abs853-native-ddh-fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65.svg",
+      "hashSvg": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+      "byteSvg": 24567,
+      "byteGzip": 5916,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d": {
       "tep": "capron-native1376-ddh-c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de.svg",
       "hashSvg": "c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de",
@@ -16699,6 +16708,20 @@
           "where": "12-KT-C4-D3-II-1.hinh.0.du_lieu",
           "hashDataUrl": "3f5852e966715e8fb579487a8e8db30097eb59ccd7f1b2bf22b44ed709e527a0",
           "vector": "tai-che-ddh-cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D3-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+          "where": "12-KT-C4-D3-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "f3eb5a7d60344bfdade0cf43a354a42b3ecc5ceae94b9f46a7fb858514c8ed3d",
+          "vector": "abs853-native-ddh-fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65.svg"
         }
       ]
     },
@@ -32674,6 +32697,7 @@
     "12-KT-C4-D4-III-2",
     "12-KT-C4-D4-III-4",
     "12-KT-C4-D3-II-1",
+    "12-KT-C4-D3-II-3",
     "12-KT-C4-D5-I-1",
     "12-KT-C4-D5-I-4",
     "12-KT-C4-D5-I-14",

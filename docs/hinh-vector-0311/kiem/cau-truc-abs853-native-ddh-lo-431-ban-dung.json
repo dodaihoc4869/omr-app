@@ -1,0 +1,29 @@
+[
+  {
+    "i": 853,
+    "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+    "fileNguon": "anh/9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5.png",
+    "svg": "abs853-native-ddh-fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65.svg",
+    "hashSvg": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+    "byteSvg": 24567,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D3-II-3",
+        "de": "Nhựa ABS được làm từ polymer có tên đầy đủ là poly(acrylonitrile butadiene styrene). Nhựa ABS có đặc tính cứng, rắn nhưng không giòn, cách điện, không thấm nước, bền với nhiệt độ và hoá chất. Nhựa này được sử dụng khá rộng rãi: làm vật liệu xây dựng, đồ chơi trẻ em, đồ gia dụng, mũ bảo hiểm.\nCông thức cấu tạo của ABS được trình bày trong hình dưới đây.",
+        "refs": [
+          {
+            "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+            "where": "12-KT-C4-D3-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "f3eb5a7d60344bfdade0cf43a354a42b3ecc5ceae94b9f46a7fb858514c8ed3d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "30knownprintedC2N-exclcutcontinuations-unknownxyz/3monomersstyrene-butadiene-acrylonitrile→ABS/2Ph6innerCCdouble-4outsideCCdouble-2CNtriple/3SQUAREpairsxyzSUB/4middlebackboneCONLYsingleliteral/4TRUEdamUPRIGHTcaptions-styrene-butadiene-acrylonitrile-ABS polymer/2NregularUPRIGHT-xyzregularUPRIGHT/1FILLEDconcaveRIGHThead/3tinyUNKNOWNmarks+7TOPcroppedgrayfragmentsKEEP/NOaddedH-plus-catalyst-formula-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

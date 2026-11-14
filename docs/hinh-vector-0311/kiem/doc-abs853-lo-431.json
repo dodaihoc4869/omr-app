@@ -1,0 +1,816 @@
+{
+  "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+  "native": [
+    1209,
+    398
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C4-D3-II-3",
+      "de": "Nhựa ABS được làm từ polymer có tên đầy đủ là poly(acrylonitrile butadiene styrene). Nhựa ABS có đặc tính cứng, rắn nhưng không giòn, cách điện, không thấm nước, bền với nhiệt độ và hoá chất. Nhựa này được sử dụng khá rộng rãi: làm vật liệu xây dựng, đồ chơi trẻ em, đồ gia dụng, mũ bảo hiểm.\nCông thức cấu tạo của ABS được trình bày trong hình dưới đây.",
+      "refs": [
+        {
+          "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+          "where": "12-KT-C4-D3-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "f3eb5a7d60344bfdade0cf43a354a42b3ecc5ceae94b9f46a7fb858514c8ed3d"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "30knownprintedC2N-exclcutcontinuations-unknownxyz/3monomersstyrene-butadiene-acrylonitrile→ABS/2Ph6innerCCdouble-4outsideCCdouble-2CNtriple/3SQUAREpairsxyzSUB/4middlebackboneCONLYsingleliteral/4TRUEdamUPRIGHTcaptions-styrene-butadiene-acrylonitrile-ABS polymer/2NregularUPRIGHT-xyzregularUPRIGHT/1FILLEDconcaveRIGHThead/3tinyUNKNOWNmarks+7TOPcroppedgrayfragmentsKEEP/NOaddedH-plus-catalyst-formula-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1publicde12-KT-C4-D3-II-3; OWNleft/right3x/arrow4x. Productmiddle onlysingleliteral, no theorynormalization. Captions TRUEdam, N and xyz regularUPRIGHT. Tinyarrow and TOPfragments UNKNOWN retained, no conditionguesses.",
+  "independentSourceAudit": {
+    "i": 853,
+    "assetIndexProvided": 731,
+    "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5.png",
+    "size": [
+      1209,
+      398
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C4-D3-II-3",
+        "de": "Nhựa ABS được làm từ polymer có tên đầy đủ là poly(acrylonitrile butadiene styrene). Nhựa ABS có đặc tính cứng, rắn nhưng không giòn, cách điện, không thấm nước, bền với nhiệt độ và hoá chất. Nhựa này được sử dụng khá rộng rãi: làm vật liệu xây dựng, đồ chơi trẻ em, đồ gia dụng, mũ bảo hiểm.\nCông thức cấu tạo của ABS được trình bày trong hình dưới đây.",
+        "allHinh": [
+          {
+            "hash": "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5",
+            "where": "12-KT-C4-D3-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "f3eb5a7d60344bfdade0cf43a354a42b3ecc5ceae94b9f46a7fb858514c8ed3d"
+          }
+        ],
+        "missingHashes": [
+          "9bf8e8e6225397644e61f79a21bdc12cf76efcdf0fdf0aa3c29e63cd478d3ce5"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/431-853-full3x.png",
+        "/workspace/scratch/431-853-monomers3x.png",
+        "/workspace/scratch/431-853-product3x.png",
+        "/workspace/scratch/431-853-arrow3x.png",
+        "/workspace/scratch/431-853-xyz4x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "monomerC": 15,
+        "monomerN": 1,
+        "productVisibleUnitC": 15,
+        "productN": 1,
+        "totalKnownPrintedC": 30,
+        "N": 2,
+        "phenylRings": 2,
+        "phenylInnerDoubleRays": 6,
+        "monomerOtherCCdouble": 4,
+        "productMiddleCCdouble": 0,
+        "CNTriplePairs": 2,
+        "squareBracketPairs": 3,
+        "filledRightHeads": 1,
+        "polymerWholeC": "Unknownx/y/z/outsidefreeends, no restoredformula"
+      },
+      "font": {
+        "captions": "TRUEBOLDuprightsans styrene/butadiene/acrylonitrile/ABS polymer",
+        "atomN": "Regularuprightsans",
+        "xyz": "Lowercase x/y/z REGULARUPRIGHTsans, notmathitalic"
+      },
+      "styrene": {
+        "ringVertices": [
+          [
+            117,
+            119
+          ],
+          [
+            149,
+            137
+          ],
+          [
+            149,
+            174
+          ],
+          [
+            117,
+            192
+          ],
+          [
+            84,
+            174
+          ],
+          [
+            84,
+            137
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              91,
+              141
+            ],
+            [
+              91,
+              169
+            ]
+          ],
+          [
+            [
+              119,
+              127
+            ],
+            [
+              141,
+              140
+            ]
+          ],
+          [
+            [
+              119,
+              184
+            ],
+            [
+              141,
+              171
+            ]
+          ]
+        ],
+        "vinylMain": [
+          [
+            117,
+            119
+          ],
+          [
+            117,
+            84
+          ],
+          [
+            149,
+            65
+          ]
+        ],
+        "vinylExtraRay": [
+          [
+            121,
+            87
+          ],
+          [
+            152,
+            69
+          ]
+        ],
+        "caption": {
+          "literal": "styrene",
+          "bbox": [
+            74,
+            206,
+            164,
+            229
+          ]
+        }
+      },
+      "butadiene": {
+        "mainVertices": [
+          [
+            282,
+            172
+          ],
+          [
+            312,
+            155
+          ],
+          [
+            344,
+            172
+          ],
+          [
+            375,
+            154
+          ]
+        ],
+        "extraDoubleRays": [
+          [
+            [
+              284,
+              178
+            ],
+            [
+              313,
+              162
+            ]
+          ],
+          [
+            [
+              346,
+              165
+            ],
+            [
+              373,
+              148
+            ]
+          ]
+        ],
+        "caption": {
+          "literal": "butadiene",
+          "bbox": [
+            274,
+            197,
+            395,
+            219
+          ]
+        }
+      },
+      "acrylonitrile": {
+        "mainVertices": [
+          [
+            186,
+            319
+          ],
+          [
+            186,
+            285
+          ],
+          [
+            219,
+            265
+          ]
+        ],
+        "CCextra": [
+          [
+            192,
+            318
+          ],
+          [
+            192,
+            290
+          ]
+        ],
+        "tripleRays": [
+          [
+            [
+              216,
+              258
+            ],
+            [
+              235,
+              247
+            ]
+          ],
+          [
+            [
+              219,
+              265
+            ],
+            [
+              238,
+              253
+            ]
+          ],
+          [
+            [
+              223,
+              272
+            ],
+            [
+              242,
+              261
+            ]
+          ]
+        ],
+        "Nbox": [
+          242,
+          239,
+          258,
+          260
+        ],
+        "caption": {
+          "literal": "acrylonitrile",
+          "bbox": [
+            145,
+            342,
+            289,
+            365
+          ]
+        }
+      },
+      "arrow": {
+        "shaft": [
+          [
+            447,
+            201
+          ],
+          [
+            738,
+            201
+          ]
+        ],
+        "filledHead": [
+          [
+            704,
+            191
+          ],
+          [
+            738,
+            201
+          ],
+          [
+            704,
+            211
+          ],
+          [
+            713,
+            201
+          ]
+        ],
+        "conditions": "NONE"
+      },
+      "product": {
+        "mainInternalVertices": [
+          [
+            877,
+            159
+          ],
+          [
+            910,
+            141
+          ],
+          [
+            940,
+            159
+          ],
+          [
+            974,
+            141
+          ],
+          [
+            1006,
+            159
+          ],
+          [
+            1039,
+            141
+          ],
+          [
+            1070,
+            159
+          ],
+          [
+            1102,
+            141
+          ]
+        ],
+        "freeOutsideEndStrokes": [
+          [
+            [
+              818,
+              127
+            ],
+            [
+              877,
+              159
+            ]
+          ],
+          [
+            [
+              1102,
+              141
+            ],
+            [
+              1134,
+              159
+            ]
+          ]
+        ],
+        "warning": "Outsideendpointsarecutbackbonecontinuations, NOTextraC. Middleysegment4CconnectedONLYsingle, noextraC=Cfrombutadienetheory.",
+        "phenylBranch": {
+          "stem": [
+            [
+              877,
+              159
+            ],
+            [
+              877,
+              195
+            ]
+          ],
+          "vertices": [
+            [
+              877,
+              195
+            ],
+            [
+              910,
+              213
+            ],
+            [
+              910,
+              249
+            ],
+            [
+              877,
+              268
+            ],
+            [
+              844,
+              249
+            ],
+            [
+              844,
+              213
+            ]
+          ],
+          "innerRays": [
+            [
+              [
+                851,
+                217
+              ],
+              [
+                851,
+                245
+              ]
+            ],
+            [
+              [
+                879,
+                203
+              ],
+              [
+                902,
+                216
+              ]
+            ],
+            [
+              [
+                879,
+                260
+              ],
+              [
+                902,
+                246
+              ]
+            ]
+          ]
+        },
+        "CNbranch": {
+          "bareCN_C": [
+            1102,
+            105
+          ],
+          "stem": [
+            [
+              1102,
+              141
+            ],
+            [
+              1102,
+              105
+            ]
+          ],
+          "tripleRays": [
+            [
+              [
+                1095,
+                84
+              ],
+              [
+                1095,
+                105
+              ]
+            ],
+            [
+              [
+                1102,
+                84
+              ],
+              [
+                1102,
+                105
+              ]
+            ],
+            [
+              [
+                1109,
+                84
+              ],
+              [
+                1109,
+                105
+              ]
+            ]
+          ],
+          "Nbox": [
+            1094,
+            59,
+            1112,
+            78
+          ],
+          "glyphGap": "Keepwhitegapabove3raytopsandN, noCNtextswap."
+        },
+        "brackets": [
+          {
+            "left": [
+              [
+                848,
+                124
+              ],
+              [
+                837,
+                124
+              ],
+              [
+                837,
+                279
+              ],
+              [
+                848,
+                279
+              ]
+            ],
+            "right": [
+              [
+                908,
+                124
+              ],
+              [
+                919,
+                124
+              ],
+              [
+                919,
+                279
+              ],
+              [
+                908,
+                279
+              ]
+            ],
+            "sub": {
+              "literal": "x",
+              "bbox": [
+                920,
+                281,
+                934,
+                298
+              ]
+            }
+          },
+          {
+            "left": [
+              [
+                942,
+                123
+              ],
+              [
+                931,
+                123
+              ],
+              [
+                931,
+                279
+              ],
+              [
+                942,
+                279
+              ]
+            ],
+            "right": [
+              [
+                1035,
+                123
+              ],
+              [
+                1047,
+                123
+              ],
+              [
+                1047,
+                279
+              ],
+              [
+                1035,
+                279
+              ]
+            ],
+            "sub": {
+              "literal": "y",
+              "bbox": [
+                1048,
+                281,
+                1063,
+                299
+              ]
+            }
+          },
+          {
+            "left": [
+              [
+                1072,
+                123
+              ],
+              [
+                1060,
+                123
+              ],
+              [
+                1060,
+                279
+              ],
+              [
+                1072,
+                279
+              ]
+            ],
+            "right": [
+              [
+                1114,
+                123
+              ],
+              [
+                1125,
+                123
+              ],
+              [
+                1125,
+                279
+              ],
+              [
+                1114,
+                279
+              ]
+            ],
+            "sub": {
+              "literal": "z",
+              "bbox": [
+                1125,
+                281,
+                1140,
+                298
+              ]
+            }
+          }
+        ],
+        "bracketCrossings": "Verticalbracketstrokesintentionallycrossnativebackbone, no artificialgaps.",
+        "caption": {
+          "literal": "ABS polymer",
+          "bbox": [
+            908,
+            314,
+            1065,
+            336
+          ]
+        }
+      },
+      "unknownMarks": [
+        {
+          "bboxInclusive": [
+            634,
+            129,
+            640,
+            132
+          ],
+          "appearance": "Smallblackangledspeckaboveequationarrow",
+          "interpretation": "UNKNOWNretain, notcatalystlabel/arrowhead"
+        },
+        {
+          "bboxInclusive": [
+            542,
+            193,
+            545,
+            194
+          ],
+          "appearance": "Tinygrayspeckaboveshaft"
+        },
+        {
+          "bboxInclusive": [
+            580,
+            193,
+            584,
+            195
+          ],
+          "appearance": "Tinygrayspeckaboveshaft"
+        }
+      ],
+      "TOPcroppedFaintMarks": {
+        "bboxesInclusive": [
+          [
+            16,
+            0,
+            17,
+            0
+          ],
+          [
+            219,
+            0,
+            222,
+            0
+          ],
+          [
+            352,
+            0,
+            354,
+            0
+          ],
+          [
+            578,
+            0,
+            579,
+            0
+          ],
+          [
+            662,
+            0,
+            664,
+            0
+          ],
+          [
+            966,
+            0,
+            969,
+            0
+          ],
+          [
+            1068,
+            0,
+            1071,
+            0
+          ]
+        ],
+        "grayApprox": [
+          222,
+          243
+        ],
+        "interpretation": "Onlyy0faintink, no legibleglyph; retainfainttinysegmentsnorestoration. Notblackdata/charges."
+      },
+      "noAdded": [
+        "No conditionsaboveblankarrow",
+        "No plusesbetweenmonomersnotprinted",
+        "No productmiddledoublebond",
+        "No charges",
+        "No repeatedn",
+        "No hiddenCoutsidebrackets",
+        "No captiontranslation"
+      ]
+    },
+    "measurementLimits": "Eachmonomer/productown3xopened, XYZown4x. Nativeapproxcoords±1–2px. Unknownmarksnotchemistry; topfaintcroppedinkreadnativegrayvalues. NoSVGreview.",
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount"
+  },
+  "rootOldNewXmlAudit": {
+    "intermediateSha": "7d418f19a3266d802997ddb6b670d3992683678de4fad42970e4e5c20779e200",
+    "finalSha": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+    "children": 31,
+    "changedChildren": [
+      14
+    ],
+    "onlyChange": "y outeranchor baseline294→296; innerglyphd EXACT; ALLotherXMLchildren EXACT",
+    "initialRejectedReason": "Bị loại bởi root: acrylonitrile quá rộng ở cỡ25, bracket/đỉnh/ray lệch native khoảng1–3px; N trên sản phẩm có ray bắt đầu80 thay vì native~84. Không claim ink collision.",
+    "intermediateRejectedReason": "RootOWN12x: rightarm y chạm nextbracketbottom. Sửa duy ybaseline294→296; cần freshALL newhash.",
+    "noOldProofCarry": true
+  },
+  "rootActualReview": {
+    "hashSvg": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+    "nativeFullOpened": true,
+    "allPublicDeOpened": [
+      "12-KT-C4-D3-II-3"
+    ],
+    "freshChromium3xFullOpened": "/workspace/scratch/root431-853.png",
+    "macrosOpened": [
+      "/workspace/scratch/final431-left.png",
+      "/workspace/scratch/final431-right.png",
+      "/workspace/scratch/final431-arrow.png",
+      "/workspace/scratch/final431-y.png"
+    ],
+    "ketQua": "Đạt root own fresh finalFULL/allmacros: 30knownprintedC2N excludingcutcontinuations; 2Ph6innerCC, 4outsideCCdouble2CNtriple; 3SQUARExyzUPRIGHT. 4middleC singleliteral. y WHITEgap after2pxbaselinefix. 4captions TRUEdam othersregular. Unknown3specks7TOPfragmentskeep. NativeapproxNOTsubpixel."
+  },
+  "readonlyFinalRuntime": {
+    "sha256": "3506b7342994b1893417dbfd205c89236391a5f625f5595ac87bf2dbb9761cf0",
+    "rawLog": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/abs853-native-ddh-fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65.svg fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65\n853 { x: 0, y: 0, width: 1209, height: 398 }\n\nPOSTSHOT_SHA fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65\nCOMMAND node /workspace/scratch/agent-render431-final.cjs\nCONTEXT 12-KT-C4-D3-II-3.hinh.0.du_lieu public de/one ref only; no answers.\n"
+  },
+  "readonlyFinalReview": [
+    {
+      "i": 853,
+      "hashSvg": "fdbac8093bfdd7700c980e20a3d1def1f7d50a9db82463a389257905fa856e65",
+      "nguoiSoat": "soat_hinh_vector",
+      "ketQua": "Đạt: own native FULL/public de-ref/3nativezoom, fresh FINALChromium3x FULL/macros allmonomers/product/twoCN/xyz/flecks. 30knownprintedC2N excludingcutcontinuations/unknownxyz; 2Ph6innerCCdouble/4outsideCCdouble/2CNtriple, productmiddle4C allsingle giữliteral không theoryfix. Ba squarepairs/x-y-zsubregular, y mới whitegap với đáyngoặc cạnh; Nregularupright, 4captiontrueDAMupright EXACTstyrene/butadiene/acrylonitrile/ABS polymer. 1FILLEDconcavehead/3tinyunknownmarks/7topcroppedgrayfragments giữ không gán dữ kiện. Glyphgaps/CNtop/captionedges sạch không chạm/cắt mới. ActualSHApre/post đúng final, negative7d418 giữ riêng không carry.",
+      "render": "/workspace/scratch/soat431-final-853-fresh.png",
+      "macro": [
+        "/workspace/scratch/abs853-final-styrene.png",
+        "/workspace/scratch/abs853-final-butadiene.png",
+        "/workspace/scratch/abs853-final-acrylo.png",
+        "/workspace/scratch/abs853-final-product.png",
+        "/workspace/scratch/abs853-final-CN.png",
+        "/workspace/scratch/abs853-final-xyz.png",
+        "/workspace/scratch/abs853-final-flecks.png",
+        "/workspace/scratch/abs853-final-topcrop.png"
+      ]
+    }
+  ]
+}

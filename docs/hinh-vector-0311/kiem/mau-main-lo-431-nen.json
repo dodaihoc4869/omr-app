@@ -1,0 +1,17 @@
+{
+  "lo": 431,
+  "main": "20147d572013373a26649338b2825775cf4cafd1",
+  "previousMain": "fe5e82b172aa0588c6b23cf7ae7ff27b0166f543",
+  "diffStat": "32 files changed, 1777 insertions(+), 350 deletions(-)",
+  "appChanged": true,
+  "serverChanged": true,
+  "viteChanged": true,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2004,
+  "checkerFiles": 377,
+  "colorLogSha256": "eac12d30ae3f8bb24b8cbd17ef0c257ccb63ebb38b269c617cc12bc0d9c728ba",
+  "colorSummary": "kiem-mau-giu-nguyen · mốc origin/main · 377 tệp src/ đổi · 2004 vi phạm",
+  "release": "Main Sinh Tồn bản 2 đợt 4 phần dữ liệu; chưa gộp. Latestmain build/speed/full theo tên bắt buộc trước merge-release; không dùng cổng nhánh thay thế."
+}
