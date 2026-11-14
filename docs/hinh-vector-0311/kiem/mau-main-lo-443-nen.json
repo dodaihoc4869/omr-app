@@ -1,0 +1,31 @@
+{
+  "lo": 443,
+  "main": "b71484f61d2147023140d25d2f9d3681ff2e34f7",
+  "previousMain": "b95dafd0efc63d07c2b019d4e3f9c2479db803d7",
+  "diffStat": " .github/workflows/xoa-nhat-ky-1411.yml             |   32 +\n DIEU-PHOI.md                                       |    2 +\n public/video-bai/hoat-hoa-4.js                     |  299 +++++\n public/video-bai/index.html                        |    1 +\n public/video-bai/khung.css                         |   17 +\n public/video-bai/khung.html                        |    1 +\n public/video-bai/khung.js                          |    4 +-\n scripts/video-bai-giang/am-thanh.py                |   40 +-\n scripts/video-bai-giang/do-nhip-truc-tiep.mjs      |   11 +-\n scripts/video-bai-giang/dung-kich-ban.mjs          |   36 +-\n scripts/video-bai-giang/mau-giong.json             |    1 +\n scripts/video-bai-giang/thu-trang-xem.mjs          |   11 +-\n .../video-bai-giang/vi-du/k10-lien-ket-cht.json    | 1347 ++++++++++++++++++++\n 13 files changed, 1787 insertions(+), 15 deletions(-)\n",
+  "files": [
+    ".github/workflows/xoa-nhat-ky-1411.yml",
+    "DIEU-PHOI.md",
+    "public/video-bai/hoat-hoa-4.js",
+    "public/video-bai/index.html",
+    "public/video-bai/khung.css",
+    "public/video-bai/khung.html",
+    "public/video-bai/khung.js",
+    "scripts/video-bai-giang/am-thanh.py",
+    "scripts/video-bai-giang/do-nhip-truc-tiep.mjs",
+    "scripts/video-bai-giang/dung-kich-ban.mjs",
+    "scripts/video-bai-giang/mau-giong.json",
+    "scripts/video-bai-giang/thu-trang-xem.mjs",
+    "scripts/video-bai-giang/vi-du/k10-lien-ket-cht.json"
+  ],
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "Mainb71484f61 mới so442:13files1787insert15delete/publicvideo-audio-script-workflow-journalchanged/appsrc-server-Vite-DDHfont-mốcunchanged; khônggộp. LatestmainfullBYNAME-buildspeed bắtbuộc trướcmerge-release."
+}

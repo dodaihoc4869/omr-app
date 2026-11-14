@@ -1,0 +1,599 @@
+{
+  "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+  "native": [
+    1040,
+    243
+  ],
+  "questions": [
+    {
+      "qid": "12-C4-B13-I-49",
+      "de": "Cao su butyl có khả năng chống thấm khí tốt, chống chịu hoá chất nên được sử dụng làm lớp lót trong săm lốp, găng tay cao su,... Cao su butyl thường được sản xuất bằng cách trùng hợp 98% monomer X với 2% monomer Y. Dưới đây là một đoạn mạch của cao su butyl:",
+      "refs": [
+        {
+          "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+          "where": "12-C4-B13-I-49.hinh.0.du_lieu",
+          "hashDataUrl": "dd99811f11cd36170b39e6ec6a496eb7d356fd8c1a9553340c7b7bb70f65208d"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "17printedC32printedH=5CH2+1CH+4C+7CH3-SYMBOLICnNOTwholepolymerformula/1CCdouble2rays/7verticalCH3branches3UP4DOWN/2individualROUNDaroundONLYmiddleCH2-Cplus2CH3-1nSUBupright/2wavesEACH4crests4troughs-startDOWNendMID-individualnonperiodicturns/ALLregularUPRIGHT-SUB23-FIRSTCanchors/0arrow-stereo-charge-caption/noaddedH-monomer-name98percent2percent-answer/noalias481/nativeapproxNOTsubpixel/faintscangridNOTchemicalbonds-data",
+  "independentSourceAudit": {
+    "i": 139,
+    "assetIndex": 480,
+    "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9.png",
+    "size": [
+      1040,
+      243
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C4-B13-I-49",
+        "de": "Cao su butyl có khả năng chống thấm khí tốt, chống chịu hoá chất nên được sử dụng làm lớp lót trong săm lốp, găng tay cao su,... Cao su butyl thường được sản xuất bằng cách trùng hợp 98% monomer X với 2% monomer Y. Dưới đây là một đoạn mạch của cao su butyl:",
+        "allHinh": [
+          {
+            "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+            "where": "12-C4-B13-I-49.hinh.0.du_lieu",
+            "hashDataUrl": "dd99811f11cd36170b39e6ec6a496eb7d356fd8c1a9553340c7b7bb70f65208d"
+          }
+        ],
+        "missingHashes": [
+          "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/443-139-full3x.png",
+        "/workspace/scratch/443-139-left8x.png",
+        "/workspace/scratch/443-139-right8x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "labels": [
+        {
+          "literal": "CH₂",
+          "bbox": [
+            128,
+            110,
+            184,
+            139
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            214,
+            110,
+            233,
+            134
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            298,
+            110,
+            351,
+            139
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            409,
+            110,
+            428,
+            134
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            514,
+            110,
+            571,
+            139
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            604,
+            110,
+            623,
+            134
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH",
+          "bbox": [
+            659,
+            110,
+            707,
+            134
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            727,
+            110,
+            784,
+            139
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            808,
+            110,
+            865,
+            139
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            893,
+            110,
+            912,
+            134
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            214,
+            44,
+            270,
+            71
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            214,
+            172,
+            270,
+            200
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            409,
+            44,
+            465,
+            71
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            409,
+            172,
+            465,
+            200
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            604,
+            172,
+            660,
+            200
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            893,
+            48,
+            948,
+            76
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            893,
+            172,
+            948,
+            200
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        },
+        {
+          "literal": "n",
+          "bbox": [
+            483,
+            169,
+            498,
+            188
+          ],
+          "anchor": "first C for CHtokens; n lowerbaseline upright"
+        }
+      ],
+      "horizontalSingleBonds": [
+        [
+          [
+            188,
+            125
+          ],
+          [
+            211,
+            125
+          ]
+        ],
+        [
+          [
+            238,
+            125
+          ],
+          [
+            292,
+            125
+          ]
+        ],
+        [
+          [
+            356,
+            125
+          ],
+          [
+            405,
+            125
+          ]
+        ],
+        [
+          [
+            434,
+            125
+          ],
+          [
+            508,
+            125
+          ]
+        ],
+        [
+          [
+            574,
+            125
+          ],
+          [
+            600,
+            125
+          ]
+        ],
+        [
+          [
+            709,
+            125
+          ],
+          [
+            723,
+            125
+          ]
+        ],
+        [
+          [
+            787,
+            125
+          ],
+          [
+            805,
+            125
+          ]
+        ],
+        [
+          [
+            869,
+            125
+          ],
+          [
+            888,
+            125
+          ]
+        ]
+      ],
+      "CCdoubleRays": [
+        [
+          [
+            628,
+            119
+          ],
+          [
+            655,
+            119
+          ]
+        ],
+        [
+          [
+            628,
+            126
+          ],
+          [
+            655,
+            126
+          ]
+        ]
+      ],
+      "verticalBranches": [
+        [
+          [
+            224,
+            72
+          ],
+          [
+            224,
+            106
+          ]
+        ],
+        [
+          [
+            224,
+            138
+          ],
+          [
+            224,
+            168
+          ]
+        ],
+        [
+          [
+            419,
+            72
+          ],
+          [
+            419,
+            106
+          ]
+        ],
+        [
+          [
+            419,
+            138
+          ],
+          [
+            419,
+            168
+          ]
+        ],
+        [
+          [
+            614,
+            138
+          ],
+          [
+            614,
+            168
+          ]
+        ],
+        [
+          [
+            903,
+            76
+          ],
+          [
+            903,
+            106
+          ]
+        ],
+        [
+          [
+            903,
+            138
+          ],
+          [
+            903,
+            168
+          ]
+        ]
+      ],
+      "roundParentheses": {
+        "leftGuide": [
+          [
+            280,
+            66
+          ],
+          [
+            266,
+            94
+          ],
+          [
+            264,
+            125
+          ],
+          [
+            267,
+            156
+          ],
+          [
+            280,
+            184
+          ]
+        ],
+        "rightGuide": [
+          [
+            472,
+            68
+          ],
+          [
+            484,
+            96
+          ],
+          [
+            488,
+            125
+          ],
+          [
+            484,
+            157
+          ],
+          [
+            472,
+            186
+          ]
+        ]
+      },
+      "leftWave": {
+        "start": [
+          32,
+          124
+        ],
+        "orderedTurns": [
+          [
+            38,
+            129
+          ],
+          [
+            49,
+            118
+          ],
+          [
+            60,
+            129
+          ],
+          [
+            72,
+            118
+          ],
+          [
+            83,
+            129
+          ],
+          [
+            94,
+            118
+          ],
+          [
+            106,
+            129
+          ],
+          [
+            117,
+            118
+          ]
+        ],
+        "end": [
+          123,
+          124
+        ],
+        "crests": 4,
+        "troughs": 4
+      },
+      "rightWave": {
+        "start": [
+          917,
+          126
+        ],
+        "orderedTurns": [
+          [
+            924,
+            132
+          ],
+          [
+            935,
+            120
+          ],
+          [
+            947,
+            132
+          ],
+          [
+            958,
+            120
+          ],
+          [
+            970,
+            132
+          ],
+          [
+            981,
+            121
+          ],
+          [
+            993,
+            132
+          ],
+          [
+            1004,
+            121
+          ]
+        ],
+        "end": [
+          1011,
+          127
+        ],
+        "crests": 4,
+        "troughs": 4
+      },
+      "waveStyle": "manualsmooth alternating turn guides, source irregular spacing/heights; bothstartdown andendmid. Each4crest4trough confirmed own8x, not genericperiodic template.",
+      "counts": {
+        "C": 17,
+        "printedH": 32,
+        "CH2tokens": 5,
+        "CHtokens": 1,
+        "barePrintedCtokens": 4,
+        "CH3tokens": 7,
+        "CCdouble": 1,
+        "roundParentheses": 2,
+        "lowerN": 1,
+        "waves": 2
+      },
+      "styles": {
+        "allLabels": "regular upright sans allC/CH/Hsubs/n, no truebold oritalic observed",
+        "bonds": "thin black approx1–1.5px",
+        "caption": "NONE"
+      },
+      "crop": "No glyph/branch clipped; outsidewavecontinuationunknown, noextraC added",
+      "background": "Faint horizontal dotted scanline around y99 and193, not chemicalbonds orrepeatlabels. Do not infer extra data from faintscanline."
+    },
+    "measurementLimits": "Nativeapprox±1–2px per bond/label/turn, source row not normalized. Parentheses enclose ONLY middleCH2-C withupperlowerCH3, no changingrepeatboundaries by theory. Count17C32H is sum explicittokens only, not wholepolymerformula outsidecuts/n.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "Root OWN nativeFULL/FULL2x/all1de12-C4-B13-I-49/2waves10x.17C32H explicit labels counted5CH2+1CH+4C+7CH3; n/outsidecutUNKNOWN/no polymer molecularformula.7CH3branches3UP4DOWN/1CCdouble/2ROUNDonlymiddleCH2-C.Eachwave4crests4troughs-startDOWNendMID/nonperiodicnativeguides. ALLregularUPRIGHT. Faint dottedscanbackgroundNOTchemicalbond/data/noinventedcount/noadded98percent2percent-monomeranswer.",
+  "rootActualReview": {
+    "hashSvg": "c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0",
+    "ketQua": "Đạt root OWN nativeFULL/FULL2x/all1publicde/freshChromiumFULL3x/left-right-waveRmacros; IMG.decode1040×243 exactSHA.17C32Hprintedlabels/7branches3UP4DOWN/1CCdouble/2ROUNDnSUB/2waves4crests4troughsEACH/noextraformula-answer. Whiteglyph-bondgaps/scanbackgroundnotdata.",
+    "render": "/workspace/scratch/root443-139.png",
+    "macros": [
+      "/workspace/scratch/root443-left.png",
+      "/workspace/scratch/root443-right.png",
+      "/workspace/scratch/root443-waveR.png"
+    ],
+    "negativeHistory": "Không SVGnegative found443; không tạo negative giả."
+  },
+  "readonlyRuntime": {
+    "sha256": "42732cc4270e2ac19418e8a875fc3f96d210c71211e23e60dc26175e14eb4c83",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/butyl139-native-ddh-c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0.svg c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0\nIMGDECODE [ 1040, 243 ]\n139 { x: 0, y: 0, width: 1040, height: 243 }\n\nPOSTSHOT_SHA c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0\nCOMMAND node /workspace/scratch/agent-render443.cjs\nCONTEXT 12-C4-B13-I-49.hinh.0.du_lieu public de/one ref only; no answers; IMG.decode success.\n"
+  }
+}

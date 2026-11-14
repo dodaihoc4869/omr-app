@@ -1,0 +1,29 @@
+[
+  {
+    "i": 139,
+    "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+    "fileNguon": "anh/189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9.png",
+    "svg": "butyl139-native-ddh-c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0.svg",
+    "hashSvg": "c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0",
+    "byteSvg": 23724,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C4-B13-I-49",
+        "de": "Cao su butyl có khả năng chống thấm khí tốt, chống chịu hoá chất nên được sử dụng làm lớp lót trong săm lốp, găng tay cao su,... Cao su butyl thường được sản xuất bằng cách trùng hợp 98% monomer X với 2% monomer Y. Dưới đây là một đoạn mạch của cao su butyl:",
+        "refs": [
+          {
+            "hash": "189ef68ef4c1a7d34805244c7f96ab6dfa1d6134fc0edd77ce4cb544e47955d9",
+            "where": "12-C4-B13-I-49.hinh.0.du_lieu",
+            "hashDataUrl": "dd99811f11cd36170b39e6ec6a496eb7d356fd8c1a9553340c7b7bb70f65208d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "17printedC32printedH=5CH2+1CH+4C+7CH3-SYMBOLICnNOTwholepolymerformula/1CCdouble2rays/7verticalCH3branches3UP4DOWN/2individualROUNDaroundONLYmiddleCH2-Cplus2CH3-1nSUBupright/2wavesEACH4crests4troughs-startDOWNendMID-individualnonperiodicturns/ALLregularUPRIGHT-SUB23-FIRSTCanchors/0arrow-stereo-charge-caption/noaddedH-monomer-name98percent2percent-answer/noalias481/nativeapproxNOTsubpixel/faintscangridNOTchemicalbonds-data",
+    "hashSvgDaSoat": "c52f147f41ea0b195ccb28f67c5c6c159bba4de1438314c4b488990af0ddd2a0",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
