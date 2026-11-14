@@ -2,6 +2,7 @@
 // (server/src/kenh-lop-may.ts) chạy ngay trong trình duyệt ⇒ máy bù chỗ, lượt hạ, hộp tiếp tế đều do đúng mã phát hành tính.
 // Mở: npx vite rồi vào /docs/ban-ve-sinh-ton-1211/that/ — tham số: ?xem=1 (máy thầy, có nút «Thầy vào trận») · ?ban=3 (số bạn giả tự chạy) · ?yeu=1 (máy yếu)
 //   · ?thay=1 (đợt 3: một bé ma Thầy GIẢ chạy trong sân — gói đi qua kết nối vai `gv` như máy thầy thật) · ?giay=65 (tua đồng hồ tới giây 65 của ván ⇒ Ma Mực trồi ngay).
+//   · Đợt 4: bạn giả (và em) mặc vài bộ đồ + danh hiệu tuần (mã gọn như phòng gắn vào danh sách) — ?do=0 để tắt (so khung hình với bản cũ không đồ).
 import { createRoot } from 'react-dom/client'
 import '../../../src/styles/tokens.css'
 import TroSinhTon from '../../../src/components/live-khoi/TroSinhTon'
@@ -16,7 +17,10 @@ const giay = Number(Q.get('giay'))
 if (giay > 0) { const goc = Date.now.bind(Date), t = goc(), lechT = (((giay * 1000 - (t % VAN_MS)) % VAN_MS) + VAN_MS) % VAN_MS; Date.now = () => goc() + lechT }
 const xem = Q.get('xem') === '1', soBan = Math.max(0, Math.min(110, Number(Q.get('ban') ?? 3)))
 const TEN = ['Nguyễn Thị Hà', 'Đỗ Hoàng Nam', 'Lê Gia Huy', 'Ngô Gia Bảo', 'Bùi Đức Anh', 'Trần Minh Anh', 'Phạm Khánh Vy', 'Vũ Ngọc Lan']
-const ds: NguoiLop[] = Array.from({ length: soBan + 1 }, (_, i) => ({ sbd: `S${i}`, ten: TEN[i % TEN.length], doi: i % 4 }))
+// Mã đồ gọn (tu-do.ts `gonMac`: mũ · áo · vệt đạn · khi hạ) + danh hiệu (chỉ số DANH_HIEU) của từng bạn giả.
+const BO_DO = ['3567', '1408', '2500', '0460', '3000', '1567', '', '2408'], DH = [0, -1, 1, -1, 2, -1, -1, 0]
+const coDo = Q.get('do') !== '0'
+const ds: NguoiLop[] = Array.from({ length: soBan + 1 }, (_, i) => ({ sbd: `S${i}`, ten: TEN[i % TEN.length], doi: i % 4, ...(coDo && BO_DO[i % 8] ? { c: BO_DO[i % 8] } : {}), ...(coDo && DH[i % 8]! >= 0 ? { dh: DH[i % 8] } : {}) }))
 const st = { ketThuc: false, live: { khoi: { k: 12, gd: 'cho', che: 'hoc' } }, ds: ds.map((e) => ({ ...e, vao: true, kj: 0 })), doiThuong: [0, 0, 0, 0] }
 
 // ── Phòng giả: mỗi bạn giả một «ổ cắm» riêng (phòng «chỉ gửi gần» nhận ra người nhận theo ổ cắm). Ổ của em (S0) chuyển ảnh LỌC cho màn; ổ «máy thầy» luôn

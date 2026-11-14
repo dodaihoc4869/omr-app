@@ -158,10 +158,14 @@ function chom(g: G, b: BangMau, doi: number, c: Rgb, nhat: Rgb, hat: number): vo
     const q = elip(44, 14, 2.4, 2.4, 10); to(g, q, nhat); netTay(g, q, { mau: m, day: 1.2, hat, bien: 0.3 })
   }
 }
-/** `thay` = bé ma THẦY (đợt 3, ảnh 11 · 12): màu --tr-hs thay màu đội, mặt nhạt, ĐEO KÍNH, không chỏm đội (nướng ở k × 2,2, đặt ở tỉ lệ 2,2). */
-function nuongMa(b: BangMau, k: number, doi: number, trai: boolean, khung: number, thay = false): Anh {
-  const c = thay ? b.hs : b.doi[doi] ?? b.muc, ao = pha(c, b.giay, 0.18), hat = doi * 31 + khung * 7 + (trai ? 3 : 0) + (thay ? 101 : 0)
-  return nuong(MA_W, MA_H, k, MA_OX, MA_OY, (g) => {
+/** Lề TRÊN của ảnh bé ma MẶC ĐỒ (đợt 4): mũ phù thuỷ nhô tới y ≈ −9 của hộp 70 × 84 ⇒ ảnh cao thêm, neo dời xuống đúng chừng ấy (đặt vẫn khớp chân). */
+const MU_TREN = 14
+/** `thay` = bé ma THẦY (đợt 3, ảnh 11 · 12): màu --tr-hs thay màu đội, mặt nhạt, ĐEO KÍNH, không chỏm đội (nướng ở k × 2,2, đặt ở tỉ lệ 2,2).
+ *  `do` (đợt 4) = vẽ trang phục chồng lên SAU thân, CÙNG phép lật (mặt lệch theo hướng nhìn ⇒ áo / mũ lật theo); ảnh có thêm lề trên MU_TREN. */
+function nuongMa(b: BangMau, k: number, doi: number, trai: boolean, khung: number, thay = false, ve?: (g: G) => void): Anh {
+  const c = thay ? b.hs : b.doi[doi] ?? b.muc, ao = pha(c, b.giay, 0.18), hat = doi * 31 + khung * 7 + (trai ? 3 : 0) + (thay ? 101 : 0), tren = ve ? MU_TREN : 0
+  return nuong(MA_W, MA_H + tren, k, MA_OX, MA_OY + tren, (g) => {
+    if (tren) g.translate(0, tren)
     if (trai) { g.translate(MA_W, 0); g.scale(-1, 1) }
     for (const [x, y] of [[16, 40], [54, 38]] as P[]) { const q = elip(x, y, 4.2, 3.4, 12); to(g, q, ao); netTay(g, q, { mau: b.muc, day: 1.4, hat: hat + x, bien: 0.5 }) }
     to(g, HINH_MA, ao)
@@ -179,6 +183,7 @@ function nuongMa(b: BangMau, k: number, doi: number, trai: boolean, khung: numbe
       for (const x of [33, 44]) { const q = elip(x, 30, 4.4, 3.6, 14); to(g, q, b.giay, 0.35); netTay(g, q, { mau: b.muc, day: 1.4, hat: hat + x, bien: 0.3 }) }
       netTay(g, [[37.4, 30], [39.6, 30]], { mau: b.muc, day: 1.2, hat, kin: false, bien: 0.1 })
     }
+    ve?.(g)
   })
 }
 
@@ -420,11 +425,14 @@ function nuongBong(b: BangMau, k: number): Anh {
   return nuong(32, 12, k, 16, 6, (g) => { g.beginPath(); g.ellipse(16, 6, 15, 5, 0, 0, Math.PI * 2); g.fillStyle = mau(b.bong, b.bongA * 1.3); g.fill() })
 }
 
+/** Trần số ảnh bé ma MẶC ĐỒ nướng sẵn mỗi bộ hình (mỗi tổ hợp mũ + áo × đội × hướng × khung là một ảnh) — quá trần ⇒ bé ma trơn (đồ chỉ là hình). */
+export const TRAN_DO = 32
 /** Bộ hình nướng LƯỜI theo (bảng màu, k, kiểu phẳng): mỗi hình nướng lần đầu cần rồi giữ. Đổi cỡ màn / màu / kiểu ⇒ tạo bộ mới. */
 export class BoHinh {
   private nho = new Map<string, Anh>()
   readonly b: BangMau; readonly k: number; readonly phang: boolean
-  constructor(b: BangMau, k: number, phang: boolean) { this.b = b; this.k = k; this.phang = phang }
+  /** `veDo` (đợt 4): hàm vẽ đồ theo mã gọn (be-ma-mac.ts `veDoTrenMa` — màn tiêm vào, tránh vòng nhập); thiếu ⇒ không vẽ đồ. */
+  constructor(b: BangMau, k: number, phang: boolean, veDo: ((g: G, b: BangMau, gon: string) => void) | null = null) { this.b = b; this.k = k; this.phang = phang; this.veDo = veDo }
   /** Hạn nướng của khung này (`performance.now`): quá hạn thì hình CHƯA nướng được bỏ qua khung này (hiện ở khung kế) — khung đầu ở máy yếu không dồn cả chục lần nướng. 0 = không hạn. */
   han = 0
   private trong: Anh | null = null
@@ -438,6 +446,17 @@ export class BoHinh {
   }
   /** Bé ma: `khung` 0 / 1 = hai lượt nét rung (kiểu phẳng luôn khung 0). */
   ma(doi: number, trai: boolean, khung: number): Anh { const kh = this.phang ? 0 : khung; return this.lay(`m${doi}${+trai}${kh}`, () => nuongMa(this.b, this.k, doi, trai, kh)) }
+  private readonly veDo: ((g: G, b: BangMau, gon: string) => void) | null
+  private soDo = 0
+  /** Bé ma MẶC ĐỒ theo mã gọn (tu-do.ts `gonMac`): ảnh chỉ phụ thuộc MŨ + ÁO (vệt đạn / khi hạ vẽ ở sân). KIỂU PHẲNG (máy yếu) ⇒ chỉ mũ.
+   *  Không đồ / quá trần TRAN_DO ⇒ bé ma trơn. */
+  maDo(doi: number, trai: boolean, khung: number, gon: string): Anh {
+    const ve = this.veDo, mu = gon[0] ?? '0', ao = this.phang ? '0' : gon[1] ?? '0'
+    if (!ve || (mu === '0' && ao === '0')) return this.ma(doi, trai, khung)
+    const kh = this.phang ? 0 : khung, khoa = `M${doi}${+trai}${kh}${mu}${ao}`
+    if (this.soDo >= TRAN_DO && !this.nho.has(khoa)) return this.ma(doi, trai, khung)
+    return this.lay(khoa, () => { this.soDo++; return nuongMa(this.b, this.k, doi, trai, kh, false, (g) => ve(g, this.b, `${mu}${ao}00`)) })
+  }
   sung(doi: number, cap: number): Anh { return this.lay(`s${doi}${cap}`, () => nuongSung(this.b, this.k, doi, cap)) }
   /** Bé ma Thầy (to ×2,2: nướng ở k × 2,2 ⇒ đặt bằng `dat(…, TO_THAY)` vẫn nét) + bút đỏ. */
   thay(trai: boolean, khung: number): Anh { const kh = this.phang ? 0 : khung; return this.lay(`t${+trai}${kh}`, () => nuongMa(this.b, this.k * TO_THAY, 0, trai, kh, true)) }

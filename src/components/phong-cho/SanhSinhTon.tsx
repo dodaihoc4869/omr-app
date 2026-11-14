@@ -55,7 +55,8 @@ function raToanMan(): void {
 function docNguoi(d: unknown): NguoiLop | null {
   if (!Array.isArray(d) || typeof d[0] !== 'string' || !d[0]) return null
   const doi = Number(d[2])
-  return { sbd: d[0], ten: typeof d[1] === 'string' ? d[1] : '', doi: doi >= 0 && doi <= 3 ? Math.floor(doi) : 0 }
+  // Bản 6 (đợt 4): [sbd, tên, đội, mã đồ gọn?, danh hiệu?] — thiếu ⇒ không đồ / không danh hiệu.
+  return { sbd: d[0], ten: typeof d[1] === 'string' ? d[1] : '', doi: doi >= 0 && doi <= 3 ? Math.floor(doi) : 0, ...(typeof d[3] === 'string' && d[3] ? { c: d[3] } : {}), ...(typeof d[4] === 'number' ? { dh: d[4] } : {}) }
 }
 const docDs = (ds: unknown): NguoiLop[] => (Array.isArray(ds) ? ds.map(docNguoi).filter((n): n is NguoiLop => !!n) : [])
 

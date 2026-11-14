@@ -35,6 +35,9 @@ let dangMo: number | null = null
 let henMo: ReturnType<typeof setTimeout> | undefined
 export const layDangMo = (): number | null => dangMo
 export const layView = (): ViewBang | null => view
+/** Sinh Tồn đợt 4: đồ + danh hiệu từng em (từ `lop-ds` phòng phát cả máy thầy) ⇒ máy chiếu vẽ đồ / danh hiệu như máy em. Đổi ⇒ tạo Map mới (useSyncExternalStore). */
+let doLop: ReadonlyMap<string, { c?: string; dh?: number }> = new Map()
+export const layDoLop = (): ReadonlyMap<string, { c?: string; dh?: number }> => doLop
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
 // ── Nối với mảnh gắn bảng (gan-gv): báo chế độ để bảng Bình Phản Ứng ẩn / hiện đúng luật; theo dõi lúc thầy Esc ra Hôm nay. ──
@@ -136,6 +139,13 @@ function nhan(tin: unknown): void {
     gan(); phatDoi()
   }
   else if (j.t === 'lop' && j.k) for (const f of tai.get(j.k) ?? []) { try { f(tin as TinLop) } catch { /* nơi nghe lỗi */ } }
+  else if (j.t === 'lop-ds') {
+    const m = new Map<string, { c?: string; dh?: number }>()
+    for (const x of Array.isArray((j as { ds?: unknown }).ds) ? (j as { ds: unknown[] }).ds : []) {
+      if (Array.isArray(x) && typeof x[0] === 'string' && (typeof x[4] === 'string' || typeof x[5] === 'number')) m.set(x[0], { ...(typeof x[4] === 'string' && x[4] ? { c: x[4] } : {}), ...(typeof x[5] === 'number' ? { dh: x[5] } : {}) })
+    }
+    if (m.size || doLop.size) { doLop = m; phatDoi() }
+  }
 }
 let daNghe = false
 function batNghe(): void {

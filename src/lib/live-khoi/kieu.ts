@@ -6,7 +6,9 @@ export interface LichLive { id: string; khoi: KhoiLive; /** Giờ bắt đầu (
 /** Thẻ Live ở trang chủ máy em: `khong` = không có buổi cho khối em; `hen` = có lịch (chưa tới 10 phút trước giờ); `cho` / `dang` = bấm «Tham gia» được. */
 export interface LiveCuaEm { trangThai: 'khong' | 'hen' | 'cho' | 'dang'; khoi?: KhoiLive; ten?: string; batDau?: number }
 /** Một người trong phòng: `doi` 0..3 theo DOI_BPU (Natri · Kali · Đồng · Canxi). */
-export interface NguoiLop { sbd: string; ten: string; doi: number; /** kJ của em trong buổi (phòng gửi kèm danh sách lớp). */ kj?: number }
+export interface NguoiLop { sbd: string; ten: string; doi: number; /** kJ của em trong buổi (phòng gửi kèm danh sách lớp). */ kj?: number
+  /** Sinh Tồn đợt 4 (bản 6): mã đồ gọn (`gonMac`, tu-do.ts) và chỉ số danh hiệu tuần (`DANH_HIEU`) — phòng gắn vào danh sách lúc em vào; thiếu ⇒ không đồ / không danh hiệu. */
+  c?: string; dh?: number }
 
 /** KÊNH LỚP: tin đi qua kết nối sẵn có của phòng, phòng chỉ chuyển tiếp trong bộ nhớ (0 D1). `chat` = nhắn cả lớp · `tro` = trò Sinh Tồn ở phòng chờ. */
 export type LoaiTinLop = 'chat' | 'tro' | 'mt' | 'hieu'
@@ -79,4 +81,5 @@ export interface SinhTonAnh {
 // 4 (13/11, bản 2 đợt 2): «chỉ gửi gần» (ds chỉ quanh em) + `an` mang chuỗi / thủ khoa + `tk` · `bc` · `bv` · `hg` + `e` trong gói gửi + hộp 4 loại (`loaiHop`).
 // 5 (13/11, bản 2 đợt 3): Thầy vào trận (`ty`, dòng «đội» 4 máu 0..2000 — chỉ phòng live) + Ma Mực (`bx` · `bp` · `bh`, mã 'MM' trong `t` / `an`) + mỗi trang
 //    một hộp (`hn`, `k` trong gói gửi, `loaiHopO`) + vòng cuối 0,32 ở sân ≥ 3 × 3 trang (`heVongCuoi`) ⇒ máy còn mảnh cũ tính sai vòng / hộp.
-export const PHIEN_BAN_ST = 5
+// 6 (14/11, bản 2 đợt 4 ghép): danh sách phòng `st-ds` / `st-vao.toi` thêm [mã đồ gọn?, danh hiệu?] + đội cả học kỳ ⇒ máy cũ không vẽ đồ / xếp sai đội hiện ra.
+export const PHIEN_BAN_ST = 6

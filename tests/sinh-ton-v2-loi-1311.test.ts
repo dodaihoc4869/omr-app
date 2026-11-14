@@ -16,9 +16,9 @@ const nv = (o: Partial<NhanVat> & { id: string }): NhanVat => ({ x: 0, y: 0, mau
 const hat = (s: number) => () => { s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
 
 describe('sáu khẩu súng', () => {
-  it('đủ 6 cấp ở mọi mảng theo cấp; máy bù tối đa cấp 3; giao thức lên bản 5 (đợt 3)', () => {
+  it('đủ 6 cấp ở mọi mảng theo cấp; máy bù tối đa cấp 3; giao thức lên bản 6 (đợt 4 ghép: danh sách mang đồ + danh hiệu + đội cả kỳ)', () => {
     expect(SUNG_TEN).toEqual(['Súng Hạt', 'Súng Đôi', 'Súng Bọt', 'Súng Sấm', 'Súng Lửa Màu', 'Pháo Sao'])
-    expect([CAP_TOI_DA, CAP_MAY_TOI_DA, PHIEN_BAN_ST]).toEqual([6, 3, 5])
+    expect([CAP_TOI_DA, CAP_MAY_TOI_DA, PHIEN_BAN_ST]).toEqual([6, 3, 6])
     for (const m of [SAT_THUONG_GIAY, NHIP_BAN_MS, DAN_BAY_MS]) expect(m).toHaveLength(6)
     expect([...SAT_THUONG_GIAY]).toEqual([34, 42, 50, 58, 66, 74])
     // Cấp 3 bọt hơi chậm hơn cấp 2; Pháo Sao chậm nhất; đạn luôn tới trước phát kế.

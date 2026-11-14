@@ -7,7 +7,7 @@ import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
 import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
-import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
+import { batTiengLai, dangKy, datGiaiLao, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layDoLop, layView, lenhMic, phienCua } from './thay-khoi'
 import { SK_COT, docCotMuon, ghiCotMuon, hinhCot } from './cot-chat-hinh'
 import KeoCot from './KeoCot'
 import { DaNghi } from './da-nghi'
@@ -338,7 +338,8 @@ function PhongChoThay({ v, khoi, nghi }: { v: ViewBang; khoi: number; /** đang 
   const [loi, setLoi] = useState('')
   const [thiDua, setThiDua] = useState(false)
   const vao = useMemo(() => v.ds.filter((e) => e.vao), [v.ds])
-  const dsLop = useMemo(() => vao.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), [vao])
+  const doLop = useSyncExternalStore(dangKy, layDoLop) // Sinh Tồn đợt 4: đồ + danh hiệu từng em ⇒ máy chiếu thấy như máy em
+  const dsLop = useMemo(() => vao.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, ...doLop.get(e.sbd) })), [vao, doLop])
   const batDau = async () => {
     if (dang) return
     setDang(true); setLoi('')
