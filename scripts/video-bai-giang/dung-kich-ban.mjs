@@ -58,7 +58,7 @@ function catCau(a, b, vietThat = false) {
 // ── nét phấn trang 3 (mọi cảnh của buổi K12 trên bảng cuộn này) ──
 const tr0 = trang.trang.find((t) => t.net.length > 100) ?? trang.trang[trang.trang.length - 1]
 // NÉT CÓ GIỜ THẬT TỪNG ĐIỂM (net-co-gio.ts dựng từ net.bin): có thì dùng cho cả phân tích (cụm nét, giờ viết xong) lẫn bộ khung (dạng 2, bộ máy bút live)
-const NET_GIO = existsSync(join(duLieu, 'net-gio.json')) ? JSON.parse(readFileSync(join(duLieu, 'net-gio.json'), 'utf8')) : null
+const NET_GIO = ch.netCoGio && existsSync(join(duLieu, 'net-gio.json')) ? JSON.parse(readFileSync(join(duLieu, 'net-gio.json'), 'utf8')) : null // bật bằng «netCoGio»: true trong cấu hình
 const tr = NET_GIO ? { ...tr0, net: NET_GIO.net.map((n) => { const p = []; for (let i = 0; i < n.d.length; i += 4) p.push(Math.round(n.d[i] * 6400), Math.round((n.d[i + 1] * 6400) / NET_GIO.tiLe), n.d[i + 3]); return { t: n.t, p } }) } : tr0
 const netBox = tr.net.map((n) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y } return { t0: n.t / 1000, t1: (n.t + (n.p[n.p.length - 1] || 0)) / 1000, x0, y0, x1, y1 } })
 // GIỮ NHỊP VIẾT THẬT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): khoảng không có lời mà Thầy ĐANG VIẾT thì không tua vụt — đoạn đang

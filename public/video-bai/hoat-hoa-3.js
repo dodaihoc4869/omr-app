@@ -168,7 +168,7 @@ function veBazoBC(Z, m, t) {
   })
   Z.soC.forEach((e, i) => { const p = lo(t - tDem[i], 2.4, 0.5); datXY(e, giua(i) + 56, Y + 112); e.style.opacity = r3(kep(p * 1.5)); e.style.transform = `translateX(${r3(dx(i))}px) scale(${r3(0.4 + 0.6 * kep(p, 0, 1.2))})` })
   // NaOH bay vào gắn từng đầu C khi Thầy viết ": 3a"
-  Z.naohT.forEach((e, i) => { const t0 = m.b_3a + i * 0.18, p = eInOut(tien(t, t0, 0.6)); datXY(e, lerp(Z.W - 120, giua(i) - 58 + dx(i), p), lerp(-40, Y + 192, p)); e.style.opacity = r3(tien(t, t0, 0.12)) })
+  Z.naohT.forEach((e, i) => { const t0 = m.b_3a + i * 0.18, p = eInOut(tien(t, t0, 0.6)); datXY(e, lerp(Z.W + 20, giua(i) - 58 + dx(i), p), Y + 192); e.style.opacity = r3(tien(t, t0, 0.12)) })
   const dem = Z.demC; dem.style.top = `${Y + 254}px`; dem.style.opacity = r3(tien(t, m.b_c1 - 0.25, 0.3))
   const tI = [tDem[0], tDem[1], tDem[2], m.b_tong, m.b_3a + 0.4]
   dem.querySelectorAll('i').forEach((e, i) => { const p = lo(t - tI[i], 2.4, 0.5); e.style.opacity = r3(kep(p * 1.4)); e.style.transform = `translateY(${r3((1 - p) * 14)}px)` })
@@ -202,7 +202,7 @@ function veBazoD(Z, m, t) {
   oH.textContent = daGan ? 'Na' : 'H'; oH.className = `bz-g ${daGan ? 'na' : 'h'}`; oH.classList.toggle('sang', daGan || (t >= m.d_na && ra < 0.05))
   oH.style.visibility = t >= m.d_na && !daGan ? 'hidden' : ''
   if (Z.oD) {
-    datXY(d.h, Z.oD.x + ra * 50, Z.oD.y - ra * 70); d.h.style.opacity = r3(tien(t, m.d_na, 0.05) * (1 - tien(t, m.d_na + 0.9, 0.3)))
+    datXY(d.h, Z.oD.x + ra * 70, Z.oD.y - ra * 34); d.h.style.opacity = r3(tien(t, m.d_na, 0.05) * (1 - tien(t, m.d_na + 0.9, 0.3)))
     datXY(d.na, lerp(Z.W - 110, Z.oD.x, vao), lerp(Y - 80, Z.oD.y, vao)); d.na.style.opacity = r3(tien(t, m.d_na + 0.4, 0.2) * (daGan ? 0 : 1))
   }
   datXY(d.tenM, X, Y + 84); xuat(d.tenM, t, m.d_coona)
