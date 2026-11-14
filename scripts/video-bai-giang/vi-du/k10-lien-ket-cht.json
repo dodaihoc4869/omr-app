@@ -4,8 +4,8 @@
  "ngay": "Thứ Năm 12/11/2026",
  "moDau": {
   "kicker": "LIVE KHỐI 10 · THỨ NĂM 12/11",
-  "tieuDe": "LIÊN KẾT CỘNG HOÁ TRỊ",
-  "phu": "Phân cực · Không phân cực · Hiệu độ âm điện · Liên kết σ, π",
+  "tieuDe": "LIÊN KẾT",
+  "phu": "Cộng hoá trị phân cực, không phân cực · Hiệu độ âm điện Δχ · Liên kết σ, π",
   "thay": "Thầy Đỗ Đại Học"
  },
  "mucLuc": [
@@ -155,7 +155,7 @@
      ],
      "luc": [
       4,
-      "lệch"
+      "phân"
      ],
      "toi": "ket",
      "dai": 4
@@ -213,8 +213,8 @@
       527
      ],
      "luc": [
-      3,
-      "HCl:"
+      4,
+      "cũng"
      ],
      "dai": 4
     },
@@ -510,7 +510,7 @@
      ],
      "luc": [
       0,
-      "hiệu"
+      "ion."
      ],
      "dai": 4
     },
@@ -522,8 +522,8 @@
       260
      ],
      "luc": [
-      2,
-      "bằng"
+      3,
+      "đóng"
      ],
      "toi": "ket",
      "dai": 4
@@ -536,8 +536,8 @@
       473
      ],
      "luc": [
-      5,
-      "0,4,"
+      9,
+      "tạo"
      ],
      "toi": "thang",
      "dai": 4
@@ -550,8 +550,8 @@
       700
      ],
      "luc": [
-      11,
-      "1,7,"
+      13,
+      "lệch"
      ],
      "toi": "thang",
      "dai": 4

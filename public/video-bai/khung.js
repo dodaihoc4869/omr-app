@@ -350,7 +350,7 @@ function veChuong(d, t) {
 function dungMoDau() {
   const d = DOAN.find((x) => x.loai === 'mo-dau'); if (!d) return
   $('#mo-ke').textContent = d.kicker; $('#mo-phu').textContent = d.phu; $('#mo-thay').innerHTML = `<i>ĐĐH</i>${thoat(d.thay)}`
-  $('#mo-ten').innerHTML = [...d.tieuDe].map((ch) => `<span class="ch">${thoat(ch)}</span>`).join('')
+  $('#mo-ten').innerHTML = [...d.tieuDe].map((ch) => `<span class="ch">${ch === ' ' ? '&nbsp;' : thoat(ch)}</span>`).join('') // dấu cách giữ bề rộng (ô chữ là khối riêng)
   const muc = $('#mo-muc'); muc.innerHTML = '<div class="mm-ten">Hôm nay em học</div>'
   for (const [so, ten, mau] of d.muc || []) tao('div', 'mm-dong', muc, `<b style="background:${MAU[mau] || MAU.vang}">${thoat(so)}</b><span>${thoat(so === '?' ? `${ten}: một câu thử sức cuối bài` : ten)}</span>`)
 }

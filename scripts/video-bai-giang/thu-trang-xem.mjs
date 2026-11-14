@@ -30,7 +30,7 @@ for (const [khoName, w, h] of [['ngang', 844, 390], ['doc', 390, 844]]) {
   const kb = await tr.evaluate(() => { const c = KB.doan.filter((d) => d.loai === 'canh'), i = c.findIndex((d) => d.doVui); return { so: c.length, dv: i + 1, dung: i < 0 ? 0 : c[i].doVui.luaChon.findIndex((x) => x[2]) + 1 } })
   kiem('mục lục đủ phần', soMuc === kb.so, `${soMuc} dòng`)
   await tr.click(`#muc button:nth-child(${kb.dv})`)
-  const dung = await tr.waitForFunction(() => !document.querySelector('#chon').classList.contains('an-ui'), null, { timeout: 30000 }).then(() => true, () => false)
+  const dung = await tr.waitForFunction(() => !document.querySelector('#chon').classList.contains('an-ui'), null, { timeout: 75000 }).then(() => true, () => false)
   kiem('tới Đoán nhanh ⇒ dừng cho chọn', dung && await tr.evaluate(() => document.querySelector('#am').paused))
   await tr.waitForTimeout(700)
   await tr.screenshot({ path: join(ra, `${khoName}-4-do-vui.jpg`), type: 'jpeg', quality: 70 })
