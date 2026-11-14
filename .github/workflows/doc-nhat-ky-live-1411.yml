@@ -1,0 +1,54 @@
+# ĐỌC NHẬT KÝ MÁY CHỦ CA LIVE TỐI 14/11 (CHỈ ĐỌC — Workers Logs, không truy vấn D1) — thầy ~22:45: «sửa triệt để hiện tượng lag, sửa tận gốc».
+# Phòng live ghi `live_tieng` mỗi 10 giây khi đang live (số đo mạng / tiếng của máy thầy + từng máy em, dạng gọn) + các dòng lỗi `[live]` `[bpu]`.
+# In: khoá trường có sẵn, số dòng theo loại, và các dòng `live_tieng` / lỗi trong khung 19:25–21:55 VN. Repo công khai ⇒ CHE số báo danh (6 kí tự đầu + ***).
+name: Đọc nhật ký máy chủ ca live (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/live-streaming-classroom-e4juo5]
+    paths: ['.github/workflows/doc-nhat-ky-live-1411.yml']
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Workers Logs
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const goc = `https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/observability/telemetry`
+          const che = (s) => String(s).replace(/\b(\d{4})\d{2,}\b/g, '$1***').replace(/"s":"([^"]{0,4})[^"]*"/g, '"s":"$1***"')
+          const tu = Date.parse('2026-11-14T12:25:00Z'), den = Date.parse('2026-11-14T14:55:00Z')
+          const hoi = async (duong, body) => {
+            const r = await fetch(`${goc}/${duong}`, { method: 'POST', headers: H, body: JSON.stringify(body) })
+            const t = await r.text(); let j = null; try { j = JSON.parse(t) } catch {}
+            if (!r.ok || j?.success === false) console.log(`LỖI ${duong} HTTP ${r.status}:`, t.slice(0, 600))
+            return j
+          }
+          const k = await hoi('keys', { timeframe: { from: tu, to: den }, datasets: ['cloudflare-workers'], limit: 200 })
+          console.log('=== KHOÁ TRƯỜNG ===')
+          console.log((k?.result ?? []).map((x) => `${x.key}:${x.type}`).join(' · ').slice(0, 3000))
+          const loc = (chu) => ({ key: '$metadata.message', operation: 'includes', type: 'string', value: chu })
+          for (const [ten, f] of [['live_tieng', loc('live_tieng')], ['[live]', loc('[live]')], ['[bpu]', loc('[bpu]')], ['lỗi', { key: '$metadata.level', operation: 'eq', type: 'string', value: 'error' }]]) {
+            const q = await hoi('query', { queryId: `doc-${Date.now()}`, timeframe: { from: tu, to: den }, view: 'events', limit: 100, parameters: { datasets: ['cloudflare-workers'], filters: [f], calculations: [], groupBys: [] } })
+            const ev = q?.result?.events?.events ?? q?.result?.events ?? []
+            console.log(`=== ${ten}: ${Array.isArray(ev) ? ev.length : JSON.stringify(Object.keys(q?.result ?? {}))} dòng ===`)
+            if (Array.isArray(ev)) for (const e of ev.slice(0, 100)) {
+              const t = e.timestamp ?? e.$metadata?.timestamp ?? e['$metadata.timestamp']
+              const m = e.$metadata?.message ?? e.message ?? e.source ?? e
+              console.log(new Date(Number(t) + 7 * 3600e3).toISOString().slice(11, 19), che(typeof m === 'string' ? m : JSON.stringify(m)).slice(0, 900))
+            }
+          }
+          JS
