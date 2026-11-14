@@ -99,6 +99,8 @@ export async function gvLiveThongKe(env: Env, b: Row, hoiPhong: (buoiId: string)
   return {
     ok: true, buoiId: id, ten: str(buoi.ten), khoi, moLuc: str(buoi.mo_luc), dongLuc: str(buoi.dong_luc) || null, coPhong: tk.ok === true, dangLive: tk.dangLive === true, ketThuc: tk.ketThuc === true || !!str(buoi.dong_luc),
     luat: { bat: luat.dangBat, ...luat }, siSo: khoi ? coMat.length + vang.length : coMat.length, soCoMat: coMat.length, soVang: vang.length,
+    // Số đo mạng / tiếng / nét của máy em (14/11 sửa lag tận gốc): `chot` lúc tắt live, `dong` mỗi phút đang live — do phòng ghi, không D1.
+    soDo: (tk.soDo ?? null) as unknown,
     coMat: coMat.map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, roi: e.roi })).sort((x, y) => y.roi - x.roi || x.ten.localeCompare(y.ten, 'vi')),
     roiMan: coMat.filter((e) => e.roi > 0).map((e) => ({ sbd: e.sbd, ten: e.ten, tenGoi: tg(e.ten), lop: e.lop, lan: e.roi })).sort((x, y) => y.lan - x.lan),
     moiRa: [...moiRa.values()].map((e) => ({ ...e, tenGoi: tg(e.ten) })), vang: vang.map((e) => ({ ...e, tenGoi: tg(e.ten) })).sort((x, y) => x.lop.localeCompare(y.lop, 'vi') || x.ten.localeCompare(y.ten, 'vi')),

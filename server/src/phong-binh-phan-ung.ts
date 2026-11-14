@@ -506,7 +506,11 @@ export class PhongBinhPhanUng {
     const b = (await req.json().catch(() => ({}))) as Row
     const nay = Date.now()
     // THỐNG KÊ BUỔI cho văn phòng trực live (13/11): ai đã vào, mỗi em rời màn mấy lần. Đọc-chỉ, không đổi trạng thái, dùng được cả sau khi buổi kết thúc.
-    if (u.pathname === '/tk') { const st = await this.doc(); return json(st ? { ok: true, phong: st.lop, ketThuc: st.ketThuc, dangLive: !!st.live?.bat, luat: st.live?.luat?.n ?? 0, em: st.ds.map((e) => [e.sbd, e.ten, e.vao ? 1 : 0, e.roi]) } : { ok: false, lyDo: 'chua-mo' }) }
+    if (u.pathname === '/tk') {
+      const [st, chot, dong] = await Promise.all([this.doc(), this.ctx.storage.get('live-do').catch(() => null), this.ctx.storage.get('live-do-ls').catch(() => null)])
+      // soDo (14/11 sửa lag tận gốc): số đo máy em lúc tắt live (`chot`, có từng máy) + dòng thời gian mỗi phút (`dong`) — đọc lại sau buổi để tìm gốc lag.
+      return json(st ? { ok: true, phong: st.lop, ketThuc: st.ketThuc, dangLive: !!st.live?.bat, luat: st.live?.luat?.n ?? 0, em: st.ds.map((e) => [e.sbd, e.ten, e.vao ? 1 : 0, e.roi]), soDo: { chot: chot ?? null, dong: dong ?? [] } } : { ok: false, lyDo: 'chua-mo' })
+    }
     if (u.pathname === '/tt-doc') return json({ ok: true, tt: (await this.ctx.storage.get('tt')) ?? null })
     if (u.pathname === '/tt-ghi') {
       const moi = chuanTienTrinh(b.tt), cu = chuanTienTrinh(await this.ctx.storage.get('tt'))

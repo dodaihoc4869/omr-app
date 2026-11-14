@@ -103,3 +103,31 @@ describe('phòng THẬT: giữ bản đo mới nhất, chuyển máy thầy, ghi
     expect(ph.kho.ghi).toBe(ghi0) // không ghi storage theo số đo
   })
 })
+
+describe('DÒNG THỜI GIAN SỐ ĐO (14/11 — sửa lag tận gốc: số đo máy em nằm trong phòng, đọc lại sau buổi)', () => {
+  beforeEach(() => { datWebSocketPairGia(); vi.useFakeTimers({ now: 1_700_000_000_000 }); vi.spyOn(console, 'log').mockImplementation(() => undefined) })
+  afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers() })
+  it('mỗi phút đang live ⇒ một mục tóm tắt (không tên); tắt live ⇒ bản chốt có từng máy; `/tk` trả cả hai', async () => {
+    const ph = taoPhongGia()
+    await ph.khoi([{ sbd: 'S1' }, { sbd: 'S2' }])
+    const gv = await ph.noi('gv'), e1 = await ph.noi('hs', 'S1'), e2 = await ph.noi('hs', 'S2')
+    await ph.gui(gv, { t: 'live-bat' })
+    for (const e of [e1, e2]) await ph.gui(e, { t: 'live-ok', dc: true, nghe: true })
+    const tot = { cs: 'connected', ice: 'connected', uv: 'host/udp' }, xau = { cs: 'connected', ice: 'connected', uv: 'relay/tcp' }
+    await ph.gui(e1, { t: 'live-do', d: 120, j: 30, rtt: 80, ti: tot }) // phút đầu: chưa ghi mục nào
+    expect(((await ph.post('/tk', {})) as { soDo: { dong: unknown[] } }).soDo.dong).toEqual([])
+    vi.advanceTimersByTime(50_000); await ph.gui(e2, { t: 'live-do', d: 300, j: 90, rtt: 400, ti: xau })
+    vi.advanceTimersByTime(11_000); await ph.gui(e1, { t: 'live-do', d: 140, j: 30, rtt: 80, dc: true, ti: tot }) // 61 s ⇒ mục 1 (2 máy trong 30 s)
+    vi.advanceTimersByTime(54_000); await ph.gui(e2, { t: 'live-do', d: 500, j: 120, rtt: 600, ti: xau })
+    vi.advanceTimersByTime(10_000); await ph.gui(e1, { t: 'live-do', d: 150, j: 40, rtt: 90, ti: tot }) // 125 s ⇒ mục 2
+    const tk1 = await ph.post('/tk', {}) as { soDo: { chot: unknown; dong: Record<string, any>[] } }
+    expect(tk1.soDo.dong.length).toBe(2)
+    expect(tk1.soDo.dong[0]).toMatchObject({ so: 2, dc: 1, noi: 2, d: { tv: 140, p95: 300 } })
+    expect(tk1.soDo.dong[1]).toMatchObject({ so: 2, d: { tv: 150, p95: 500 }, rtt: { p95: 600 } })
+    expect(JSON.stringify(tk1.soDo.dong)).not.toMatch(/S1|S2/) // dòng thời gian không mang số báo danh
+    await ph.gui(gv, { t: 'live-tat' })
+    const tk2 = await ph.post('/tk', {}) as { soDo: { chot: Record<string, any> | null } }
+    expect(tk2.soDo.chot).toMatchObject({ so: 2 })
+    expect(tk2.soDo.chot!.may.map((x: { s: string }) => x.s).sort()).toEqual(['S1', 'S2'])
+  })
+})

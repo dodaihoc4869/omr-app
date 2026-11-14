@@ -45,6 +45,8 @@ const GOM_XEM_MS = 300
 const LAM_MOI_DS_MS = 5000
 const NHIP_LUU_MS = 60_000
 const NHIP_DO_MS = 10_000
+/** Dòng thời gian số đo (14/11): một mục mỗi phút đang live, giữ tối đa 300 mục (5 giờ). */
+const DONG_DO_MS = 60_000, DONG_DO_TOI_DA = 300
 /** Gọi lại em ở xa CHƯA nối phòng (em mở app sau lúc thầy bật) thưa nhất ngần này một lần, theo nhịp của máy thầy. */
 const NHIP_GOI_XA_MS = 120_000
 /** Nhật ký đàm thoại trong kho của phòng: mỗi lần ghi một khoá `nk:<giờ>:<số>` (không đọc–sửa–ghi cả sổ); đọc lại tối đa ngần này khoá. */
@@ -76,6 +78,12 @@ export class LiveMay {
   private henXem: ReturnType<typeof setTimeout> | null = null
   private doEm = new Map<string, DoEm>()
   private lucGuiDo = 0
+  /** DÒNG THỜI GIAN SỐ ĐO (14/11 — thầy «sửa triệt để hiện tượng lag, sửa tận gốc»; khoá CI không đọc được nhật ký Workers ⇒ số đo máy em phải nằm trong phòng):
+   *  mỗi phút đang live ghi một mục tóm tắt (số máy em báo, số có DataChannel, trễ nét d, rung jitter, muộn m, rtt, trễ tiếng — trung vị + p95 giữa các em)
+   *  + bộ đếm lưu lượng của phòng (lô điểm / tin điểm gửi / lô bỏ vì vượt trần / lần bù bị chặn) + số kết nối máy em. Giữ ≤ DONG_DO_TOI_DA mục trong kho của phòng,
+   *  đọc qua `/gv/bpu/live-thong-ke` (`soDo.dong`). Không tên, không D1. */
+  private dongDo: Record<string, unknown>[] | null = null
+  private lucDongDo = 0
   /** Bản đo tiếng gần nhất của máy thầy + lúc ghi nhật ký gần nhất. */
   private tiThay: SoTieng | null = null
   private lucNhatKy = 0
@@ -237,7 +245,7 @@ export class LiveMay {
       if (t === 'live-san') doi = LL.liveSan(st, { san: j.san !== false, ss: j.ss }, nay)
       else if (t === 'live-bat') {
         doi = LL.liveBat(st, nay)
-        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay; if (this.chu.xl) this.chu.xl.bat(await this.docSo(st), nay) } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
+        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay; this.lucDongDo = nay; this.dongDo = []; if (this.chu.xl) this.chu.xl.bat(await this.docSo(st), nay) } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
       else if (t === 'live-dat') {
         const xaTruoc = l.xa
@@ -288,6 +296,7 @@ export class LiveMay {
       if (!l.bat || a.x !== l.phien) return true
       this.doEm.set(a.s, { luc: nay, d: so(j.d, 2000), j: so(j.j, 5000), m: so(j.m, 60_000), rtt: so(j.rtt, 10_000), tt: so(j.tt, 10_000), dc: j.dc === true, gl: j.gl === true, ti: sachTieng(j.ti) })
       this.nhatKyTieng(st, nay)
+      if (nay - this.lucDongDo >= DONG_DO_MS) { this.lucDongDo = nay; await this.ghiDongDo(nay) }
       if (nay - this.lucGuiDo >= NHIP_DO_MS) { this.lucGuiDo = nay; this.guiThay(JSON.stringify({ t: 'live-do', ...this.gomDo(nay) })) }
       return true
     }
@@ -299,6 +308,17 @@ export class LiveMay {
     this.lucNhatKy = nay
     const em = [...this.doEm].filter(([, x]) => nay - x.luc <= 30_000).slice(0, 300).map(([s, x]) => ngan(s, x.ti))
     console.log(JSON.stringify({ live_tieng: { b: st.buoiId, p: st.live.phien, thay: ngan('GV', this.tiThay), em } }))
+  }
+  /** Một mục dòng thời gian số đo (mỗi phút đang live) — xem `dongDo`. */
+  private async ghiDongDo(nay: number): Promise<void> {
+    try {
+      const kho = this.chu.ctx.storage
+      this.dongDo ??= (await kho.get<Record<string, unknown>[]>('live-do-ls')) ?? []
+      const { may: _bo, ...g } = this.gomDo(nay)
+      this.dongDo.push({ luc: nay, ...g, noi: this.chu.ctx.getWebSockets('hs').length, dem: { ...this.dem } })
+      if (this.dongDo.length > DONG_DO_TOI_DA) this.dongDo.splice(0, this.dongDo.length - DONG_DO_TOI_DA)
+      await kho.put('live-do-ls', this.dongDo)
+    } catch { /* số đo hỏng không chặn phòng */ }
   }
   /** Gộp số đo các máy em báo trong 30 giây gần nhất (trung vị + p95 giữa các em). Chỉ trong bộ nhớ. */
   gomDo(nay: number) {
