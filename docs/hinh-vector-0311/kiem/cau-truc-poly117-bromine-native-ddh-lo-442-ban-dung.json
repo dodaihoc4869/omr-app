@@ -1,0 +1,29 @@
+[
+  {
+    "i": 117,
+    "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+    "fileNguon": "anh/167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2.png",
+    "svg": "poly117-bromine-native-ddh-73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5.svg",
+    "hashSvg": "73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5",
+    "byteSvg": 19226,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D2-I-8",
+        "de": "Phản ứng của polyisoprene với bromine xảy ra theo phương trình hoá học ở hình dưới. Phản ứng trên thuộc loại phản ứng",
+        "refs": [
+          {
+            "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+            "where": "12-KT-C1234-D2-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "2fd4d132caa23ab9733c521b28e99b6173ae1ae6c35b357a9ea1ee2ff5f3e649"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10printedC16printedH4Brinclreagent-SYMBOLICnNOTpolymermolecularformula/LEFTCH2-C(CH3)=CH-CH2+ nBr2→RIGHTCH2-C(CH3)(Br)-CH(Br)-CH2/1CCdouble2separaterays/4individualROUND2nSUBupright/1tinyFILLEDrighthead/ALLregularUPRIGHT-sub23-FIRSTC-FIRSTBanchors/0stereo-charge-caption-condition/noaddedH-HBr-name-answer/nativeapproxNOTsubpixel/scanbackgroundflecksNOTchemicalbonds-particles",
+    "hashSvgDaSoat": "73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

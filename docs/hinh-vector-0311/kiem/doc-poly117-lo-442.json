@@ -1,0 +1,529 @@
+{
+  "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+  "native": [
+    1132,
+    246
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C1234-D2-I-8",
+      "de": "Phản ứng của polyisoprene với bromine xảy ra theo phương trình hoá học ở hình dưới. Phản ứng trên thuộc loại phản ứng",
+      "refs": [
+        {
+          "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+          "where": "12-KT-C1234-D2-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "2fd4d132caa23ab9733c521b28e99b6173ae1ae6c35b357a9ea1ee2ff5f3e649"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "10printedC16printedH4Brinclreagent-SYMBOLICnNOTpolymermolecularformula/LEFTCH2-C(CH3)=CH-CH2+ nBr2→RIGHTCH2-C(CH3)(Br)-CH(Br)-CH2/1CCdouble2separaterays/4individualROUND2nSUBupright/1tinyFILLEDrighthead/ALLregularUPRIGHT-sub23-FIRSTC-FIRSTBanchors/0stereo-charge-caption-condition/noaddedH-HBr-name-answer/nativeapproxNOTsubpixel/scanbackgroundflecksNOTchemicalbonds-particles",
+  "independentSourceAudit": {
+    "i": 117,
+    "assetIndex": 616,
+    "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2.png",
+    "size": [
+      1132,
+      246
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C1234-D2-I-8",
+        "de": "Phản ứng của polyisoprene với bromine xảy ra theo phương trình hoá học ở hình dưới. Phản ứng trên thuộc loại phản ứng",
+        "allHinh": [
+          {
+            "hash": "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2",
+            "where": "12-KT-C1234-D2-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "2fd4d132caa23ab9733c521b28e99b6173ae1ae6c35b357a9ea1ee2ff5f3e649"
+          }
+        ],
+        "missingHashes": [
+          "167a25d1b49b49f4f085516dddc4b74babb5043776ef8c4eb290f2909ecaa6f2"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/442-117-full3x.png",
+        "/workspace/scratch/442-117-head30x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "labels": [
+        {
+          "literal": "CH₂",
+          "bbox": [
+            79,
+            117,
+            137,
+            144
+          ],
+          "baseline": 140
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            170,
+            117,
+            190,
+            141
+          ]
+        },
+        {
+          "literal": "CH",
+          "bbox": [
+            212,
+            117,
+            260,
+            141
+          ]
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            292,
+            117,
+            350,
+            144
+          ]
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            173,
+            58,
+            226,
+            84
+          ]
+        },
+        {
+          "literal": "n",
+          "bbox": [
+            378,
+            139,
+            394,
+            159
+          ],
+          "style": "upright loweredsubscript"
+        },
+        {
+          "literal": "+ nBr₂",
+          "bbox": [
+            447,
+            118,
+            536,
+            144
+          ]
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            749,
+            119,
+            807,
+            147
+          ]
+        },
+        {
+          "literal": "C",
+          "bbox": [
+            840,
+            119,
+            859,
+            143
+          ]
+        },
+        {
+          "literal": "CH",
+          "bbox": [
+            895,
+            119,
+            943,
+            143
+          ]
+        },
+        {
+          "literal": "CH₂",
+          "bbox": [
+            975,
+            119,
+            1033,
+            147
+          ]
+        },
+        {
+          "literal": "CH₃",
+          "bbox": [
+            841,
+            60,
+            895,
+            87
+          ]
+        },
+        {
+          "literal": "Br",
+          "bbox": [
+            837,
+            171,
+            871,
+            193
+          ]
+        },
+        {
+          "literal": "Br",
+          "bbox": [
+            896,
+            172,
+            930,
+            194
+          ]
+        },
+        {
+          "literal": "n",
+          "bbox": [
+            1058,
+            141,
+            1075,
+            161
+          ],
+          "style": "upright loweredsubscript"
+        }
+      ],
+      "leftSingleBonds": [
+        [
+          [
+            45,
+            132
+          ],
+          [
+            77,
+            132
+          ]
+        ],
+        [
+          [
+            145,
+            132
+          ],
+          [
+            161,
+            132
+          ]
+        ],
+        [
+          [
+            266,
+            132
+          ],
+          [
+            282,
+            132
+          ]
+        ],
+        [
+          [
+            357,
+            132
+          ],
+          [
+            390,
+            132
+          ]
+        ],
+        [
+          [
+            181,
+            90
+          ],
+          [
+            181,
+            108
+          ]
+        ]
+      ],
+      "leftCCdoubleRays": [
+        [
+          [
+            192,
+            125
+          ],
+          [
+            210,
+            125
+          ]
+        ],
+        [
+          [
+            192,
+            131
+          ],
+          [
+            210,
+            131
+          ]
+        ]
+      ],
+      "rightSingleBonds": [
+        [
+          [
+            715,
+            134
+          ],
+          [
+            747,
+            134
+          ]
+        ],
+        [
+          [
+            815,
+            134
+          ],
+          [
+            831,
+            134
+          ]
+        ],
+        [
+          [
+            870,
+            134
+          ],
+          [
+            887,
+            134
+          ]
+        ],
+        [
+          [
+            949,
+            134
+          ],
+          [
+            966,
+            134
+          ]
+        ],
+        [
+          [
+            1041,
+            134
+          ],
+          [
+            1075,
+            134
+          ]
+        ],
+        [
+          [
+            851,
+            91
+          ],
+          [
+            851,
+            109
+          ]
+        ],
+        [
+          [
+            847,
+            151
+          ],
+          [
+            847,
+            167
+          ]
+        ],
+        [
+          [
+            905,
+            151
+          ],
+          [
+            905,
+            167
+          ]
+        ]
+      ],
+      "roundParentheses": [
+        {
+          "side": "leftReactant",
+          "guide": [
+            [
+              79,
+              100
+            ],
+            [
+              69,
+              109
+            ],
+            [
+              69,
+              153
+            ],
+            [
+              79,
+              165
+            ]
+          ]
+        },
+        {
+          "side": "rightReactant",
+          "guide": [
+            [
+              365,
+              100
+            ],
+            [
+              375,
+              111
+            ],
+            [
+              375,
+              152
+            ],
+            [
+              365,
+              165
+            ]
+          ]
+        },
+        {
+          "side": "leftProduct",
+          "guide": [
+            [
+              749,
+              102
+            ],
+            [
+              739,
+              113
+            ],
+            [
+              739,
+              155
+            ],
+            [
+              749,
+              167
+            ]
+          ]
+        },
+        {
+          "side": "rightProduct",
+          "guide": [
+            [
+              1043,
+              102
+            ],
+            [
+              1053,
+              113
+            ],
+            [
+              1053,
+              155
+            ],
+            [
+              1043,
+              167
+            ]
+          ]
+        }
+      ],
+      "arrow": {
+        "shaft": [
+          [
+            561,
+            135
+          ],
+          [
+            663,
+            135
+          ]
+        ],
+        "filledHeadTriangle": [
+          [
+            659,
+            131
+          ],
+          [
+            666,
+            135
+          ],
+          [
+            659,
+            139
+          ]
+        ],
+        "nativeMacro": "OWN30x shows solid black interior triangularhead, no hollow base/V-gap"
+      },
+      "counts": {
+        "knownCPrintedRepeatMotifs": 10,
+        "explicitHPrintedRepeatMotifs": 16,
+        "BrIncludingReagent": 4,
+        "CCdouble": 1,
+        "roundParentheses": 4,
+        "arrowheads": 1,
+        "explanation": "each printed motifCH2+C+CH+CH2+CH3=5C8H; 2Br in nBr2 +2productBr. Coefficientn and polymercontinuation symbolic; no total polymer molecular formula inferred."
+      },
+      "styles": {
+        "chemicalAndCoefficients": "regular upright serif, including Br/n and numeric subscripts; no truebold or italic observed",
+        "bonds": "thin uniform black approx1nativepx",
+        "caption": "NONE"
+      },
+      "unknownFaintBackground": {
+        "approxRegions": [
+          [
+            98,
+            146,
+            102,
+            199
+          ],
+          [
+            279,
+            146,
+            283,
+            192
+          ],
+          [
+            313,
+            146,
+            317,
+            194
+          ]
+        ],
+        "description": "Sparse pale vertically aligned scan dots beneath left formula, no readable text/chemical glyph. IntentUNKNOWN, do not turn into bonds/charges or restore any label."
+      },
+      "crop": "No chemical glyph or bracket clipped; no extra conditions/title"
+    },
+    "measurementLimits": "Nativeapprox±1–2px each bond/label/parenthesis independently; firstC anchors in CHtokens, Br anchorsfirstB. No generic nfontSUB glyph replacement: ordinaryn lowerbaseline. Own30xhead topology clear filled. Do not normalize chain or add internal bonds absentlisted.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "Root OWN nativeFULL+FULL2x/all1de12-KT-C1234-D2-I-8/head12x confirms FILLEDtinytriangle/ALLregularUPRIGHT/10printedC16printedH4Brinclreagent UNKNOWNn. FirstC-FIRSTBanchors; no restored formula/extraHBr-answer. Sparse pale sourcegrain underLEFT is scanbackground, NOT bonds/charges/particles; no invented count.",
+  "rootActualReview": {
+    "hashSvg": "73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5",
+    "ketQua": "Đạt root OWN nativeFULL/FULL2x/all1publicde/freshChromiumFULL3x/left-right-headmacros; IMG.decode1132×246 exactSHA. ALLregularUPRIGHT/10C16H4Brprintedmotifs/4ROUND2nSUB/tinyFILLEDhead. Whiteglyph-bondgaps; no extraHBr-answer; scanbackgroundnotparticles.",
+    "render": "/workspace/scratch/root442-117.png",
+    "macros": [
+      "/workspace/scratch/root442-left.png",
+      "/workspace/scratch/root442-right.png",
+      "/workspace/scratch/root442-head.png"
+    ],
+    "negativeHistory": "Không SVGnegative found442; không tạo negative giả."
+  },
+  "readonlyRuntime": {
+    "sha256": "d49e215803c2e8f0823a69e833c1f17ae5424dbcbe6887a50f1eca8a2d12974e",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/poly117-bromine-native-ddh-73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5.svg 73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5\nIMGDECODE [ 1132, 246 ]\n117 { x: 0, y: 0, width: 1132, height: 246 }\n\nPOSTSHOT_SHA 73c146df8fd05afff8151585748bd1091ba8f537c6fb5b2eb5fe7b438f3f3bf5\nCOMMAND node /workspace/scratch/agent-render442.cjs\nCONTEXT 12-KT-C1234-D2-I-8.hinh.0.du_lieu public de/one ref only; no answers; IMG.decode success.\n"
+  }
+}
