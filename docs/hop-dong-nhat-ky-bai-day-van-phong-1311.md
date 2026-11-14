@@ -1,5 +1,7 @@
 # Hợp đồng: văn phòng soạn «Nhật ký bài dạy» sau mỗi buổi live (13/11)
 
+> **14/11 — THẦY DỪNG VIỆC NÀY** («Tôi ko muốn văn phòng dựng nhật kí nữa»). Từ bản phát hành sau 23:40 ngày 14/11: `live-nhat-ky-ds` trả `ds: []` kèm `tat: true`, `live-nhat-ky-ghi` trả `{ ok: false, lyDo: "thay-tat" }`. `live-nhat-ky-tu-lieu` vẫn mở (bộ dựng video bài giảng `scripts/video-bai-giang/` dùng). Hai nhật ký đã đăng (K10 12/11, K12 13/11) chưa gỡ, chờ thầy quyết. Bật lại: biến Worker `NHAT_KY_VAN_PHONG=1`.
+
 Thầy chốt 13/11: «nhật kí sau khi live xong gửi cho văn phòng soạn». App KHÔNG tự gọi AI. Văn phòng (Javis DDH) lấy tư liệu của buổi, soạn kịch bản hoạt hoạ, gửi về app. App tự kiểm rồi mới cho học sinh xem. Không ai duyệt tay.
 
 Bản vẽ, khuôn và hai kịch bản mẫu: `docs/ban-ve-nhat-ky-bai-day-1311/` (`kich-ban-lien-ket.json`, `kich-ban-fes2.json`, `luoc-do.json`, `dac-ta.md`).

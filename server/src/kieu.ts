@@ -122,6 +122,8 @@ export interface Env {
   GOM_D1?: DurableObjectNamespace
   /** 31/10: tắt bảng tra thành viên chiến dịch (chien-dich-tv.ts) ⇒ đường của em đọc cả dòng chien_dich như cũ. */
   TAT_CHIEN_DICH_TV?: string
+  /** 14/11 thầy «ko muốn văn phòng dựng nhật kí nữa»: vắng / khác '1' ⇒ văn phòng thôi soạn nhật ký bài dạy (live-nhat-ky.ts: danh sách việc rỗng, lệnh ghi bị từ chối). '1' ⇒ bật lại, không cần sửa mã. */
+  NHAT_KY_VAN_PHONG?: string
   /** Công tắc đệm phản hồi lệnh hỏi định kỳ trong ngăn (ngan-hoc-sinh.ts). */
   TAT_DEM_PHAN_HOI?: string
   /** Bật đọc qua bản sao D1 gần nhất trong ngăn học sinh (Sessions API + dấu trang riêng của em, ngan-hoc-sinh.ts). Mặc định tắt. */

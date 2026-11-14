@@ -213,11 +213,16 @@ export async function nhatKyGhi(env: Env, b: Row, nay = Date.now()): Promise<Row
 }
 
 /** Lệnh của văn phòng (cửa xem lại đã kiểm mã GV). */
+/** 14/11 thầy «Tôi ko muốn văn phòng dựng nhật kí nữa» ⇒ mặc định văn phòng THÔI soạn: danh sách việc rỗng (`tat: true`), lệnh ghi bị từ chối.
+ *  Tư liệu buổi (`tu-lieu`) vẫn mở cho bộ dựng video bài giảng (scripts/video-bai-giang). Bài đã đăng KHÔNG gỡ ở đây (xoá dữ liệu thật ⇒ chờ thầy quyết).
+ *  Bật lại: biến Worker `NHAT_KY_VAN_PHONG=1`. */
+const vanPhongSoan = (env: Env): boolean => String(env.NHAT_KY_VAN_PHONG ?? '').trim() === '1'
+const TAT_VAN_PHONG = { lyDo: 'thay-tat', error: 'Thầy đã dừng việc văn phòng soạn nhật ký bài dạy (14/11).' }
 export async function lenhNhatKy(env: Env, p: string, b: Row, cc: CongCuNhatKy): Promise<Row | null> {
-  if (p === '/gv/live-nhat-ky-ds') return nhatKyDs(env, b)
+  if (p === '/gv/live-nhat-ky-ds') return vanPhongSoan(env) ? nhatKyDs(env, b) : { ok: true, ds: [], moc: str(b.sau).trim().slice(0, 40), tat: true, ...TAT_VAN_PHONG }
   const id = str(b.buoiId).trim()
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) return { ok: false, lyDo: 'thieu', error: 'Thiếu mã buổi (buoiId).' }
   if (p === '/gv/live-nhat-ky-tu-lieu') return nhatKyTuLieu(env, id, cc)
-  if (p === '/gv/live-nhat-ky-ghi') return nhatKyGhi(env, b)
+  if (p === '/gv/live-nhat-ky-ghi') return vanPhongSoan(env) ? nhatKyGhi(env, b) : { ok: false, ...TAT_VAN_PHONG }
   return null
 }

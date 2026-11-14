@@ -143,7 +143,7 @@ const kbMau = (): any => { const k = boPhanMay(doc('kich-ban-lien-ket.json')) as
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0)
   d1 = taoD1That(); r2 = taoR2Gia()
-  env = { ...d1.env, DE: r2.be } as unknown as Env
+  env = { ...d1.env, DE: r2.be, NHAT_KY_VAN_PHONG: '1' } as unknown as Env // các ca dưới kiểm đường văn phòng khi BẬT (14/11 mặc định tắt)
   d1.sql.exec(`INSERT INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,mat_khau,cap_nhat_luc) VALUES ('A1','Nguyễn Minh Anh','10','10A1','mk','x'),('A2','Trần Văn Long','10','10A1','mk','x')`)
 })
 afterEach(() => { vi.useRealTimers() })
@@ -217,6 +217,18 @@ describe('lệnh của văn phòng', () => {
     expect(r).toMatchObject({ ok: true, phatHanh: false, lyDo: 'chua-du-canh' })
     expect(r2.du.has('live/b1/nhat-ky.json')).toBe(false)
     expect((await vp('/gv/live-nhat-ky-ds')).ds[0]).toMatchObject({ canSoan: true, nhatKy: { phatHanh: false } })
+  })
+})
+
+describe('thầy dừng văn phòng soạn (14/11) — mặc định tắt', () => {
+  it('vắng NHAT_KY_VAN_PHONG ⇒ danh sách việc rỗng (tat), lệnh ghi bị từ chối, không cất gì; tư liệu buổi vẫn mở; vẫn cần mã GV', async () => {
+    env = { ...env, NHAT_KY_VAN_PHONG: undefined } as unknown as Env
+    await themBuoi('b1')
+    expect((await goi('/gv/live-nhat-ky-ds', {}, false)).status).toBe(403)
+    expect(await vp('/gv/live-nhat-ky-ds')).toMatchObject({ ok: true, ds: [], tat: true, lyDo: 'thay-tat' })
+    expect(await vp('/gv/live-nhat-ky-ghi', { buoiId: 'b1', ban: 2, kichBan: kbMau() })).toMatchObject({ ok: false, lyDo: 'thay-tat' })
+    expect(r2.du.has('live/b1/nhat-ky.json')).toBe(false)
+    expect((await vp('/gv/live-nhat-ky-tu-lieu', { buoiId: 'b1' })).ok).toBe(true)
   })
 })
 
