@@ -256,7 +256,8 @@
 .st-hp-pt small { padding: 0 4px; font-size: 13px; line-height: 1.2; color: var(--st-chu); background: color-mix(in srgb, var(--st-nen) 82%, transparent); border-bottom: 2px solid var(--doi); white-space: nowrap; }
 .st-hp ~ .st-truy { top: 96px; }
 .st-hp[data-hai] ~ .st-truy { top: 128px; }
-.st-hp ~ .st-bao { top: 96px; }
+.st-hp ~ .st-bao { top: 112px; }
+.st-hp[data-hai] ~ .st-bao { top: 146px; }
 .st-hp ~ .st-truy ~ .st-bao { top: 156px; }
 .st-dai b { font-size: 22px; }
 .st[data-em] .st-hp-vach i { transition: none; }
