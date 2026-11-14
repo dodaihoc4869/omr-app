@@ -1,0 +1,32 @@
+# XOÁ «NHẬT KÝ BÀI DẠY» ĐÃ ĐĂNG (thầy 14/11 «xóa bỏ nhật kí ở 2 video live và văn phòng không phải soạn nhật kí nữa, giờ soạn video tóm tắt»).
+# Xoá đúng tệp R2 `live/<buổi>/nhat-ky.json` của mọi buổi văn phòng đã đăng (danh sách đọc từ D1 live_nhat_ky, chỉ SELECT) ⇒ thẻ «Nhật ký bài dạy» trong
+# Xem lại Live tự ẩn (app hỏi HEAD tệp này). Không đụng tiếng / nét / bản xem lại / video tóm tắt. Dòng D1 live_nhat_ky giữ làm sổ (không ra màn học sinh).
+# Chỉ in MÃ BUỔI + kết quả (repo công khai).
+name: Xoá nhật ký bài dạy đã đăng (thầy 14/11)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  xoa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Xoá nhat-ky.json của các buổi đã đăng
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          ds=$(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT DISTINCT buoi_id FROM live_nhat_ky" | jq -r '.[0].results[].buoi_id' | grep -E '^BH-[0-9]{8}-[0-9a-f]+$' || true)
+          echo "Buổi có nhật ký: $(echo "$ds" | grep -c . || true)"
+          for b in $ds; do
+            echo "── $b"
+            for t in nhat-ky.json nhat-ky-goc.json; do npx -y wrangler@4 r2 object delete "omr-de/live/$b/$t" --remote 2>&1 | tail -1; done
+          done
