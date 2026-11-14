@@ -1,0 +1,20 @@
+[
+  {
+    "i": 1106,
+    "hashSvg": "e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và freshChromiumIMG.decode+FULL3x/macros baseline2halves/59-60/27-29/Y40/Y100/mz. 23individualREDUPstrokes giữ drawingink không gọi23assignedions; 7labels15-27-29-31-42-59-60 và61X21Ystems/7X6Ynums, Y0.0DOT đúng. Narrow59/60và27/29 có whitegap không overlap; Ytitle40/100tick và mzbottom sạch. ALLtrueDAMuprightinclm/z, Yrot−90literalCường độ tương đối %no parens/3unknownfragments giữ, closedframe/noheadsgrid/noaddedionidentityanswer. Heightsnative không exactpercent; runtimeactualSHApre/post+IMGdecode đúng final, không carryinitial.",
+    "render": "/workspace/scratch/soat441-1106-fresh.png",
+    "macro": [
+      "/workspace/scratch/ms1106-baseL.png",
+      "/workspace/scratch/ms1106-baseR.png",
+      "/workspace/scratch/ms1106-5960.png",
+      "/workspace/scratch/ms1106-2729.png",
+      "/workspace/scratch/ms1106-Y40.png",
+      "/workspace/scratch/ms1106-Y100.png",
+      "/workspace/scratch/ms1106-mz.png"
+    ],
+    "hash": "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00",
+    "hashSvgDaSoat": "e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5"
+  }
+]

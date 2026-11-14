@@ -1,0 +1,605 @@
+{
+  "hash": "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00",
+  "native": [
+    608,
+    338
+  ],
+  "questions": [
+    {
+      "qid": "DH-11-C3-B12-III-5",
+      "de": "Phổ khối lượng của chất hữu cơ (X) được cho trong hình dưới đây:\nBiết phân tử khối của (X) được xác định thông qua kết quả phổ khối lượng với peak ion phân tử có giá trị m/z lớn nhất. Phân tử khối của (X) có giá trị là bao nhiêu?",
+      "refs": [
+        {
+          "hash": "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00",
+          "where": "DH-11-C3-B12-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "77d449ee467499b44d3908e0ed81a1ca57829116b8f8f0a5ed9c61ff027bb643"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "23individualREDUPstrokes-NOT23scientificallyassignedions/7peaklabels15-27-29-31-42-59-60/61X21Ystems7X6Ynums-Y0.0DOT/ALLTRUEdamUPRIGHTinclmz-Yrotminus90-percentNOparens/closedframe0heads0grid/2TOP1LEFTunknownfragmentsKEEP/noaddedmolecule-ionidentity-answer/nativepixelheightsNOTexactpercent/nativeapproxNOTsubpixel",
+  "independentSourceAudit": {
+    "i": 1106,
+    "assetIndex": 1112,
+    "hash": "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00.png",
+    "size": [
+      608,
+      338
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-11-C3-B12-III-5",
+        "de": "Phổ khối lượng của chất hữu cơ (X) được cho trong hình dưới đây:\nBiết phân tử khối của (X) được xác định thông qua kết quả phổ khối lượng với peak ion phân tử có giá trị m/z lớn nhất. Phân tử khối của (X) có giá trị là bao nhiêu?",
+        "allHinh": [
+          {
+            "hash": "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00",
+            "where": "DH-11-C3-B12-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "77d449ee467499b44d3908e0ed81a1ca57829116b8f8f0a5ed9c61ff027bb643"
+          }
+        ],
+        "missingHashes": [
+          "c6de02bc17e42d09a898767b9bcc1eac053403d6772fb6ed62e07ef07fdbaf00"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/441-1106-full2x.png",
+        "/workspace/scratch/441-1106-base3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "frameCorners": [
+        [
+          80,
+          24
+        ],
+        [
+          593,
+          24
+        ],
+        [
+          593,
+          292
+        ],
+        [
+          80,
+          292
+        ]
+      ],
+      "frameWidth": 2,
+      "xtickCenters": [
+        80.5,
+        89,
+        97,
+        105,
+        114,
+        122.5,
+        132,
+        140,
+        148.5,
+        157,
+        165,
+        173,
+        183,
+        191,
+        199.5,
+        208,
+        216.5,
+        225,
+        235,
+        243,
+        251.5,
+        259.5,
+        268,
+        276,
+        286,
+        293.5,
+        302,
+        310.5,
+        319,
+        327,
+        337,
+        346,
+        354,
+        362,
+        370.5,
+        378.5,
+        388,
+        396.5,
+        405,
+        413,
+        421,
+        430,
+        440,
+        448,
+        456.5,
+        465,
+        473,
+        481,
+        491,
+        499,
+        507.5,
+        516,
+        524,
+        534,
+        542,
+        550.5,
+        559,
+        567.5,
+        576,
+        585,
+        592.5
+      ],
+      "ytickCenters": [
+        24,
+        38,
+        50,
+        64,
+        78,
+        90.5,
+        104.5,
+        118,
+        131,
+        144.5,
+        158,
+        172,
+        184.5,
+        199,
+        213,
+        225,
+        239,
+        252.5,
+        265,
+        279,
+        291.5
+      ],
+      "xNumericLabels": [
+        {
+          "literal": "10",
+          "center": [
+            80,
+            309
+          ]
+        },
+        {
+          "literal": "20",
+          "center": [
+            167,
+            309
+          ]
+        },
+        {
+          "literal": "30",
+          "center": [
+            252,
+            309
+          ]
+        },
+        {
+          "literal": "40",
+          "center": [
+            337,
+            309
+          ]
+        },
+        {
+          "literal": "50",
+          "center": [
+            424,
+            309
+          ]
+        },
+        {
+          "literal": "60",
+          "center": [
+            509,
+            309
+          ]
+        },
+        {
+          "literal": "70",
+          "center": [
+            595,
+            309
+          ]
+        }
+      ],
+      "yNumericLabels": [
+        {
+          "literal": "100",
+          "bbox": [
+            38,
+            12,
+            72,
+            29
+          ]
+        },
+        {
+          "literal": "80",
+          "bbox": [
+            49,
+            67,
+            72,
+            82
+          ]
+        },
+        {
+          "literal": "60",
+          "bbox": [
+            49,
+            121,
+            72,
+            137
+          ]
+        },
+        {
+          "literal": "40",
+          "bbox": [
+            49,
+            175,
+            72,
+            191
+          ]
+        },
+        {
+          "literal": "20",
+          "bbox": [
+            49,
+            229,
+            72,
+            245
+          ]
+        },
+        {
+          "literal": "0.0",
+          "bbox": [
+            42,
+            285,
+            73,
+            301
+          ]
+        }
+      ],
+      "peakStrokeGuides": [
+        {
+          "x": 114,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 123,
+          "topY": 282,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 157,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 208,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 217,
+          "topY": 273,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 225,
+          "topY": 246,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        },
+        {
+          "x": 234,
+          "topY": 273,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 243,
+          "topY": 243,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        },
+        {
+          "x": 260,
+          "topY": 25,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        },
+        {
+          "x": 268,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 276,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 310,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 319,
+          "topY": 283,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 328,
+          "topY": 270,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 337,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 346,
+          "topY": 266,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 355,
+          "topY": 253,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        },
+        {
+          "x": 363,
+          "topY": 276,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 372,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 380,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 482,
+          "topY": 286,
+          "bottomY": 292,
+          "width": 2,
+          "color": "muted dark red"
+        },
+        {
+          "x": 500,
+          "topY": 262,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        },
+        {
+          "x": 508,
+          "topY": 271,
+          "bottomY": 292,
+          "width": 3,
+          "color": "muted dark red"
+        }
+      ],
+      "peakLabels": [
+        {
+          "literal": "15",
+          "bbox": [
+            109,
+            262,
+            131,
+            279
+          ]
+        },
+        {
+          "literal": "27",
+          "bbox": [
+            206,
+            228,
+            226,
+            245
+          ]
+        },
+        {
+          "literal": "29",
+          "bbox": [
+            232,
+            222,
+            254,
+            239
+          ]
+        },
+        {
+          "literal": "31",
+          "bbox": [
+            265,
+            30,
+            286,
+            47
+          ]
+        },
+        {
+          "literal": "42",
+          "bbox": [
+            342,
+            235,
+            363,
+            252
+          ]
+        },
+        {
+          "literal": "59",
+          "bbox": [
+            482,
+            240,
+            503,
+            257
+          ]
+        },
+        {
+          "literal": "60",
+          "bbox": [
+            504,
+            252,
+            525,
+            269
+          ]
+        }
+      ],
+      "axisTitles": [
+        {
+          "literal": "Cường độ tương đối %",
+          "bbox": [
+            14,
+            36,
+            38,
+            283
+          ],
+          "rotation": -90,
+          "center": [
+            26,
+            159.5
+          ]
+        },
+        {
+          "literal": "m/z",
+          "bbox": [
+            319,
+            319,
+            358,
+            335
+          ],
+          "baseline": 334
+        }
+      ],
+      "styles": {
+        "allNumbersAndY": "true bold upright sans, including peaknums and0.0",
+        "mz": "heavy upright sans; ownFULL mstem approximatelyvertical, do NOT assume italic from previous MS figure",
+        "frameAndTicks": "black/gray native thick, 61downX21leftYticks",
+        "peaks": "muted red with gray/black antialias scan fringes"
+      },
+      "unknownRetainedFragments": [
+        {
+          "bbox": [
+            69,
+            1,
+            78,
+            4
+          ],
+          "intent": "UNKNOWN tinyhorizontal gray fragment"
+        },
+        {
+          "bbox": [
+            204,
+            1,
+            211,
+            4
+          ],
+          "intent": "UNKNOWN tinygray fragment"
+        },
+        {
+          "bbox": [
+            33,
+            307,
+            38,
+            311
+          ],
+          "intent": "UNKNOWN tinyblack fleck below-leftaxis"
+        }
+      ],
+      "counts": {
+        "xTicks": 61,
+        "yTicks": 21,
+        "xNumericLabels": 7,
+        "yNumericLabels": 6,
+        "peakLabels": 7,
+        "upwardRedStrokeGroups": 23,
+        "axisHeads": 0
+      },
+      "weakStrokeLimit": "23source upward stroke guides incl veryshort redbumps, not23scientifically assigned distinct ions. Some 1–2px nearbaseline tops may be raster thickening; preserve visible ink. No theoreticalm/z/intensities inferred.",
+      "crop": "TOP2tinyfragments cropped/partial shapes retained asUNKNOWN, no restored text. Frame/axis titles complete."
+    },
+    "measurementLimits": "Nativeapprox ±1–2px per tick band and peak. Coordinates measured individually belowbaseline/aboveaxis for ticks, no uniformgrid normalization. Pixel heights are native geometry, not exact abundance percentages. Source titles no parentheses around percent.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "RootOWNnativeFULL3x/all1deDH-11-C3-B12-III-5/baselineL8x-R6x/mz12x/TOP5x/Y3x. 23individually visibleREDUPstrokes incl tinyweakstrokes, NOT23scientificallyassignedionclaim/noexactabundanceinferred.61X21Ystems7X6Ynums7peaklabels/0.0DOT. ALLtrueDAMUPRIGHT incl m/z: OWN12x verticalmstem; no default italic from otherMS. Yrot−90/Cường độ tương đối % NOparentheses. 2TOPtinyfragments+1LEFTfleckUNKNOWNretain/noRestoration/noextraquantities-or-answer.",
+  "rootActualReview": {
+    "hashSvg": "e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5",
+    "ketQua": "Đạt root OWN native FULL/all1publicde/freshChromium FULL3x; macro59-60/Y40: WHITE ink gaps. ALL TRUEdamUPRIGHTinclm/z/23redUPstrokes/61X21Y/0.0DOT/3unknownfragments retained.",
+    "render": "/workspace/scratch/root441-1106.png",
+    "macros": [
+      "/workspace/scratch/root441-label5960.png",
+      "/workspace/scratch/root441-Y40.png"
+    ],
+    "negativeHistory": "ms1106-lo-441-ban-cu-bi-loai.json",
+    "xmlChildren": 131,
+    "changedChildren": [
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127
+    ],
+    "scope": "Initial→final ONLY7peaklabel size22→19 and Ytitlex37→33; innerglyphd exact, othergeometry exact."
+  },
+  "readonlyRuntime": {
+    "sha256": "7e7c22019d8171e71aaf14de72f7f169226aed343b1014854aab8d64f5de9c43",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ms1106-native-ddh-e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5.svg e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5\nIMGDECODE [ 608, 338 ]\n1106 { x: 0, y: 0, width: 608, height: 338 }\n\nPOSTSHOT_SHA e7188eac409119a1a8f83c17b460dd449875eb7b1a1db01a4c848d2fac4d9dc5\nCOMMAND node /workspace/scratch/agent-render441.cjs\nCONTEXT DH-11-C3-B12-III-5.hinh.0.du_lieu public de/one ref only; no answers; IMG.decode success.\n"
+  }
+}
