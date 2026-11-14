@@ -1,0 +1,29 @@
+[
+  {
+    "i": 546,
+    "hash": "6702ef90d5118e0511d538cbf2d11aebc0c4adc90d2a2c23e15374cd82b1ccc0",
+    "fileNguon": "anh/6702ef90d5118e0511d538cbf2d11aebc0c4adc90d2a2c23e15374cd82b1ccc0.png",
+    "svg": "glucose546-native-ddh-03fd8bcafa95d3e0270a3261ebc49d9230e5dd7bf1bc0cd9823a6768bc038c9a.svg",
+    "hashSvg": "03fd8bcafa95d3e0270a3261ebc49d9230e5dd7bf1bc0cd9823a6768bc038c9a",
+    "byteSvg": 72096,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B4-II-3",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "hash": "6702ef90d5118e0511d538cbf2d11aebc0c4adc90d2a2c23e15374cd82b1ccc0",
+            "where": "VIP27-C2-B4-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "2eba318c77e352685d2caf5820fdee21b93015284a17ee83046fa951cef7233b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18C36H18OstructuresEXCLannotationOH/12freeOH3CH2OH-15hydroxylO2ringO1aldehydeO/14standaloneH/2Haworth1Fischer/18nums/4TAPER2boldfront6pxVERTICALfeet82-160and577-655/4HALFfilledharpoons2FULLfilledcurvedleaders/2dashedOHboxes20individualNONPERIODICborderRunsEACH-nativeC1stemOVERLAPSrightbottomdashKEEP/EXACT2OH hemiacetalWITHl-α-glucose-glucose-β-glucose/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO-HOlastO/3TOPcroppedUNKNOWNfragmentsKEEP/NOaddedH-equation-condition-answer-alias473151106250/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "03fd8bcafa95d3e0270a3261ebc49d9230e5dd7bf1bc0cd9823a6768bc038c9a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

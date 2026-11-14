@@ -1,0 +1,29 @@
+{
+  "i": 875,
+  "hash": "9f199a6f7e03bb64d8ceb4aa2cb72a6b5f92cdc27b809338a1d4e3dd6449c19e",
+  "size": [
+    635,
+    420
+  ],
+  "publicQuestions": [
+    {
+      "qid": "11-C5-B21-II-2",
+      "de": "Thực hiện các thí nghiệm sau:\n- Cho phenol vào ống nghiệm, thêm nước và lắc đều ống nghiệm thấy dung dịch có màu trắng đục (ống nghiệm A).\n- Cho dung dịch NaOH vào ống nghiệm thấy dung dịch chuyển sang trong suốt (ống nghiệm B).\n- Sục khí CO₂ vào ống nghiệm thấy dung dịch chuyển màu trắng đục như ban đầu (ống nghiệm C).",
+      "allHinh": [
+        {
+          "hash": "9f199a6f7e03bb64d8ceb4aa2cb72a6b5f92cdc27b809338a1d4e3dd6449c19e",
+          "where": "11-C5-B21-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "e8a9bdc6bcdc68c3447674f10da4d1d2250837c208dd20362acee8e0c9397057"
+        }
+      ]
+    }
+  ],
+  "nativeFullOpened": true,
+  "reason": "BottomAphenolgrain/topologyuncertain; do notinventillustrativepatchforpass. Parentrequestedclearsourceinstead.",
+  "status": "source-onlyHOLD/noSVG/noCount",
+  "lo": 432,
+  "rootNativeFullOpened": true,
+  "rootAllPublicDeOpened": true,
+  "rootConclusion": "HOLD: bottomAphenolgrain and Cgraybubblegrain topology/count not established. No arbitraryillustrativepatch/noguess/noSVG/noCount. Publicde explains phenomenon but does not resolvegraingeometry.",
+  "evidence": "nguon875-grain-lo-432-hold.jpg"
+}

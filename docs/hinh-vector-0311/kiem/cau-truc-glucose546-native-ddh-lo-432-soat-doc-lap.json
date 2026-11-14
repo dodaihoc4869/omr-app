@@ -1,0 +1,21 @@
+[
+  {
+    "i": 546,
+    "hashSvg": "03fd8bcafa95d3e0270a3261ebc49d9230e5dd7bf1bc0cd9823a6768bc038c9a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/3nativezooms/public de-ref và freshChromium3x FULL/macros từngHaworth-Fischer/2boxes/4heads/topcrop. 18C36H18O phần cấu trúc/14standaloneH: Fischer CHOtop, rowsH-OH/HO-H/H-OH/H-OH, CH₂OHbottom đúng; Haworth anomericOHleftDOWN/rightUP/C2DOWN-C3UP-C4DOWN-CH₂OHUP và từngH đối ứng đúng. 18nums/4TAPER2front6pxverticalfeet liền không spike, Oglyph/sub2/HOlastO anchors sạch. 4HALFfilledharpoons upperRIGHTabove-lowerLEFTbelow, 2FULLfilledcurvedleaders/2OHboxes20runsEACH individualroundcorners; C1stemmerge bottomdashright giữ native. EXACT2OH hemiacetalWITHl/α-glucose/glucose/β-glucose allregularupright, 3topunknownfragments giữ/noaddeddata-answer. RuntimeSHApre/post đúng final, nooldcarry.",
+    "render": "/workspace/scratch/soat432-546-fresh.png",
+    "macro": [
+      "/workspace/scratch/glucose546-left.png",
+      "/workspace/scratch/glucose546-fischer.png",
+      "/workspace/scratch/glucose546-right.png",
+      "/workspace/scratch/glucose546-leftbox.png",
+      "/workspace/scratch/glucose546-rightbox.png",
+      "/workspace/scratch/glucose546-headsL.png",
+      "/workspace/scratch/glucose546-headsR.png",
+      "/workspace/scratch/glucose546-topcrop.png"
+    ],
+    "hash": "6702ef90d5118e0511d538cbf2d11aebc0c4adc90d2a2c23e15374cd82b1ccc0",
+    "hashSvgDaSoat": "03fd8bcafa95d3e0270a3261ebc49d9230e5dd7bf1bc0cd9823a6768bc038c9a"
+  }
+]
