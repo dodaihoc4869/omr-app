@@ -337,3 +337,28 @@ html.nhe .ct-svg [filter], html.nhe #danh-dau [filter], html.nhe .bi-svg [filter
 .bz-giot.nho { width: 50px; height: 58px; font-size: 15px; }
 .bz-giot.sang { box-shadow: 0 0 0 3px var(--vang), 0 0 30px rgba(255, 210, 122, .6); }
 .bz-giot { z-index: 2; }
+/* bước A bản 3: phương trình đúng như bảng — một dòng chữ, mỗi ký hiệu một ô cố định; bản sao bay giữa các ô */
+.bz-hangA, .bz-hangD { position: absolute; left: 0; top: 120px; display: flex; align-items: baseline; flex-wrap: nowrap; white-space: nowrap; font-size: 43px; font-weight: 900; color: var(--phan); }
+.bz-hangA { width: 100%; justify-content: center; gap: 0; }
+.bz-hangD { top: 0; font-size: 50px; }
+.bz-g { position: relative; display: inline-block; padding: 0 1px; border-radius: 10px; transform-origin: 50% 70%; }
+.bz-g.he { color: var(--vang); margin-left: 4px; }
+.bz-g.dau { margin: 0 8px; color: var(--phan-mo); }
+.bz-g.mui { color: var(--vang); }
+.bz-g.h { color: var(--hong); }
+.bz-g.na, .bz-g.oh { color: var(--xanh); }
+.bz-g.chiso { font-size: .55em; vertical-align: -0.25em; }
+.bz-g .q { position: absolute; right: -10px; top: -8px; font-size: .5em; font-style: normal; opacity: 0; }
+.bz-g.sang { background: rgba(255, 210, 122, .12); box-shadow: 0 0 0 3px currentColor, 0 0 26px rgba(255, 210, 122, .35); }
+.bz-bay { position: absolute; font-size: 43px; font-weight: 900; color: var(--phan); white-space: nowrap; padding: 0 1px; opacity: 0; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .5)); }
+.bz-bay.vua { font-size: 50px; }
+.bz-bay .q { position: absolute; right: -10px; top: -8px; font-size: .5em; font-style: normal; }
+.bz-bay.h { color: var(--hong); } .bz-bay.na, .bz-bay.oh { color: var(--xanh); }
+.bz-gach { position: absolute; height: 5px; border-radius: 3px; background: var(--xanh); transform-origin: 0 50%; }
+.bz-khung { position: absolute; border: 4px solid #8fd8ee; border-radius: 12px; box-shadow: 0 0 24px rgba(143, 216, 238, .45); pointer-events: none; }
+html.nhe .bz-bay { filter: none; }
+/* phụ đề cụm (thầy 14/11 «phụ đề siêu cuốn»): chữ to đậm, viền tối cho nổi trên mọi nền, từ khoá màu cảnh, con số có ô dạ quang */
+.dong.cum { font-size: 46px; font-weight: 800; line-height: 1.24; letter-spacing: .005em; text-shadow: 0 3px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(0, 0, 0, .55); }
+.dong.cum .tu { transform-origin: 50% 75%; }
+.dong.cum .tu.k { color: var(--mau, var(--vang)); }
+.dong.cum .tu.nb { color: #172126; background: var(--vang); border-radius: 12px; padding: 0 10px; text-shadow: none; box-shadow: 0 6px 18px rgba(255, 210, 122, .35); }

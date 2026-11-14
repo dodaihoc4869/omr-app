@@ -6,7 +6,7 @@
 //   · mảnh nối (không giọng): khoảng ngừng dài trong câu / giữa hai câu rút còn ~0,3 giây ⇒ nét phấn Thầy viết lúc ngừng được vẽ TUA NHANH cho khớp.
 // Điểm cắt bám khoảng lặng thật (`silencedetect`) trong ±0,45 giây quanh mốc của bản chép lời ⇒ không cắt giữa chữ.
 // Dùng: node dung-kich-ban.mjs <thư mục tư liệu> <cau-hinh.json> <thư mục ra>
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const [duLieu, cauHinhTep, ra] = process.argv.slice(2)
@@ -56,7 +56,10 @@ function catCau(a, b, vietThat = false) {
 }
 
 // ── nét phấn trang 3 (mọi cảnh của buổi K12 trên bảng cuộn này) ──
-const tr = trang.trang.find((t) => t.net.length > 100) ?? trang.trang[trang.trang.length - 1]
+const tr0 = trang.trang.find((t) => t.net.length > 100) ?? trang.trang[trang.trang.length - 1]
+// NÉT CÓ GIỜ THẬT TỪNG ĐIỂM (net-co-gio.ts dựng từ net.bin): có thì dùng cho cả phân tích (cụm nét, giờ viết xong) lẫn bộ khung (dạng 2, bộ máy bút live)
+const NET_GIO = existsSync(join(duLieu, 'net-gio.json')) ? JSON.parse(readFileSync(join(duLieu, 'net-gio.json'), 'utf8')) : null
+const tr = NET_GIO ? { ...tr0, net: NET_GIO.net.map((n) => { const p = []; for (let i = 0; i < n.d.length; i += 4) p.push(Math.round(n.d[i] * 6400), Math.round((n.d[i + 1] * 6400) / NET_GIO.tiLe), n.d[i + 3]); return { t: n.t, p } }) } : tr0
 const netBox = tr.net.map((n) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y } return { t0: n.t / 1000, t1: (n.t + (n.p[n.p.length - 1] || 0)) / 1000, x0, y0, x1, y1 } })
 // GIỮ NHỊP VIẾT THẬT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): khoảng không có lời mà Thầy ĐANG VIẾT thì không tua vụt — đoạn đang
 // viết chạy ×TOC_VIET, đoạn ngồi yên rút còn ~0,12 s. Trả các mảnh nối (không giọng) phủ kín [s0, s1], tổng ≥ toiThieu.
@@ -169,6 +172,8 @@ for (const cc of ch.canh) {
   }
   /** giờ (video) chữ thứ vt của câu q */
   function gioChu(q, vt) {
+    // GHIM một chữ vào nét viết (cc.ghimChu: [câu, chữ thứ mấy, giây tiếng gốc]) — vd. «gắn Na» đúng lúc Thầy viết «Na»
+    const gc = (cc.ghimChu ?? []).find(([d2, w2]) => d2 === q.i && w2 === vt); if (gc) return raGioCanh(gc[2])
     const tu = q.chu.split(/\s+/)
     const am = tu.map(soAm), cong = (a, b) => am.slice(a, b).reduce((x, y) => x + y, 0), tong = cong(0, tu.length)
     let dauCum = 0; for (let i = 0; i < vt; i++) if (/[,;:]$/.test(tu[i])) dauCum = i + 1
@@ -187,11 +192,36 @@ for (const cc of ch.canh) {
     if (ghim) sCum = Math.min(q.s1, Math.max(q.s0, ghim[2]))
     return raGioCanh(raNguon(Math.min(V, raGiong(sCum) + cong(dauCum, vt) / 4.5)))
   }
-  // PHỤ ĐỀ HIỆN THEO CỤM (cc.phuDeCum): chữ của cụm chưa nói tới thì chưa hiện ⇒ chữ và hình bước cùng một mốc
-  if (cc.phuDeCum) for (const q of canh.cau) {
-    const tu = q.chu.split(/\s+/); let dau = 0, gio = q.t0
-    q.tw = tu.map((w, j) => { if (j === dau) gio = Math.max(q.t0, (gioChu(q, j) ?? q.t0) - 0.12); if (/[,;:]$/.test(w)) dau = j + 1; return Math.round(gio * 1000) / 1000 })
+  // PHỤ ĐỀ CỤM (cc.phuDeCum — thầy 14/11 «học tất cả cách làm phụ đề siêu cuốn»): như phụ đề ngắn của các kênh giảng dạy lớn — mỗi lần MỘT cụm (tách ở dấu
+  // phẩy, cụm dài > 8 chữ tách đôi cho ≤ 2 dòng), hiện đúng đầu cụm trên trục lời, chữ bật lên lần lượt theo nhịp nói ~4,5 âm/giây, giữ tới cụm sau.
+  if (cc.phuDeCum) {
+    canh.phuDe = []
+    for (const q of canh.cau) {
+      const tu = q.chu.split(/\s+/), cum = []; let bd = 0
+      tu.forEach((w, j) => { if (/[,;:]$/.test(w) || j === tu.length - 1) { cum.push([bd, j + 1]); bd = j + 1 } })
+      // cụm dài > 8 chữ tách đôi ở chỗ ngắt tự nhiên gần giữa nhất (trước «mà, thì, nên, còn, là, với, khi, để, vì»), không thì ở giữa
+      const NGAT = /^(mà|thì|nên|còn|là|với|khi|để|vì)$/i
+      const tach = []; for (const [x, y] of cum) {
+        if (y - x <= 8) { tach.push([x, y]); continue }
+        let g = x + Math.ceil((y - x) / 2), tot = 1e9; for (let j = x + 2; j <= y - 2; j++) if (NGAT.test(tu[j]) && Math.abs(j - (x + y) / 2) < tot) { tot = Math.abs(j - (x + y) / 2); g = j }
+        tach.push([x, g], [g, y])
+      }
+      tach.forEach(([x, y]) => { const t0 = Math.max(q.t0, (gioChu(q, x) ?? q.t0) - 0.1); canh.phuDe.push({ chu: tu.slice(x, y).join(' '), t0, cau: q, x, y }) })
+    }
+    canh.phuDe.forEach((c, i) => { const p = canh.phuDe[i - 1]; if (p && c.t0 < p.t0 + 0.5) c.t0 = p.t0 + 0.5 })
+    // cụm hiện chưa tới 1 giây ⇒ gộp với cụm sau cùng câu (≤ 10 chữ): mắt kịp đọc
+    for (let i = 0; i + 1 < canh.phuDe.length; i++) {
+      const c = canh.phuDe[i], n = canh.phuDe[i + 1]
+      if (n.cau === c.cau && n.t0 - c.t0 < 1.0 && c.chu.split(/\s+/).length + n.chu.split(/\s+/).length <= 10) { c.chu += ' ' + n.chu; c.y = n.y; canh.phuDe.splice(i + 1, 1); i-- }
+    }
+    canh.phuDe = canh.phuDe.map((c, i) => {
+      const sau = canh.phuDe[i + 1], t1 = sau ? Math.min(sau.t0 - 0.04, sau.cau === c.cau ? sau.t0 : Math.max(c.cau.t1, c.t0 + 1.2)) : c.cau.t1
+      const am = c.chu.split(/\s+/).map(soAm), tw = []; let cong = 0
+      for (const a of am) { tw.push(Math.round(Math.min(c.t0 + cong / 4.5, c.t0 + 0.85 * (t1 - c.t0)) * 1000) / 1000); cong += a }
+      return { chu: c.chu, t0: Math.round(c.t0 * 1000) / 1000, t1: Math.round(t1 * 1000) / 1000, tw }
+    })
   }
+
   const mocTu = (v) => {
     if (Array.isArray(v)) return typeof v[1] === 'string' ? (gioTu(v[0], v[1], v[3] ?? 1) ?? moc(v[0], 0)) + (v[2] ?? 0) : moc(v[0], v[1])
     if (v && typeof v === 'object' && 's' in v) return raGioCanh(v.s) + (v.lech ?? 0)
@@ -203,14 +233,14 @@ for (const cc of ch.canh) {
     canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, p: cc.hoat.p, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, v]) => [k, mocTu(v)])) }
     // 4 HCl bay vào + bộ đếm lên đủ 4a NGAY TRƯỚC lúc lộ đáp án (không lướt qua «3a» khi thẻ đã sáng)
     if (canh.doVui && 'thuoc' in canh.hoat.moc) canh.hoat.moc.thuoc = Math.max(canh.doVui.tMo - 1.35, (canh.hoat.moc.tong ?? 0) + 0.3)
-    const TD = { hat: { hien: 'bip', dem50: 'vut', mau: 'bop', lk: 've', oligo: 'bop', poly: 'bop' }, 'dong-phan': { hien: 'vut', doi: 'vut', so: 'dap', quy: 'bop', giu: 'bip', dau: 'bop' }, 'cat-lk': { hien: 'vut', nuoc: 'bot', tach: 'dap', mt: 'bop', hoan: 'bop', khong: 'bop' }, biuret: { thuoc: 'bot', x3: 'bip', tim: 'dung-nhe' }, 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, bazo: { a_cooh: 'bop', a_naoh: 'bop', a_acid: 'bip', a_base: 'bip', a_bay: 'nhay', a_nuoc: 'giot', a_coona: 'lap', a_tom: 'bop', b_hien: 'vut', b_gly1: 'bop', b_ala: 'bop', b_gly2: 'bop', b_dem: 'bip', b_c1: 'dem1', b_c2: 'dem2', b_c3: 'dem3', b_tong: 'tong', b_3a: 'vut', c_can: 'giot', c_sinh: 'giot', c_triet: 'gach', c_con: 'dung-nhe', d_hien: 'vut', d_na: 'bop', d_coona: 'lap', d_tru1: 'bip', d_cong23: 'bip', d_22: 'tong', d_ala22: 'bip' }, chuoi: { hien: 'vut', cat: 'bot', d1: 'bip', d2: 'bip', d3: 'bip', d4: 'bip', d5: 'bip', tong: 'dap', thuoc: 'vut', sinh: 'bot', con: 'bop', nhan: 'bop', m1: 'bop', m2: 'bop' } }[cc.hoat.loai] ?? {}
+    const TD = { hat: { hien: 'bip', dem50: 'vut', mau: 'bop', lk: 've', oligo: 'bop', poly: 'bop' }, 'dong-phan': { hien: 'vut', doi: 'vut', so: 'dap', quy: 'bop', giu: 'bip', dau: 'bop' }, 'cat-lk': { hien: 'vut', nuoc: 'bot', tach: 'dap', mt: 'bop', hoan: 'bop', khong: 'bop' }, biuret: { thuoc: 'bot', x3: 'bip', tim: 'dung-nhe' }, 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, bazo: { a_g1: 'bop', a_g1b: 'bop', a_acid: 'bip', a_base: 'bip', a_cung0: 'nhay', a_nuoc: 'giot', a_hop: 've', a_coona: 'lap', a_tom: 'bop', b_hien: 'vut', b_gly1: 'bop', b_ala: 'bop', b_gly2: 'bop', b_dem: 'bip', b_c1: 'dem1', b_c2: 'dem2', b_c3: 'dem3', b_tong: 'tong', b_3a: 'vut', c_can: 'giot', c_sinh: 'giot', c_triet: 'gach', c_con: 'dung-nhe', d_hien: 'vut', d_na: 'bop', d_coona: 'lap', d_tru1: 'bip', d_cong23: 'bip', d_22: 'tong', d_ala22: 'bip' }, chuoi: { hien: 'vut', cat: 'bot', d1: 'bip', d2: 'bip', d3: 'bip', d4: 'bip', d5: 'bip', tong: 'dap', thuoc: 'vut', sinh: 'bot', con: 'bop', nhan: 'bop', m1: 'bop', m2: 'bop' } }[cc.hoat.loai] ?? {}
     if (cc.hoat.loai === 'phuong-trinh') for (const k of Object.keys(canh.hoat.moc)) TD[k] = 'bop'
     for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
     if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
     if (cc.hoat.loai === 'chuoi') sfx.push({ t: canh.hoat.moc.cat + 0.55, loai: 'bot' })
     if (cc.hoat.loai === 'bazo') { // tiếng đi kèm chuyển động phụ (khớp hoat-hoa-3.js): Na gắn vào COO⁻ · 2 liên kết đứt · giọt thứ 2, 3 · Na gắn vào Gly · = 111
       const m = canh.hoat.moc, them = (tt, loai) => { if (tt != null && Number.isFinite(tt)) sfx.push({ t: tt, loai }) }
-      them(m.a_coona + 0.75, 'gan'); them(m.c_can + 0.12, 'giot'); them(m.c_can + 0.45, 'gay'); them(m.c_can + 0.57, 'gay')
+      them(m.a_gCN3, 'gan'); them(m.c_can + 0.12, 'giot'); them(m.c_can + 0.45, 'gay'); them(m.c_can + 0.57, 'gay')
       them(m.c_sinh + 0.16, 'giot'); them(m.c_sinh + 0.32, 'giot'); them(m.c_triet + 0.5, 'gach'); them(m.d_na + 1.1, 'gan'); them(m.d_ala22 + 0.7, 'dung-nhe')
     }
   }
@@ -220,7 +250,8 @@ for (const cc of ch.canh) {
     // khoanh theo GIỜ VIẾT (tuS…denS trên tiếng gốc): vùng đúng các nét Thầy viết trong khoảng ấy, hiện ngay khi viết xong vế đó
     if (dd.tuS != null) {
       const h = hopNet(dd.tuS - 0.05, dd.denS); if (!h) continue
-      const t0 = raGioCanh(dd.denS) + (dd.lech ?? 0.1)
+      // `luc` (mốc lời: [câu, "từ"] / [câu, cụm] / {s}) ⇒ khoanh đúng lúc Thầy NÓI tới chữ ấy (chữ có thể đã viết từ trước) — «nói tới đâu chiếu bảng tới đó»
+      const t0 = dd.luc != null ? mocTu(dd.luc) + (dd.lech ?? 0) : raGioCanh(dd.denS) + (dd.lech ?? 0.1)
       canh.danhDau.push({ t0, t1: t0 + (dd.dai ?? 2.2), neo: [h.x0, h.y0, h.x1, h.y1], toi: dd.toi }); sfx.push({ t: t0, loai: 've' }); continue
     }
     const q = dauCau(dd.dong); if (!q) continue
@@ -260,6 +291,16 @@ for (const cc of ch.canh) {
     }
     canh.khung = ks
   }
+  // MÁY QUAY THEO LỜI: chỗ được khoanh mà đang nằm ngoài khung ⇒ máy tới đó trước 0,7 s, khoanh xong thì về lại khung cũ (nét Thầy viết tiếp vẫn trong hình)
+  if (cc.khungNet) for (const dd of canh.danhDau.slice().sort((x, y) => x.t0 - y.t0)) {
+    const ks = canh.khung, i = ks.reduce((z, k, j) => (k.t <= dd.t0 ? j : z), 0), k = ks[i].k, [x0, y0, x1, y1] = dd.neo
+    if (x0 >= k[0] + 20 && x1 <= k[0] + k[2] - 20 && y0 >= k[1] + 20 && y1 <= k[1] + k[3] - 20) continue
+    const cxN = (x0 + x1) / 2, cyN = (y0 + y1) / 2, gan = netBox.filter((b) => b.t0 <= (dd.s ?? 1e9) && Math.abs((b.x0 + b.x1) / 2 - cxN) < 380 && Math.abs((b.y0 + b.y1) / 2 - cyN) < 150)
+    const h = gan.reduce((r, b) => ({ x0: Math.min(r.x0, b.x0), y0: Math.min(r.y0, b.y0), x1: Math.max(r.x1, b.x1), y1: Math.max(r.y1, b.y1) }), { x0, y0, x1, y1 })
+    const toi = { t: dd.t0 - 0.7, k: khungQuay(h) }, sau = ks[i + 1]
+    ks.splice(i + 1, 0, toi)
+    if (!sau || sau.t > dd.t1 + 1.4) ks.splice(i + 2, 0, { t: dd.t1 + 0.2, k })
+  }
   canh.vung = hopCanh ? khungQuay(hopCanh) : kTruoc
   doan.push(canh)
 }
@@ -270,7 +311,7 @@ t += KET_DAI
 
 const kb = { fps: 30, rong: 1920, cao: 1080, nhip: NHIP, bo: BO, tong: Math.round(t * 1000) / 1000, ten: ch.ten, lop: ch.lop, ngay: ch.ngay, doan, giong, sfx: sfx.sort((a, b) => a.t - b.t) }
 writeFileSync(join(ra, 'kich-ban.json'), JSON.stringify(kb))
-writeFileSync(join(ra, 'net.json'), JSON.stringify({ rong: tr.rong, cao: tr.cao, mau: tr.mau, net: tr.net }))
+writeFileSync(join(ra, 'net.json'), JSON.stringify(NET_GIO ?? { rong: tr.rong, cao: tr.cao, mau: tr.mau, net: tr.net }))
 const giay = (x) => `${Math.floor(x / 60)}:${String(Math.round(x % 60)).padStart(2, '0')}`
 console.log(`tổng ${giay(t)} (${t.toFixed(1)} s) · ${giong.length} mảnh giọng · ${sfx.length} tiếng động`)
 for (const d of doan) console.log(`  ${d.loai.padEnd(10)} ${d.t0.toFixed(1).padStart(6)} → ${d.t1.toFixed(1).padStart(6)}  ${d.id ?? ''} ${d.cau ? `${d.cau.length} câu · ${d.khung.length} khung · vùng ${d.vung}` : ''}`)

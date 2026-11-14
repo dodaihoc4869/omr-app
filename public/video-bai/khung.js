@@ -14,6 +14,7 @@ function lo(tau, f = 2.3, z = 0.5) {
   return Math.abs(1 - v) < 0.002 ? 1 : Math.round(v * 1000) / 1000
 }
 const lerp = (a, b, p) => a + (b - a) * p
+const r2 = (x) => Math.round(x * 1000) / 1000
 const MAU = { vang: '#ffd27a', hong: '#fda4af', ngoc: '#6ee7b7', xanh: '#8fb6ff', trang: '#f4efe4' }
 const MAU_PHU = { vang: ['#ffd27a', '#fda4af', '#6ee7b7'], hong: ['#fda4af', '#ffd27a', '#8fb6ff'], ngoc: ['#6ee7b7', '#8fb6ff', '#ffd27a'], xanh: ['#8fb6ff', '#c4b5fd', '#6ee7b7'] }
 const $ = (s) => document.querySelector(s)
@@ -58,28 +59,38 @@ function diemDo(n, da) {
   if (j > 0 && j < n.p.length) { const t0 = n.p[j - 1], t1 = n.p[j + 2], q = t1 > t0 ? kep((da - t0) / (t1 - t0)) : 1; d.push(lerp(n.p[j - 3] / 4, n.p[j] / 4, q), lerp(n.p[j - 2] / 4, n.p[j + 1] / 4, q)) }
   return d
 }
-/** Cây bút ở đầu nét (toạ độ màn bảng): thân nghiêng, ngòi màu phấn đang viết, nhấc lên khi di chuyển giữa hai nét. */
-function veBut(c, x, y, mau, nhac, mo) {
-  if (mo <= 0.01) return
-  c.save(); c.globalAlpha = mo; c.translate(x, y - nhac * 10); c.rotate(-0.95)
-  if (!CHE_DO.trucTiep) { c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 14; c.shadowOffsetY = 8 + nhac * 10 } // bóng thân bút chỉ ở bộ quay video (máy em: bỏ cho nhẹ)
-  c.fillStyle = '#2b3c43'; c.beginPath(); c.moveTo(4, -9); c.lineTo(132, -9); c.arcTo(142, -9, 142, 0, 9); c.arcTo(142, 9, 132, 9, 9); c.lineTo(4, 9); c.closePath(); c.fill()
-  c.shadowBlur = 0; c.shadowOffsetY = 0
-  c.fillStyle = '#d8dee0'; c.beginPath(); c.moveTo(0, 0); c.lineTo(30, -9); c.lineTo(30, 9); c.closePath(); c.fill()
-  c.fillStyle = mau; c.beginPath(); c.moveTo(-1, 0); c.lineTo(11, -3.6); c.lineTo(11, 3.6); c.closePath(); c.fill()
-  c.fillStyle = 'rgba(244,239,228,.55)'; c.fillRect(34, -6, 92, 3)
-  c.fillStyle = mau; c.fillRect(100, -9, 8, 18)
-  c.restore()
+/** Cây bút NGẮN của live (src/components/live/tro-but.ts `but`): ngòi ở gốc (0, 0), thân đi lên-phải; thân màu cam vàng của bảng live (--p-cam), ngòi mang
+ *  màu phấn đang viết. `k` = px mỗi đơn vị thiết kế. */
+const MAU_THAN_BUT = '#f59e0b'
+function veButLive(g, muc, k) {
+  const ux = 30 / 45.3, uy = -34 / 45.3, nx = -uy, ny = ux, r = 3.4, dm = (t, s) => [(ux * t + nx * s) * k, (uy * t + ny * s) * k]
+  g.fillStyle = MAU_THAN_BUT; g.beginPath()
+  let p = dm(10, -r); g.moveTo(p[0], p[1]); p = dm(42, -r); g.lineTo(p[0], p[1])
+  p = dm(45.3, 0); const q = dm(42, r), c1 = dm(46, -r), c2 = dm(46, r); g.quadraticCurveTo(c1[0], c1[1], p[0], p[1]); g.quadraticCurveTo(c2[0], c2[1], q[0], q[1])
+  p = dm(10, r); g.lineTo(p[0], p[1]); g.closePath(); g.fill()
+  g.fillStyle = muc || '#f4efe4'; g.beginPath(); g.moveTo(0, 0); p = dm(10, -r); g.lineTo(p[0], p[1]); p = dm(10, r); g.lineTo(p[0], p[1]); g.closePath(); g.fill()
 }
 function nap(kb, net) {
   KB = kb; NET = net; DOAN = kb.doan
   NET.net.sort((a, b) => a.t - b.t)
+  // NÉT DẠNG 2 (thầy 14/11 «nét bút bị giật … làm thật mượt như live»): điểm chuẩn hoá + lực + GIỜ THẬT từng điểm (dựng lại từ net.bin) ⇒ dựng đa giác bằng
+  // ĐÚNG bộ máy bút của live (loi-but.js): Catmull-Rom qua từng mẫu, bề rộng theo lực, thon hai đầu. Đổi sang toạ độ bảng 1600 cho các phần còn lại dùng chung.
+  if (NET.v === 2 && typeof LoiBut !== 'undefined') {
+    const H = 1600 / NET.tiLe, kh = LoiBut.khung(1600, H), k = kh.k
+    NET.kh = kh; NET.mau = []
+    for (const n of NET.net) {
+      n.diem = []; n.p = []
+      for (let i = 0; i < n.d.length; i += 4) { n.diem.push([n.d[i], n.d[i + 1], n.d[i + 2], n.d[i + 3]]); n.p.push(n.d[i] * 6400, n.d[i + 1] * H * 4, n.d[i + 3]) }
+      n.c = n.co * k; n.m = -1; n.bu = LoiBut.buSang(n.mau)
+      const dg = LoiBut.dungNet(n, kh), p = new Path2D(); for (let i = 0; i < dg.length; i++) dg[i] *= k
+      LoiBut.veDaGiac(p, dg); n.daGiac = p
+    }
+  }
   for (const n of NET.net) {
     let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9
     for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y) }
-    n.hop = [x0, y0, x1, y1]; n.ket = n.t + (n.p[n.p.length - 1] || 0); n.mauVe = (NET.mau[n.m] && NET.mau[n.m][0]) || '#f4efe4'
-    const p = new Path2D(), d = []; for (let i = 0; i < n.p.length; i += 3) d.push(n.p[i] / 4, n.p[i + 1] / 4)
-    veTron(p, d); n.duong = p
+    n.hop = [x0, y0, x1, y1]; n.ket = n.t + (n.p[n.p.length - 1] || 0); n.mauVe = n.daGiac ? n.mau : (NET.mau[n.m] && NET.mau[n.m][0]) || '#f4efe4'
+    if (!n.daGiac) { const p = new Path2D(), d = []; for (let i = 0; i < n.p.length; i += 3) d.push(n.p[i] / 4, n.p[i + 1] / 4); veTron(p, d); n.duong = p }
   }
   if (kb.bo) {
     const [bx, by, bw, bh] = kb.bo.bang, [cx, cy, cw, chh] = kb.bo.cot
@@ -141,11 +152,19 @@ function dungCanh() {
     }
     d.lon = d.su.filter((s) => s.loai === 'lon')
     // phụ đề: mỗi câu một dòng, mỗi chữ một ô
-    for (const q of d.cau) {
-      const el = tao('div', 'dong an', pd); el.style.setProperty('--mau', mau)
+    // PHỤ ĐỀ CỤM (kịch bản có d.phuDe — thầy 14/11 «phụ đề siêu cuốn»): mỗi lần một cụm ngắn ≤ 2 dòng, chữ bật lên theo nhịp nói, từ khoá nảy mạnh, con số
+    // có ô dạ quang. Kịch bản cũ (không có phuDe): mỗi câu một dòng như trước.
+    for (const q of d.phuDe || d.cau) {
+      const el = tao('div', d.phuDe ? 'dong cum an' : 'dong an', pd); el.style.setProperty('--mau', mau)
       const tu = q.chu.split(/\s+/)
-      q.tu = tu.map((w) => { const s = tao('span', 'tu', el, thoat(w) + ' '); const sach = w.toLowerCase().replace(/[.,:;!?()]/g, ''); if (TU_KHOA.test(sach) || khoa.has(sach)) s.classList.add('k'); return s })
+      q.tu = tu.map((w) => {
+        const s = tao('span', 'tu', el, thoat(w) + (d.phuDe ? '' : ' ')); if (d.phuDe) el.append(' ')
+        const sach = w.toLowerCase().replace(/[.,:;!?()]/g, ''); if (TU_KHOA.test(sach) || khoa.has(sach)) s.classList.add('k')
+        if (d.phuDe && /^\d/.test(sach)) s.classList.add('nb')
+        return s
+      })
       q.el = el
+      if (d.phuDe) q.tj = q.tw
       // phụ đề theo cụm (kịch bản có q.tw): mỗi chữ hiện theo giờ cụm của nó, lần lượt 0,04 s trong cụm
       if (q.tw) q.tj = q.tw.map((g, j) => g + 0.04 * (j - q.tw.indexOf(g)))
     }
@@ -166,7 +185,7 @@ function doCo() {
     for (const th of d.the) { th.el.classList.remove('an'); th.y = y; th.h = th.el.offsetHeight; y += th.h + 20; th.el.classList.add('an') }
     // cuộn chồng thẻ khi tràn: sau thẻ k, đáy chồng phải nằm trong cột
     let cuon = 0; for (const th of d.the) { cuon = Math.max(cuon, th.y + th.h - 740 + (d.doVui ? 0 : 0)); th.cuon = Math.max(0, cuon) }
-    for (const q of d.cau) { q.el.classList.remove('an'); q.rong = Math.min(1700, Math.max(...[...q.el.querySelectorAll('.tu')].map((s) => s.offsetLeft + s.offsetWidth)) - Math.min(...[...q.el.querySelectorAll('.tu')].map((s) => s.offsetLeft)) + 90); q.cao = q.el.offsetHeight + 30; q.el.classList.add('an') }
+    for (const q of d.phuDe || d.cau) { q.el.classList.remove('an'); q.rong = Math.min(1700, Math.max(...[...q.el.querySelectorAll('.tu')].map((s) => s.offsetLeft + s.offsetWidth)) - Math.min(...[...q.el.querySelectorAll('.tu')].map((s) => s.offsetLeft)) + 90); q.cao = q.el.offsetHeight + 30; q.el.classList.add('an') }
     if (d.phanTu) doPhanTu(d)
   }
   hienTam.forEach((e) => e.classList.add('an'))
@@ -383,15 +402,60 @@ function napDem(d, s, s0, cx, cy, k) {
   while (DEM.i < net.length && net[DEM.i].ket <= s) {
     const n = net[DEM.i++], h = n.hop
     if (h[2] < cx - 20 || h[0] > x1 + 20 || h[3] < cy - 20 || h[1] > y1 + 20) continue
-    c.globalAlpha = n.ket < s0 ? 0.38 : 1; c.strokeStyle = n.mauVe; c.lineWidth = Math.max(1.6 / k, n.c * 1.05); c.stroke(n.duong)
+    veNetXong(c, n, n.ket < s0 ? 0.38 : 1, k)
   }
   DEM.s = s
+}
+/** Nét đã xong: dạng 2 tô đa giác của bộ máy bút live (+ một lượt bù sáng như live); dạng cũ vẽ đường. */
+function veNetXong(c, n, a, k) {
+  c.globalAlpha = a
+  if (n.daGiac) { c.fillStyle = n.mauVe; c.fill(n.daGiac); if (n.bu) { c.globalAlpha = a * n.bu; c.fill(n.daGiac) } }
+  else { c.strokeStyle = n.mauVe; c.lineWidth = Math.max(1.6 / k, n.c * 1.05); c.stroke(n.duong) }
+  c.globalAlpha = 1
+}
+/** Nét đang viết dở tới `da` ms: điểm cuối nội suy giữa hai mẫu kẹp mốc (như trình phát Xem lại). Trả đầu nét [x, y] (toạ độ bảng) hoặc null. */
+function veNetDo(c, n, da, k) {
+  if (!n.daGiac) {
+    const p = diemDo(n, da); if (!p.length) return null
+    c.strokeStyle = n.mauVe; c.lineWidth = Math.max(1.6 / k, n.c * 1.05); c.beginPath(); veTron(c, p); c.stroke(); return [p[p.length - 2], p[p.length - 1]]
+  }
+  const ds = n.diem, pts = []; let j = 0
+  for (; j < ds.length && ds[j][3] <= da; j++) pts.push(ds[j])
+  if (j > 0 && j < ds.length) { const a = ds[j - 1], b = ds[j], q = b[3] > a[3] ? kep((da - a[3]) / (b[3] - a[3])) : 1; pts.push([lerp(a[0], b[0], q), lerp(a[1], b[1], q), lerp(a[2], b[2], q), da]) }
+  if (!pts.length) return null
+  const kh = NET.kh, st = LoiBut.moXuLy(n, kh); LoiBut.xuLyThem(st, pts, pts.length)
+  const dg = LoiBut.vien(st, 0, -1, null, false); for (let i = 0; i < dg.length; i++) dg[i] *= kh.k
+  c.fillStyle = n.mauVe; c.beginPath(); LoiBut.veDaGiac(c, dg); c.fill(); if (n.bu) { c.globalAlpha = n.bu; c.fill(); c.globalAlpha = 1 }
+  const e = pts[pts.length - 1]; return [e[0] * 1600, e[1] * 1600 / NET.tiLe]
+}
+/** CÂY BÚT theo tay Thầy — chép cách trình phát Xem lại Live (may-phat.ts `troGiuaNet`): đang viết ⇒ ngòi ở đầu nét; nghỉ ngắn (≤ 0,7 s) ⇒ lướt suốt
+ *  quãng nghỉ tới đầu nét sau; nghỉ dài ⇒ nán ở cuối nét rồi lướt (xa thì lâu hơn); nghỉ lâu ⇒ nán 0,9 s rồi ẩn, hiện lại 0,3 s trước nét kế. Không trạng
+ *  thái: mọi thứ tính từ giờ ⇒ tua tới đâu cũng đúng. Trả { x, y, cham, mau, nhac (0 chạm … 1 nhấc) } toạ độ bảng, hoặc null. */
+const TRO = { nan: 900, tron: 700, it: 220, truoc: 300, ro: 420 }
+const emTay = (f) => (f <= 0 ? 0 : f >= 1 ? 1 : f * f * (3 - 2 * f))
+function viTriBut(s, dau, mauDau, truoc, sau) {
+  if (dau) return { x: dau[0], y: dau[1], cham: true, mau: mauDau, nhac: 0, ro: 0.92 }
+  if (!truoc && !sau) return null
+  const H = NET.v === 2 ? 1600 / NET.tiLe : 1600, cuoi = (n) => { const m = n.p.length; return [n.p[m - 3] / 4, n.p[m - 2] / 4] }, dauN = (n) => [n.p[0] / 4, n.p[1] / 4]
+  const nhacTu = (t0) => kep((s - t0) / 120), roTu = (t0) => 0.92 - 0.34 * kep((s - t0 - TRO.ro) / 180)
+  if (truoc && sau && s >= truoc.ket) {
+    const c = cuoi(truoc), p = dauN(sau), nghi = sau.t - truoc.ket, con = sau.t - s, xa = Math.hypot(p[0] - c[0], p[1] - c[1]) / H
+    const luot = nghi <= TRO.tron ? nghi : Math.min(TRO.tron, Math.max(TRO.it, 160 + 1400 * xa, nghi - TRO.nan))
+    if (nghi > 0 && nghi - luot <= TRO.nan) {
+      if (con >= luot) return { x: c[0], y: c[1], cham: false, mau: truoc.mauVe, nhac: nhacTu(truoc.ket), ro: roTu(truoc.ket) }
+      const f = emTay(1 - con / luot)
+      return { x: lerp(c[0], p[0], f), y: lerp(c[1], p[1], f), cham: false, mau: sau.mauVe, nhac: nhacTu(truoc.ket), ro: roTu(truoc.ket) }
+    }
+  }
+  if (sau && sau.t - s <= TRO.truoc) { const p = dauN(sau); return { x: p[0], y: p[1], cham: false, mau: sau.mauVe, nhac: 1, ro: 0.58 } }
+  if (truoc && s >= truoc.ket && s - truoc.ket < TRO.nan) { const c = cuoi(truoc); return { x: c[0], y: c[1], cham: false, mau: truoc.mauVe, nhac: nhacTu(truoc.ket), ro: roTu(truoc.ket) } }
+  return null
 }
 function veBang(d, t) {
   const s = nguon(d, t) * 1000, s0 = d.cau[0].s0 * 1000 - 2000
   const [cx, cy, cw] = camera(d, t), k = BANG.w / cw
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, BANG.w, BANG.h)
-  let dau = null, truoc = null, sau = null
+  let dau = null, mauDau = '', truoc = null, sau = null
   if (CHE_DO.nhe) {
     napDem(d, s, s0, cx, cy, k)
     ctx.drawImage(DEM.cv, 0, 0)
@@ -399,8 +463,7 @@ function veBang(d, t) {
     if (DEM.i > 0) truoc = NET.net[DEM.i - 1]
     for (let i = DEM.i; i < NET.net.length; i++) {
       const n = NET.net[i]; if (n.t > s) { sau = n; break }
-      const p = diemDo(n, s - n.t); if (!p.length) continue
-      ctx.globalAlpha = 1; ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05); ctx.beginPath(); veTron(ctx, p); ctx.stroke(); dau = [p[p.length - 2], p[p.length - 1], n.mauVe]
+      const e = veNetDo(ctx, n, s - n.t, k); if (e) { dau = e; mauDau = n.mauVe }
     }
   } else {
     ctx.setTransform(k, 0, 0, k, -cx * k, -cy * k)
@@ -411,28 +474,17 @@ function veBang(d, t) {
       const xong = n.ket <= s, tuoi = (s - n.ket) / 1000
       if (xong && (!truoc || n.ket >= truoc.ket)) truoc = n
       const h = n.hop; if (h[2] < cx - 20 || h[0] > x1 + 20 || h[3] < cy - 20 || h[1] > y1 + 20) continue
-      ctx.globalAlpha = n.ket < s0 ? 0.38 : 1
-      ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05)
       if (!xong || tuoi < 1.4) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 * (xong ? 1 - tuoi / 1.4 : 1) } else ctx.shadowBlur = 0
-      if (xong) ctx.stroke(n.duong)
-      else { const p = diemDo(n, s - n.t); if (p.length) { ctx.beginPath(); veTron(ctx, p); ctx.stroke(); dau = [p[p.length - 2], p[p.length - 1], n.mauVe] } }
+      if (xong) veNetXong(ctx, n, n.ket < s0 ? 0.38 : 1, k)
+      else { const e = veNetDo(ctx, n, s - n.t, k); if (e) { dau = e; mauDau = n.mauVe } }
     }
     ctx.shadowBlur = 0; ctx.globalAlpha = 1
   }
-  // CÂY BÚT theo tay Thầy: đang viết ⇒ ở đầu nét; giữa hai nét gần nhau ⇒ nhấc lên, lướt tới chỗ nét sau; nghỉ lâu ⇒ mờ đi
-  const ra = (x, y) => [(x - cx) * k, (y - cy) * k]
-  ctx.setTransform(1, 0, 0, 1, 0, 0)
-  if (dau) {
-    const [x, y] = ra(dau[0], dau[1])
-    ctx.fillStyle = '#fff'; ctx.shadowColor = dau[2]; ctx.shadowBlur = CHE_DO.nhe ? 0 : 22; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0
-    veBut(ctx, x, y, dau[2], 0, 1)
-  } else if (truoc) {
-    const n = truoc, m = n.p.length, e = ra(n.p[m - 3] / 4, n.p[m - 2] / 4), nghi = s - n.ket
-    if (sau && sau.t - n.ket < 1500) {
-      const q = eInOut(kep(nghi / Math.max(1, sau.t - n.ket))), f = ra(sau.p[0] / 4, sau.p[1] / 4)
-      veBut(ctx, lerp(e[0], f[0], q), lerp(e[1], f[1], q), sau.mauVe, Math.sin(q * Math.PI), 1)
-    } else if (nghi < 700) veBut(ctx, e[0], e[1], n.mauVe, eOut(kep(nghi / 400)), 1 - kep((nghi - 250) / 450))
-    else if (sau && sau.t - s < 350) { const f = ra(sau.p[0] / 4, sau.p[1] / 4); veBut(ctx, f[0], f[1], sau.mauVe, kep((sau.t - s) / 350), 1 - kep((sau.t - s) / 350)) }
+  // CÂY BÚT VÀNG của live (tro-but.ts dáng «but»): cỡ theo bề cao bảng như live (≈ 5,5 %), nhấc lên chếch phải-trên khi lơ lửng
+  const b = viTriBut(s, dau, mauDau, truoc, sau)
+  if (b) {
+    const co = Math.max(15, Math.min(44, BANG.h * 0.055)), x = (b.x - cx) * k + 0.07 * co * b.nhac, y = (b.y - cy) * k - 0.15 * co * b.nhac
+    ctx.setTransform(1, 0, 0, 1, x, y); ctx.globalAlpha = b.ro; veButLive(ctx, b.mau, (co / 60) * 1.3); ctx.globalAlpha = 1; ctx.setTransform(1, 0, 0, 1, 0, 0)
   }
 }
 
@@ -486,12 +538,14 @@ function veCanh(d, t) {
   }
   if (!coLon) lonEl.classList.add('an')
   // phụ đề
-  let qDang = null; for (const q of d.cau) if (t >= q.t0 - 0.05 && t < q.t1 + 0.12) qDang = q
+  const PD = d.phuDe || d.cau
+  let qDang = null; for (const q of PD) if (t >= q.t0 - 0.05 && t < q.t1 + 0.12) qDang = q
   const nen = $('#phu-de-nen')
-  for (const q of d.cau) {
+  for (const q of PD) {
     const on = q === qDang && !(d.doVui && t >= d.doVui.t0 && t < d.doVui.t1); q.el.classList.toggle('an', !on); if (!on) continue
     const ra = tien(t, q.t1 - 0.06, 0.18)
-    q.tu.forEach((w, j) => { const tj = q.tj ? q.tj[j] : q.t0 + j * 0.04, p = lo(t - tj, 2.6, 0.55); w.style.transform = `translateY(${(1 - p) * 20 - ra * 10}px) scale(${0.88 + 0.12 * p})`; w.style.opacity = kep((t - tj) / 0.14) * (1 - ra) })
+    const cum = !!d.phuDe
+    q.tu.forEach((w, j) => { const tj = q.tj ? q.tj[j] : q.t0 + j * 0.04, p = lo(t - tj, 2.6, 0.55), manh = cum && w.classList.contains('k'); w.style.transform = `translateY(${r2((1 - p) * (cum ? 26 : 20) - ra * 10)}px) scale(${r2(manh ? 0.62 + 0.38 * p : 0.88 + 0.12 * p)})`; w.style.opacity = r2(kep((t - tj) / 0.12) * (1 - ra)) })
     nen.style.width = `${q.rong}px`; nen.style.height = `${q.cao}px`; nen.style.opacity = 1 - ra
   }
   if (!qDang || (d.doVui && t >= d.doVui.t0 && t < d.doVui.t1)) nen.style.opacity = 0

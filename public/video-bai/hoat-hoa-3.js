@@ -27,16 +27,26 @@ function dungBazo(d, goc) {
     mui: o(h1, 'dau mui', '→'),
     glyna: o(h2, 'glyna', '<b>Gly-Na</b> : 2a'), cong2: o(h2, 'dau', '+'), alana: o(h2, 'alana', '<b>Ala-Na</b> : a'), cong3: o(h2, 'dau', '+'), nuoc: o(h2, 'nuoc', '<b>H₂O</b> : <em>a</em>'),
   }
-  // ── A: cơ chế COOH + NaOH ──
+  // ── A: PHƯƠNG TRÌNH ĐÚNG NHƯ BẢNG (thầy 14/11 «hoạt hoạ theo thứ tự thầy viết, ký hiệu phải chính xác đúng vị trí»): «1COOH + 1NaOH → H₂O + COONa» là MỘT
+  //    dòng chữ thường (mỗi ký hiệu một ô cố định, không bao giờ chồng); mỗi chữ hiện đúng lúc Thầy viết chữ đó. Chuyển động là các BẢN SAO bay giữa
+  //    các ô (H⁺ theo cung, OH⁻ + H⁺ vào ô H₂O, COO + Na vào ô COONa) — điểm đi / đến đo từ chính các ô sau khi chữ đã dàn trang.
   const A = E('bz-san', ''); A.style.top = '24px'
   const svgA = svgEl('svg', { width: W, height: 500, viewBox: `0 0 ${W} 500`, class: 'bz-svg' }, A)
   const cung = svgEl('path', { fill: 'none', stroke: '#fda4af', 'stroke-width': 5, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 }, svgA)
   const muiCung = svgEl('path', { d: 'M -16 -10 L 2 0 L -16 10', fill: 'none', stroke: '#fda4af', 'stroke-width': 5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0 }, svgA)
+  const hang = E('bz-hangA', '', A), S = (cls, html, cha = hang) => tao('span', `bz-g ${cls}`, cha, html)
+  const g = {
+    he1: S('he', '1'), C: S('', 'C'), O1: S('', 'O'), O2: S('', 'O<i class="q">−</i>'), H: S('h', 'H<i class="q">+</i>'), cong1: S('dau', '+'),
+    he2: S('he', '1'), Na: S('na', 'Na<i class="q">+</i>'), OH: S('oh', 'OH<i class="q">−</i>'), mui: S('dau mui', '→'), H2O: S('nuoc', ''), cong2: S('dau', '+'), COONa: S('', ''),
+  }
+  g.H2O_H = S('', 'H', g.H2O); g.H2O_2 = S('chiso', '2', g.H2O); g.H2O_O = S('', 'O', g.H2O)
+  g.CN_C = S('', 'C', g.COONa); g.CN_OO = S('', 'OO', g.COONa); g.CN_Na = S('na', 'Na', g.COONa)
   const a = {
-    cooR: E('bz-f', '-COO', A), cooH: E('bz-f h', 'H', A), na: E('bz-f na', 'Na', A), oh: E('bz-f oh', 'OH', A),
-    nhC: E('bz-nh', 'nhóm <b>COOH</b> ở <b>đầu C</b>', A), nhAcid: E('bz-nh hong', 'acid: <b>nhường H⁺</b>', A), nhBase: E('bz-nh xanh', 'base: <b>nhận H⁺</b>', A),
-    nuoc: E('bz-giot lon', 'H₂O', A), nhNuoc: E('bz-nh nuoc', 'thành <b>1 nước</b>', A), nhCoona: E('bz-nh vang', 'còn lại gộp: <b>COONa</b>', A),
-    tom: E('bz-tom', '1 COOH + 1 NaOH → <b>COONa + H₂O</b>', A), cung, muiCung,
+    hang, g, cung, muiCung, gach: E('bz-gach', '', A), hop: E('bz-khung', '', A),
+    bayH: E('bz-bay h', 'H<i class="q">+</i>', A), bayOH: E('bz-bay oh', 'OH<i class="q">−</i>', A), bayCOO: E('bz-bay', 'COO', A), bayNa: E('bz-bay na', 'Na', A),
+    nhAcid: E('bz-nh hong', 'acid: <b>nhường H⁺</b>', A), nhBase: E('bz-nh xanh', 'base: <b>nhận H⁺</b>', A),
+    nhNuoc: E('bz-nh nuoc', 'H⁺ + OH⁻ ⇒ <b>1 nước</b>', A), nhCoona: E('bz-nh vang', 'còn lại gộp: <b>COONa</b>', A),
+    tom: E('bz-tom', 'Mỗi <b>COOH</b> (đầu C) cần <b>1 NaOH</b>, sinh <b>1 H₂O</b>', A),
   }
   // ── B + C: chuỗi Gly - Ala - Gly · đầu C · NaOH · nước ──
   const BC = E('bz-san', '')
@@ -53,7 +63,7 @@ function dungBazo(d, goc) {
   // ── D: muối + M ──
   const D = E('bz-san', '')
   const dd = {
-    goc: E('bz-f vua', 'H₂N-CH₂-COO', D), h: E('bz-f vua h', 'H', D), na: E('bz-f vua na', 'Na', D), tenM: E('bz-nh vang', 'Gly ⇒ <b>Gly-Na</b>', D),
+    hang: E('bz-hangD', '<span class="bz-g">H₂N-CH₂-COO</span><span class="bz-g h">H</span>', D), h: E('bz-bay h vua', 'H', D), na: E('bz-bay na vua', 'Na', D), tenM: E('bz-nh vang', 'Gly ⇒ <b>Gly-Na</b>', D),
     tru: E('bz-nh hong', 'mất 1 H: <b>− 1</b>', D), cong: E('bz-nh xanh', 'thêm Na: <b>+ 23</b>', D),
     m: E('bz-m', '<span>Gly-Na</span><i>M = 75</i><i>− 1</i><i>+ 23</i><i>= 75 + <em>22</em></i><i>= 97</i>', D),
     ala: E('bz-m ala', '<span>Ala-Na</span><i>M = 89</i><i>+ <em>22</em></i><i>= 111</i>', D),
@@ -62,7 +72,7 @@ function dungBazo(d, goc) {
   // TIA LẤP LÁNH đúng khoảnh khắc (khung.js vẽ theo moc + trễ): nước thành · Na gắn · đếm 1-2-3 · tổng 3 · NaOH gắn · còn 1 nước · M = 97 · 111
   const iDem = demC.querySelectorAll('i'), iM = dd.m.querySelectorAll('i'), iAla = dd.ala.querySelectorAll('i'), NUOC = '#8fd8ee', VANG = '#ffd27a'
   d.lap = [
-    { k: 'a_nuoc', tre: 0.15, e: a.nuoc, mau: NUOC, n: 14 }, { k: 'a_coona', tre: 0.8, e: a.cooR, mau: VANG },
+    { k: 'a_nuoc', e: g.H2O, mau: NUOC, n: 14 }, { k: 'a_coona', e: g.COONa, mau: VANG },
     { k: 'b_c1', e: dauC[0] }, { k: 'b_c2', e: dauC[1] }, { k: 'b_c3', e: dauC[2] }, { k: 'b_tong', e: iDem[3], mau: VANG, n: 16 },
     ...naohT.map((e, i) => ({ k: 'b_3a', tre: 0.6 + i * 0.18, e, mau: '#8fb6ff', n: 8 })),
     { k: 'c_con', tre: 0.5, e: giotSinh[2], mau: NUOC, n: 14 }, { k: 'd_na', tre: 1.15, e: dd.na, mau: '#8fb6ff' },
@@ -71,7 +81,7 @@ function dungBazo(d, goc) {
   ]
   d.hoatNeo = {
     'pt-pep': P.pep, 'pt-naoh': P.naoh, 'pt-3a': P.naoh.querySelector('em'), 'pt-mui': P.mui, 'pt-nuoc': P.nuoc, 'pt-glyna': P.glyna, 'pt-alana': P.alana,
-    'a-cooh': a.cooR, 'a-oh': a.oh, 'a-nuoc': a.nuoc, 'a-coona': a.cooR, 'b-dc': dauC[0], 'd-tru': dd.tru, 'd-m': dd.m, 'd-ala': dd.ala,
+    'a-cooh': g.C, 'a-h': g.H, 'a-oh': g.OH, 'a-nuoc': g.H2O, 'a-coona': g.COONa, 'b-dc1': dauC[1], 'b-dc2': dauC[2], 'd-cong': dd.cong, 'b-dc': dauC[0], 'd-tru': dd.tru, 'd-m': dd.m, 'd-ala': dd.ala,
   }
 }
 
@@ -90,43 +100,56 @@ function veBazo(d, t) {
   if (vD > 0) veBazoD(Z, m, t)
 }
 
+/** Ô chữ của dòng phương trình theo toạ độ sân A (đo MỘT lần, chỉ khi dòng đã hiện + phông đã nạp — đo lúc ẩn ra 0 là lỗi bản 2: «H đè lên C»). */
+function oA(Z) {
+  if (Z.oA) return Z.oA
+  const h = Z.a.hang
+  if (!h.offsetWidth || (document.fonts && document.fonts.status !== 'loaded')) return null
+  const o = {}
+  for (const [k, e] of Object.entries(Z.a.g)) { let x = e.offsetLeft, y = e.offsetTop; if (e.parentElement !== h) { x += e.parentElement.offsetLeft; y += e.parentElement.offsetTop } o[k] = { x: h.offsetLeft + x, y: h.offsetTop + y, w: e.offsetWidth, h: e.offsetHeight } }
+  Z.oA = o; return o
+}
 function veBazoA(Z, m, t) {
-  const a = Z.a, W = Z.W, Y = 150
-  const pC = lo(t - m.a_cooh, 2.2, 0.55), pN = lo(t - m.a_naoh, 2.2, 0.55)
-  const bay = eInOut(tien(t, m.a_bay, 1.0)), gop = eInOut(tien(t, m.a_coona, 0.8)), tach = eInOut(tien(t, m.a_base, 0.6))
-  if (!Z.wR) { const c0 = a.cooR.innerHTML, n0 = a.na.innerHTML; a.cooR.innerHTML = '-COO'; a.na.innerHTML = 'Na'; Z.wR = a.cooR.offsetWidth - 6; Z.wNa = a.na.offsetWidth - 6; a.cooR.innerHTML = c0; a.na.innerHTML = n0; if (!Z.wR) Z.wR = 0 }
-  const xR = 40, wR = Z.wR || 150, xNa = W - 300, xOH = xNa + (Z.wNa || 74) + 44 * tach
-  // H của COOH bay theo cung tới OH⁻ (khi Thầy vẽ mũi tên cong trên bảng)
-  const hx0 = xR + wR + 8, hx1 = xOH - 40, cx = (hx0 + hx1) / 2, cy = Y - 150
-  const bx = (1 - bay) ** 2 * hx0 + 2 * (1 - bay) * bay * cx + bay ** 2 * hx1, by = (1 - bay) ** 2 * Y + 2 * (1 - bay) * bay * cy + bay ** 2 * Y
-  // -COO đứng yên; Na⁺ rời OH⁻ (hạ xuống) rồi bay về gắn vào -COO⁻ ⇒ -COONa
-  a.cooR.style.opacity = r3(kep(pC * 1.5)); datXY(a.cooR, xR, Y); a.cooR.style.transform = `scale(${r3(0.7 + 0.3 * kep(pC, 0, 1.2))})`
-  a.cooR.innerHTML = t >= m.a_coona + 0.8 ? '-COONa' : t >= m.a_acid && gop < 0.6 ? '-COO<sup>−</sup>' : '-COO'
-  a.cooR.classList.toggle('sang', t >= m.a_coona + 0.8)
-  a.cooH.style.opacity = r3(kep(pC * 1.5) * (1 - tien(t, m.a_nuoc, 0.25))); datXY(a.cooH, bx, by)
-  a.cooH.style.transform = `scale(${r3(t >= m.a_acid ? 1 + 0.3 * ex(-(t - m.a_acid) * 3) : 0.7 + 0.3 * kep(pC, 0, 1.2))})`
-  a.cooH.innerHTML = t >= m.a_acid ? 'H<sup>+</sup>' : 'H'; a.cooH.classList.toggle('sang', t >= m.a_acid && t < m.a_nuoc)
-  const naX = lerp(xNa - 40 * tach, hx0, gop), naY = Y + 150 * tach * (1 - gop)
-  a.na.style.opacity = r3(kep(pN * 1.5) * (1 - tien(t, m.a_coona + 0.8, 0.12))); datXY(a.na, naX, naY); a.na.style.transform = `scale(${r3(0.7 + 0.3 * kep(pN, 0, 1.2))})`
-  a.na.innerHTML = t >= m.a_base && gop < 0.6 ? 'Na<sup>+</sup>' : 'Na'
-  a.oh.style.opacity = r3(kep(pN * 1.5) * (1 - tien(t, m.a_nuoc, 0.25))); datXY(a.oh, xOH, Y); a.oh.style.transform = `scale(${r3(t >= m.a_base ? 1 + 0.3 * ex(-(t - m.a_base) * 3) : 0.7 + 0.3 * kep(pN, 0, 1.2))})`
-  a.oh.innerHTML = t >= m.a_base ? 'OH<sup>−</sup>' : 'OH'; a.oh.classList.toggle('sang', t >= m.a_base && t < m.a_nuoc)
+  const a = Z.a, g = a.g
+  // chữ hiện ĐÚNG lúc Thầy viết chữ đó (giờ nét trên bảng)
+  for (const [k, t0] of [['he1', m.a_g1], ['C', m.a_gC], ['O1', m.a_gO1], ['O2', m.a_gO2], ['H', m.a_gH], ['cong1', m.a_gCong1], ['he2', m.a_g1b], ['Na', m.a_gNa], ['OH', m.a_gOH], ['mui', m.a_gMui],
+    ['H2O_H', m.a_gH2O], ['H2O_2', m.a_gH2O2], ['H2O_O', m.a_gH2O3], ['cong2', m.a_gCong2], ['CN_C', m.a_gCN], ['CN_OO', m.a_gCN2], ['CN_Na', m.a_gCN3]]) xuat(g[k], t, t0, 10, 0.6)
+  for (const k of ['H2O', 'COONa']) g[k].style.opacity = 1
+  // acid nhường H⁺ (H sáng hồng, mang dấu +, COO mang dấu −) · base nhận H⁺ (OH sáng xanh, mang dấu −, Na mang dấu +)
+  const daBay = t >= m.a_cung1, xongNuoc = t >= m.a_nuoc, xongMuoi = t >= m.a_coona, tom = t >= m.a_tom
+  g.H.classList.toggle('sang', t >= m.a_acid && !daBay); g.OH.classList.toggle('sang', t >= m.a_base && t < m.a_nuoc)
+  for (const [e, t0] of [[g.H, m.a_acid], [g.O2, m.a_acid], [g.Na, m.a_base], [g.OH, m.a_base]]) e.querySelector('.q').style.opacity = r3(tien(t, t0, 0.25) * (tom ? 0 : 1))
+  // đã dùng ⇒ mờ đi (H đã bay sang OH, OH đã thành nước, COO + Na đã gộp); tổng kết ⇒ phương trình đọc lại bình thường
+  const mo = (e, t0) => { if (t >= t0 && !tom) e.style.opacity = r3(Number(e.style.opacity) * (1 - 0.62 * tien(t, t0, 0.4))) }
+  mo(g.H, m.a_cung0 + 0.1); mo(g.OH, m.a_gH2O); mo(g.C, m.a_gCN); mo(g.O1, m.a_gCN); mo(g.O2, m.a_gCN); mo(g.Na, m.a_gCN3 - 0.3)
   // nhãn theo lời
-  datXY(a.nhC, xR - 6, Y + 96); xuat(a.nhC, t, m.a_cooh + 0.6); tat(a.nhC, t, m.a_acid - 0.3)
-  datXY(a.nhAcid, xR - 6, Y + 96); xuat(a.nhAcid, t, m.a_acid); tat(a.nhAcid, t, m.a_coona)
-  datXY(a.nhBase, W - 236, Y + 96); xuat(a.nhBase, t, m.a_base); tat(a.nhBase, t, m.a_coona)
-  // cung mũi tên H → OH (vẽ dần như nét bút)
-  const pc = eOut(tien(t, m.a_bay - 0.25, 0.7)), ex1 = xOH + 36, ey1 = Y - 8
-  a.cung.setAttribute('d', `M ${hx0 + 16} ${Y - 6} Q ${cx} ${cy - 30} ${ex1} ${ey1}`); a.cung.setAttribute('stroke-dashoffset', String(r3(1 - pc)))
-  const moCung = r3(1 - tien(t, m.a_nuoc, 0.4)); a.cung.setAttribute('opacity', String(moCung))
-  const goc = Math.atan2(ey1 - (cy - 30), ex1 - cx) * 180 / Math.PI
-  a.muiCung.setAttribute('transform', `translate(${ex1},${ey1}) rotate(${r3(goc)})`); a.muiCung.setAttribute('opacity', String(pc >= 0.97 ? moCung : 0))
-  // H⁺ + OH⁻ ⇒ H₂O (giọt nổi lên) · Na⁺ gộp vào COO⁻ ⇒ COONa
-  const pn = lo(t - m.a_nuoc, 2.0, 0.45), noi = Math.min(36, Math.max(0, t - m.a_nuoc - 0.8) * 12)
-  datXY(a.nuoc, xOH - 36, Y - 18 - noi); a.nuoc.style.transform = `scale(${r3(0.3 + 0.7 * kep(pn, 0, 1.2))})`; a.nuoc.style.opacity = r3(kep(pn * 1.4))
-  datXY(a.nhNuoc, xOH - 70, Y + 96 - noi); xuat(a.nhNuoc, t, m.a_nuoc + 0.3); tat(a.nhBase, t, m.a_nuoc - 0.2, 0.2)
-  datXY(a.nhCoona, xR - 6, Y + 96); xuat(a.nhCoona, t, m.a_coona + 0.9)
-  datXY(a.tom, 0, 420); xuat(a.tom, t, m.a_tom)
+  const o = oA(Z)
+  if (o) {
+    const duoi = (k, dy = 0) => o[k].y + o[k].h + 10 + dy
+    datXY(a.nhAcid, o.C.x - 6, duoi('C')); xuat(a.nhAcid, t, m.a_acid); tat(a.nhAcid, t, m.a_nuoc + 1.2)
+    datXY(a.nhBase, Math.min(Z.W - 236, o.Na.x - 6), duoi('Na', 58)); xuat(a.nhBase, t, m.a_base); tat(a.nhBase, t, m.a_nuoc + 1.2)
+    datXY(a.nhNuoc, Math.min(Z.W - 300, o.H2O.x - 20), duoi('H2O')); xuat(a.nhNuoc, t, m.a_nuoc + 0.2)
+    datXY(a.nhCoona, Math.min(Z.W - 330, o.COONa.x - 60), duoi('COONa', 58)); xuat(a.nhCoona, t, m.a_coona + 0.2)
+    // MŨI TÊN CONG H → OH: vẽ dần ĐÚNG nhịp nét cong Thầy vẽ (a_cung0 … a_cung1); bản sao H⁺ chạy theo đầu mũi tên
+    const x0 = o.H.x + o.H.w / 2, x1 = o.OH.x + o.OH.w * 0.4, yC = o.H.y + 2, cx = (x0 + x1) / 2, cy = yC - 120
+    const pc = tien(t, m.a_cung0, Math.max(0.3, m.a_cung1 - m.a_cung0)), mCung = r3(1 - tien(t, m.a_gH2O, 0.4))
+    a.cung.setAttribute('d', `M ${x0} ${yC} Q ${cx} ${cy} ${x1} ${yC}`); a.cung.setAttribute('stroke-dashoffset', String(r3(1 - pc))); a.cung.setAttribute('opacity', String(mCung))
+    a.muiCung.setAttribute('transform', `translate(${x1},${yC}) rotate(${r3((Math.atan2(yC - cy, x1 - cx) * 180) / Math.PI)})`); a.muiCung.setAttribute('opacity', String(t >= m.a_muiCung ? mCung : 0))
+    const bz = (p, A0, A1, A2) => (1 - p) * (1 - p) * A0 + 2 * (1 - p) * p * A1 + p * p * A2
+    // H⁺ bay theo cung, đậu trên OH; khi Thầy viết H₂O thì H⁺ + OH⁻ cùng bay vào ô H₂O
+    const vao = eInOut(tien(t, m.a_gH2O - 0.35, 0.6)), hX = lerp(bz(pc, o.H.x, cx - o.H.w / 2, o.OH.x - 4), o.H2O.x, vao), hY = lerp(bz(pc, o.H.y, cy - 10, o.OH.y - o.OH.h * 0.75), o.H2O.y, vao)
+    datXY(a.bayH, hX, hY); a.bayH.style.opacity = r3(tien(t, m.a_cung0, 0.12) * (1 - tien(t, m.a_gH2O + 0.25, 0.2)))
+    datXY(a.bayOH, lerp(o.OH.x, o.H2O.x + o.H2O.w * 0.35, vao), lerp(o.OH.y, o.H2O.y, vao)); a.bayOH.style.opacity = r3(tien(t, m.a_gH2O - 0.35, 0.1) * (1 - tien(t, m.a_gH2O + 0.25, 0.2)))
+    // gạch dưới OH (lúc Thầy gạch trên bảng) · khung quanh H₂O (lúc Thầy vẽ khung)
+    datXY(a.gach, o.OH.x - 2, o.OH.y + o.OH.h - 4); a.gach.style.width = `${o.OH.w + 4}px`; a.gach.style.transform = `scaleX(${r3(eOut(tien(t, m.a_gachOH, 0.35)))})`; a.gach.style.opacity = r3(1 - tien(t, m.a_gH2O, 0.4))
+    datXY(a.hop, o.H2O.x - 10, o.H2O.y - 4); a.hop.style.width = `${o.H2O.w + 20}px`; a.hop.style.height = `${o.H2O.h + 8}px`; a.hop.style.opacity = r3(tien(t, m.a_hop, 0.3))
+    // COO (từ COOH) + Na (từ NaOH) bay vào ô COONa đúng lúc Thầy viết COONa
+    const vC = eInOut(tien(t, m.a_gCN - 0.5, 0.6)), vN = eInOut(tien(t, m.a_gCN3 - 0.5, 0.6))
+    datXY(a.bayCOO, lerp(o.C.x, o.COONa.x, vC), lerp(o.C.y, o.COONa.y, vC) - 70 * Math.sin(Math.PI * vC)); a.bayCOO.style.opacity = r3(tien(t, m.a_gCN - 0.5, 0.1) * (1 - tien(t, m.a_gCN + 0.15, 0.2)))
+    datXY(a.bayNa, lerp(o.Na.x, o.CN_Na.x, vN), lerp(o.Na.y, o.CN_Na.y, vN) - 50 * Math.sin(Math.PI * vN)); a.bayNa.style.opacity = r3(tien(t, m.a_gCN3 - 0.5, 0.1) * (1 - tien(t, m.a_gCN3 + 0.15, 0.2)))
+  }
+  g.H2O.classList.toggle('sang', xongNuoc && !tom); g.COONa.classList.toggle('sang', xongMuoi && !tom)
+  datXY(a.tom, 0, 330); xuat(a.tom, t, m.a_tom)
 }
 
 function veBazoBC(Z, m, t) {
@@ -170,12 +193,18 @@ function veBazoBC(Z, m, t) {
 }
 
 function veBazoD(Z, m, t) {
-  const d = Z.dd, Y = 30, X = 30, wG = 336
-  // Gly: H của nhóm COOH bật ra (− 1), Na bay vào đúng chỗ đó (+ 23) ⇒ Gly-Na
-  xuat(d.goc, t, m.d_hien); datXY(d.goc, X, Y)
-  const ra = eOut(tien(t, m.d_na, 0.6)), vao = eInOut(tien(t, m.d_na + 0.45, 0.7))
-  d.h.style.opacity = r3(kep(lo(t - m.d_hien, 2.2, 0.55) * 1.5) * (1 - tien(t, m.d_na + 0.9, 0.3))); datXY(d.h, X + wG + ra * 50, Y - ra * 70); d.h.classList.toggle('sang', t >= m.d_na)
-  d.na.style.opacity = r3(tien(t, m.d_na + 0.4, 0.2)); datXY(d.na, lerp(Z.W - 110, X + wG, vao), lerp(Y - 80, Y, vao)); d.na.classList.toggle('sang', vao > 0.98)
+  const d = Z.dd, Y = 30, X = 30
+  // Gly: H của nhóm COOH bật ra (− 1), Na bay vào ĐÚNG ô của H (+ 23) ⇒ Gly-Na. Ô H đo từ dòng chữ (một lần, khi đã hiện + phông đã nạp).
+  datXY(d.hang, X, Y); xuat(d.hang, t, m.d_hien)
+  const oH = d.hang.lastChild
+  if (!Z.oD && d.hang.offsetWidth && (!document.fonts || document.fonts.status === 'loaded')) Z.oD = { x: d.hang.offsetLeft + oH.offsetLeft, y: d.hang.offsetTop + oH.offsetTop }
+  const ra = eOut(tien(t, m.d_na, 0.6)), vao = eInOut(tien(t, m.d_na + 0.45, 0.7)), daGan = vao >= 1
+  oH.textContent = daGan ? 'Na' : 'H'; oH.className = `bz-g ${daGan ? 'na' : 'h'}`; oH.classList.toggle('sang', daGan || (t >= m.d_na && ra < 0.05))
+  oH.style.visibility = t >= m.d_na && !daGan ? 'hidden' : ''
+  if (Z.oD) {
+    datXY(d.h, Z.oD.x + ra * 50, Z.oD.y - ra * 70); d.h.style.opacity = r3(tien(t, m.d_na, 0.05) * (1 - tien(t, m.d_na + 0.9, 0.3)))
+    datXY(d.na, lerp(Z.W - 110, Z.oD.x, vao), lerp(Y - 80, Z.oD.y, vao)); d.na.style.opacity = r3(tien(t, m.d_na + 0.4, 0.2) * (daGan ? 0 : 1))
+  }
   datXY(d.tenM, X, Y + 84); xuat(d.tenM, t, m.d_coona)
   datXY(d.tru, X, Y + 150); xuat(d.tru, t, m.d_tru1)
   datXY(d.cong, X + 330, Y + 150); xuat(d.cong, t, m.d_cong23)
