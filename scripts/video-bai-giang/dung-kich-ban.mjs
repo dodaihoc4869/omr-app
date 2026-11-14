@@ -18,7 +18,8 @@ const ch = JSON.parse(readFileSync(cauHinhTep, 'utf8'))
 const lang = readFileSync(join(duLieu, 'lang-35.txt'), 'utf8').trim().split('\n').map((d) => d.split(/\s+/).map(Number)).filter((x) => x.length === 2 && x[1] > x[0])
 
 // ── nhịp dựng ──
-const MO_DAU = 6.5, THE_CHUONG = 2.4, NOI_CAU = 0.25, NGUNG_DAI = 0.55, NGUNG_GIU = 0.1, DUOI_CANH = 0.7, KET = 11
+// Nhạc 112 BPM: mở đầu đúng 4 ô nhịp ⇒ chũm chọe của ô 5 rơi đúng lúc thẻ chương đầu vào
+const NHIP = 112, MO_DAU = 4 * 4 * 60 / NHIP, THE_CHUONG = 2.4, NOI_CAU = 0.25, NGUNG_DAI = 0.55, NGUNG_GIU = 0.1, DUOI_CANH = 0.7, KET = 11
 const DAU_TRUOC = 0.08, DUOI_SAU = 0.12
 
 const trongLang = (t) => lang.find(([a, b]) => t >= a && t <= b)
@@ -45,7 +46,9 @@ function catCau(a, b) {
 // ── nét phấn trang 3 (mọi cảnh của buổi K12 trên bảng cuộn này) ──
 const tr = trang.trang.find((t) => t.net.length > 100) ?? trang.trang[trang.trang.length - 1]
 const netBox = tr.net.map((n) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y } return { t0: n.t / 1000, t1: (n.t + (n.p[n.p.length - 1] || 0)) / 1000, x0, y0, x1, y1 } })
-const BANG_W = tr.rong, BANG_H = tr.cao, KHUNG_TI = 1140 / 760
+// BỐ CỤC MỘT NGUỒN (khung.js đọc từ kich-ban.bo): bảng phấn trái, cột hình minh hoạ phải — cột rộng để hình đọc rõ trên điện thoại
+const BO = { bang: [56, 118, 950, 760], cot: [1036, 118, 828, 760] }
+const BANG_W = tr.rong, BANG_H = tr.cao, KHUNG_TI = BO.bang[2] / BO.bang[3]
 function hopNet(s0, s1) {
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, n = 0
   for (const b of netBox) { if (b.t1 < s0 || b.t0 > s1) continue; n++; x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0); x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1) }
@@ -74,7 +77,10 @@ function khungQuay(h) {
 // ── dựng dòng thời gian ──
 const doan = [], sfx = [], giong = []
 let t = 0
-doan.push({ loai: 'mo-dau', t0: 0, t1: MO_DAU, ...ch.moDau }); sfx.push({ t: 0.35, loai: 'vut' }, { t: 1.1, loai: 'dap' }, { t: 2.2, loai: 'bop' })
+// mục lục «Hôm nay em học» (dấu hiệu cấu trúc bài): mỗi phần một dòng
+const muc = ch.canh.map((c) => [c.so, c.tieuDe, c.mau])
+doan.push({ loai: 'mo-dau', t0: 0, t1: MO_DAU, ...ch.moDau, muc }); sfx.push({ t: 0.35, loai: 'vut' }, { t: 1.1, loai: 'dap' }, { t: 2.2, loai: 'bop' }, { t: 4.45, loai: 'vut' })
+muc.forEach((_, i) => sfx.push({ t: 5.05 + i * 0.32, loai: 'bip' }))
 t = MO_DAU
 for (const cc of ch.canh) {
   const c = nk.canh.find((x) => x.id === cc.id)
@@ -109,11 +115,15 @@ for (const cc of ch.canh) {
   canh.t1 = t
   // sự kiện hiện thẻ / điểm nhấn / phân tử theo đầu câu
   const dauCau = (i) => canh.cau.find((x) => x.i === i)
+  // LỘ ĐÁP ÁN đúng lúc Thầy nói chữ cuối câu ("…là 4a"): đáy đoạn giọng cuối của câu − 0,55 s
+  if (canh.doVui) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t1 - 0.55; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
   const moc = (dong, frac) => { const q = dauCau(dong); return q ? q.t0 + (frac != null ? frac * (q.t1 - q.t0) : 0.35) : null }
   for (const s of cc.su ?? []) { const tt = moc(s.dong, s.frac); if (tt == null) continue; canh.su.push({ ...s, t: tt }); sfx.push({ t: tt, loai: s.loai === 'lon' || s.loai === 'dau' ? 'dap' : 'bop' }) }
   // HOẠT HOẠ chi tiết của cảnh: mốc = [câu, phần trăm độ dài câu] ⇒ giây trên video
   if (cc.hoat) {
     canh.hoat = { loai: cc.hoat.loai, cao: cc.hoat.cao, moc: Object.fromEntries(Object.entries(cc.hoat.moc).map(([k, [dong, frac]]) => [k, moc(dong, frac)])) }
+    // 4 HCl bay vào + bộ đếm lên đủ 4a NGAY TRƯỚC lúc lộ đáp án (không lướt qua «3a» khi thẻ đã sáng)
+    if (canh.doVui && 'hcl' in canh.hoat.moc) canh.hoat.moc.hcl = canh.doVui.tMo - 1.35
     const TD = { 'thu-vien': { hien: 'vut', ala: 'bip', gly: 'bip', val: 'bip', lys: 'bip', lysN2: 'bip', glu: 'bip', gluC2: 'bip', sang: 'bop' }, 'cau-truc': { hien: 'vut', dk1: 'dung-nhe', alpha: 'bip', matOH: 'bop', matH: 'bop', noi: 'vut' }, chuoi: { hien: 'vut', cat: 'bot', n1: 'bip', n2: 'bip', n3: 'bip', n4: 'bip', tong: 'dap', hcl: 'vut', lys: 'bop' } }[cc.hoat.loai] ?? {}
     for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
     if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
@@ -135,7 +145,6 @@ for (const cc of ch.canh) {
   }
   for (const i of cc.nhan ?? []) { const q = dauCau(i); if (q) canh.nhanManh.push({ t0: q.t0, t1: q.t1 }) }
   if (cc.phanTu) { canh.phanTu = Object.fromEntries(Object.entries(cc.phanTu).map(([k, i]) => [k, dauCau(i).t0 + 0.4])); for (const k of ['hien', 'matOH', 'matH']) sfx.push({ t: canh.phanTu[k], loai: 'bop' }); sfx.push({ t: canh.phanTu.noi + 0.9, loai: 'dap' }, { t: canh.phanTu.nuoc + 1.2, loai: 'bot' }) }
-  if (canh.doVui) { const q = dauCau(canh.doVui.moDong); canh.doVui.tMo = q.t0 + 1.0; sfx.push({ t: canh.doVui.tMo, loai: 'dung' }) }
   // khung máy quay: theo nét Thầy viết quanh từng câu; câu không viết ⇒ giữ khung trước
   const hopCanh = hopNet(canh.cau[0].s0 - 25, canh.cau[canh.cau.length - 1].s1) ?? hopNet(canh.cau[0].s0 - 120, canh.cau[0].s0)
   let kTruoc = hopCanh ? khungQuay(hopCanh) : [0, 0, BANG_W, BANG_W / KHUNG_TI]
@@ -151,7 +160,7 @@ for (const cc of ch.canh) {
 doan.push({ loai: 'ket', t0: t, t1: t + KET, ...ch.ket }); sfx.push({ t: t + 0.02, loai: 'vut' }); ch.ket.y.forEach((_, i) => sfx.push({ t: t + 1.3 + i * 0.9, loai: 'bop' })); sfx.push({ t: t + KET - 3.6, loai: 'dap' })
 t += KET
 
-const kb = { fps: 30, rong: 1920, cao: 1080, tong: Math.round(t * 1000) / 1000, ten: ch.ten, lop: ch.lop, ngay: ch.ngay, doan, giong, sfx: sfx.sort((a, b) => a.t - b.t) }
+const kb = { fps: 30, rong: 1920, cao: 1080, nhip: NHIP, bo: BO, tong: Math.round(t * 1000) / 1000, ten: ch.ten, lop: ch.lop, ngay: ch.ngay, doan, giong, sfx: sfx.sort((a, b) => a.t - b.t) }
 writeFileSync(join(ra, 'kich-ban.json'), JSON.stringify(kb))
 writeFileSync(join(ra, 'net.json'), JSON.stringify({ rong: tr.rong, cao: tr.cao, mau: tr.mau, net: tr.net }))
 const giay = (x) => `${Math.floor(x / 60)}:${String(Math.round(x % 60)).padStart(2, '0')}`

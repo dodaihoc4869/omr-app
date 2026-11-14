@@ -41,7 +41,7 @@ ghi_wav(f'{ra}/giong-tho.wav', giong)
 chay('ffmpeg', '-y', '-v', 'error', '-i', f'{ra}/giong-tho.wav', '-af', 'highpass=f=85,afftdn=nf=-28,equalizer=f=3200:t=q:w=1.2:g=2.5,acompressor=threshold=-22dB:ratio=3:attack=5:release=140:makeup=2.5,alimiter=limit=0.89', '-ar', str(SR), f'{ra}/giong.wav')
 
 # ── 2) NHẠC (MIDI tự viết) ──
-BPM, PPQ = 112, 480
+BPM, PPQ = kb.get('nhip', 112), 480
 BEAT = 60 / BPM; BAR = 4 * BEAT
 su = []  # (tick, thứ tự, bytes)
 def tk(giay): return int(round(giay / BEAT * PPQ))
@@ -59,12 +59,14 @@ doan = kb['doan']
 ket = next(d for d in doan if d['loai'] == 'ket')
 dv = next((d['doVui'] for d in doan if d['loai'] == 'canh' and d.get('doVui')), None)
 so_o = int((T - 1.2) // BAR)  # ô nhịp hợp âm cuối
+mo_dau_doan = next(d for d in doan if d['loai'] == 'mo-dau')
+N_MO = max(2, round(mo_dau_doan['t1'] / BAR))  # số ô nhịp mở đầu (kịch bản đặt mở đầu đúng N ô)
 o_ket = int(ket['t0'] // BAR)
 for o in range(so_o + 1):
     t0 = o * BAR
     bass, hop = HOP[o % 4]
     cuoi = o == so_o
-    mo_dau = o < 3
+    mo_dau = o < N_MO
     lang = dv is not None and t0 + BAR > dv['t0'] - 0.3 and t0 < dv['t1']
     giai = mo_dau or o >= o_ket
     if cuoi:  # hợp âm Fa ngân + chũm chọe
@@ -92,9 +94,9 @@ for o in range(so_o + 1):
             if s is None: continue
             not_(4, t0 + i * BEAT / 2, BEAT / 2 * 0.95, s, 92); not_(5, t0 + i * BEAT / 2, BEAT / 2 * 0.6, s + 12, 46)
     # trống
-    if o >= 2 or o >= o_ket:
-        if o == 3 or o == o_ket: not_(9, t0, BEAT * 2, 49, 92)
-        if o == 2:  # dồn trống vào cảnh
+    if o >= N_MO - 1 or o >= o_ket:
+        if o == N_MO or o == o_ket: not_(9, t0, BEAT * 2, 49, 92)
+        if o == N_MO - 1:  # dồn trống vào thẻ chương đầu
             for i in range(8): not_(9, t0 + 2 * BEAT + i * BEAT / 4, BEAT / 4, 38, 40 + i * 9)
             not_(9, t0, BEAT, 36, 90)
             continue

@@ -161,3 +161,39 @@ em, .nhan { font-style: normal; color: var(--mau, var(--vang)); font-weight: 800
 .cq-d .pt i { font-style: normal; display: inline-block; margin-right: 10px; }
 .cq-nhan-lys { position: absolute; left: 6px; top: 594px; font-size: 22px; font-weight: 700; color: var(--phan-mo); }
 .cq-nhan-lys em { color: #fda4af; }
+
+/* ═══ BẢN 3: bố cục cột rộng (đọc rõ trên điện thoại) + mục lục mở đầu ═══ */
+#mo-dau-khoi { position: absolute; inset: 0; transform-origin: 50% 36%; }
+#mo-muc { position: absolute; left: 50%; top: 330px; width: 1180px; margin-left: -590px; opacity: 0; }
+#mo-muc .mm-ten { font-size: 34px; font-weight: 800; letter-spacing: .22em; color: var(--ngoc); text-transform: uppercase; margin-bottom: 26px; }
+.mm-dong { display: flex; align-items: center; gap: 26px; margin-bottom: 20px; padding: 18px 28px; border-radius: 26px; background: rgba(28, 42, 48, .92); box-shadow: inset 0 0 0 1.5px var(--vien), 0 16px 40px rgba(0, 0, 0, .35); font-size: 44px; font-weight: 800; }
+.mm-dong b { flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 22px; color: #172126; font-size: 34px; font-weight: 900; }
+#pt .m { font-size: 46px; }
+#pt .tieu-pt { font-size: 38px; }
+#pt .nhan-pt { font-size: 28px; }
+#pt .nhan-lk, #pt .nhan-nuoc { font-size: 34px; }
+#pt .nuoc { width: 170px; height: 170px; font-size: 50px; }
+.the { font-size: 34px; }
+.the.tieu-de { font-size: 44px; }
+/* thư viện (cột 828) */
+.tv .tv-giai { font-size: 26px; }
+.tv .o { width: 40px; height: 40px; font-size: 24px; }
+.tv-hang { height: 104px; grid-template-columns: 110px 1fr 104px; }
+.tv-ten { font-size: 42px; }
+.tv-ct { font-size: 32px; }
+.tv-dem b { font-size: 24px; }
+/* cấu trúc */
+.ct-dk span { font-size: 30px; padding: 12px 18px; }
+.ct-dk b { width: 42px; height: 42px; font-size: 24px; }
+/* chuỗi (cột 828) */
+.cq-khoi { width: 230px; height: 120px; }
+.cq-khoi b { font-size: 54px; }
+.cq-lk { width: 55px; height: 12px; }
+.cq-giot { width: 76px; height: 86px; font-size: 22px; }
+.cq-n { width: 62px; height: 62px; font-size: 30px; }
+.cq-so { width: 38px; height: 38px; font-size: 22px; }
+.cq-hcl { font-size: 26px; padding: 5px 14px; border-radius: 14px; }
+.cq-dem { top: 330px; }
+.cq-d { font-size: 38px; padding: 10px 22px; }
+.cq-d span { min-width: 112px; }
+.cq-nhan-lys { top: 568px; font-size: 28px; }

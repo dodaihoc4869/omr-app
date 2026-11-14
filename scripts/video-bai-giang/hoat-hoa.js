@@ -19,7 +19,7 @@ function dungThuVien(d, goc) {
   d.hoatNeo = {}
   d.tv = TV.map((r, i) => {
     const h = tao('div', 'tv-hang', goc, `<div class="tv-ten">${r.ten}</div><div class="tv-ct">${r.ct.replace(/<n>/g, '<span class="g n">').replace(/<c>/g, '<span class="g c">').replace(/<\/[nc]>/g, '</span>')}</div><div class="tv-dem"><b class="dn">0 N</b><b class="dc">0 C</b></div>`)
-    h.style.top = `${70 + i * 114}px`; d.hoatNeo[r.k] = h
+    h.style.top = `${62 + i * 116}px`; d.hoatNeo[r.k] = h
     return { ...r, h, n: [...h.querySelectorAll('.g.n')], c: [...h.querySelectorAll('.g.c')], dn: h.querySelector('.dn'), dc: h.querySelector('.dc') }
   })
 }
@@ -66,7 +66,8 @@ const LK = [['n1', 'ca1'], ['ca1', 'h_ca1'], ['ca1', 'r1'], ['ca1', 'c1'], ['c1'
 const MAU_NT = { c: ['#56656c', '#2b373c', '#f4efe4'], h: ['#ffffff', '#c9d1d3', '#22303a'], o: ['#ff9a9a', '#e05a5a', '#2a1215'], n: ['#b5ceff', '#5d86e0', '#0f1d3a'], r: ['#ddd2ff', '#9d86f0', '#1e1440'], 'nhom-n': ['#b5ceff', '#5d86e0', '#0f1d3a'], 'nhom-c': ['#ffc1c8', '#e0788a', '#2a1215'] }
 function dungCauTruc(d, goc) {
   goc.classList.add('ct')
-  const svg = svgEl('svg', { viewBox: '0 0 760 600', width: 632, height: 499, class: 'ct-svg' }, goc)
+  const rong = (typeof COT !== 'undefined' && COT.w) || 828
+  const svg = svgEl('svg', { viewBox: '0 70 760 420', width: rong, height: Math.round(rong * 420 / 760), class: 'ct-svg' }, goc)
   const defs = svgEl('defs', {}, svg)
   for (const [k, [a, b]] of Object.entries(MAU_NT)) { const g = svgEl('radialGradient', { id: `cau-${k}`, cx: '35%', cy: '30%', r: '70%' }, defs); svgEl('stop', { offset: '0%', 'stop-color': a }, g); svgEl('stop', { offset: '100%', 'stop-color': b }, g) }
   const f = svgEl('filter', { id: 'phat-sang', filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 960, height: 800 }, defs); svgEl('feGaussianBlur', { stdDeviation: '6', result: 'b' }, f); const mg = svgEl('feMerge', {}, f); svgEl('feMergeNode', { in: 'b' }, mg); svgEl('feMergeNode', { in: 'SourceGraphic' }, mg)
@@ -74,21 +75,21 @@ function dungCauTruc(d, goc) {
   const C = { svg, nt: {}, lk: [], nhan: {} }
   for (const [k, nhan, loai, x, y, mx] of NT) {
     const g = svgEl('g', {}, lopNt), nhom = loai.startsWith('nhom')
-    const r = loai === 'h' ? 17 : nhom ? 0 : 25
-    const hinh = nhom ? svgEl('rect', { x: -48, y: -26, width: 96, height: 52, rx: 26, fill: `url(#cau-${loai})` }, g) : svgEl('circle', { r, fill: `url(#cau-${loai})` }, g)
+    const r = loai === 'h' ? 19 : nhom ? 0 : 28
+    const hinh = nhom ? svgEl('rect', { x: -52, y: -28, width: 104, height: 56, rx: 28, fill: `url(#cau-${loai})` }, g) : svgEl('circle', { r, fill: `url(#cau-${loai})` }, g)
     const vong = svgEl('circle', { r: (r || 40) + 12, fill: 'none', stroke: MV, 'stroke-width': 4, opacity: 0, filter: 'url(#phat-sang)' }, g)
-    const chu = svgEl('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': nhom ? 26 : loai === 'h' ? 19 : 24, 'font-weight': 800, fill: MAU_NT[loai][2] }, g); chu.textContent = nhan
+    const chu = svgEl('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': nhom ? 27 : loai === 'h' ? 21 : 27, 'font-weight': 800, fill: MAU_NT[loai][2] }, g); chu.textContent = nhan
     C.nt[k] = { g, hinh, vong, x, y, x0: x, y0: y, mx, loai }
   }
   for (const [a, b, kep2] of LK) C.lk.push({ a, b, l: svgEl('line', { stroke: '#cfd8dc', 'stroke-width': 7, 'stroke-linecap': 'round' }, lopLk), l2: kep2 ? svgEl('line', { stroke: '#cfd8dc', 'stroke-width': 7, 'stroke-linecap': 'round' }, lopLk) : null })
   C.lkMoi = svgEl('line', { stroke: MV, 'stroke-width': 9, 'stroke-linecap': 'round', filter: 'url(#phat-sang)' }, lopLk)
   const nhanSvg = (k, x, y, chu, mau, co = 24) => { const e = svgEl('text', { x, y, 'text-anchor': 'middle', 'font-size': co, 'font-weight': 800, fill: mau }, lopNhan); e.textContent = chu; C.nhan[k] = e; return e }
-  nhanSvg('mx1', 230, 150, 'mắt xích 1 (bên trái)', '#b9c3c0', 24); nhanSvg('mx2', 560, 150, 'mắt xích 2 (bên phải)', '#b9c3c0', 24)
-  nhanSvg('a1', 160, 192, 'Cα', MV, 24); nhanSvg('a2', 598, 192, 'Cα', MV, 24)
-  nhanSvg('oh', 352, 248, 'mất OH', MC, 26); nhanSvg('h2', 438, 372, 'mất H', MC, 26)
-  nhanSvg('lk', 330, 455, 'liên kết peptide', MV, 30); nhanSvg('nuoc', 622, 130, 'mất 1 H₂O', '#8fd8ee', 30)
+  nhanSvg('mx1', 230, 150, 'mắt xích 1 (bên trái)', '#b9c3c0', 26); nhanSvg('mx2', 560, 150, 'mắt xích 2 (bên phải)', '#b9c3c0', 26)
+  nhanSvg('a1', 160, 190, 'Cα', MV, 28); nhanSvg('a2', 598, 190, 'Cα', MV, 28)
+  nhanSvg('oh', 352, 246, 'mất OH', MC, 29); nhanSvg('h2', 432, 378, 'mất H', MC, 29)
+  nhanSvg('lk', 330, 455, 'liên kết peptide', MV, 33); nhanSvg('nuoc', 628, 132, 'mất 1 H₂O', '#8fd8ee', 32)
   C.cung = svgEl('path', { fill: 'none', stroke: MV, 'stroke-width': 3.5, 'stroke-dasharray': '7 7', opacity: 0 }, lopNhan)
-  C.cungChu = nhanSvg('cung', 205, 465, 'gắn ngay cạnh COOH', MV, 22)
+  C.cungChu = nhanSvg('cung', 205, 468, 'gắn ngay cạnh COOH', MV, 26)
   // dải chữ điều kiện ở đáy
   C.dk = tao('div', 'ct-dk', goc, '<span class="dk-1"><b>1</b>Hai <em>α-amino acid</em></span><span class="dk-2"><b>2</b>Trái <em>mất OH</em>, phải <em>mất H</em></span>')
   d.ct = C; d.hoatNeo = { oh: C.nt.oh_o.g, h2: C.nt.h2.g }
@@ -155,39 +156,37 @@ function veCauTruc(d, t) {
 // ═════════ 3) CHUỖI Gly - Lys - Gly: cắt 2 liên kết bằng 2 H₂O, đếm N 1 → 4, 4 HCl gắn vào N ═════════
 function dungChuoi(d, goc) {
   goc.classList.add('cq')
-  const K = [{ ten: 'Gly', x: 10, n: 1 }, { ten: 'Lys', x: 222, n: 2 }, { ten: 'Gly', x: 434, n: 1 }]
+  const K = [{ ten: 'Gly', x: 14, n: 1 }, { ten: 'Lys', x: 299, n: 2 }, { ten: 'Gly', x: 584, n: 1 }]
   const C = { khoi: [], lk: [], n: [], hcl: [], giot: [] }
-  tao('div', 'cq-ten', goc, 'Gly - Lys - Gly : a')
-  K.forEach((k) => {
+  K.forEach((k, i) => {
     const e = tao('div', 'cq-khoi', goc, `<b>${k.ten}</b>`); e.style.left = `${k.x}px`
     C.khoi.push({ e, x: k.x })
-    for (let j = 0; j < k.n; j++) { const dot = tao('div', 'cq-n', goc, 'N'); const x = k.x + 94 - (k.n - 1) * 34 + j * 68; dot.style.left = `${x - 26}px`; C.n.push({ e: dot, x, khoi: i, so: tao('div', 'cq-so', goc, String(C.n.length + 1)) }) }
+    for (let j = 0; j < k.n; j++) { const dot = tao('div', 'cq-n', goc, 'N'); const x = k.x + 115 - (k.n - 1) * 40 + j * 80; dot.style.left = `${x - 31}px`; C.n.push({ e: dot, x, khoi: i, so: tao('div', 'cq-so', goc, String(C.n.length + 1)) }) }
   })
-  for (let i = 0; i < 2; i++) { const l = tao('div', 'cq-lk', goc); l.style.left = `${198 + i * 212}px`; C.lk.push(l); const g = tao('div', 'cq-giot', goc, 'H₂O'); g.style.left = `${178 + i * 212}px`; C.giot.push(g) }
+  for (let i = 0; i < 2; i++) { const l = tao('div', 'cq-lk', goc); l.style.left = `${244 + i * 285}px`; C.lk.push(l); const g = tao('div', 'cq-giot', goc, 'H₂O'); g.style.left = `${233 + i * 285}px`; C.giot.push(g) }
   C.n.forEach(() => { C.hcl.push(tao('div', 'cq-hcl', goc, 'HCl')) })
   C.dem = tao('div', 'cq-dem', goc, '<div class="cq-d nuoc"><span>H₂O</span><b>: 0a</b></div><div class="cq-d dem"><span>N</span><b class="pt"><i>1</i><i>+ 2</i><i>+ 1</i><i>= 4</i></b></div><div class="cq-d hcl"><span>HCl</span><b>: 0a</b></div>')
   C.nhanLys = tao('div', 'cq-nhan-lys', goc, 'Lys có 2 N ⇒ gắn <em>2 HCl</em>')
   d.cq = C; d.hoatNeo = { nuoc: C.dem.querySelector('.nuoc'), dem: C.dem.querySelector('.dem') }
 }
 function veChuoi(d, t) {
-  const m = d.hoat.moc, C = d.cq, Y = 120
+  const m = d.hoat.moc, C = d.cq, Y = 26
   const tachRa = eInOut(tien(t, m.cat + 0.55, 0.6))
-  d.hoatEl.querySelector('.cq-ten').style.opacity = tien(t, m.hien, 0.3)
   C.khoi.forEach((k, i) => { const p = lo(t - m.hien - i * 0.12, 2.2, 0.55), dx = (i - 1) * 22 * tachRa; k.e.style.top = `${Y}px`; k.e.style.transform = `translateX(${dx}px) scale(${0.6 + 0.4 * p})`; k.e.style.opacity = kep(p * 1.4); k.dx = dx })
-  C.lk.forEach((l) => { const ve = tien(t, m.hien + 0.35, 0.3), dut = tien(t, m.cat + 0.55, 0.2); l.style.top = `${Y + 52}px`; l.style.transform = `scaleX(${ve * (1 - dut)})`; l.style.opacity = ve > 0 ? 1 : 0; l.style.boxShadow = t > m.cat + 0.45 && t < m.cat + 0.75 ? '0 0 24px 8px rgba(143,216,238,.9)' : '' })
-  C.giot.forEach((g, i) => { const roi = eInOut(tien(t, m.cat + i * 0.12, 0.55)), mat = tien(t, m.cat + 0.6 + i * 0.12, 0.25); g.style.top = `${lerp(-40, Y + 30, roi)}px`; g.style.opacity = tien(t, m.cat + i * 0.12, 0.15) * (1 - mat); g.style.transform = `scale(${1 - 0.5 * mat})` })
+  C.lk.forEach((l) => { const ve = tien(t, m.hien + 0.35, 0.3), dut = tien(t, m.cat + 0.55, 0.2); l.style.top = `${Y + 54}px`; l.style.transform = `scaleX(${ve * (1 - dut)})`; l.style.opacity = ve > 0 ? 1 : 0; l.style.boxShadow = t > m.cat + 0.45 && t < m.cat + 0.75 ? '0 0 24px 8px rgba(143,216,238,.9)' : '' })
+  C.giot.forEach((g, i) => { const roi = eInOut(tien(t, m.cat + i * 0.12, 0.55)), mat = tien(t, m.cat + 0.6 + i * 0.12, 0.25); g.style.top = `${lerp(-60, Y + 18, roi)}px`; g.style.opacity = tien(t, m.cat + i * 0.12, 0.15) * (1 - mat); g.style.transform = `scale(${1 - 0.5 * mat})` })
   // đếm N
   const tN = [m.n1, m.n2, m.n3, m.n4]
   C.n.forEach((n, i) => {
     const k = C.khoi[n.khoi], hien = tien(t, m.hien + 0.5, 0.4), tau = t - tN[i]
-    n.e.style.top = `${Y + 140}px`; n.e.style.transform = `translateX(${k.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * Math.exp(-tau * 5) : 0.9})`; n.e.style.opacity = hien
+    n.e.style.top = `${Y + 172}px`; n.e.style.transform = `translateX(${k.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * Math.exp(-tau * 5) : 0.9})`; n.e.style.opacity = hien
     n.e.classList.toggle('sang', tau >= 0)
-    const ps = lo(tau, 2.4, 0.5); n.so.style.left = `${n.x - 16 + (k.dx || 0)}px`; n.so.style.top = `${Y + 92 - ps * 8}px`; n.so.style.opacity = kep(ps * 1.5); n.so.style.transform = `scale(${0.4 + 0.6 * ps})`
+    const ps = lo(tau, 2.4, 0.5); n.so.style.left = `${n.x - 19 + (k.dx || 0)}px`; n.so.style.top = `${Y + 128 - ps * 8}px`; n.so.style.opacity = kep(ps * 1.5); n.so.style.transform = `scale(${0.4 + 0.6 * ps})`
   })
   // HCl bay vào gắn từng N
   C.hcl.forEach((h, i) => {
     const t0 = m.hcl + i * 0.16, p = eInOut(tien(t, t0, 0.6)), n = C.n[i], k = C.khoi[n.khoi]
-    const x = lerp(620, n.x - 34 + (k.dx || 0), p), y = lerp(-30, Y + 214, p)
+    const x = lerp(780, n.x - 40 + (k.dx || 0), p), y = lerp(-40, Y + 250, p)
     h.style.left = `${x}px`; h.style.top = `${y}px`; h.style.opacity = tien(t, t0, 0.12)
     const lysXung = n.khoi === 1 && t >= m.lys ? 0.5 + 0.5 * Math.sin((t - m.lys) * 7) : 0
     h.style.boxShadow = lysXung ? `0 0 ${10 + 22 * lysXung}px rgba(253,164,175,.8)` : ''
@@ -212,10 +211,10 @@ function veDanhDau(d, t, cam, bienDoi) {
   svg.innerHTML = ''
   for (const dd of d.danhDau || []) {
     if (t < dd.t0 || t > dd.t1 + 0.4) continue
-    const [cx, cy, cw] = cam, k = 1140 / cw
+    const [cx, cy, cw] = cam, k = BANG.w / cw
     const le = 18
-    let x0 = 56 + (dd.neo[0] - cx) * k - le, y0 = 118 + (dd.neo[1] - cy) * k - le, x1 = 56 + (dd.neo[2] - cx) * k + le, y1 = 118 + (dd.neo[3] - cy) * k + le
-    x0 = Math.max(64, x0); y0 = Math.max(126, y0); x1 = Math.min(1188, x1); y1 = Math.min(870, y1)
+    let x0 = BANG.x + (dd.neo[0] - cx) * k - le, y0 = BANG.y + (dd.neo[1] - cy) * k - le, x1 = BANG.x + (dd.neo[2] - cx) * k + le, y1 = BANG.y + (dd.neo[3] - cy) * k + le
+    x0 = Math.max(BANG.x + 8, x0); y0 = Math.max(BANG.y + 8, y0); x1 = Math.min(BANG.x + BANG.w - 8, x1); y1 = Math.min(BANG.y + BANG.h - 8, y1)
     if (x1 - x0 < 30 || y1 - y0 < 20) continue
     const a = bienDoi(x0, y0), b = bienDoi(x1, y1)
     const mo = 1 - tien(t, dd.t1, 0.4), ve = eOut(tien(t, dd.t0, 0.5)), noiP = eOut(tien(t, dd.t0 + 0.35, 0.45))
@@ -224,9 +223,10 @@ function veDanhDau(d, t, cam, bienDoi) {
     void r
     const dich = d.hoatNeo && d.hoatNeo[dd.toi]
     if (dich) {
-      const rr = dich.getBoundingClientRect(), ex = rr.left - 10, ey = rr.top + rr.height / 2
+      const rr = dich.getBoundingClientRect(), laNt = dich instanceof SVGElement
+      const ex = laNt ? rr.left + rr.width / 2 : rr.left - 10, ey = laNt ? rr.top - 8 : rr.top + rr.height / 2
       const sx = b[0] + 4, sy = (a[1] + b[1]) / 2
-      const p = svgEl('path', { d: `M ${sx} ${sy} C ${sx + 90} ${sy}, ${ex - 90} ${ey}, ${ex} ${ey}`, fill: 'none', stroke: mau, 'stroke-width': 4, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 - noiP, opacity: mo, filter: 'url(#dd-sang)' }, svg)
+      const p = svgEl('path', { d: laNt ? `M ${sx} ${sy} C ${sx + 120} ${sy}, ${ex} ${ey - 160}, ${ex} ${ey}` : `M ${sx} ${sy} C ${sx + 90} ${sy}, ${ex - 90} ${ey}, ${ex} ${ey}`, fill: 'none', stroke: mau, 'stroke-width': 4, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 - noiP, opacity: mo, filter: 'url(#dd-sang)' }, svg)
       void p
       if (noiP > 0.98) svgEl('circle', { cx: ex, cy: ey, r: 8, fill: mau, opacity: mo }, svg)
     }

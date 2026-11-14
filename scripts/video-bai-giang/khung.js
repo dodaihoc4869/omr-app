@@ -23,7 +23,8 @@ function hat(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x -
 const CHECK = '<svg width="40" height="40" viewBox="0 0 40 40"><path class="dau-tick" d="M9 21 l7 7 l15 -16" fill="none" stroke="#6ee7b7" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="40" stroke-dashoffset="40"/></svg>'
 
 let KB = null, NET = null, CANH = [], DOAN = []
-const BANG = { w: 1140, h: 760 }
+const BANG = { x: 56, y: 118, w: 1140, h: 760 }
+let COT = { x: 1232, y: 118, w: 632, h: 760 }
 let ctx = null, hoaCtx = null
 
 function nap(kb, net) {
@@ -35,6 +36,13 @@ function nap(kb, net) {
     n.hop = [x0, y0, x1, y1]; n.ket = n.t + (n.p[n.p.length - 1] || 0); n.mauVe = (NET.mau[n.m] && NET.mau[n.m][0]) || '#f4efe4'
     const p = new Path2D(); for (let i = 0; i < n.p.length; i += 3) { const x = n.p[i] / 4, y = n.p[i + 1] / 4; if (i === 0) p.moveTo(x, y); else p.lineTo(x, y) } if (n.p.length === 3) p.lineTo(n.p[0] / 4 + 0.1, n.p[1] / 4)
     n.duong = p
+  }
+  if (kb.bo) {
+    const [bx, by, bw, bh] = kb.bo.bang, [cx, cy, cw, chh] = kb.bo.cot
+    Object.assign(BANG, { x: bx, y: by, w: bw, h: bh }); COT = { x: cx, y: cy, w: cw, h: chh }
+    for (const [id, [x, y, w, h]] of [['#bang', kb.bo.bang], ['#cot', kb.bo.cot], ['#pt', kb.bo.cot]]) Object.assign($(id).style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` })
+    Object.assign($('#phan').style, { width: `${bw}px`, height: `${bh}px` })
+    Object.assign($('#dau').style, { left: `${bx + bw - 470}px`, top: `${by + bh - 190}px`, right: 'auto' })
   }
   $('#ten-bai').textContent = `${String(kb.ten || '').toUpperCase()} · ${String(kb.lop || '').replace(/^Live Khối /, 'K')}`
   dungNen(); dungCanh(); dungMoDau(); dungKet(); dungChuong()
@@ -127,6 +135,7 @@ function dungPhanTu(d) {
     a1: m('a1', 'H₂N-CH₂-CO'), b1: m('b1', 'OH'), b2: m('b2', 'H-'), a2: m('a2', 'NH-CH₂-COOH'), gach: m('gach', '-'),
     lk: tao('div', 'lienket', pt), nlk: tao('div', 'nhan-lk', pt, 'liên kết peptide'),
     nuoc: tao('div', 'nuoc', pt, 'H₂O'), nnuoc: tao('div', 'nhan-nuoc', pt, 'mất 1 H₂O'),
+    sp: m('sp', 'H₂N-CH₂-<span class="lk-chu">CO-NH</span>-CH₂-COOH'),
   }
   pt.classList.add('an')
 }
@@ -136,11 +145,12 @@ function doPhanTu(d) {
   P.w = { a1: w(P.a1), b1: w(P.b1), b2: w(P.b2), a2: w(P.a2), gach: w(P.gach) }
   // bề ngang "CO" cuối a1 và "NH" đầu a2 để khoanh đúng liên kết
   const thu = tao('div', 'm', pt, 'CO'); P.w.co = thu.offsetWidth; thu.innerHTML = 'NH'; P.w.nh = thu.offsetWidth; thu.remove()
+  const lkc = P.sp.querySelector('.lk-chu'); P.w.lkX = lkc.offsetLeft; P.w.lkW = lkc.offsetWidth
   pt.classList.add('an')
 }
 function vePhanTu(d, t) {
   const P = d.pt, c = d.phanTu, W = P.w
-  const X0 = 40, R1 = 170, R2 = 360, RS = 560
+  const X0 = 44, R1 = 180, R2 = 380, RS = 570
   const daHien = (k) => t >= c[k]
   const hien = (e, on) => { e.style.display = on ? '' : 'none' }
   const vao = (k, tre = 0) => lo(t - c[k] - tre)
@@ -155,7 +165,7 @@ function vePhanTu(d, t) {
   // các mảnh công thức: vị trí theo pha
   const noi = eInOut(tien(t, c.noi, 0.9)), tachOH = eOut(tien(t, c.matOH, 0.45)), tachH = eOut(tien(t, c.matH, 0.45)), bay = eInOut(tien(t, c.nuoc, 0.75))
   const xNoiA1 = 18, xNoiG = xNoiA1 + W.a1, xNoiA2 = xNoiG + W.gach
-  const BX = 420, BY = 210 // tâm bong bóng nước
+  const BX = 560, BY = 230 // tâm bong bóng nước
   const dat = (e, x, y, s = 1, o = 1) => { e.style.transform = `translate(${x}px,${y}px) scale(${s})`; e.style.opacity = o }
   const p1 = vao('hien'), p2 = vao('hien', 0.25)
   hien(P.a1, daHien('hien')); dat(P.a1, lerp(X0, xNoiA1, noi), lerp(R1, RS, noi) + (1 - p1) * 30, 1, kep(p1 * 1.5))
@@ -168,14 +178,17 @@ function vePhanTu(d, t) {
   hien(P.b2, daHien('hien') && t < c.nuoc + 0.9); P.b2.classList.toggle('do', t >= c.matH)
   dat(P.b2, lerp(xH, BX - W.b2 / 2, bay), lerp(yH, BY - 30, bay), nhay('matH') * (1 - 0.5 * bay), kep(p2 * 1.5) * (1 - tien(t, c.nuoc + 0.6, 0.3)))
   // gạch nối + khoanh liên kết peptide
-  hien(P.gach, t >= c.noi + 0.5); dat(P.gach, xNoiG, RS, 1, tien(t, c.noi + 0.5, 0.3))
+  const lien = tien(t, c.noi + 0.85, 0.12) // mảnh ⇒ chuỗi liền
+  hien(P.gach, t >= c.noi + 0.5 && lien < 1); dat(P.gach, xNoiG, RS, 1, tien(t, c.noi + 0.5, 0.3) * (1 - lien))
+  if (lien > 0) { P.a1.style.opacity = 1 - lien; P.a2.style.opacity = 1 - lien }
+  hien(P.sp, lien > 0); dat(P.sp, xNoiA1, RS, 1, lien)
   const lkP = lo(t - c.noi - 0.95)
-  hien(P.lk, t >= c.noi + 0.95); P.lk.style.left = `${xNoiG - W.co - 10}px`; P.lk.style.top = `${RS - 6}px`; P.lk.style.width = `${W.co + W.gach + W.nh + 20}px`; P.lk.style.height = '58px'; P.lk.style.transform = `scale(${0.7 + 0.3 * lkP})`; P.lk.style.opacity = kep(lkP * 1.3)
-  hien(P.nlk, t >= c.noi + 1.1); P.nlk.style.left = `${xNoiG - W.co - 6}px`; P.nlk.style.top = `${RS + 82}px`; P.nlk.style.opacity = tien(t, c.noi + 1.1, 0.3); P.nlk.style.transform = `translateY(${(1 - eOut(tien(t, c.noi + 1.1, 0.4))) * 16}px)`
+  hien(P.lk, t >= c.noi + 0.95); P.lk.style.left = `${xNoiA1 + W.lkX - 10}px`; P.lk.style.top = `${RS - 6}px`; P.lk.style.width = `${W.lkW + 20}px`; P.lk.style.height = '68px'; P.lk.style.transform = `scale(${0.7 + 0.3 * lkP})`; P.lk.style.opacity = kep(lkP * 1.3)
+  hien(P.nlk, t >= c.noi + 1.1); P.nlk.style.left = `${xNoiA1 + W.lkX - 6}px`; P.nlk.style.top = `${RS + 92}px`; P.nlk.style.opacity = tien(t, c.noi + 1.1, 0.3); P.nlk.style.transform = `translateY(${(1 - eOut(tien(t, c.noi + 1.1, 0.4))) * 16}px)`
   // bong bóng nước
   const bp = lo(t - c.nuoc - 0.7, 2.0, 0.42), noiLen = Math.max(0, t - c.nuoc - 1.4)
-  hien(P.nuoc, t >= c.nuoc + 0.7); P.nuoc.style.left = `${BX - 75}px`; P.nuoc.style.top = `${BY - 75 - Math.min(40, noiLen * 14) + Math.sin(noiLen * 2.2) * 6}px`; P.nuoc.style.transform = `scale(${0.2 + 0.8 * bp})`; P.nuoc.style.opacity = kep(bp * 1.4)
-  hien(P.nnuoc, t >= c.nuoc + 1.0); P.nnuoc.style.left = `${BX + 92}px`; P.nnuoc.style.top = `${BY - 22 - Math.min(40, noiLen * 14)}px`; P.nnuoc.style.opacity = tien(t, c.nuoc + 1.0, 0.3)
+  hien(P.nuoc, t >= c.nuoc + 0.7); P.nuoc.style.left = `${BX - 85}px`; P.nuoc.style.top = `${BY - 85 - Math.min(40, noiLen * 14) + Math.sin(noiLen * 2.2) * 6}px`; P.nuoc.style.transform = `scale(${0.2 + 0.8 * bp})`; P.nuoc.style.opacity = kep(bp * 1.4)
+  hien(P.nnuoc, t >= c.nuoc + 1.0); P.nnuoc.style.left = `${BX - 85}px`; P.nnuoc.style.top = `${BY + 100 - Math.min(40, noiLen * 14)}px`; P.nnuoc.style.opacity = tien(t, c.nuoc + 1.0, 0.3)
 }
 
 // ── ĐỐ VUI ──
@@ -191,7 +204,7 @@ function dungDoVui(d) {
   d.the.unshift({ el: mini, su: { loai: 'the' }, t: v.t1 })
   if (d.hoatEl) d.hoatEl.style.display = ''
   // hạt pháo giấy (cố định theo hạt giống)
-  v.phao = Array.from({ length: 110 }, (_, i) => ({ g: -Math.PI / 2 + (hat(i) - 0.5) * 2.2, v: 650 + hat(i + 1) * 900, q: hat(i + 2) * 8, m: ['#ffd27a', '#6ee7b7', '#fda4af', '#8fb6ff', '#f4efe4'][i % 5], w: 10 + hat(i + 3) * 10, h: 6 + hat(i + 4) * 8 }))
+  v.phao = Array.from({ length: 110 }, (_, i) => ({ g: -Math.PI / 2 + (hat(i) - 0.5) * 2.2, v: 650 + hat(i + 1) * 900, q: hat(i + 2) * 8, m: ['#ffd27a', '#6ee7b7', '#fda4af', '#8fb6ff', '#f4efe4'][i % 5], w: 8 + hat(i + 3) * 8, h: 5 + hat(i + 4) * 6 }))
 }
 function veDoVui(d, t) {
   const v = d.doVui, dv = $('#dv')
@@ -218,7 +231,7 @@ function veDoVui(d, t) {
     const r = v.mini.getBoundingClientRect(), dungO = v.miniO.find((e) => e.dataset.dung === '1').getBoundingClientRect()
     const ox = dungO.left + dungO.width / 2, oy = dungO.top + dungO.height / 2; void r
     for (const p of v.phao) {
-      const x = ox + Math.cos(p.g) * p.v * tau * 0.55, y = oy + Math.sin(p.g) * p.v * tau * 0.55 + 900 * tau * tau * 0.5
+      const r0 = 60 + p.v * tau * 0.55, x = ox + Math.cos(p.g) * r0, y = oy + Math.sin(p.g) * r0 + 900 * tau * tau * 0.5
       hoaCtx.save(); hoaCtx.globalAlpha = kep(1 - (tau - 1.6) / 1); hoaCtx.translate(x, y); hoaCtx.rotate(p.q + tau * 9); hoaCtx.fillStyle = p.m; hoaCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); hoaCtx.restore()
     }
   }
@@ -255,6 +268,8 @@ function dungMoDau() {
   const d = DOAN.find((x) => x.loai === 'mo-dau'); if (!d) return
   $('#mo-ke').textContent = d.kicker; $('#mo-phu').textContent = d.phu; $('#mo-thay').innerHTML = `<i>ĐĐH</i>${thoat(d.thay)}`
   $('#mo-ten').innerHTML = [...d.tieuDe].map((ch) => `<span class="ch">${thoat(ch)}</span>`).join('')
+  const muc = $('#mo-muc'); muc.innerHTML = '<div class="mm-ten">Hôm nay em học</div>'
+  for (const [so, ten, mau] of d.muc || []) tao('div', 'mm-dong', muc, `<b style="background:${MAU[mau] || MAU.vang}">${thoat(so)}</b><span>${thoat(so === '?' ? `${ten}: một câu thử sức cuối bài` : ten)}</span>`)
 }
 function veMoDau(d, t) {
   const mo = $('#mo'); mo.classList.remove('an')
@@ -265,6 +280,13 @@ function veMoDau(d, t) {
   const g = $('#mo-gach'), gw = 760 * eOut(tien(t, 1.9, 0.7)); g.style.width = `${gw}px`; g.style.marginLeft = `${-gw / 2}px`
   const ph = $('#mo-phu'); ph.style.opacity = tien(t, 2.3, 0.5); ph.style.transform = `translateY(${(1 - eOut(tien(t, 2.3, 0.6))) * 24}px)`
   const th = $('#mo-thay'), pt = lo(t - 2.9, 1.8, 0.55); th.style.transform = `translate(-50%, ${(1 - pt) * 60}px)`; th.style.opacity = kep(pt * 1.5)
+  // 4,4 s: tên bài thu lên đỉnh, mục lục «Hôm nay em học» hiện từng dòng
+  const len = eInOut(tien(t, 4.4, 0.6))
+  $('#mo-dau-khoi').style.transform = `translateY(${-len * 215}px) scale(${1 - 0.42 * len})`
+  for (const id of ['#mo-phu', '#mo-thay']) $(id).style.opacity = Number($(id).style.opacity) * (1 - tien(t, 4.4, 0.3))
+  const muc = $('#mo-muc'); muc.style.opacity = tien(t, 4.75, 0.3)
+  muc.querySelector('.mm-ten').style.transform = `translateY(${(1 - eOut(tien(t, 4.75, 0.5))) * 20}px)`
+  muc.querySelectorAll('.mm-dong').forEach((e, i) => { const p = lo(t - 5.05 - i * 0.32, 2.1, 0.55); e.style.transform = `translateX(${(1 - p) * 120}px)`; e.style.opacity = kep(p * 1.5) })
 }
 function dungKet() {
   const d = DOAN.find((x) => x.loai === 'ket'); if (!d) return
