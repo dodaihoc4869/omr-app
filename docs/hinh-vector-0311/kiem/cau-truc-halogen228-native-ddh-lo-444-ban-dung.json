@@ -1,0 +1,29 @@
+[
+  {
+    "i": 228,
+    "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+    "fileNguon": "anh/275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c.png",
+    "svg": "halogen228-native-ddh-e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37.svg",
+    "hashSvg": "e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37",
+    "byteSvg": 4938,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C5-B19-III-1",
+        "de": "Hàng nghìn các dẫn xuất halogen được tách ra từ nhiều loại sinh vật biển khác nhau như rong, tảo biển, san hô,... Chúng có các hoạt tính sinh học rất quý giá như khả năng điều trị bệnh ung thư và nhiều bệnh khác. Cho công thức khung phân tử của dẫn xuất halogen sau: Dẫn xuất halogen tách ra từ tảo biển đỏ chi Laurencia có tác dụng chống ung thư vòm họng.\nPhần trăm khối lượng của nguyên tố bromine trong dẫn xuất halogen trên (Làm tròn kết quả đến hàng phần mười)?",
+        "refs": [
+          {
+            "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+            "where": "11-C5-B19-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "6623ea6558c0714737f949732937d5594e2d3dace92ab556266c6f0901c94187"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10bareC=8mainvertices+2UPmethyl/2Br2Cl/2CCdouble-LEFTupperrayCONTACTverticalstem104.5-lowerCONTACTrightarmCALCULATED94,109.03448/RIGHTinnerrayFREEbothends/ALLregularUPRIGHT-ClcapitalC+lowerl-FIRSTC-FIRSTB/0explicitH-arrow-stereo-charge-caption/isolatedBOTTOMdashUNKNOWNretain-NOTminus/noaddedH-formula-name-percentage-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

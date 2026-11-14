@@ -1,0 +1,29 @@
+{
+  "lo": 444,
+  "main": "9e50886554ddccbd620cde9983096be80d4ca389",
+  "previousMain": "b71484f61d2147023140d25d2f9d3681ff2e34f7",
+  "diffStat": " .claude/skills/video-tom-tat/SKILL.md    | 80 ++++++++++++++++++++++++++++++++\n DIEU-PHOI.md                             |  2 +\n scripts/video-bai-giang/chuan-bi-buoi.sh | 77 ++++++++++++++++++++++++++++++\n scripts/video-bai-giang/gop-asr.py       | 15 ++++++\n scripts/video-bai-giang/hoan-tat-buoi.sh | 35 ++++++++++++++\n scripts/video-bai-giang/kiem-ten.py      | 15 ++++++\n scripts/video-bai-giang/sinh-loi.py      | 25 ++++++++++\n scripts/video-bai-giang/tu-asr.py        | 10 ++++\n scripts/video-bai-giang/ve-bang.py       | 21 +++++++++\n server/src/live-xem-lai-lenh.ts          |  6 ++-\n tests/live-xem-lai-lenh-1111.test.ts     |  9 ++++\n 11 files changed, 293 insertions(+), 2 deletions(-)\n",
+  "files": [
+    ".claude/skills/video-tom-tat/SKILL.md",
+    "DIEU-PHOI.md",
+    "scripts/video-bai-giang/chuan-bi-buoi.sh",
+    "scripts/video-bai-giang/gop-asr.py",
+    "scripts/video-bai-giang/hoan-tat-buoi.sh",
+    "scripts/video-bai-giang/kiem-ten.py",
+    "scripts/video-bai-giang/sinh-loi.py",
+    "scripts/video-bai-giang/tu-asr.py",
+    "scripts/video-bai-giang/ve-bang.py",
+    "server/src/live-xem-lai-lenh.ts",
+    "tests/live-xem-lai-lenh-1111.test.ts"
+  ],
+  "appChanged": false,
+  "serverChanged": true,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "Main9e5088655 mới so443:11files293insert2delete/videoCLI-skill+live-xem-lai-lenh-test-journal/serverchanged/appsrc-Vite-DDHfont-mốcunchanged; khônggộp. Nhật ký phát hànhkhẩn19:07 của MAIN khôngphảilệnhriêngchoviệcvector. LatestmainfullBYNAME-buildspeed bắtbuộc trướcmerge-release."
+}

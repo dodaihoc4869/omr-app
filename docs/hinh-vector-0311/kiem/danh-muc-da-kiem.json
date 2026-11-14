@@ -6607,6 +6607,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c": {
+      "tep": "halogen228-native-ddh-e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37.svg",
+      "hashSvg": "e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37",
+      "byteSvg": 4938,
+      "byteGzip": 1144,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fafdb07fbf91274ebbb869f641a4d482a7608e673794feaa77f5bfbbb10c23cc": {
       "tep": "salicylate-ddh-f6c4c8c5374e3089c24fe4c3251b1a01db89fc3b30d515fd2e1e51b01fbec232.svg",
       "hashSvg": "f6c4c8c5374e3089c24fe4c3251b1a01db89fc3b30d515fd2e1e51b01fbec232",
@@ -10932,6 +10941,20 @@
           "where": "11-C5-B21-III-4.hinh.0.du_lieu",
           "hashDataUrl": "1a70f3530fb281a27faaf196821b4ac264d1aeaac66596196fe97862b05a0daf",
           "vector": "hoa-ddh-d904d8368af109a49febb8f477f941618809ff0c4e9ad71409e7b7d77e5e26f8.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C5-B19-III-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+          "where": "11-C5-B19-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "6623ea6558c0714737f949732937d5594e2d3dace92ab556266c6f0901c94187",
+          "vector": "halogen228-native-ddh-e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37.svg"
         }
       ]
     },
@@ -32607,6 +32630,7 @@
     "11-C5-B21-I-15",
     "11-C5-B21-II-3",
     "11-C5-B21-III-4",
+    "11-C5-B19-III-1",
     "11-C4-ON-I-9",
     "11-C6-B24-I-1",
     "11-C6-B24-I-3",

@@ -1,0 +1,389 @@
+{
+  "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+  "native": [
+    548,
+    246
+  ],
+  "questions": [
+    {
+      "qid": "11-C5-B19-III-1",
+      "de": "Hàng nghìn các dẫn xuất halogen được tách ra từ nhiều loại sinh vật biển khác nhau như rong, tảo biển, san hô,... Chúng có các hoạt tính sinh học rất quý giá như khả năng điều trị bệnh ung thư và nhiều bệnh khác. Cho công thức khung phân tử của dẫn xuất halogen sau: Dẫn xuất halogen tách ra từ tảo biển đỏ chi Laurencia có tác dụng chống ung thư vòm họng.\nPhần trăm khối lượng của nguyên tố bromine trong dẫn xuất halogen trên (Làm tròn kết quả đến hàng phần mười)?",
+      "refs": [
+        {
+          "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+          "where": "11-C5-B19-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "6623ea6558c0714737f949732937d5594e2d3dace92ab556266c6f0901c94187"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "10bareC=8mainvertices+2UPmethyl/2Br2Cl/2CCdouble-LEFTupperrayCONTACTverticalstem104.5-lowerCONTACTrightarmCALCULATED94,109.03448/RIGHTinnerrayFREEbothends/ALLregularUPRIGHT-ClcapitalC+lowerl-FIRSTC-FIRSTB/0explicitH-arrow-stereo-charge-caption/isolatedBOTTOMdashUNKNOWNretain-NOTminus/noaddedH-formula-name-percentage-answer/nativeapproxNOTsubpixel",
+  "independentSourceAudit": {
+    "i": 228,
+    "assetIndex": 136,
+    "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c.png",
+    "size": [
+      548,
+      246
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "11-C5-B19-III-1",
+        "de": "Hàng nghìn các dẫn xuất halogen được tách ra từ nhiều loại sinh vật biển khác nhau như rong, tảo biển, san hô,... Chúng có các hoạt tính sinh học rất quý giá như khả năng điều trị bệnh ung thư và nhiều bệnh khác. Cho công thức khung phân tử của dẫn xuất halogen sau: Dẫn xuất halogen tách ra từ tảo biển đỏ chi Laurencia có tác dụng chống ung thư vòm họng.\nPhần trăm khối lượng của nguyên tố bromine trong dẫn xuất halogen trên (Làm tròn kết quả đến hàng phần mười)?",
+        "allHinh": [
+          {
+            "hash": "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c",
+            "where": "11-C5-B19-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "6623ea6558c0714737f949732937d5594e2d3dace92ab556266c6f0901c94187"
+          }
+        ],
+        "missingHashes": [
+          "275940264da9582b4b0595105cda0ac6c77db2e038f6e405c29e04f4121cb14c"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/444-228-full3x.png",
+        "/workspace/scratch/444-228-Cl6x.png",
+        "/workspace/scratch/444-228-left12x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "orderedMainChainVertices": [
+        [
+          92,
+          108
+        ],
+        [
+          150,
+          138
+        ],
+        [
+          208,
+          108
+        ],
+        [
+          266,
+          138
+        ],
+        [
+          325,
+          108
+        ],
+        [
+          383,
+          138
+        ],
+        [
+          441,
+          108
+        ]
+      ],
+      "separateCCdoubleRays": [
+        [
+          [
+            332,
+            104
+          ],
+          [
+            384,
+            131
+          ]
+        ]
+      ],
+      "bareMethylBranches": [
+        [
+          [
+            92,
+            108
+          ],
+          [
+            92,
+            48
+          ]
+        ],
+        [
+          [
+            325,
+            108
+          ],
+          [
+            325,
+            48
+          ]
+        ]
+      ],
+      "halogenBonds": [
+        {
+          "path": [
+            [
+              150,
+              138
+            ],
+            [
+              150,
+              186
+            ]
+          ],
+          "literal": "Br",
+          "anchor": "first B",
+          "bbox": [
+            140,
+            189,
+            175,
+            210
+          ]
+        },
+        {
+          "path": [
+            [
+              266,
+              138
+            ],
+            [
+              266,
+              186
+            ]
+          ],
+          "literal": "Br",
+          "anchor": "first B",
+          "bbox": [
+            257,
+            189,
+            291,
+            210
+          ]
+        },
+        {
+          "path": [
+            [
+              441,
+              108
+            ],
+            [
+              441,
+              65
+            ]
+          ],
+          "literal": "Cl",
+          "anchor": "first C",
+          "bbox": [
+            432,
+            38,
+            458,
+            60
+          ]
+        },
+        {
+          "path": [
+            [
+              441,
+              108
+            ],
+            [
+              488,
+              133
+            ]
+          ],
+          "literal": "Cl",
+          "anchor": "first C",
+          "bbox": [
+            491,
+            127,
+            516,
+            150
+          ]
+        }
+      ],
+      "counts": {
+        "C": 10,
+        "Br": 2,
+        "Cl": 2,
+        "CCdouble": 2,
+        "branchMethylBareEndpoints": 2,
+        "explicitH": 0,
+        "explanation": "8ordered mainchainvertices incl left terminalC +2upperbaremethylendpoints. Bond-end nearClglyph not an extra C; no implicitH total inferred."
+      },
+      "styles": {
+        "halogenLabels": "regular upright serif Br and Cl (capitalC lowercase l), no actualbold/italic observed; strongthickthincontrast is native serif design",
+        "bonds": "black uniform1.5–2px approx, no wedges/hashed/stereo",
+        "caption": "NONE"
+      },
+      "unknownRetained": [
+        {
+          "bbox": [
+            510,
+            217,
+            514,
+            218
+          ],
+          "shape": "tinyshort horizontal blackdash",
+          "intent": "UNKNOWN isolatedoutsidefigure ink, not minuscharge/continuation caption"
+        }
+      ],
+      "crop": "No chemical glyph or bond clipped; tinyUNKNOWNdash inside bottomright margin",
+      "leftTerminalCCdoubleRays": [
+        [
+          [
+            31,
+            136
+          ],
+          [
+            92,
+            104.5
+          ]
+        ],
+        [
+          [
+            35,
+            142
+          ],
+          [
+            94,
+            109
+          ]
+        ]
+      ],
+      "leftTopologyCorrection": "UpperleftCCraycontactsverticalmethylstem near92,104–105 ABOVEbranchjunction92,108; lowerCCraycontacts outgoingrightarm near94,109–110. NoCCray forcedintoonecommonapex. Orderedmainchainlistnowstartsbranchjunction92,108; leftterminalC retained byexplicit leftTerminalCCdoubleRays andcount."
+    },
+    "measurementLimits": "Nativeapprox±1–2px eachvertex independently; no equalzigzagnormalization. Mainleftdouble consistsuppermainray to92,108 andseparatelowerray35,143→94,113, retain offset. No atomcounts inferred from naturalproduct name or brominepercentage question.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false,
+    "correctionAudit": [
+      {
+        "old": {
+          "mainFirstEdge": [
+            [
+              32,
+              138
+            ],
+            [
+              92,
+              108
+            ]
+          ],
+          "separateLeftRay": [
+            [
+              35,
+              143
+            ],
+            [
+              94,
+              113
+            ]
+          ]
+        },
+        "new": [
+          [
+            [
+              31,
+              136
+            ],
+            [
+              92,
+              104.5
+            ]
+          ],
+          [
+            [
+              35,
+              142
+            ],
+            [
+              94,
+              109
+            ]
+          ]
+        ],
+        "reason": "OWNnarrow12x /workspace/scratch/444-228-left12x.png confirms asymmetriccontacts, oldrough rayendpoints overlowered by3–4px. New guidesnativeapprox; no native subpixel precision claim; root calculated109.03448 is intersection from approximatearm only, not measuredpixel."
+      }
+    ],
+    "rootCalculatedFootAudit": {
+      "oldSourceGuide": {
+        "mainLeft": [
+          [
+            32,
+            138
+          ],
+          [
+            92,
+            108
+          ]
+        ],
+        "separateLeft": [
+          [
+            35,
+            143
+          ],
+          [
+            94,
+            113
+          ]
+        ]
+      },
+      "correctedBeforeFirstBuilder": {
+        "upperLeft": [
+          [
+            31,
+            136
+          ],
+          [
+            92,
+            104.5
+          ]
+        ],
+        "lowerLeft": [
+          [
+            35,
+            142
+          ],
+          [
+            94,
+            109.03448275862068
+          ]
+        ],
+        "stem": [
+          [
+            92,
+            48
+          ],
+          [
+            92,
+            108
+          ]
+        ]
+      },
+      "reason": "RootOWNnativeFULL3x-left8x/pixelrows102..114 x89..97: upperleft joins verticalstem near104–105; lowerleft joins incomingrightarm near109–111, not genericoffsetray ending94,113. LowerfootY109.03448275862068 CALCULATEDfromapproxnativearm92,108→150,138 atx94; NOT measurednativeSubpixel. NoSVGcreatedbeforecorrection/noSVGnegative."
+    }
+  },
+  "rootSourceAudit": "RootOWNnativeFULL3x/all1de11-C5-B19-III-1/left8x-right6x/pixelrows102..114x89..97.10C=8main+2methylnotfromname;2Br2ClregularUPRIGHT capitalC+lowerl. LEFTupperrayjoinsstem104–105/lowerjoinsrightarm109–111; agentoldgenericraywrongcorrectBEFOREfirstbuilder/oldnewaudit retained. Lowerfoot94,109.03448275862068 CALCULATEDfromapproxarm92,108→150,138 NOT nativeSubpixel. RIGHTinnerrayFREEbothends. IsolatedbottomdashUNKNOWNkeepNOTcharge. NoaddedH-massformula-percent-answer.",
+  "rootActualReview": {
+    "hashSvg": "e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37",
+    "ketQua": "Đạt root OWN nativeFULL/FULL3x/all1publicde/freshChromiumFULL3x/left-right-Brmacros; IMG.decode548×246exactSHA.10bareC2Br2Cl/2CC/LEFT2feetCONTACT/RIGHTinnerrayFREE/ClcapitalC+lowerl regularUPRIGHT/whiteglyphgaps/tinyBOTTOMunknown dash retained.",
+    "render": "/workspace/scratch/root444-228.png",
+    "macros": [
+      "/workspace/scratch/root444-left.png",
+      "/workspace/scratch/root444-right.png",
+      "/workspace/scratch/root444-Br.png"
+    ],
+    "negativeHistory": "halogen228-lo-444-ban-cu-bi-loai.json exactUTF8+JPG missingmainsegment. FINALONLYmainpathadds92,108→150,138/XML16ONLY1/allotherchildrenEXACT/freshALLnoOldCarry.",
+    "xmlChildren": 16,
+    "changedChildren": [
+      1
+    ]
+  },
+  "readonlyRuntime": {
+    "sha256": "8b49f826e8997648055042960964152e6cd8666c680a6758f83fe7be82c2d952",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/halogen228-native-ddh-e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37.svg e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37\nIMGDECODE [ 548, 246 ]\n228 { x: 0, y: 0, width: 548, height: 246 }\n\nPOSTSHOT_SHA e8ba414cd31860aaad4d9ac87e74745ea39c4623d9418310e2af1c9f71199e37\nCOMMAND node /workspace/scratch/agent-render444.cjs\nCONTEXT 11-C5-B19-III-1.hinh.0.du_lieu public de/one ref only; no answers; IMG.decode success.\n"
+  }
+}
