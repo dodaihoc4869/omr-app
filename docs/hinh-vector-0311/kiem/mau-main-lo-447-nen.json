@@ -1,0 +1,33 @@
+{
+  "lo": 447,
+  "main": "37fc8be6c622a5c1e0b165079452b594bdb7a4cd",
+  "previousMain": "d6453489b4479fa2a0c294b1315a8747ad0687ac",
+  "diffStat": " .github/workflows/do-de-thieu-cau-1411.yml | 84 +++++++++++++++++++++++++++\n .github/workflows/do-live-lag-1411.yml     | 91 ++++++++++++++++++++++++++++++\n DIEU-PHOI.md                               |  1 +\n public/video-bai/khung.js                  |  2 +\n src/components/chien-dich/to-chieu.ts      |  9 ++-\n src/components/day-hoc/DayHocLenBang.tsx   |  6 ++\n src/lib/bpu/to-chieu-bpu.ts                |  4 ++\n src/lib/cau-noi-ddh.ts                     |  2 +\n src/lib/day-hoc-len-bang.ts                | 35 +++---------\n src/lib/dong-bo-ngam.ts                    | 60 ++++++++++++++++++++\n src/lib/exam-sync.ts                       | 39 +++++++++++--\n src/screens/GoiLenBangScreen.tsx           | 10 ++++\n tests/de-thieu-cau-1411.test.ts            | 48 ++++++++++++++++\n tests/dong-bo-ngam-1411.test.ts            | 77 +++++++++++++++++++++++++\n 14 files changed, 432 insertions(+), 36 deletions(-)\n",
+  "files": [
+    ".github/workflows/do-de-thieu-cau-1411.yml",
+    ".github/workflows/do-live-lag-1411.yml",
+    "DIEU-PHOI.md",
+    "public/video-bai/khung.js",
+    "src/components/chien-dich/to-chieu.ts",
+    "src/components/day-hoc/DayHocLenBang.tsx",
+    "src/lib/bpu/to-chieu-bpu.ts",
+    "src/lib/cau-noi-ddh.ts",
+    "src/lib/day-hoc-len-bang.ts",
+    "src/lib/dong-bo-ngam.ts",
+    "src/lib/exam-sync.ts",
+    "src/screens/GoiLenBangScreen.tsx",
+    "tests/de-thieu-cau-1411.test.ts",
+    "tests/dong-bo-ngam-1411.test.ts"
+  ],
+  "appChanged": true,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 382,
+  "colorLogSha256": "f4491b9314c0dc989ed8ae800f7fb6442263e024d83e7e28253201714f2576c6",
+  "release": "Main37fc8be6c mới so446:14files432insert36delete/workflows-monitor+publicvideo+appsrc-examsync-dongbongam-dayhoc+tests-journalchanged/server-Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised.",
+  "ketLuan": "Main37fc8be6c mới so446:14files432insert36delete/workflows-monitor+publicvideo+appsrc-examsync-dongbongam-dayhoc+tests-journalchanged/server-Vite-DDHfont-mốcunchanged; NOTmerged/latestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/382 baseline RED; no gate raised."
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 31,
+    "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+    "fileNguon": "anh/06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200.png",
+    "svg": "triester31-native-ddh-6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe.svg",
+    "hashSvg": "6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe",
+    "byteSvg": 5339,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D5-III-3",
+        "de": "Cho chất X là thành phần chính trong một loại dầu thực vật và có cấu tạo như sau:\nCho các phát biểu: 1) X thuộc loại chất béo không no, trong phân tử có ba liên kết π. 2) Khi sử dụng làm thực phẩm, X sẽ cung cấp acid béo omega-6 cho cơ thể. 3) Ở điều kiện thường, X tồn tại ở thể lỏng và có khối lượng riêng nhỏ hơn 1 g/mL. 4) Khi để lâu trong không khí, X sẽ bị oxi hóa tạo ra hợp chất có mùi. 5) Dùng nước dễ dàng rửa sạch chất X bám vào các vật dụng.\nLiệt kê các phát biểu đúng theo số thứ tự tăng dần (ví dụ 123; 234;...).",
+        "refs": [
+          {
+            "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+            "where": "12-KT-C1-D5-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "85e8db2d78e83e6fa751f29c11d43c68f96a415de05ecf5724d80d493ca792b4"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "55C6O=3bareglycerol+16-18-18acyl/CC0-1-2/3literalOOC-LASTCanchors-NOexpandedCO/ALLregularUPRIGHT/ALLthin-gray/individualnonperiodicvertices-rays/isolatedBOTTOMLEFTgrayUNKNOWNretain-NOTcharge/0H-arrow-stereo-caption/NOaddedH-formula-X-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,460 @@
+{
+  "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+  "native": [
+    995,
+    292
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C1-D5-III-3",
+      "de": "Cho chất X là thành phần chính trong một loại dầu thực vật và có cấu tạo như sau:\nCho các phát biểu: 1) X thuộc loại chất béo không no, trong phân tử có ba liên kết π. 2) Khi sử dụng làm thực phẩm, X sẽ cung cấp acid béo omega-6 cho cơ thể. 3) Ở điều kiện thường, X tồn tại ở thể lỏng và có khối lượng riêng nhỏ hơn 1 g/mL. 4) Khi để lâu trong không khí, X sẽ bị oxi hóa tạo ra hợp chất có mùi. 5) Dùng nước dễ dàng rửa sạch chất X bám vào các vật dụng.\nLiệt kê các phát biểu đúng theo số thứ tự tăng dần (ví dụ 123; 234;...).",
+      "refs": [
+        {
+          "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+          "where": "12-KT-C1-D5-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "85e8db2d78e83e6fa751f29c11d43c68f96a415de05ecf5724d80d493ca792b4"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "55C6O=3bareglycerol+16-18-18acyl/CC0-1-2/3literalOOC-LASTCanchors-NOexpandedCO/ALLregularUPRIGHT/ALLthin-gray/individualnonperiodicvertices-rays/isolatedBOTTOMLEFTgrayUNKNOWNretain-NOTcharge/0H-arrow-stereo-caption/NOaddedH-formula-X-name-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/FULL3x/left4x/all1publicde.3bareglycerol+15/17/17barechains+3literalOOC-C=55C6O/CC0-1-2. No addedC at labelbondstarts, expandedCO, H2C-HC, Xcaption or answer. Individual native vertices retained; tinyBOTTOMLEFTgraymark UNKNOWN.",
+  "sourceIndependentAudit": {
+    "i": 31,
+    "assetIndex": 570,
+    "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200.png",
+    "size": [
+      995,
+      292
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-KT-C1-D5-III-3",
+        "de": "Cho chất X là thành phần chính trong một loại dầu thực vật và có cấu tạo như sau:\nCho các phát biểu: 1) X thuộc loại chất béo không no, trong phân tử có ba liên kết π. 2) Khi sử dụng làm thực phẩm, X sẽ cung cấp acid béo omega-6 cho cơ thể. 3) Ở điều kiện thường, X tồn tại ở thể lỏng và có khối lượng riêng nhỏ hơn 1 g/mL. 4) Khi để lâu trong không khí, X sẽ bị oxi hóa tạo ra hợp chất có mùi. 5) Dùng nước dễ dàng rửa sạch chất X bám vào các vật dụng.\nLiệt kê các phát biểu đúng theo số thứ tự tăng dần (ví dụ 123; 234;...).",
+        "allHinh": [
+          {
+            "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+            "where": "12-KT-C1-D5-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "85e8db2d78e83e6fa751f29c11d43c68f96a415de05ecf5724d80d493ca792b4"
+          }
+        ],
+        "missingHashes": [
+          "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/447-31-full3x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "glycerolBareVertices": [
+        [
+          48,
+          103
+        ],
+        [
+          71,
+          146
+        ],
+        [
+          48,
+          189
+        ]
+      ],
+      "glycerolOOCbonds": [
+        [
+          [
+            48,
+            103
+          ],
+          [
+            70,
+            81
+          ]
+        ],
+        [
+          [
+            71,
+            146
+          ],
+          [
+            106,
+            146
+          ]
+        ],
+        [
+          [
+            48,
+            189
+          ],
+          [
+            69,
+            209
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "literal": "OOC",
+          "bbox": [
+            71,
+            57,
+            134,
+            80
+          ],
+          "leftBondAnchor": "first O",
+          "rightBondAnchor": "last C"
+        },
+        {
+          "literal": "OOC",
+          "bbox": [
+            111,
+            133,
+            174,
+            156
+          ],
+          "leftBondAnchor": "first O",
+          "rightBondAnchor": "last C"
+        },
+        {
+          "literal": "OOC",
+          "bbox": [
+            71,
+            211,
+            134,
+            234
+          ],
+          "leftBondAnchor": "first O",
+          "rightBondAnchor": "last C"
+        }
+      ],
+      "chains": [
+        {
+          "row": "top",
+          "bondStartNearCondensedC": [
+            144,
+            65
+          ],
+          "orderedBareCarbonVertices": [
+            [
+              186,
+              42
+            ],
+            [
+              228,
+              65
+            ],
+            [
+              271,
+              42
+            ],
+            [
+              313,
+              65
+            ],
+            [
+              355,
+              42
+            ],
+            [
+              397,
+              65
+            ],
+            [
+              441,
+              42
+            ],
+            [
+              482,
+              65
+            ],
+            [
+              525,
+              42
+            ],
+            [
+              567,
+              65
+            ],
+            [
+              609,
+              42
+            ],
+            [
+              651,
+              65
+            ],
+            [
+              694,
+              42
+            ],
+            [
+              736,
+              65
+            ],
+            [
+              777,
+              43
+            ]
+          ],
+          "innerCCrays": [],
+          "bareC": 15,
+          "totalCIncludingCondensedLastC": 16
+        },
+        {
+          "row": "middle",
+          "bondStartNearCondensedC": [
+            180,
+            149
+          ],
+          "orderedBareCarbonVertices": [
+            [
+              222,
+              124
+            ],
+            [
+              265,
+              149
+            ],
+            [
+              307,
+              124
+            ],
+            [
+              350,
+              149
+            ],
+            [
+              392,
+              124
+            ],
+            [
+              434,
+              149
+            ],
+            [
+              476,
+              124
+            ],
+            [
+              520,
+              149
+            ],
+            [
+              604,
+              149
+            ],
+            [
+              646,
+              124
+            ],
+            [
+              689,
+              149
+            ],
+            [
+              731,
+              124
+            ],
+            [
+              774,
+              149
+            ],
+            [
+              816,
+              124
+            ],
+            [
+              858,
+              149
+            ],
+            [
+              900,
+              124
+            ],
+            [
+              942,
+              149
+            ]
+          ],
+          "innerCCrays": [
+            [
+              [
+                532,
+                135
+              ],
+              [
+                589,
+                135
+              ]
+            ]
+          ],
+          "bareC": 17,
+          "totalCIncludingCondensedLastC": 18
+        },
+        {
+          "row": "bottom",
+          "bondStartNearCondensedC": [
+            138,
+            226
+          ],
+          "orderedBareCarbonVertices": [
+            [
+              180,
+              250
+            ],
+            [
+              223,
+              227
+            ],
+            [
+              265,
+              250
+            ],
+            [
+              307,
+              227
+            ],
+            [
+              350,
+              250
+            ],
+            [
+              392,
+              227
+            ],
+            [
+              434,
+              250
+            ],
+            [
+              477,
+              227
+            ],
+            [
+              562,
+              227
+            ],
+            [
+              604,
+              250
+            ],
+            [
+              647,
+              227
+            ],
+            [
+              731,
+              227
+            ],
+            [
+              774,
+              250
+            ],
+            [
+              816,
+              227
+            ],
+            [
+              858,
+              250
+            ],
+            [
+              900,
+              227
+            ],
+            [
+              942,
+              250
+            ]
+          ],
+          "innerCCrays": [
+            [
+              [
+                491,
+                241
+              ],
+              [
+                548,
+                241
+              ]
+            ],
+            [
+              [
+                661,
+                241
+              ],
+              [
+                717,
+                241
+              ]
+            ]
+          ],
+          "bareC": 17,
+          "totalCIncludingCondensedLastC": 18
+        }
+      ],
+      "counts": {
+        "C": 55,
+        "O": 6,
+        "CCdouble": 3,
+        "drawnCarbonylDoubleRays": 0,
+        "OOCtokens": 3,
+        "explanation": "3glycerolbareC +top15bare+1OOC-C +middle17bare+1OOC-C +bottom17bare+1OOC-C=55C. EachOOC2O; no expandedcarbonyl bond drawing. NoimplicitH total inferred."
+      },
+      "styles": {
+        "labels": "regular upright serif allOOC; no actualbold oritalic observed",
+        "bonds": "fine darkgray about0.8–1px no stereo/taper",
+        "caption": "NONE"
+      },
+      "unknownRetained": [
+        {
+          "bbox": [
+            28,
+            263,
+            30,
+            265
+          ],
+          "intent": "UNKNOWN isolatedtinygray speck, no charge/radical/ellipsis inferred"
+        }
+      ],
+      "crop": "No molecular branch clipped; all3rightfreeends visible. No restoration outside canvas.",
+      "negativeRules": [
+        "Do not count bondstartNearCondensedC as an extra bareC: these endpoints stop next to lastC glyph",
+        "No addedC=Orays orH2C/HC glyphs on bareglycerol",
+        "ReadOOC literal all3rows, no COOC prefix added"
+      ]
+    },
+    "measurementLimits": "Each row traced separately from OWN995×292 and3x, nativeapprox±1–2px. TopY42/65vsmiddle124/149vsbottom227/250 individually read. No translation/copy chain from other source; zero/theone/twodoublecounts directly visible.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "render": "/workspace/scratch/root447-31.png",
+    "macro": "/workspace/scratch/root447-labels.png",
+    "hashSvg": "6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe",
+    "imgDecode": [
+      995,
+      292
+    ],
+    "ketQua": "Đạt: 3 glycerol trần + mạch15/17/17 đỉnh + 3 C của OOC =55C6O; CC0/1/2. Cạnh nhãn không thêm C; OOC nguyên văn, không khai triển CO, không thêm H2C-HC/Xcaption/answer. TinyBOTTOMLEFTgray UNKNOWN giữ. No SVG negative found447.",
+    "readonlyProof": "/workspace/scratch/soat-triester31-lo447.json"
+  },
+  "readonlyRuntime": {
+    "sha256": "9b7244de270af609f350d57e0e1066d84a23fe74492a50c1843d7a6473e9c2cd",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/triester31-native-ddh-6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe.svg 6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe\nIMGDECODE [ 995, 292 ]\n31 { x: 0, y: 0, width: 995, height: 292 }\nPOSTSHOT_SHA 6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe\nCOMMAND node /workspace/scratch/agent-render447.cjs\nCONTEXT 12-KT-C1-D5-III-3.hinh.0.du_lieu public de/ref only; no answers; own native FULL and fresh FULL/macros viewed.\n"
+  }
+}

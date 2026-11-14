@@ -1,0 +1,18 @@
+[
+  {
+    "i": 31,
+    "hashSvg": "6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL/câu dẫn và ref công khai duy nhất; fresh Chromium IMG.decode FULL3×, từng mạch, nhãn trái và dấu nhỏ đáy trái. Đếm độc lập 3 C glycerol + các mạch acyl 16/18/18 C = 55C6O; C=C lần lượt 0/1/2, các tia trong tách đầu đúng nguồn. Ba nhãn literal OOC neo C cuối với khe chữ–bond sạch, không tính đầu bond ở nhãn thành C mới; nét xám mảnh, DDH regular upright. Giữ dấu xám nhỏ cô lập đáy trái UNKNOWN, không diễn giải thành charge. Không khai triển CO, không thêm H₂C/HC/tên/caption/đáp án; không thấy chạm/cắt/tràn.",
+    "render": "/workspace/scratch/soat447-31-fresh.png",
+    "macro": [
+      "/workspace/scratch/triester31-top.png",
+      "/workspace/scratch/triester31-middle.png",
+      "/workspace/scratch/triester31-bottom.png",
+      "/workspace/scratch/triester31-labels.png",
+      "/workspace/scratch/triester31-unknown.png"
+    ],
+    "hash": "06a4f853c24b6f400d9372303462d08b4a8f8981a5c8f19f7ba7da612d0cc200",
+    "hashSvgDaSoat": "6139ce8579ca761e39775e337004f301dc41acc0aa72cfbef96e0b71d956e7fe"
+  }
+]
