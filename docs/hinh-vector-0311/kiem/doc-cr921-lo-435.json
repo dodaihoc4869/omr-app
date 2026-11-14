@@ -1,0 +1,631 @@
+{
+  "hash": "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f",
+  "native": [
+    476,
+    382
+  ],
+  "questions": [
+    {
+      "qid": "12-C8-B27-II-13",
+      "de": "Phức chất X có công thức cấu tạo như hình bên dưới.",
+      "refs": [
+        {
+          "hash": "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f",
+          "where": "12-C8-B27-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "e65f9c12076fdd6ec6fb0fb1dea6fe20cfda14c932448c63a793460a503b5c33"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "6bareC12O1Cr3oxalates6COdouble/2solidwedges/6LEFT7RIGHTindividualgradedbars/2axialsingles/SQUAREpair-3minusOUTSIDE/ALLregularUPRIGHT/individualnonperiodicgeometry-shortCOjoins/0H-caption-arrows/NOaddedatom-formula-name-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1de12-C8-B27-II-13/core-top-bottom-right5x/hash9x. 6C12OCr; 6left7rightbars individually counted, no mirroredtemplate. AllregularUPRIGHT/2filledwedges/3minusoutside. Root corrected source approximate carbonyl joins BEFORE firstbuilder; coordinates approximate notnativeSubpixel. Sparsebackgroundflecks not chemical charges. Native gradedbars6LEFT7RIGHT independently matched; preliminary agent bboxes guide only. First top/bottom shortCO joins root corrected BEFORE builder; initial right CC slant separately corrected AFTER actual rejection. Rightfootfraction CALCULATED from approximate arms, not native subpixel.",
+  "rootActualReview": {
+    "hashSvg": "653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513",
+    "nativeFull": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": "/workspace/scratch/root435-921.png",
+    "macros": [
+      "core",
+      "top",
+      "bottom",
+      "right"
+    ],
+    "verdict": "Đạt root OWN FULL/macros:6C12OCr6CO/2solid6LEFT7RIGHThash/regularupright/3minusoutside; no collision/crop. Final newhash freshALL after initialCr-touch/rightCC-drift rejected.",
+    "oldNewXmlRead": {
+      "oldHash": "6fcd731c728294aec34d6be899c195ca5fbe7156bc5fc71345d1c274bbbde679",
+      "newHash": "653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513",
+      "childrenOldNew": [
+        34,
+        34
+      ],
+      "changedChildren": [
+        3,
+        32
+      ],
+      "scope": "Only rightligand bondpath and Cr outer placement/size. All12O/charge/13bars/2wedges/brackets/otherbonds EXACT; Cr label innerd EXACT, outer size changed."
+    },
+    "nativeMeasurementLimits": "Right C-C vertical328; topupperfoot326,191.3636/bottomlower326,220.9091 CALCULATED from approximate incoming/outgoing native arms, NOT native subpixel measurement/new numericgate. Other pairedrays on vertical328. No extra carbonyl crossbar.",
+    "hashesNote": "Individual widths and lengths irregular; source left nearCr203 thin versus preceding193 wider. No monotonicwidth template."
+  },
+  "sourceIndependent": {
+    "i": 921,
+    "assetIndex": 519,
+    "hash": "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f.png",
+    "size": [
+      476,
+      382
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C8-B27-II-13",
+        "de": "Phức chất X có công thức cấu tạo như hình bên dưới.",
+        "allHinh": [
+          {
+            "hash": "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f",
+            "where": "12-C8-B27-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "e65f9c12076fdd6ec6fb0fb1dea6fe20cfda14c932448c63a793460a503b5c33"
+          }
+        ],
+        "missingHashes": [
+          "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/433-921-full3x.png",
+        "/workspace/scratch/435-hashes8x.png",
+        "/workspace/scratch/435-left12x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "counts": {
+        "C": 6,
+        "O": 12,
+        "Cr": 1,
+        "COdouble": 6,
+        "solidWedges": 2,
+        "leftGradedBars": 6,
+        "rightGradedBars": 7,
+        "charge": "3−"
+      },
+      "Cr": {
+        "literal": "Cr",
+        "bbox": [
+          209,
+          197,
+          232,
+          216
+        ],
+        "center": [
+          221,
+          207
+        ]
+      },
+      "oxalates": [
+        {
+          "position": "upper-left",
+          "bareCvertices": [
+            [
+              148,
+              122
+            ],
+            [
+              183,
+              105
+            ]
+          ],
+          "singleBonds": [
+            [
+              [
+                148,
+                122
+              ],
+              [
+                183,
+                105
+              ]
+            ],
+            [
+              [
+                183,
+                105
+              ],
+              [
+                211,
+                120
+              ]
+            ],
+            [
+              [
+                148,
+                124
+              ],
+              [
+                148,
+                152
+              ]
+            ]
+          ],
+          "COdoubleRays": [
+            [
+              [
+                118,
+                112
+              ],
+              [
+                148,
+                119
+              ]
+            ],
+            [
+              [
+                117,
+                118
+              ],
+              [
+                144,
+                126
+              ]
+            ],
+            [
+              [
+                181,
+                104
+              ],
+              [
+                181,
+                74
+              ]
+            ],
+            [
+              [
+                187,
+                104
+              ],
+              [
+                187,
+                74
+              ]
+            ]
+          ],
+          "Ocenters": [
+            [
+              105,
+              112
+            ],
+            [
+              184,
+              61
+            ],
+            [
+              222,
+              125
+            ],
+            [
+              148,
+              165
+            ]
+          ]
+        },
+        {
+          "position": "lower-left",
+          "bareCvertices": [
+            [
+              148,
+              290
+            ],
+            [
+              180,
+              299
+            ]
+          ],
+          "singleBonds": [
+            [
+              [
+                148,
+                290
+              ],
+              [
+                180,
+                299
+              ]
+            ],
+            [
+              [
+                148,
+                286
+              ],
+              [
+                148,
+                259
+              ]
+            ],
+            [
+              [
+                181,
+                299
+              ],
+              [
+                210,
+                290
+              ]
+            ]
+          ],
+          "COdoubleRays": [
+            [
+              [
+                146,
+                286
+              ],
+              [
+                115,
+                293
+              ]
+            ],
+            [
+              [
+                146,
+                292
+              ],
+              [
+                117,
+                300
+              ]
+            ],
+            [
+              [
+                176,
+                300
+              ],
+              [
+                176,
+                329
+              ]
+            ],
+            [
+              [
+                184,
+                300
+              ],
+              [
+                184,
+                329
+              ]
+            ]
+          ],
+          "Ocenters": [
+            [
+              105,
+              300
+            ],
+            [
+              180,
+              342
+            ],
+            [
+              221,
+              290
+            ],
+            [
+              148,
+              248
+            ]
+          ]
+        },
+        {
+          "position": "right",
+          "bareCvertices": [
+            [
+              328,
+              193
+            ],
+            [
+              328,
+              218
+            ]
+          ],
+          "singleBonds": [
+            [
+              [
+                328,
+                193
+              ],
+              [
+                328,
+                218
+              ]
+            ],
+            [
+              [
+                328,
+                191
+              ],
+              [
+                306,
+                175
+              ]
+            ],
+            [
+              [
+                328,
+                220
+              ],
+              [
+                306,
+                240
+              ]
+            ]
+          ],
+          "COdoubleRays": [
+            [
+              [
+                327,
+                190
+              ],
+              [
+                348,
+                174
+              ]
+            ],
+            [
+              [
+                330,
+                198
+              ],
+              [
+                352,
+                179
+              ]
+            ],
+            [
+              [
+                330,
+                216
+              ],
+              [
+                351,
+                238
+              ]
+            ],
+            [
+              [
+                326,
+                222
+              ],
+              [
+                345,
+                240
+              ]
+            ]
+          ],
+          "Ocenters": [
+            [
+              297,
+              165
+            ],
+            [
+              360,
+              165
+            ],
+            [
+              360,
+              248
+            ],
+            [
+              297,
+              249
+            ]
+          ]
+        }
+      ],
+      "axialSingleBonds": [
+        [
+          [
+            221,
+            135
+          ],
+          [
+            221,
+            196
+          ]
+        ],
+        [
+          [
+            221,
+            218
+          ],
+          [
+            221,
+            278
+          ]
+        ]
+      ],
+      "solidWedgeTriangles": [
+        [
+          [
+            206,
+            216
+          ],
+          [
+            160,
+            235
+          ],
+          [
+            160,
+            247
+          ]
+        ],
+        [
+          [
+            237,
+            216
+          ],
+          [
+            283,
+            235
+          ],
+          [
+            283,
+            247
+          ]
+        ]
+      ],
+      "gradedBarInkBboxes": {
+        "left": [
+          [
+            160,
+            170,
+            161,
+            173
+          ],
+          [
+            169,
+            174,
+            171,
+            177
+          ],
+          [
+            176,
+            178,
+            178,
+            184
+          ],
+          [
+            186,
+            183,
+            187,
+            189
+          ],
+          [
+            193,
+            187,
+            197,
+            196
+          ],
+          [
+            203,
+            190,
+            204,
+            202
+          ]
+        ],
+        "right": [
+          [
+            232,
+            194,
+            235,
+            203
+          ],
+          [
+            241,
+            190,
+            245,
+            198
+          ],
+          [
+            250,
+            187,
+            252,
+            193
+          ],
+          [
+            258,
+            183,
+            259,
+            189
+          ],
+          [
+            265,
+            178,
+            266,
+            184
+          ],
+          [
+            272,
+            176,
+            276,
+            177
+          ],
+          [
+            282,
+            172,
+            283,
+            173
+          ]
+        ]
+      },
+      "brackets": {
+        "left": [
+          [
+            66,
+            47
+          ],
+          [
+            48,
+            47
+          ],
+          [
+            48,
+            350
+          ],
+          [
+            66,
+            350
+          ]
+        ],
+        "right": [
+          [
+            375,
+            47
+          ],
+          [
+            393,
+            47
+          ],
+          [
+            393,
+            350
+          ],
+          [
+            375,
+            350
+          ]
+        ],
+        "strokeWidth": 2
+      },
+      "charge": {
+        "literal": "3−",
+        "bbox": [
+          400,
+          39,
+          434,
+          62
+        ],
+        "superscriptRelativeToBracket": true
+      },
+      "styles": {
+        "labels": "regular upright serif O/Cr/3−, no bold/italic; no explicit C glyphs",
+        "bonds": "gray/black scan about1.5–2px, bracket approx2px; solid wedges filled and graded bars individually varying native widths"
+      },
+      "crop": "None; complete bracket/countercharge inside canvas",
+      "background": "Sparse faint scan flecks, not additional atoms/dots/charges"
+    },
+    "measurementLimits": "Nativeapprox ±1–2px, each oxalate drawn independently. Graded hash bboxes measured from distinct connected dark ink, then visually confirmed own8x/12x; first left edge pixel in crop belongs O glyph and is not an extra bar. No generic equal-spacing wedge template. CO ray arrays are separate pair strokes, no added carbon glyph or theory crossbar.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "readonlyRuntime": {
+    "sha256": "c41fb617185ce0d7c6215279b3f750af83c54710a825164d64ab0456bfc1dd72",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/cr921-native-ddh-653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513.svg 653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513\n921 { x: 0, y: 0, width: 476, height: 382 }\n\nPOSTSHOT_SHA 653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513\nCOMMAND node /workspace/scratch/agent-render435.cjs\nCONTEXT 12-C8-B27-II-13.hinh.0.du_lieu public de/one ref only; no answers.\n"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "i": 921,
+    "hashSvg": "653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: own native FULL/public de-ref và nativecenterzoom, freshChromium3x FULL/macros3ligands/center/charge/rgapnearest. 6C12O1Cr/6COdouble, 2solidwedges nhọnCr-rộngO, 6LEFT7RIGHTindividualgradedbars individualnativewidths/lengths không đều, không monotonic-width normalize/2axialsingle đúng. RightligandCCvertical/COshortjoins đúng nguồn, mọiOglyphgap rõ. Narrow r-rightnearesthash có khe trắng corner, không đen nối; SQUARE3minusoutside/ALLregularupright/noH-caption-charge thêm. Geometrynativeapprox không subpixel, không suy theo complexname; bounds/gaps sạch runtimeSHApre/post đúng final không carryinitial.",
+    "render": "/workspace/scratch/soat435-921-fresh.png",
+    "macro": [
+      "/workspace/scratch/cr921-center.png",
+      "/workspace/scratch/cr921-top.png",
+      "/workspace/scratch/cr921-bottom.png",
+      "/workspace/scratch/cr921-right.png",
+      "/workspace/scratch/cr921-charge.png",
+      "/workspace/scratch/cr921-nativecenter.png",
+      "/workspace/scratch/cr921-rgap.png"
+    ],
+    "hash": "a78695f2035b0f4ba0d83b6cbd0e667da03aec3a756a4e859006ccfd425bcb1f",
+    "hashSvgDaSoat": "653b29f29b1c28bd62d72d43d58305a048c1f8f8a5a9f7b2132348289206d513"
+  }
+]
