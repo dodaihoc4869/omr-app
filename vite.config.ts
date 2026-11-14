@@ -382,7 +382,6 @@ export default defineConfig({
           '**/dong-bo-ngam-*.js', // đồng bộ ngầm kho đề MÁY THẦY (14/11, src/lib/dong-bo-ngam.ts) — chỉ app thầy nạp động ⇒ kho chạy-lúc (precache 171 → 170, lượt 23:40 trượt cổng SW)
           '**/TinhTheCoVu-*.js', // tinh thể cổ vũ bạn lên bảng (13/11) — chỉ dùng trong buổi live (đang có mạng)
           '**/chieu-xoay-*.js', // luật xoay hình lúc live (src/components/live/chieu-xoay.ts) — chỉ dùng trong buổi live (đang có mạng)
-          '**/dong-bo-ngam-*.js', // đồng bộ ngầm kho đề MÁY THẦY (src/lib/dong-bo-ngam.ts, 14/11) — mảnh lười chỉ máy thầy nạp, cần mạng mới chạy ⇒ kho chạy-lúc (giữ trần 170 tệp)
           '**/mau-????????.js', // bảng màu xanh than của live theo khối (src/lib/live-khoi/mau.ts) — 8 dấu ? = đúng mã băm, không bắt nhầm `mau-chieu-*`
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
           '**/BangBinhPhanUng-*.{js,css}',
