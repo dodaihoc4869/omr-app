@@ -1,0 +1,505 @@
+{
+  "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+  "native": [
+    764,
+    416
+  ],
+  "questions": [
+    {
+      "qid": "12-C1-B1-D2-II-1",
+      "de": "Phổ khối lượng của ester E được cho ở hình dưới đây:",
+      "refs": [
+        {
+          "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+          "where": "12-C1-B1-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "4dadf4b768a80eadc0f29cf0e416fa231012c63ba10edec382c3c424fe781bac"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "5mainUPpeaks14additionaltinyUPink-INTENTuncertainNOT19quantitativepeaks/61X21Yticks7X6Ynums/0heads0grid/closedframeTOP36.5to39-BASE331to333.5driftKEEP/ALLregularUPRIGHTexceptmzREGULARITALIC-Yrotminus90/unknownoutsidefleck665366KEEP/backgroundgrainNOTdata/noaddedmolecule-ion-name-answer/nativeapproxNOTsubpixel",
+  "independentSourceAudit": {
+    "i": 1186,
+    "assetIndex": 265,
+    "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f.png",
+    "size": [
+      764,
+      416
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C1-B1-D2-II-1",
+        "de": "Phổ khối lượng của ester E được cho ở hình dưới đây:",
+        "allHinh": [
+          {
+            "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+            "where": "12-C1-B1-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "4dadf4b768a80eadc0f29cf0e416fa231012c63ba10edec382c3c424fe781bac"
+          }
+        ],
+        "missingHashes": [
+          "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/440-1186-full2x.png",
+        "/workspace/scratch/440-1186-base4x.png",
+        "/workspace/scratch/440-1186-left8x.png",
+        "/workspace/scratch/440-1186-mid8x.png",
+        "/workspace/scratch/440-1186-right8x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "frameCorners": [
+        [
+          127,
+          36.5
+        ],
+        [
+          693,
+          39
+        ],
+        [
+          692,
+          333.5
+        ],
+        [
+          127,
+          331
+        ]
+      ],
+      "frameWidth": 1.5,
+      "noArrowheads": true,
+      "xtickCenters": [
+        126.5,
+        136,
+        145,
+        154.5,
+        164,
+        173,
+        182.5,
+        191.5,
+        201.5,
+        211,
+        220.5,
+        230,
+        239,
+        249,
+        258.5,
+        267,
+        277,
+        286,
+        295.5,
+        305,
+        315,
+        323.5,
+        333,
+        343,
+        352.5,
+        361.5,
+        371,
+        380,
+        390.5,
+        398.5,
+        408.5,
+        418,
+        427.5,
+        437.5,
+        446,
+        455.5,
+        465.5,
+        474,
+        484,
+        492.5,
+        502,
+        512,
+        521,
+        530.5,
+        540.5,
+        550,
+        558.5,
+        568.5,
+        578,
+        587,
+        596.5,
+        605.5,
+        615,
+        624.5,
+        634.5,
+        643,
+        653,
+        662.5,
+        671,
+        681,
+        691.5
+      ],
+      "xTickCount": 61,
+      "xTickNotes": "Native individually sampled below baseline; x286/295.5 guides visually interpolated between own visible tickstems because scan weak; preserve rather than change axis mapping. Major ticks x126.5/220.5/315/408.5/502/596.5/691.5 approximately.",
+      "ytickCenters": [
+        36.5,
+        50.5,
+        65.5,
+        79.5,
+        95.5,
+        109.5,
+        124.5,
+        138,
+        153.5,
+        168.5,
+        183.5,
+        197,
+        213,
+        226.5,
+        241.5,
+        256,
+        272,
+        286.5,
+        301,
+        314.5,
+        330
+      ],
+      "yTickCount": 21,
+      "xLabels": [
+        {
+          "literal": "10",
+          "center": [
+            127,
+            351
+          ],
+          "bbox": [
+            115,
+            342,
+            139,
+            359
+          ]
+        },
+        {
+          "literal": "20",
+          "center": [
+            223,
+            351
+          ],
+          "bbox": [
+            211,
+            342,
+            235,
+            359
+          ]
+        },
+        {
+          "literal": "30",
+          "center": [
+            318,
+            351
+          ],
+          "bbox": [
+            306,
+            342,
+            330,
+            359
+          ]
+        },
+        {
+          "literal": "40",
+          "center": [
+            413,
+            351
+          ],
+          "bbox": [
+            401,
+            342,
+            425,
+            359
+          ]
+        },
+        {
+          "literal": "50",
+          "center": [
+            509,
+            351
+          ],
+          "bbox": [
+            497,
+            342,
+            521,
+            359
+          ]
+        },
+        {
+          "literal": "60",
+          "center": [
+            604,
+            351
+          ],
+          "bbox": [
+            592,
+            342,
+            616,
+            359
+          ]
+        },
+        {
+          "literal": "70",
+          "center": [
+            697,
+            351
+          ],
+          "bbox": [
+            685,
+            342,
+            709,
+            359
+          ]
+        }
+      ],
+      "yLabels": [
+        {
+          "literal": "100",
+          "bbox": [
+            83,
+            30,
+            120,
+            46
+          ]
+        },
+        {
+          "literal": "80",
+          "bbox": [
+            91,
+            89,
+            120,
+            105
+          ]
+        },
+        {
+          "literal": "60",
+          "bbox": [
+            91,
+            148,
+            120,
+            164
+          ]
+        },
+        {
+          "literal": "40",
+          "bbox": [
+            91,
+            207,
+            120,
+            223
+          ]
+        },
+        {
+          "literal": "20",
+          "bbox": [
+            91,
+            266,
+            120,
+            282
+          ]
+        },
+        {
+          "literal": "0",
+          "bbox": [
+            103,
+            325,
+            120,
+            341
+          ]
+        }
+      ],
+      "axisTitles": [
+        {
+          "literal": "Cường độ tương đối (%)",
+          "center": [
+            61,
+            190
+          ],
+          "rotation": -90,
+          "bbox": [
+            48,
+            72,
+            72,
+            307
+          ],
+          "style": "regular upright sans rotated"
+        },
+        {
+          "literal": "m/z",
+          "bbox": [
+            392,
+            365,
+            429,
+            384
+          ],
+          "style": "italic sans"
+        }
+      ],
+      "mainPeaks": [
+        {
+          "x": 174,
+          "topY": 276,
+          "bottomY": 331,
+          "width": 1.5
+        },
+        {
+          "x": 306,
+          "topY": 198,
+          "bottomY": 332,
+          "width": 1.5
+        },
+        {
+          "x": 325,
+          "topY": 38,
+          "bottomY": 332,
+          "width": 1.5
+        },
+        {
+          "x": 334,
+          "topY": 198,
+          "bottomY": 332,
+          "width": 1.5
+        },
+        {
+          "x": 597,
+          "topY": 220,
+          "bottomY": 333,
+          "width": 1.5
+        }
+      ],
+      "additionalUpwardInk": [
+        {
+          "x": 145,
+          "topY": 329,
+          "width": 1.5
+        },
+        {
+          "x": 154,
+          "topY": 328,
+          "width": 1.5
+        },
+        {
+          "x": 164,
+          "topY": 325,
+          "width": 1.5
+        },
+        {
+          "x": 183,
+          "topY": 329,
+          "width": 1.5
+        },
+        {
+          "x": 192,
+          "topY": 329,
+          "width": 1.5
+        },
+        {
+          "x": 202,
+          "topY": 328,
+          "width": 1.5
+        },
+        {
+          "x": 296,
+          "topY": 316,
+          "width": 1.5
+        },
+        {
+          "x": 315,
+          "topY": 314,
+          "width": 1.5
+        },
+        {
+          "x": 343,
+          "topY": 329,
+          "width": 1.5
+        },
+        {
+          "x": 438,
+          "topY": 330,
+          "width": 1.5
+        },
+        {
+          "x": 447,
+          "topY": 327,
+          "width": 1.5
+        },
+        {
+          "x": 456,
+          "topY": 330,
+          "width": 1.5
+        },
+        {
+          "x": 587,
+          "topY": 331,
+          "width": 1.5
+        },
+        {
+          "x": 607,
+          "topY": 330,
+          "width": 1.5
+        }
+      ],
+      "weakInkLimit": "Fourteen additional upward marks are visible independently in baseline8x; preserve source ink heights but tiny1–2px marks overlapping ticks may be scan-thickened tick tops rather than scientifically distinct peaks. Do not infer exact m/z or abundance/count from them. Main5 unambiguous tall peaks.",
+      "unknownOutsidePlot": [
+        {
+          "bbox": [
+            665,
+            366,
+            670,
+            370
+          ],
+          "intent": "UNKNOWN black fleck retain, not decimal/title"
+        }
+      ],
+      "styles": {
+        "allNumericLabels": "regular upright sans, no truebold asserted",
+        "axes": "grayblack thin frame and ticks",
+        "peaks": "darkgray/black strokes",
+        "background": "faint scattered grayprint grain not extra data"
+      },
+      "counts": {
+        "mainUnambiguousPeaks": 5,
+        "additionalUpwardInkGroups": 14,
+        "xTickStems": 61,
+        "yTickStems": 21,
+        "xNumericLabels": 7,
+        "yNumericLabels": 6,
+        "arrowheads": 0
+      },
+      "crop": "Allframe/labels within canvas; no chemical structure/inset/title; no axis arrowheads"
+    },
+    "measurementLimits": "Coordinates nativeapprox±1–2px. Axis frame drifts top36.5→39 andbaseline331→333.5, not normalized to perfect rectangle. Peak pixel heights not exact measured percentages; no identity/ion answer inferred. Tiny upward ink uncertainty explicitly retained rather than theory-removal.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootSourceAudit": "RootOWNnativeFULL3x/all1de12-C1-B1-D2-II-1/baselineL8x-R6x-Y3x/fleck10x/ticks28629520x. Main5 tall5 visible; 14tinyUPstrokes preserved literalink, tiny1–2px intent uncertain NOT19quantitativepeaks claim. All61X/21Ytickstems counted; sourceagent guides286/295.5 described interpolation, rootOWN20x confirms BOTHvisible downward stems, no inventedperiodicgrid. FrameTOP36.5→39 BASE331→333.5 drift. Native pixel heights NOT exact percentages. Sourcegrain background not extra particles/data. m/z regularitalic/Ytitle regularUPRIGHTrot−90; 7X6Yregularnums; unknownoutsidefleck kept.",
+  "rootActualReview": {
+    "nativeFullOpened": true,
+    "allPublicRefsRead": [
+      "12-C1-B1-D2-II-1.hinh.0.du_lieu"
+    ],
+    "freshChromium3xFull": "/workspace/scratch/root440-1186.png",
+    "macrosOpened": [
+      "/workspace/scratch/root440-axis.png",
+      "/workspace/scratch/root440-baseL.png",
+      "/workspace/scratch/root440-baseR.png"
+    ],
+    "hashSvg": "d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6",
+    "verdict": "Đạt rootnativeALL1de/freshFULL3x/macros.5main+14tinyUPinkuncertainNOT19quantitativepeaks/61X21Ystems7X6Yregularnums/Yregularrot−90-mzregularITALIC/0headsgrid/closedframeTOPBASEdriftKEEP/unknownoutsidefleckretained/noaddedmoleculeionanswer. NoSVGnegativefound440."
+  },
+  "readonlyRuntime": {
+    "sha256": "28d0d8b949d1596ba03ccaa830260810e69255374b6b4d68a2d3893c52d32aef",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ms1186-native-ddh-d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6.svg d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6\nIMGDECODE [ 764, 416 ]\n1186 { x: 0, y: 0, width: 764, height: 416 }\n\nPOSTSHOT_SHA d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6\nCOMMAND node /workspace/scratch/agent-render440.cjs\nCONTEXT 12-C1-B1-D2-II-1.hinh.0.du_lieu public de/one ref only; no answers; IMG.decode success.\n"
+  }
+}

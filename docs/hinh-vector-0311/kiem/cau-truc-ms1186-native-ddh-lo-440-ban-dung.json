@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1186,
+    "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+    "fileNguon": "anh/d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f.png",
+    "svg": "ms1186-native-ddh-d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6.svg",
+    "hashSvg": "d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6",
+    "byteSvg": 38658,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-II-1",
+        "de": "Phổ khối lượng của ester E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "d6f751e7f86a06e7cdeb30694310f11229c045b006f6312f69f5719315e26c6f",
+            "where": "12-C1-B1-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "4dadf4b768a80eadc0f29cf0e416fa231012c63ba10edec382c3c424fe781bac"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5mainUPpeaks14additionaltinyUPink-INTENTuncertainNOT19quantitativepeaks/61X21Yticks7X6Ynums/0heads0grid/closedframeTOP36.5to39-BASE331to333.5driftKEEP/ALLregularUPRIGHTexceptmzREGULARITALIC-Yrotminus90/unknownoutsidefleck665366KEEP/backgroundgrainNOTdata/noaddedmolecule-ion-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "d8a061f86540a936fbd46f8a1e65be0dc27b392453dd78e7be1c0b885abbe3a6",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
