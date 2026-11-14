@@ -12,7 +12,7 @@ const kb = JSON.parse(readFileSync(join(kbDir, 'kich-ban.json'), 'utf8')), net =
 const trinh = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--force-color-profile=srgb', '--disable-lcd-text'] })
 const trang = await trinh.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 })
 const loi = []; trang.on('pageerror', (e) => loi.push(e.message)); trang.on('console', (m) => { if (m.type() === 'error') loi.push(m.text()) })
-await trang.goto('file://' + join(dirname(fileURLToPath(import.meta.url)), 'khung.html'))
+await trang.goto('file://' + join(dirname(fileURLToPath(import.meta.url)), '../../public/video-bai/khung.html'))
 await trang.evaluate(([k, n]) => window.nap(k, n), [kb, net])
 await trang.waitForTimeout(300)
 

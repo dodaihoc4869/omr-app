@@ -1,8 +1,8 @@
 /* VIDEO BÀI GIẢNG — khung 1920×1080. Màu theo bảng nhật ký bài dạy (public/nhat-ky/khuon.css): nền bảng, phấn trắng, vàng, ngọc, hồng. */
-@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../public/nhat-ky/phong/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../public/nhat-ky/phong/ddh-rounded-de-latin.woff2') format('woff2'); }
-@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../public/nhat-ky/phong/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
-@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../public/nhat-ky/phong/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../public/nhat-ky/phong/ddh-rounded-dam-latin.woff2') format('woff2'); }
-@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../public/nhat-ky/phong/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../nhat-ky/phong/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../nhat-ky/phong/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../nhat-ky/phong/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../nhat-ky/phong/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../nhat-ky/phong/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../nhat-ky/phong/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
 :root {
   --bang: #131f24; --bang-sau: #0b1418; --mat: #1c2a30; --mat-2: #24343b; --vien: #34474f;
   --phan: #f4efe4; --phan-mo: #b9c3c0; --vang: #ffd27a; --ngoc: #6ee7b7; --hong: #fda4af; --xanh: #8fb6ff; --tim: #c4b5fd;
@@ -25,7 +25,7 @@ body { font-family: var(--phong); color: var(--phan); -webkit-font-smoothing: an
 #nhan-chuong { display: inline-flex; align-items: center; gap: 14px; height: 52px; padding: 0 24px 0 10px; border-radius: 999px; background: rgba(28, 42, 48, .92); box-shadow: inset 0 0 0 1.5px var(--vien); font-weight: 700; font-size: 25px; white-space: nowrap; }
 #nhan-chuong b { display: inline-grid; place-items: center; min-width: 36px; height: 36px; padding: 0 8px; border-radius: 999px; background: var(--mau, var(--vang)); color: #172126; font-size: 20px; font-weight: 800; }
 #tien-do { flex: 1; height: 8px; border-radius: 99px; background: rgba(255, 255, 255, .08); position: relative; overflow: hidden; }
-#tien-do i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: linear-gradient(90deg, var(--ngoc), var(--vang)); }
+#tien-do i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--ngoc), var(--vang)); transform-origin: 0 50%; transform: scaleX(0); }
 #tien-do s { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--bang-sau); }
 #ten-bai { font-weight: 800; font-size: 24px; letter-spacing: .14em; color: var(--phan-mo); white-space: nowrap; }
 

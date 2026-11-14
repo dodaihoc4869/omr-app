@@ -5,11 +5,13 @@ const kep = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
 const tien = (t, t0, d) => kep((t - t0) / d)
 const eOut = (p) => 1 - Math.pow(1 - p, 3)
 const eInOut = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2)
-/** Lò xo tắt dần (vượt đích ~15 % rồi về 1) theo số giây kể từ lúc bật. */
+/** Tắt dần đã gần 0 ⇒ ĐÚNG 0, còn lại làm tròn 3 chữ số: kiểu dáng thôi đổi khi hoạt cảnh đã dừng ⇒ trình duyệt thôi vẽ lại (phát trực tiếp trên máy em). */
+const ex = (v) => { const r = Math.exp(v); return r < 0.002 ? 0 : Math.round(r * 1000) / 1000 }
+/** Lò xo tắt dần (vượt đích ~15 % rồi về 1) theo số giây kể từ lúc bật — dừng hẳn ở 1 khi đã đủ gần. */
 function lo(tau, f = 2.3, z = 0.5) {
   if (tau <= 0) return 0
-  const w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z)
-  return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau))
+  const w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z), v = 1 - ex(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau))
+  return Math.abs(1 - v) < 0.002 ? 1 : Math.round(v * 1000) / 1000
 }
 const lerp = (a, b, p) => a + (b - a) * p
 const MAU = { vang: '#ffd27a', hong: '#fda4af', ngoc: '#6ee7b7', xanh: '#8fb6ff', trang: '#f4efe4' }
@@ -23,6 +25,12 @@ function hat(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x -
 const CHECK = '<svg width="40" height="40" viewBox="0 0 40 40"><path class="dau-tick" d="M9 21 l7 7 l15 -16" fill="none" stroke="#6ee7b7" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="40" stroke-dashoffset="40"/></svg>'
 
 let KB = null, NET = null, CANH = [], DOAN = []
+// CHẾ ĐỘ (video tóm tắt trong app, 14/11): `trucTiep` = phát trên máy em (bỏ hạt phim hoà trộn toàn màn + bụi phấn trôi — vẽ lại cả lớp nền mỗi khung);
+// `nhe` = máy yếu (thêm: bỏ phát sáng nét phấn, bỏ làm mờ lúc chuyển). Bộ quay video để cả hai TẮT ⇒ video y như trước.
+const _q = new URLSearchParams(location.search)
+const CHE_DO = { trucTiep: _q.has('truc-tiep') || _q.has('nhe'), nhe: _q.has('nhe') }
+window.CHE_DO = CHE_DO
+let QUANG = [], BUI = []
 const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
 let ctx = null, hoaCtx = null
@@ -55,15 +63,16 @@ function nap(kb, net) {
 function dungNen() {
   const nen = $('#nen')
   const ds = [['#6ee7b7', 980, .11], ['#ffd27a', 820, .09], ['#8fb6ff', 900, .10], ['#fda4af', 700, .07]]
-  ds.forEach(([m, r, a], i) => { const q = tao('div', 'quang', nen); q.style.width = q.style.height = `${r}px`; q.style.background = `radial-gradient(circle, ${m}${Math.round(a * 255).toString(16).padStart(2, '0')} 0%, transparent 68%)`; q.dataset.i = i })
+  QUANG = ds.map(([m, r, a], i) => { const q = tao('div', 'quang', nen); q.style.width = q.style.height = `${r}px`; q.style.background = `radial-gradient(circle, ${m}${Math.round(a * 255).toString(16).padStart(2, '0')} 0%, transparent 68%)`; return { q, i, r } })
+  if (CHE_DO.trucTiep) { $('#hat').remove(); return }
   const bui = tao('div', 'bui', nen); bui.style.cssText = 'position:absolute;inset:0'
-  for (let i = 0; i < 46; i++) { const d = tao('i', '', bui); const r = 2 + hat(i) * 4; d.style.cssText = `position:absolute;width:${r}px;height:${r}px;border-radius:50%;background:rgba(244,239,228,${0.15 + hat(i + 9) * 0.35})` }
+  for (let i = 0; i < 46; i++) { const d = tao('i', '', bui); const r = 2 + hat(i) * 4; d.style.cssText = `position:absolute;width:${r}px;height:${r}px;border-radius:50%;background:rgba(244,239,228,${0.15 + hat(i + 9) * 0.35})`; BUI.push(d) }
 }
 function veNen(t) {
-  document.querySelectorAll('.quang').forEach((q) => { const i = +q.dataset.i, r = parseFloat(q.style.width); const x = [0.2, 0.75, 0.55, 0.1][i] * 2112 + 160 * Math.sin(t * (0.11 + i * 0.03) + i * 2.1) - r / 2, y = [0.25, 0.3, 0.8, 0.75][i] * 1188 + 110 * Math.cos(t * (0.09 + i * 0.025) + i) - r / 2; q.style.transform = `translate(${x}px,${y}px)` })
-  const bui = document.querySelectorAll('.bui i')
-  bui.forEach((d, i) => { const sp = 8 + hat(i + 3) * 18, x = (hat(i) * 2112 + t * sp * (hat(i + 5) - 0.5) * 2) % 2112, y = ((hat(i + 1) * 1188 - t * sp) % 1188 + 1188) % 1188; d.style.transform = `translate(${x}px,${y}px)` })
-  const f = Math.floor(t * 30); $('#hat').style.transform = `translate(${-Math.floor(hat(f) * 64)}px,${-Math.floor(hat(f + 7) * 64)}px)`
+  QUANG.forEach(({ q, i, r }) => { const x = [0.2, 0.75, 0.55, 0.1][i] * 2112 + 160 * Math.sin(t * (0.11 + i * 0.03) + i * 2.1) - r / 2, y = [0.25, 0.3, 0.8, 0.75][i] * 1188 + 110 * Math.cos(t * (0.09 + i * 0.025) + i) - r / 2; q.style.transform = `translate(${x}px,${y}px)` })
+  if (CHE_DO.trucTiep) return
+  BUI.forEach((d, i) => { const sp = 8 + hat(i + 3) * 18, x = (hat(i) * 2112 + t * sp * (hat(i + 5) - 0.5) * 2) % 2112, y = ((hat(i + 1) * 1188 - t * sp) % 1188 + 1188) % 1188; d.style.transform = `translate(${x}px,${y}px)` })
+  const f = Math.floor(t * 30), hatEl = $('#hat'); if (hatEl) hatEl.style.transform = `translate(${-Math.floor(hat(f) * 64)}px,${-Math.floor(hat(f + 7) * 64)}px)`
 }
 
 // ── CẢNH: thẻ cột phải, phụ đề, phân tử, đố vui ──
@@ -224,13 +233,13 @@ function veDoVui(d, t) {
     const batDem = v.t1 - 5.4, conLai = 5 - Math.floor(kep((t - batDem) / 5, 0, 0.9999) * 5), pha = (t - batDem) % 1
     const dem = $('#dv-dem'); dem.style.opacity = tien(t, batDem - 0.3, 0.3) * (1 - ra)
     dem.querySelector('b').textContent = String(conLai)
-    dem.querySelector('b').style.transform = `scale(${1 + 0.35 * Math.exp(-pha * 6)})`
+    dem.querySelector('b').style.transform = `scale(${1 + 0.35 * ex(-pha * 6)})`
     dem.querySelector('.vong').style.strokeDashoffset = String(440 * kep((t - batDem) / 5))
     $('#dv-goi').style.opacity = tien(t, v.t0 + 0.9, 0.4) * (1 - ra)
   }
   // lật đáp án trong thẻ thu nhỏ + pháo giấy
   const mo = t >= v.tMo
-  v.miniO.forEach((e) => { const dung = e.dataset.dung === '1'; e.style.background = mo && dung ? 'linear-gradient(170deg,#1f6f55,#145240)' : 'rgba(255,255,255,.07)'; e.style.boxShadow = mo && dung ? `0 0 0 ${3 + 3 * Math.exp(-(t - v.tMo) * 3)}px #6ee7b7, 0 0 40px rgba(110,231,183,.5)` : 'none'; e.style.opacity = mo && !dung ? 0.4 : 1; e.style.transform = mo && dung ? `scale(${1 + 0.18 * Math.exp(-(t - v.tMo) * 4) * Math.cos((t - v.tMo) * 14)})` : '' })
+  v.miniO.forEach((e) => { const dung = e.dataset.dung === '1'; e.style.background = mo && dung ? 'linear-gradient(170deg,#1f6f55,#145240)' : 'rgba(255,255,255,.07)'; e.style.boxShadow = mo && dung ? `0 0 0 ${3 + 3 * ex(-(t - v.tMo) * 3)}px #6ee7b7, 0 0 40px rgba(110,231,183,.5)` : 'none'; e.style.opacity = mo && !dung ? 0.4 : 1; e.style.transform = mo && dung ? `scale(${1 + 0.18 * ex(-(t - v.tMo) * 4) * Math.cos((t - v.tMo) * 14)})` : '' })
   const tau = t - v.tMo
   if (tau >= 0 && tau < 2.6) {
     const r = v.mini.getBoundingClientRect(), dungO = v.miniO.find((e) => e.dataset.dung === '1').getBoundingClientRect()
@@ -265,7 +274,7 @@ function veChuong(d, t) {
   $('#chuong-noi .quet').style.left = `${lerp(-500, 2300, eInOut(tien(t, d.t0 + 0.6, 1.1)))}px`
   const ps = lo(t - d.t0 - 0.35, 1.6, 0.6); so.style.transform = `translateX(${(1 - ps) * -120}px)`; so.style.opacity = kep(ps * 1.3)
   ke.style.opacity = tien(t, d.t0 + 0.45, 0.3); ke.style.letterSpacing = `${0.6 - 0.32 * eOut(tien(t, d.t0 + 0.45, 0.7))}em`
-  ten.querySelectorAll('.tu').forEach((w, j) => { const p = lo(t - d.t0 - 0.5 - j * 0.055, 2.2, 0.55); w.style.transform = `translateY(${(1 - p) * 60}px)`; w.style.opacity = kep(p * 1.5); w.style.filter = `blur(${Math.max(0, (1 - p * 1.4) * 10)}px)` })
+  ten.querySelectorAll('.tu').forEach((w, j) => { const p = lo(t - d.t0 - 0.5 - j * 0.055, 2.2, 0.55); w.style.transform = `translateY(${(1 - p) * 60}px)`; w.style.opacity = kep(p * 1.5); if (!CHE_DO.nhe) w.style.filter = `blur(${Math.max(0, (1 - p * 1.4) * 10)}px)` })
 }
 
 // ── MỞ ĐẦU · KẾT ──
@@ -279,7 +288,7 @@ function dungMoDau() {
 function veMoDau(d, t) {
   const mo = $('#mo'); mo.classList.remove('an')
   const ra = eInOut(tien(t, d.t1 - 0.6, 0.6))
-  mo.style.transform = `scale(${1 + ra * 0.9})`; mo.style.opacity = 1 - ra; mo.style.filter = ra > 0 ? `blur(${ra * 14}px)` : ''
+  mo.style.transform = `scale(${1 + ra * 0.9})`; mo.style.opacity = 1 - ra; mo.style.filter = ra > 0 && !CHE_DO.nhe ? `blur(${ra * 14}px)` : ''
   const ke = $('#mo-ke'); ke.style.opacity = tien(t, 0.3, 0.5); ke.style.letterSpacing = `${0.7 - 0.4 * eOut(tien(t, 0.3, 1.2))}em`
   $('#mo-ten').querySelectorAll('.ch').forEach((c, j) => { const p = lo(t - 0.9 - j * 0.075, 2.0, 0.45); c.style.transform = `translateY(${(1 - p) * 90}px) scale(${0.3 + 0.7 * p}) rotate(${(1 - p) * -14}deg)`; c.style.opacity = kep(p * 1.6) })
   const g = $('#mo-gach'), gw = 760 * eOut(tien(t, 1.9, 0.7)); g.style.width = `${gw}px`; g.style.marginLeft = `${-gw / 2}px`
@@ -338,7 +347,7 @@ function veBang(d, t) {
     const xong = n.ket <= s, tuoi = (s - n.ket) / 1000
     ctx.globalAlpha = n.ket < s0 ? 0.38 : 1
     ctx.strokeStyle = n.mauVe; ctx.lineWidth = Math.max(1.6 / k, n.c * 1.05)
-    if (!xong || tuoi < 1.4) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 * (xong ? 1 - tuoi / 1.4 : 1) } else ctx.shadowBlur = 0
+    if (!CHE_DO.nhe && (!xong || tuoi < 1.4)) { ctx.shadowColor = n.mauVe; ctx.shadowBlur = 16 * (xong ? 1 - tuoi / 1.4 : 1) } else ctx.shadowBlur = 0
     if (xong) ctx.stroke(n.duong)
     else {
       const da = s - n.t; ctx.beginPath(); let lx = 0, ly = 0
@@ -347,7 +356,7 @@ function veBang(d, t) {
     }
   }
   ctx.shadowBlur = 0; ctx.globalAlpha = 1
-  if (dau) { ctx.fillStyle = '#fff'; ctx.shadowColor = dau[2]; ctx.shadowBlur = 24; ctx.beginPath(); ctx.arc(dau[0], dau[1], 7 / k, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0 }
+  if (dau) { ctx.fillStyle = '#fff'; ctx.shadowColor = dau[2]; ctx.shadowBlur = CHE_DO.nhe ? 0 : 24; ctx.beginPath(); ctx.arc(dau[0], dau[1], 7 / k, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0 }
 }
 
 // ── VẼ CẢNH ──
@@ -361,7 +370,7 @@ function veCanh(d, t) {
     $('#pt').classList.toggle('an', !d.phanTu); $('#cot').classList.toggle('an', !!d.phanTu)
   }
   const a = CANH[0].t0, b = CANH[CANH.length - 1].t1
-  $('#tien-do i').style.width = `${kep((t - a) / (b - a)) * 100}%`
+  $('#tien-do i').style.transform = `scaleX(${Math.round(kep((t - a) / (b - a)) * 1000) / 1000})`
   // vào cảnh: phóng 1,1 ⇒ 1 khi phiến thẻ chương rút; điểm nhấn: phóng nhẹ cả sân
   const vao = eOut(tien(t, d.t0 - 0.45, 0.95))
   let nhan = 0; for (const w of d.nhanManh) nhan = Math.max(nhan, Math.min(eOut(tien(t, w.t0, 0.35)), 1 - eInOut(tien(t, w.t1 - 0.3, 0.7))))
@@ -378,15 +387,15 @@ function veCanh(d, t) {
     const tau = t - th.t, p = th.coDinh ? 1 : lo(tau, 2.1, 0.55)
     th.el.style.top = `${th.y}px`; th.el.style.opacity = th.coDinh ? 1 : kep(tau / 0.22)
     th.el.style.transform = `translateX(${(1 - p) * 80}px) scale(${0.9 + 0.1 * p})`
-    th.el.style.filter = !th.coDinh && tau < 0.3 ? `blur(${(1 - tau / 0.3) * 8}px)` : ''
-    const bong = th.el.querySelector('.bong'); if (bong) bong.style.left = `${-200 + (tau - 0.25) * 1500}px`
+    th.el.style.filter = !CHE_DO.nhe && !th.coDinh && tau < 0.3 ? `blur(${(1 - tau / 0.3) * 8}px)` : ''
+    const bong = th.el.querySelector('.bong'); if (bong) bong.style.left = `${tau < 1.6 ? Math.round(-200 + (tau - 0.25) * 1500) : 2200}px`
     const gach = th.el.querySelector('.gach'); if (gach) gach.style.width = `${eOut(tien(tau, 0.3, 0.6)) * Math.min(560, th.el.querySelector('em') ? 360 : 300)}px`
   }
   const cuonNay = tCuon < 0 ? cuon : lerp(cuonTruoc, cuon, eInOut(tien(t, tCuon, 0.6)))
   $('#cot-trong').style.transform = `translateY(${-cuonNay}px)`
   // dấu "PHẢI THUỘC"
   const dauEl = $('#dau')
-  if (d.dau && t >= d.dau.t) { dauEl.classList.remove('an'); dauEl.textContent = d.dau.chu; const p = eOut(tien(t, d.dau.t, 0.2)); dauEl.style.transform = `rotate(-9deg) scale(${2.6 - 1.6 * p})`; dauEl.style.opacity = kep(p * 1.6); const lech = 8 * Math.exp(-Math.max(0, t - d.dau.t - 0.18) * 7); dauEl.style.textShadow = `${lech}px 0 rgba(255,70,90,.7), ${-lech}px 0 rgba(70,210,255,.7)` } else dauEl.classList.add('an')
+  if (d.dau && t >= d.dau.t) { dauEl.classList.remove('an'); dauEl.textContent = d.dau.chu; const p = eOut(tien(t, d.dau.t, 0.2)); dauEl.style.transform = `rotate(-9deg) scale(${2.6 - 1.6 * p})`; dauEl.style.opacity = kep(p * 1.6); const lech = 8 * ex(-Math.max(0, t - d.dau.t - 0.18) * 7); dauEl.style.textShadow = `${lech}px 0 rgba(255,70,90,.7), ${-lech}px 0 rgba(70,210,255,.7)` } else dauEl.classList.add('an')
   // điểm nhấn lớn giữa màn
   const lonEl = $('#lon'); let coLon = false
   for (const l of d.lon) {
@@ -396,7 +405,7 @@ function veCanh(d, t) {
     const vao2 = lo(tau, 1.9, 0.5), ra = eInOut(tien(tau, 2.25, 0.45))
     $('#lon-nen').style.opacity = kep(tau / 0.25) * (1 - ra)
     $('#lon-chu').style.transform = `translate(${ra * 560}px,${ra * -120}px) scale(${(0.55 + 0.45 * vao2) * (1 - 0.6 * ra)})`; $('#lon-chu').style.opacity = kep(vao2 * 1.5) * (1 - ra)
-    const lech = 9 * Math.exp(-tau * 8); $('#lon-chu').style.textShadow = `${lech}px 0 rgba(255,70,90,.6), ${-lech}px 0 rgba(70,210,255,.6), 0 10px 40px rgba(0,0,0,.5)`
+    const lech = 9 * ex(-tau * 8); $('#lon-chu').style.textShadow = `${lech}px 0 rgba(255,70,90,.6), ${-lech}px 0 rgba(70,210,255,.6), 0 10px 40px rgba(0,0,0,.5)`
   }
   if (!coLon) lonEl.classList.add('an')
   // phụ đề

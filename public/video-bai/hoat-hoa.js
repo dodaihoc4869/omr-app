@@ -37,13 +37,13 @@ function veThuVien(d, t) {
     r.c.forEach((g, i) => { const tau = t - tc[i]; if (tau >= 0) soC++; sangNhom(g, tau, MC) })
     capNhatDem(r.dn, `${soN} N`, t - Math.max(...tn.filter((x) => x <= t), -99))
     capNhatDem(r.dc, `${soC} C`, t - Math.max(...tc.filter((x) => x <= t), -99))
-    const sang = t >= m.sang ? Math.exp(-(t - m.sang - (d.tv.indexOf(r) * 0.08)) * 2.2) : 0
+    const sang = t >= m.sang ? ex(-(t - m.sang - (d.tv.indexOf(r) * 0.08)) * 2.2) : 0
     r.h.style.boxShadow = `0 14px 34px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,${0.08 + 0.5 * kep(sang)}), 0 0 ${40 * kep(sang)}px rgba(255,210,122,${0.5 * kep(sang)})`
   }
 }
 function sangNhom(g, tau, mau) {
   if (tau < 0) { g.style.background = 'transparent'; g.style.color = ''; g.style.boxShadow = ''; g.style.transform = ''; return }
-  const xung = Math.exp(-tau * 3.5)
+  const xung = ex(-tau * 3.5)
   g.style.background = `${mau}33`; g.style.color = mau; g.style.boxShadow = `0 0 ${10 + 26 * xung}px ${mau}${xung > 0.05 ? 'aa' : '55'}`
   g.style.transform = `scale(${1 + 0.22 * xung * Math.cos(tau * 18)})`
 }
@@ -51,7 +51,7 @@ function capNhatDem(el, chu, tau) {
   if (el.textContent !== chu) el.textContent = chu
   const so = parseInt(chu, 10)
   el.style.opacity = so > 0 ? 1 : 0.25
-  el.style.transform = tau >= 0 && tau < 0.6 ? `scale(${1 + 0.35 * Math.exp(-tau * 7)})` : ''
+  el.style.transform = tau >= 0 && tau < 0.6 ? `scale(${1 + 0.35 * ex(-tau * 7)})` : ''
 }
 
 // ═════════ 2) CẤU TRÚC (quả cầu - que): hai α-amino acid ⇒ OH + H thành H₂O thật, nối liên kết peptide ═════════
@@ -111,7 +111,7 @@ function veCauTruc(d, t) {
     a.g.setAttribute('transform', `translate(${x},${y}) scale(${kep(p, 0, 1.3)})`); a.g.setAttribute('opacity', kep(p * 1.5))
     // vòng sáng: Cα (mốc alpha), OH (mốc matOH), H (mốc matH)
     let v = 0, mau = MV
-    if (k === 'ca1' || k === 'ca2') v = Math.max(t >= m.dk1 && t < m.dk1 + 1.2 ? 0.8 * Math.sin(Math.PI * tien(t, m.dk1, 1.2)) : 0, t >= m.alpha ? 0.55 + 0.45 * Math.cos((t - m.alpha) * 5) * Math.exp(-(t - m.alpha) * 0.6) : 0) * (1 - tien(t, m.matOH, 0.5))
+    if (k === 'ca1' || k === 'ca2') v = Math.max(t >= m.dk1 && t < m.dk1 + 1.2 ? 0.8 * Math.sin(Math.PI * tien(t, m.dk1, 1.2)) : 0, t >= m.alpha ? 0.55 + 0.45 * Math.cos((t - m.alpha) * 5) * ex(-(t - m.alpha) * 0.6) : 0) * (1 - tien(t, m.matOH, 0.5))
     if (k === 'oh_o' || k === 'oh_h') { v = t >= m.matOH ? 0.7 + 0.3 * Math.sin((t - m.matOH) * 6) : 0; mau = MC }
     if (k === 'h2') { v = t >= m.matH ? 0.7 + 0.3 * Math.sin((t - m.matH) * 6) : 0; mau = MC }
     if (k in NUOC) v *= 1 - tien(t, m.noi, 0.4)
@@ -133,7 +133,7 @@ function veCauTruc(d, t) {
   // liên kết peptide mới C1 - N2
   const c1 = C.nt.c1, n2 = C.nt.n2, lkp = tien(t, m.noi + 0.85, 0.35)
   C.lkMoi.setAttribute('x1', c1.x); C.lkMoi.setAttribute('y1', c1.y); C.lkMoi.setAttribute('x2', c1.x + (n2.x - c1.x) * lkp); C.lkMoi.setAttribute('y2', c1.y + (n2.y - c1.y) * lkp); C.lkMoi.setAttribute('opacity', lkp > 0 ? 1 : 0)
-  C.lkMoi.setAttribute('stroke-width', 9 + 5 * Math.exp(-(t - m.noi - 1.2) * 4) * (t > m.noi + 1.2 ? 1 : 0))
+  C.lkMoi.setAttribute('stroke-width', 9 + 5 * ex(-(t - m.noi - 1.2) * 4) * (t > m.noi + 1.2 ? 1 : 0))
   // nhãn
   const hienNhan = (k, on, tre = 0) => { const e = C.nhan[k]; e.setAttribute('opacity', on); e.setAttribute('transform', `translate(0,${(1 - on) * 12 + tre})`) }
   hienNhan('mx1', tien(t, m.hien + 0.3, 0.4) * (1 - tien(t, m.noi, 0.4))); hienNhan('mx2', tien(t, m.hien + 0.7, 0.4) * (1 - tien(t, m.noi, 0.4)))
@@ -188,7 +188,7 @@ function veChuoi(d, t) {
   const tN = C.n.map((_, i) => m[`d${i + 1}`] ?? m.tong)
   C.n.forEach((n, i) => {
     const kh = C.khoi[n.khoi], hien = tien(t, m.hien + 0.5, 0.4), tau = t - tN[i]
-    n.e.style.top = `${Y + 172}px`; n.e.style.transform = `translateX(${kh.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * Math.exp(-tau * 5) : 0.9})`; n.e.style.opacity = hien
+    n.e.style.top = `${Y + 172}px`; n.e.style.transform = `translateX(${kh.dx || 0}px) scale(${tau >= 0 ? 1 + 0.4 * ex(-tau * 5) : 0.9})`; n.e.style.opacity = hien
     n.e.classList.toggle('sang', tau >= 0)
     const ps = lo(tau, 2.4, 0.5); n.so.style.left = `${n.x - 19 + (kh.dx || 0)}px`; n.so.style.top = `${Y + 128 - ps * 8}px`; n.so.style.opacity = kep(ps * 1.5); n.so.style.transform = `scale(${0.4 + 0.6 * ps})`
   })
@@ -199,7 +199,7 @@ function veChuoi(d, t) {
     h.style.left = `${lerp(780, n.x - (C.acid ? 40 : 52) + (kh.dx || 0), p)}px`; h.style.top = `${lerp(-40, Y + 250, p)}px`; h.style.opacity = tien(t, t0, 0.12)
     const xung = m.nhan != null && t >= m.nhan && C.P.khoi[n.khoi][C.acid ? 1 : 2] > 1 ? 0.5 + 0.5 * Math.sin((t - m.nhan) * 7) : 0
     h.style.boxShadow = xung ? `0 0 ${10 + 22 * xung}px rgba(253,164,175,.8)` : ''
-    h.style.transform = `scale(${1 + (p >= 1 ? 0.2 * Math.exp(-(t - t0 - 0.6) * 6) : 0) + 0.12 * xung})`
+    h.style.transform = `scale(${1 + (p >= 1 ? 0.2 * ex(-(t - t0 - 0.6) * 6) : 0) + 0.12 * xung})`
   })
   // bộ đếm
   const dn = C.dem.querySelector('.nuoc'), dd = C.dem.querySelector('.dem'), dh = C.dem.querySelector('.hcl')
@@ -211,7 +211,7 @@ function veChuoi(d, t) {
   }
   const iDem = dd.querySelectorAll('i'), daDem = C.khoi.map((_, k) => Math.max(...C.n.map((n, i) => (n.khoi === k ? tN[i] : -1e9))))
   dd.style.opacity = tien(t, Math.min(...tN) - 0.2, 0.3)
-  iDem.forEach((e, i) => { const t0 = i < daDem.length ? daDem[i] : m.tong, p = lo(t - t0, 2.4, 0.5); e.style.opacity = kep(p * 1.4); e.style.transform = `translateY(${(1 - p) * 14}px) scale(${i === daDem.length ? 1 + 0.4 * Math.exp(-Math.max(0, t - t0) * 4) : 1})` })
+  iDem.forEach((e, i) => { const t0 = i < daDem.length ? daDem[i] : m.tong, p = lo(t - t0, 2.4, 0.5); e.style.opacity = kep(p * 1.4); e.style.transform = `translateY(${(1 - p) * 14}px) scale(${i === daDem.length ? 1 + 0.4 * ex(-Math.max(0, t - t0) * 4) : 1})` })
   dh.style.opacity = tien(t, tThuoc, 0.3); const so = Math.min(tong, Math.max(0, Math.floor((t - tThuoc - 0.6) / 0.16) + 1)); dh.querySelector('b').textContent = `: ${so ? soA(so) : '0a'}`
   dh.classList.toggle('du', so === tong)
   if (C.nhan) { const pl = lo(t - (m.nhan ?? 1e9), 2, 0.55); C.nhan.style.opacity = kep(pl * 1.4); C.nhan.style.transform = `translateY(${(1 - pl) * 16}px)` }

@@ -27,7 +27,7 @@ function veHat(d, t) {
   const n = t < m.dem50 ? 2 : Math.round(lerp(2, 50, eInOut(tien(t, m.dem50, 2.4))))
   H.dem.style.opacity = tien(t, m.hien, 0.3); H.dem.querySelector('b').textContent = String(n)
   H.dem.querySelector('b').style.transform = t >= m.dem50 && t < m.dem50 + 2.6 ? `scale(${1.15 + 0.1 * Math.sin(t * 20)})` : ''
-  const coMau = tien(t, m.mau, 0.5), lkSang = t >= m.lk ? 0.5 + 0.5 * Math.cos((t - m.lk) * 4) * Math.exp(-(t - m.lk) * 0.5) : 0
+  const coMau = tien(t, m.mau, 0.5), lkSang = t >= m.lk ? 0.5 + 0.5 * Math.cos((t - m.lk) * 4) * ex(-(t - m.lk) * 0.5) : 0
   H.hat.forEach((h, i) => {
     const tHien = i < 2 ? m.hien + i * 0.15 : m.dem50 + ((i - 2) / 48) * 2.4 * 0.85, p = lo(t - tHien, 2.6, 0.5)
     h.g.setAttribute('opacity', kep(p * 1.5)); h.c.setAttribute('r', String(22 * kep(0.4 + 0.6 * p, 0, 1.25)))
@@ -55,7 +55,7 @@ function vePhuongTrinh(d, t) {
   const m = d.hoat.moc
   for (const k of d.ptr) {
     const t0 = m[k.moc]; bat(k.e, t, t0, 26)
-    if (k.lop === 'kq' && t >= t0) { const x = Math.exp(-(t - t0) * 2.5); k.e.style.boxShadow = `0 0 0 ${3 + 3 * x}px var(--mau), 0 0 ${30 + 30 * x}px rgba(255,210,122,${0.25 + 0.35 * x})` }
+    if (k.lop === 'kq' && t >= t0) { const x = ex(-(t - t0) * 2.5); k.e.style.boxShadow = `0 0 0 ${3 + 3 * x}px var(--mau), 0 0 ${30 + 30 * x}px rgba(255,210,122,${0.25 + 0.35 * x})` }
   }
 }
 
