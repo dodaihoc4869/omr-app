@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1111,
+    "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+    "fileNguon": "anh/c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4.png",
+    "svg": "ala1111-native-ddh-468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771.svg",
+    "hashSvg": "468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771",
+    "byteSvg": 2410,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B2-I-12",
+        "de": "α-linolenic acid (ALA) là một loại acid béo quan trọng đối với cơ thể, được cung cấp chủ yếu từ thức ăn có nguồn gốc thực vật như dầu đậu nành, dầu hạt cải, cải bó xôi,... Cấu trúc mạch carbon của α-linolenic acid như sau:\nCho các phát biểu sau:\n(1) ALA là acid béo thuộc loại Omega-3.\n(2) Trong ALA, nhóm nguyên tử ở carbon nối đôi ở vị trí cis với nhau.\n(3) Muối sodium của ALA có tác dụng giặt rửa.\n(4) Phân tử ALA có chứa 18 nguyên tử carbon.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+            "where": "12-C1-B2-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "8aeb3cb4294f8ec50b5fba56c8a74ea77c2b4436393cd62666428db366a8dcbe"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18bareC2O3CCdouble1COdoubleUP2verticalraysBOTHnativeLIGHTgaps/HOlastO-ALLregularUPRIGHT/individualnonperiodicvertices-rays-RIGHTfreeUP/0stereo-arrows-caption-nums/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

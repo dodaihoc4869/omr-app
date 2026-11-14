@@ -1,0 +1,16 @@
+{
+  "lo": 436,
+  "main": "4365aca9b5d270a86a93dfc6590d21106f7d0d55",
+  "previousMain": "4365aca9b5d270a86a93dfc6590d21106f7d0d55",
+  "diffStat": "0 files changed",
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2010,
+  "checkerFiles": 377,
+  "colorLogSha256": "a887c0e2d51d9cb94e71ed5f8ef684ed1bfd062989b9fee5e7ecf113d5f5e766",
+  "release": "Main4365aca9b không đổi so435, chưa gộp/latestmainfullBYNAME-buildspeed trướcmerge-release."
+}

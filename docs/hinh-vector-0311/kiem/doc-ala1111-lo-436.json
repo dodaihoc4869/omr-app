@@ -1,0 +1,266 @@
+{
+  "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+  "native": [
+    940,
+    200
+  ],
+  "questions": [
+    {
+      "qid": "12-C1-B2-I-12",
+      "de": "α-linolenic acid (ALA) là một loại acid béo quan trọng đối với cơ thể, được cung cấp chủ yếu từ thức ăn có nguồn gốc thực vật như dầu đậu nành, dầu hạt cải, cải bó xôi,... Cấu trúc mạch carbon của α-linolenic acid như sau:\nCho các phát biểu sau:\n(1) ALA là acid béo thuộc loại Omega-3.\n(2) Trong ALA, nhóm nguyên tử ở carbon nối đôi ở vị trí cis với nhau.\n(3) Muối sodium của ALA có tác dụng giặt rửa.\n(4) Phân tử ALA có chứa 18 nguyên tử carbon.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+          "where": "12-C1-B2-I-12.hinh.0.du_lieu",
+          "hashDataUrl": "8aeb3cb4294f8ec50b5fba56c8a74ea77c2b4436393cd62666428db366a8dcbe"
+        }
+      ]
+    }
+  ],
+  "ghiChu": "18bareC2O3CCdouble1COdoubleUP2verticalraysBOTHnativeLIGHTgaps/HOlastO-ALLregularUPRIGHT/individualnonperiodicvertices-rays-RIGHTfreeUP/0stereo-arrows-caption-nums/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+  "rootSourceAudit": "RootOWNnativeFULL/all1de12-C1-B2-I-12/CO4x-chainL4x-chainR4x.18vertices independently counted, not taken from stem. 3CC/2O/COup2rays native lightfootgaps: sourceAAgray156 at134100, NOTfullpureWHITErow claim. RegularUPRIGHT HOlastO/O. No inferred chemicalparticles from scanflecks. No answers.",
+  "independentSource": {
+    "i": 1111,
+    "assetIndex": 234,
+    "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4.png",
+    "size": [
+      940,
+      200
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "12-C1-B2-I-12",
+        "de": "α-linolenic acid (ALA) là một loại acid béo quan trọng đối với cơ thể, được cung cấp chủ yếu từ thức ăn có nguồn gốc thực vật như dầu đậu nành, dầu hạt cải, cải bó xôi,... Cấu trúc mạch carbon của α-linolenic acid như sau:\nCho các phát biểu sau:\n(1) ALA là acid béo thuộc loại Omega-3.\n(2) Trong ALA, nhóm nguyên tử ở carbon nối đôi ở vị trí cis với nhau.\n(3) Muối sodium của ALA có tác dụng giặt rửa.\n(4) Phân tử ALA có chứa 18 nguyên tử carbon.\nSố phát biểu đúng là",
+        "allHinh": [
+          {
+            "hash": "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4",
+            "where": "12-C1-B2-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "8aeb3cb4294f8ec50b5fba56c8a74ea77c2b4436393cd62666428db366a8dcbe"
+          }
+        ],
+        "missingHashes": [
+          "c76dec788a05d5b7e89f649ef7cfa863e10bacc3853f9ae1a9ca1677c72c3fc4"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "onlyThisHinh": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownMacrosOpened": [
+        "/workspace/scratch/436-1111-full3x.png",
+        "/workspace/scratch/436-1111-CO5x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "orderedCarbonVertices": [
+        [
+          139,
+          102
+        ],
+        [
+          179,
+          147
+        ],
+        [
+          225,
+          101
+        ],
+        [
+          268,
+          147
+        ],
+        [
+          315,
+          102
+        ],
+        [
+          357,
+          147
+        ],
+        [
+          405,
+          101
+        ],
+        [
+          447,
+          147
+        ],
+        [
+          492,
+          101
+        ],
+        [
+          539,
+          101
+        ],
+        [
+          582,
+          146
+        ],
+        [
+          629,
+          101
+        ],
+        [
+          678,
+          101
+        ],
+        [
+          719,
+          146
+        ],
+        [
+          767,
+          101
+        ],
+        [
+          814,
+          101
+        ],
+        [
+          856,
+          146
+        ],
+        [
+          903,
+          101
+        ]
+      ],
+      "CCdoubleInnerRays": [
+        [
+          [
+            493,
+            109
+          ],
+          [
+            538,
+            109
+          ]
+        ],
+        [
+          [
+            630,
+            109
+          ],
+          [
+            677,
+            109
+          ]
+        ],
+        [
+          [
+            768,
+            109
+          ],
+          [
+            813,
+            109
+          ]
+        ]
+      ],
+      "HOarm": [
+        [
+          92,
+          143
+        ],
+        [
+          139,
+          102
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            134,
+            62
+          ],
+          [
+            134,
+            99
+          ]
+        ],
+        [
+          [
+            143,
+            62
+          ],
+          [
+            143,
+            98
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "literal": "HO",
+          "bbox": [
+            38,
+            136,
+            88,
+            160
+          ],
+          "anchor": "last O"
+        },
+        {
+          "literal": "O",
+          "bbox": [
+            127,
+            35,
+            150,
+            60
+          ],
+          "center": [
+            138.5,
+            47.5
+          ]
+        }
+      ],
+      "counts": {
+        "visibleC": 18,
+        "O": 2,
+        "CCdouble": 3,
+        "COdouble": 1,
+        "explicitHydroxylH": 1,
+        "implicitH": "not inferred"
+      },
+      "carbonylFootAudit": "Own5x macro shows short light wedges/gaps below two parallel ray feet before V-arm apex. Ray strong ink y98/99; apex strong starts y101. Left x134 gray156 remains y100, so not a full pure-white horizontal row claim. Preserve independent rays ending near99/98 and do not extend them to contacts/crossbar by chemistry. Approx gap1–2px, raster AA limits.",
+      "styles": {
+        "labels": "regular upright serif HO/O, H high-contrast serif; no true bold asserted",
+        "bond": "black scan approx2px, no stereo/taper",
+        "caption": "NONE"
+      },
+      "crop": "No chemical glyph/bond clipped; no caption or top prose fragment",
+      "background": "Irregular faint gray scan specks, no chemical particle/radical count inferred"
+    },
+    "measurementLimits": "Nativeapprox ±1–2px read individually from full and ownCO5x, no periodic-normalized chain. Carbon count18 from listed visible vertices independently of public stem statement. Acid shape remains open with free right endpoint.",
+    "status": "source-only/noSVG/noCount",
+    "actualSvgReviewed": false
+  },
+  "rootActualReview": {
+    "nativeFull": true,
+    "allPublicDe": true,
+    "freshChromiumFull3x": "/workspace/scratch/root436-1111.png",
+    "ownMacros": [
+      "/workspace/scratch/native436-CO.png",
+      "/workspace/scratch/native436-chainL.png",
+      "/workspace/scratch/native436-chainR.png",
+      "/workspace/scratch/root436-CO.png",
+      "/workspace/scratch/root436-chainL.png",
+      "/workspace/scratch/root436-chainR.png"
+    ],
+    "hashSvg": "468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771",
+    "verdict": "Đạt root:18bareC2O3CCdouble COUP2raysBOTHlightfootgaps,HOlastOregularUPRIGHT,rightfreeUP, noextraH/captions/stereo/crops. Sourcepixels nofullpureWHITErow claim.",
+    "limits": "Native approximate not subpixel; no SVG negative found436."
+  },
+  "readonlyRuntime": {
+    "sha256": "576341616ee7ae3827a3437fbcd443ea9f4435606b0b49ab3a974cadb009c570",
+    "raw": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ala1111-native-ddh-468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771.svg 468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771\n1111 { x: 0, y: 0, width: 940, height: 200 }\n\nPOSTSHOT_SHA 468f7de849f11e8e3d7d19f5d0d7c70153493bae36d69b43f12aa47ee0693771\nCOMMAND node /workspace/scratch/agent-render436.cjs\nCONTEXT 12-C1-B2-I-12.hinh.0.du_lieu public de/one ref only; no answers.\n"
+  }
+}
