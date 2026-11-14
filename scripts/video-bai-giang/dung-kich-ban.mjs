@@ -127,7 +127,10 @@ for (const cc of ch.canh) {
   doan.push({ loai: 'the-chuong', t0: t, t1: t + THE_CHUONG, so: cc.so, tieuDe: cc.tieuDe, mau: cc.mau }); sfx.push({ t: t + 0.02, loai: 'vut' }, { t: t + 0.55, loai: 'bop' }, { t: t + THE_CHUONG - 0.42, loai: 'vut-ra' })
   t += THE_CHUONG
   const canh = { loai: 'canh', id: cc.id, so: cc.so, tieuDe: cc.tieuDe, mau: cc.mau, nhan: cc.nhan, t0: t, manh: [], cau: [], su: [], nhanManh: [], khung: [] }
-  const cauGoc = cc.dong.map((i) => ({ i, ...c.loi[i] }))
+  // LỜI RIÊNG của cảnh (cc.loiRieng — tệp trong thư mục tư liệu: [{ chu, tu, den }]): lời viết lại PHỦ KÍN mọi ý Thầy giảng (từ lời nguyên văn), thay lời
+  // tóm tắt của văn phòng vốn bỏ sót những đoạn Thầy đang giảng (thầy 14/11 «đoạn 1:20 thầy nói mà bảng với hoạt hoạ không minh hoạ»)
+  const loiCanh = cc.loiRieng ? JSON.parse(readFileSync(join(duLieu, cc.loiRieng), 'utf8')) : c.loi
+  const cauGoc = cc.dong.map((i) => ({ i, ...loiCanh[i] }))
   let trc = null
   const chenDoVui = (sMoc) => {
     const dv = cc.doVui

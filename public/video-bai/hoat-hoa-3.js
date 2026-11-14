@@ -60,15 +60,18 @@ function dungBazo(d, goc) {
   const giotCan = [0, 1].map(() => E('bz-giot nho', 'H₂O', BC)), giotSinh = [0, 1, 2].map(() => E('bz-giot nho', 'H₂O', BC))
   const can = E('bz-hop trai', '<span>Cắt 2 liên kết, cần</span><b>2 H₂O</b>', BC), sinh = E('bz-hop phai', '<span>3 đầu C sinh</span><b>3 H₂O</b>', BC)
   const triet = E('bz-triet', '3 − 2: <b>triệt tiêu 2 nước</b>', BC), con = E('bz-con', 'Chỉ còn <b>1 H₂O</b> ⇒ <em>H₂O : a</em>', BC)
+  // các ý Thầy giảng thêm (lời nguyên văn): 2 liên kết cần 2 nước · không cộng HCl mà cộng NaOH · quy luật 1 COOH ăn 1 NaOH
+  const nhLk = E('bz-nh vang', '2 liên kết ⇒ cần <b>2 H₂O</b>', BC), nhDoi = E('bz-nh xanh', '<s>HCl: đếm N</s> ⇒ <b>NaOH: đếm đầu C</b>', BC)
+  const banChat = E('bz-tom nho', 'Quy luật: <b>1 COOH</b> ăn <b>1 NaOH</b>, sinh <b>1 H₂O</b>', BC)
   // ── D: muối + M ──
   const D = E('bz-san', '')
   const dd = {
     hang: E('bz-hangD', '<span class="bz-g">H₂N-CH₂-COO</span><span class="bz-g h">H</span>', D), h: E('bz-bay h vua', 'H', D), na: E('bz-bay na vua', 'Na', D), tenM: E('bz-nh vang', 'Gly ⇒ <b>Gly-Na</b>', D),
-    tru: E('bz-nh hong', 'mất 1 H: <b>− 1</b>', D), cong: E('bz-nh xanh', 'thêm Na: <b>+ 23</b>', D),
+    tru: E('bz-nh hong', 'mất 1 H: <b>− 1</b>', D), cong: E('bz-nh xanh', 'thêm Na: <b>+ 23</b>', D), khong: E('bz-nh hong', 'không phải <s>+ 23</s> ngay', D),
     m: E('bz-m', '<span>Gly-Na</span><i>M = 75</i><i>− 1</i><i>+ 23</i><i>= 75 + <em>22</em></i><i>= 97</i>', D),
     ala: E('bz-m ala', '<span>Ala-Na</span><i>M = 89</i><i>+ <em>22</em></i><i>= 111</i>', D),
   }
-  d.bz = { pt, P, A, a, BC, khoi, lk, dauC, soC, naohT, demC, giotCan, giotSinh, can, sinh, triet, con, D, dd, bw, gap, W, giua }
+  d.bz = { pt, P, A, a, BC, khoi, lk, dauC, soC, naohT, demC, giotCan, giotSinh, can, sinh, triet, con, nhLk, nhDoi, banChat, D, dd, bw, gap, W, giua }
   // TIA LẤP LÁNH đúng khoảnh khắc (khung.js vẽ theo moc + trễ): nước thành · Na gắn · đếm 1-2-3 · tổng 3 · NaOH gắn · còn 1 nước · M = 97 · 111
   const iDem = demC.querySelectorAll('i'), iM = dd.m.querySelectorAll('i'), iAla = dd.ala.querySelectorAll('i'), NUOC = '#8fd8ee', VANG = '#ffd27a'
   d.lap = [
@@ -81,14 +84,14 @@ function dungBazo(d, goc) {
   ]
   d.hoatNeo = {
     'pt-pep': P.pep, 'pt-naoh': P.naoh, 'pt-3a': P.naoh.querySelector('em'), 'pt-mui': P.mui, 'pt-nuoc': P.nuoc, 'pt-glyna': P.glyna, 'pt-alana': P.alana,
-    'a-cooh': g.C, 'a-h': g.H, 'a-oh': g.OH, 'a-nuoc': g.H2O, 'a-coona': g.COONa, 'b-dc1': dauC[1], 'b-dc2': dauC[2], 'd-cong': dd.cong, 'b-dc': dauC[0], 'd-tru': dd.tru, 'd-m': dd.m, 'd-ala': dd.ala,
+    'a-cooh': g.C, 'a-h': g.H, 'a-oh': g.OH, 'a-nuoc': g.H2O, 'a-coona': g.COONa, 'b-dc1': dauC[1], 'b-dc2': dauC[2], 'd-cong': dd.cong, 'b-banchat': banChat, 'b-dc': dauC[0], 'd-tru': dd.tru, 'd-m': dd.m, 'd-ala': dd.ala,
   }
 }
 
 function veBazo(d, t) {
   const m = d.hoat.moc, Z = d.bz, P = Z.P
   // phương trình tổng: vế hiện đúng lúc Thầy viết; dấu "+" đi cùng vế sau nó; vế mới viết sáng viền 1,6 s
-  xuat(Z.pt, t, m.pt_pep - 0.5, 10, 0.97)
+  xuat(Z.pt, t, m.pt_pep - 0.5, 10, 0.97); Z.pt.classList.toggle('sang', m.c_dung != null && t >= m.c_dung && t < m.c_dung + 2.6)
   const ve = [[P.pep, m.pt_pep], [P.cong1, m.pt_naoh], [P.naoh, m.pt_naoh], [P.mui, m.pt_mui], [P.nuoc, m.pt_nuoc], [P.cong3, m.pt_nuoc], [P.glyna, m.pt_glyna], [P.cong2, m.pt_alana], [P.alana, m.pt_alana]]
   for (const [e, t0] of ve) { xuat(e, t, t0, 14); e.classList.toggle('moi', t >= t0 && t < t0 + 1.6) }
   P.pep.querySelector('.hs').style.opacity = r3(tien(t, m.pt_a, 0.3)); P.naoh.querySelector('.hs').style.opacity = r3(tien(t, m.b_3a, 0.3))
@@ -118,7 +121,7 @@ function veBazoA(Z, m, t) {
   // acid nhường H⁺ (H sáng hồng, mang dấu +, COO mang dấu −) · base nhận H⁺ (OH sáng xanh, mang dấu −, Na mang dấu +)
   const daBay = t >= m.a_cung1, xongNuoc = t >= m.a_nuoc, xongMuoi = t >= m.a_coona, tom = t >= m.a_tom
   g.H.classList.toggle('sang', t >= m.a_acid && !daBay); g.OH.classList.toggle('sang', t >= m.a_base && t < m.a_nuoc)
-  for (const [e, t0] of [[g.H, m.a_acid], [g.O2, m.a_acid], [g.Na, m.a_base], [g.OH, m.a_base]]) e.querySelector('.q').style.opacity = r3(tien(t, t0, 0.25) * (tom ? 0 : 1))
+  for (const [e, t0] of [[g.H, m.a_acid], [g.O2, m.a_cooTru ?? m.a_acid], [g.Na, m.a_naCong ?? m.a_base], [g.OH, m.a_base]]) e.querySelector('.q').style.opacity = r3(tien(t, t0, 0.25) * (tom ? 0 : 1))
   // đã dùng ⇒ mờ đi (H đã bay sang OH, OH đã thành nước, COO + Na đã gộp); tổng kết ⇒ phương trình đọc lại bình thường
   const mo = (e, t0) => { if (t >= t0 && !tom) e.style.opacity = r3(Number(e.style.opacity) * (1 - 0.62 * tien(t, t0, 0.4))) }
   mo(g.H, m.a_cung0 + 0.1); mo(g.OH, m.a_gH2O); mo(g.C, m.a_gCN); mo(g.O1, m.a_gCN); mo(g.O2, m.a_gCN); mo(g.Na, m.a_gCN3 - 0.3)
@@ -154,10 +157,10 @@ function veBazoA(Z, m, t) {
 
 function veBazoBC(Z, m, t) {
   const Y = 18, bw = Z.bw, gap = Z.gap, giua = Z.giua
-  const tKhoi = [m.b_gly1, m.b_ala, m.b_gly2], tach = eInOut(tien(t, m.c_can + 0.6, 0.6)), dx = (i) => (i - 1) * 14 * tach
+  const tKhoi = [m.b_gly1, m.b_ala, m.b_gly2], tach = eInOut(tien(t, m.c_can + 0.6, 0.6)), cat = m.d_cat != null ? eInOut(tien(t, m.d_cat, 0.7)) : 0, dx = (i) => (i - 1) * (14 * tach + 34 * cat)
   Z.khoi.forEach((e, i) => { const p = lo(t - tKhoi[i], 2.2, 0.55); datXY(e, 14 + i * (bw + gap), Y); e.style.opacity = r3(kep(p * 1.5)); e.style.transform = `translateX(${r3(dx(i))}px) scale(${r3(0.6 + 0.4 * kep(p, 0, 1.2))})` })
   // liên kết peptide: hiện khi mắt xích sau vào · đứt khi nước rơi vào (cần 2 nước)
-  Z.lk.forEach((e, i) => { const v = tien(t, tKhoi[i + 1], 0.3), dut = tien(t, m.c_can + 0.45 + i * 0.12, 0.2); e.style.top = `${Y + 45}px`; e.style.opacity = r3(v * (1 - dut)); e.style.transform = `scaleX(${r3(v * (1 - dut))})` })
+  Z.lk.forEach((e, i) => { const v = tien(t, tKhoi[i + 1], 0.3), dut = tien(t, m.c_can + 0.45 + i * 0.12, 0.2); e.style.top = `${Y + 45}px`; e.style.opacity = r3(v * (1 - dut)); e.style.transform = `scaleX(${r3(v * (1 - dut))}) scaleY(${r3(m.b_canNuoc != null && t >= m.b_canNuoc && t < m.b_canNuoc + 2 ? 1.8 - 0.8 * tien(t, m.b_canNuoc + 1.2, 0.8) : 1)})`; e.classList.toggle('sang', m.b_canNuoc != null && t >= m.b_canNuoc && t < m.b_canNuoc + 2.6) })
   // đầu C (COOH) của mỗi mắt xích: hiện khi Thầy viết "(đếm COOH)", sáng lần lượt theo lời "Gly… Ala… Gly…"
   const tDem = [m.b_c1, m.b_c2, m.b_c3]
   Z.dauC.forEach((e, i) => {
@@ -168,7 +171,7 @@ function veBazoBC(Z, m, t) {
   })
   Z.soC.forEach((e, i) => { const p = lo(t - tDem[i], 2.4, 0.5); datXY(e, giua(i) + 56, Y + 112); e.style.opacity = r3(kep(p * 1.5)); e.style.transform = `translateX(${r3(dx(i))}px) scale(${r3(0.4 + 0.6 * kep(p, 0, 1.2))})` })
   // NaOH bay vào gắn từng đầu C khi Thầy viết ": 3a"
-  Z.naohT.forEach((e, i) => { const t0 = m.b_3a + i * 0.18, p = eInOut(tien(t, t0, 0.6)); datXY(e, lerp(Z.W + 20, giua(i) - 58 + dx(i), p), Y + 192); e.style.opacity = r3(tien(t, t0, 0.12)) })
+  Z.naohT.forEach((e, i) => { const t0 = (m.b_an ?? m.b_3a) + i * 0.18, p = eInOut(tien(t, t0, 0.6)); datXY(e, lerp(Z.W + 20, giua(i) - 58 + dx(i), p), Y + 192); e.style.opacity = r3(tien(t, t0, 0.12)) })
   const dem = Z.demC; dem.style.top = `${Y + 254}px`; dem.style.opacity = r3(tien(t, m.b_c1 - 0.25, 0.3))
   const tI = [tDem[0], tDem[1], tDem[2], m.b_tong, m.b_3a + 0.4]
   dem.querySelectorAll('i').forEach((e, i) => { const p = lo(t - tI[i], 2.4, 0.5); e.style.opacity = r3(kep(p * 1.4)); e.style.transform = `translateY(${r3((1 - p) * 14)}px)` })
@@ -182,14 +185,17 @@ function veBazoBC(Z, m, t) {
     e.style.opacity = r3(tien(t, t0, 0.12) * (1 - mat)); e.classList.toggle('gach', t >= m.c_triet)
   })
   Z.giotSinh.forEach((e, i) => {
-    const t0 = m.c_sinh + i * 0.16, len = lo(t - t0, 2.4, 0.5), vao = eInOut(tien(t, m.c_sinh + 1.0 + i * 0.1, 0.7))
-    datXY(e, lerp(giua(i) - 25 + dx(i), hopX(false, i, 3), vao), lerp(Y + 128 - 30 * kep(len), hopY, vao)); e.style.transform = `scale(${r3(0.3 + 0.7 * kep(len, 0, 1.2) + (i === 2 && t >= m.c_con ? 0.25 * ex(-(t - m.c_con) * 3) : 0))})`
+    const t0 = m.c_sinh + i * 0.16, len = lo(t - t0, 2.4, 0.5), vao = eInOut(tien(t, (m.c_sinhHop ?? m.c_sinh + 1.0) + i * 0.1, 0.7))
+    datXY(e, lerp(giua(i) + 62 + dx(i), hopX(false, i, 3), vao), lerp(Y + 150 - 18 * kep(len), hopY, vao)); e.style.transform = `scale(${r3(0.3 + 0.7 * kep(len, 0, 1.2) + (i === 2 && t >= m.c_con ? 0.25 * ex(-(t - m.c_con) * 3) : 0))})`
     e.style.opacity = r3(tien(t, t0, 0.12) * (i < 2 ? 1 - mat : 1)); e.classList.toggle('gach', i < 2 && t >= m.c_triet); e.classList.toggle('sang', i === 2 && t >= m.c_con)
   })
   datXY(Z.can, 14, Y + 328); xuat(Z.can, t, m.c_can + 0.2); Z.can.classList.toggle('gach', t >= m.c_trai)
-  datXY(Z.sinh, Z.W / 2 + 6, Y + 328); xuat(Z.sinh, t, m.c_sinh + 0.2); Z.sinh.querySelector('b').textContent = t >= m.c_con ? '1 H₂O' : '3 H₂O'; Z.sinh.classList.toggle('sang', t >= m.c_con)
+  datXY(Z.sinh, Z.W / 2 + 6, Y + 328); xuat(Z.sinh, t, (m.c_sinhHop ?? m.c_sinh + 0.4) - 0.2); Z.sinh.querySelector('b').textContent = t >= m.c_con ? '1 H₂O' : '3 H₂O'; Z.sinh.classList.toggle('sang', t >= m.c_con)
   datXY(Z.triet, 14, Y + 430); xuat(Z.triet, t, m.c_triet); tat(Z.triet, t, m.c_con)
   datXY(Z.con, 14, Y + 430); xuat(Z.con, t, m.c_con + 0.5)
+  if (m.b_canNuoc != null) { datXY(Z.nhLk, Z.W / 2 - 170, Y + 136); xuat(Z.nhLk, t, m.b_canNuoc); tat(Z.nhLk, t, m.b_dem - 0.3) } else Z.nhLk.style.opacity = 0
+  if (m.b_hcl != null) { datXY(Z.nhDoi, 14, Y + 254); xuat(Z.nhDoi, t, m.b_hcl); tat(Z.nhDoi, t, m.b_c1 - 0.5) } else Z.nhDoi.style.opacity = 0
+  if (m.b_banChat != null) { datXY(Z.banChat, 0, Y + 330); xuat(Z.banChat, t, m.b_banChat); tat(Z.banChat, t, (m.c_sinhHop ?? m.c_sinh) - 0.5) } else Z.banChat.style.opacity = 0
 }
 
 function veBazoD(Z, m, t) {
@@ -208,7 +214,8 @@ function veBazoD(Z, m, t) {
   datXY(d.tenM, X, Y + 84); xuat(d.tenM, t, m.d_coona)
   datXY(d.tru, X, Y + 150); xuat(d.tru, t, m.d_tru1)
   datXY(d.cong, X + 330, Y + 150); xuat(d.cong, t, m.d_cong23)
-  datXY(d.m, 0, Y + 236); d.m.style.opacity = r3(tien(t, m.d_75 - 0.25, 0.3))
+  datXY(d.m, 0, Y + 236); d.m.style.opacity = r3(tien(t, (m.d_mHien ?? m.d_75) - 0.25, 0.3))
+  if (m.d_khong != null) { datXY(d.khong, X + 330, Y + 150); xuat(d.khong, t, m.d_khong); tat(d.khong, t, m.d_tru1 - 0.2) } else d.khong.style.opacity = 0
   const tm = [m.d_75, m.d_tru1, m.d_cong23, m.d_22, m.d_22 + 1.1]
   d.m.querySelectorAll('i').forEach((e, i) => { const p = lo(t - tm[i], 2.4, 0.5); e.style.opacity = r3(kep(p * 1.4)); e.style.transform = `translateY(${r3((1 - p) * 14)}px) scale(${r3(i === 3 && t >= tm[3] ? 1 + 0.25 * ex(-(t - tm[3]) * 3) : 1)})` })
   datXY(d.ala, 0, Y + 356); d.ala.style.opacity = r3(tien(t, m.d_ala - 0.25, 0.3))
