@@ -238,7 +238,7 @@ function veDanhDau(d, t, cam, bienDoi) {
     void r
     const dich = d.hoatNeo && d.hoatNeo[dd.toi]
     if (dich) {
-      const rr = dich.getBoundingClientRect(), laNt = dich instanceof SVGElement
+      const rr = hopSan(dich), laNt = dich instanceof SVGElement
       const ex = laNt ? rr.left + rr.width / 2 : rr.left - 10, ey = laNt ? rr.top - 8 : rr.top + rr.height / 2
       const sx = b[0] + 4, sy = (a[1] + b[1]) / 2
       const p = svgEl('path', { d: laNt ? `M ${sx} ${sy} C ${sx + 120} ${sy}, ${ex} ${ey - 160}, ${ex} ${ey}` : `M ${sx} ${sy} C ${sx + 90} ${sy}, ${ex - 90} ${ey}, ${ex} ${ey}`, fill: 'none', stroke: mau, 'stroke-width': 4, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 - noiP, opacity: mo, filter: 'url(#dd-sang)' }, svg)

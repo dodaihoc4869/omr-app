@@ -38,6 +38,12 @@ const BANG = { x: 56, y: 118, w: 1140, h: 760 }
 let COT = { x: 1232, y: 118, w: 632, h: 760 }
 let ctx = null, hoaCtx = null
 
+/** Khung một phần tử theo toạ độ SÂN KHẤU 1920×1080. Trang xem trong app co sân khấu vừa màn máy em ⇒ toạ độ màn khác toạ độ sân;
+ *  đường nối bảng → hình, tia lấp lánh, pháo giấy vẽ theo toạ độ sân nên phải đổi về (bộ quay video: sân ở 0,0 tỉ lệ 1 ⇒ không đổi). */
+function hopSan(e) {
+  const r = e.getBoundingClientRect(), s = document.getElementById('san').getBoundingClientRect(), k = s.width / 1920 || 1
+  return { left: (r.left - s.left) / k, top: (r.top - s.top) / k, width: r.width / k, height: r.height / k }
+}
 // NÉT BÚT MƯỢT (thầy 14/11 «giữ lại nét chữ viết theo cây bút mượt mà»): nối các điểm lấy mẫu bằng cung bậc hai qua trung điểm ⇒ không gãy khúc.
 function veTron(p, d) {
   const n = d.length / 2; p.moveTo(d[0], d[1]); if (n === 1) { p.lineTo(d[0] + 0.1, d[1]); return }
@@ -56,7 +62,7 @@ function diemDo(n, da) {
 function veBut(c, x, y, mau, nhac, mo) {
   if (mo <= 0.01) return
   c.save(); c.globalAlpha = mo; c.translate(x, y - nhac * 10); c.rotate(-0.95)
-  if (!CHE_DO.nhe) { c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 14; c.shadowOffsetY = 8 + nhac * 10 }
+  if (!CHE_DO.trucTiep) { c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 14; c.shadowOffsetY = 8 + nhac * 10 } // bóng thân bút chỉ ở bộ quay video (máy em: bỏ cho nhẹ)
   c.fillStyle = '#2b3c43'; c.beginPath(); c.moveTo(4, -9); c.lineTo(132, -9); c.arcTo(142, -9, 142, 0, 9); c.arcTo(142, 9, 132, 9, 9); c.lineTo(4, 9); c.closePath(); c.fill()
   c.shadowBlur = 0; c.shadowOffsetY = 0
   c.fillStyle = '#d8dee0'; c.beginPath(); c.moveTo(0, 0); c.lineTo(30, -9); c.lineTo(30, 9); c.closePath(); c.fill()
@@ -272,7 +278,7 @@ function veDoVui(d, t) {
   v.miniO.forEach((e) => { const dung = e.dataset.dung === '1'; e.style.background = mo && dung ? 'linear-gradient(170deg,#1f6f55,#145240)' : 'rgba(255,255,255,.07)'; e.style.boxShadow = mo && dung ? `0 0 0 ${3 + 3 * ex(-(t - v.tMo) * 3)}px #6ee7b7, 0 0 40px rgba(110,231,183,.5)` : 'none'; e.style.opacity = mo && !dung ? 0.4 : 1; e.style.transform = mo && dung ? `scale(${1 + 0.18 * ex(-(t - v.tMo) * 4) * Math.cos((t - v.tMo) * 14)})` : '' })
   const tau = t - v.tMo
   if (tau >= 0 && tau < 2.6) {
-    const r = v.mini.getBoundingClientRect(), dungO = v.miniO.find((e) => e.dataset.dung === '1').getBoundingClientRect()
+    const r = hopSan(v.mini), dungO = hopSan(v.miniO.find((e) => e.dataset.dung === '1'))
     const ox = dungO.left + dungO.width / 2, oy = dungO.top + dungO.height / 2; void r
     for (const p of v.phao) {
       const r0 = 60 + p.v * tau * 0.55, x = ox + Math.cos(p.g) * r0, y = oy + Math.sin(p.g) * r0 + 900 * tau * tau * 0.5
@@ -490,7 +496,7 @@ function veCanh(d, t) {
   if (d.phanTu) vePhanTu(d, t)
   if (d.hoat && HOAT[d.hoat.loai]) {
     HOAT[d.hoat.loai][1](d, t)
-    const m = d.hoat.moc, r = (e) => e.getBoundingClientRect()
+    const m = d.hoat.moc, r = hopSan
     if (d.tv) for (const hg of d.tv) { const tau = t - m[hg.k]; if (tau >= 0 && tau < 0.8) { const b = r(hg.h); lapLanh(hoaCtx, b.left + 50, b.top + b.height / 2, tau, d.mauHex) } }
     if (d.ct) { const tau = t - m.noi - 1.2; if (tau >= 0 && tau < 0.8) { const b = r(d.ct.lkMoi); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#ffd27a', 16) } }
     if (d.cq) { const tau = t - m.tong; if (tau >= 0 && tau < 0.8) { const b = r(d.cq.dem.querySelector('.dem i:last-child')); lapLanh(hoaCtx, b.left + b.width / 2, b.top + b.height / 2, tau, '#8fb6ff', 14) } }
