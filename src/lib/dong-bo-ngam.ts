@@ -48,11 +48,9 @@ export function dongBoNgam(ep = false): Promise<number> {
 export function batDongBoNgam(): void {
   void dongBoNgam(true)
   if (hen) return
-  hen = setInterval(() => { if (typeof document === 'undefined' || document.visibilityState === 'visible') void dongBoNgam() }, CHU_KY)
-}
-
-/** Tắt khi khoá app / rời app quản lý. */
-export function tatDongBoNgam(): void {
-  if (hen) clearInterval(hen)
-  hen = null
+  // Chỉ chạy khi cửa sổ đang hiện VÀ app thầy còn mở khoá: App.tsx gỡ `window.__ddh` (cầu nối) khi khoá / rời app quản lý ⇒ lượt định kì tự bỏ qua.
+  hen = setInterval(() => {
+    if (typeof window === 'undefined' || !(window as unknown as Record<string, unknown>).__ddh) return
+    if (document.visibilityState === 'visible') void dongBoNgam()
+  }, CHU_KY)
 }

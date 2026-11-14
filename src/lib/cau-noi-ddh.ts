@@ -166,5 +166,4 @@ export function ganCauNoi(w: Window = window): void {
 /** GỠ cầu nối. Gọi khi khoá lại, hết hạn hỏi lại, hoặc rời app quản lý. */
 export function goCauNoi(w: Window = window): void {
   delete (w as CuaSoCoCauNoi)[TEN_CAU_NOI]
-  void import('./dong-bo-ngam').then((m) => m.tatDongBoNgam()).catch(() => {})
 }
