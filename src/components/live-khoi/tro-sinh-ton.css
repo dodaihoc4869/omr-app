@@ -249,7 +249,7 @@
 .st-hp-dong { display: flex; flex-direction: column; gap: 2px; }
 .st-hp-ten { align-self: center; padding: 0 8px; font-size: 15px; line-height: 1.2; color: var(--st-chu); background: color-mix(in srgb, var(--st-nen) 82%, transparent); white-space: nowrap; }
 .st-hp-vach { display: block; height: 10px; border: 2px solid var(--st-chu); background: var(--st-nen); }
-.st-hp-vach i { display: block; height: 100%; background: var(--tr-hs); transform-origin: left center; transition: transform .25s linear; }
+.st-hp-vach i { display: block; height: 100%; background: var(--tr-hs); transform-origin: left center; transition: transform .25s linear; will-change: transform; } /* lớp riêng: vạch máu trượt trên bộ ghép hình, không vẽ lại thanh mỗi khung (đo 14/11) */
 .st-hp-doi { display: flex; height: 6px; }
 .st-hp-doi i { min-width: 0; flex: 0 1 0; background: var(--doi); }
 .st-hp-pt { display: flex; justify-content: space-between; gap: 6px; }
