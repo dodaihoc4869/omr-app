@@ -17,8 +17,8 @@ import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import { khoiTuLop } from './live-khoi'
 import { DemTTL } from './dem-chung'
 import {
-  DANH_HIEU, chuTuan, chuanMac, dsDaMo, huyHieuDat, kiemMac, maHocKy, maTuan, tuanTruoc, xetDanhHieu,
-  type BoMac, type DongTuan, type ThanhTich, type TienDoEm,
+  DANH_HIEU, chuTuan, chuanMac, dsDaMo, gonMac, huyHieuDat, kiemMac, maHocKy, maTuan, tuanTruoc, xetDanhHieu,
+  type BoMac, type DoEm, type DongTuan, type ThanhTich, type TienDoEm,
 } from '../../src/lib/live-khoi/tu-do'
 
 type Row = Record<string, unknown>
@@ -39,7 +39,7 @@ const demTuan = new DemTTL<Row[]>(60_000, 8)
 const so0 = (v: unknown): number => { const n = Math.floor(Number(v)); return Number.isFinite(n) && n > 0 ? n : 0 }
 const RE_SBD = /^[A-Za-z0-9_-]{1,40}$/
 /** Em thật: số báo danh hợp lệ, không phải máy bù (`~…`), không phải bé ma Thầy. */
-export const laEmThat = (id: unknown, idThay?: string): id is string => typeof id === 'string' && RE_SBD.test(id) && id !== idThay && id !== 'gv' && id !== 'thay'
+export const laEmThat = (id: unknown, idThay?: string): id is string => typeof id === 'string' && RE_SBD.test(id) && id !== idThay && id !== 'gv' && id !== 'thay' && id !== 'THAY' && id !== 'MM'
 /** Lớp để chia đội / thi đua: tên lớp thầy đặt, không có thì cột `lop` (cùng biểu thức ở SQL dưới). */
 const SQL_LOP = "COALESCE(NULLIF(h.ten_lop, ''), h.lop)"
 const bamSbd = (s: string): number => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 4 }
@@ -196,6 +196,81 @@ export async function gvThiDua(envDoc: Env, b: Dong, nay = Date.now()): Promise<
   return {
     ok: true, tuan, chuTuan: chuTuan(tuan), doi: vachDoi(nayDs), soEm: nayDs.length,
     danhHieuTuanNay: coTen(xetDanhHieu(nayDs.map(dongTuan))), danhHieuTuanTruoc: coTen(xetDanhHieu(truocDs.map(dongTuan))),
+  }
+}
+
+// ── BƯỚC GHÉP (đợt 4): đồ + danh hiệu + đội cả kỳ cho PHÒNG TRÒ (Durable Object), ghi thống kê theo lô ──
+const lopDongTuan = (r: Row): number | null => khoiTuLop(String((r.ten_lop as string) || (r.lop as string) || '')) ?? khoiTuLop(r.lop)
+/**
+ * Đồ đang mặc + danh hiệu tuần (trao từ số tuần trước, xét theo KHỐI — đúng cách thẻ sảnh `hsTuDo` xét) + đội cả học kỳ (`doiKy`, chỉ phòng ca) của nhiều em —
+ * MỘT đợt đọc song song: `st_mac` + (`st_doi_ky`) qua `json_each`, hai tuần thi đua đọc từ đệm 60 giây chung. Lỗi / bảng chưa có ⇒ phần đó rỗng (KHÔNG ném).
+ * Chỉ trả em có gì đó (đồ / danh hiệu / đội).
+ */
+export async function docDoPhong(env: Env, sbds: readonly string[], doiKy: boolean, nay = Date.now()): Promise<Map<string, DoEm>> {
+  const ra = new Map<string, DoEm>(), ds = [...new Set(sbds.filter((s) => laEmThat(s)))]
+  if (!ds.length || !env.DB) return ra
+  const j = JSON.stringify(ds), tuan = maTuan(nay), truoc = tuanTruoc(tuan)
+  const tat = (sql: string, ...v: unknown[]): Promise<Row[]> => {
+    try { return env.DB.prepare(sql).bind(...v).all<Row>().then((r) => r.results ?? [], () => []) } catch { return Promise.resolve([]) }
+  }
+  const [mac, doi, hai] = await Promise.all([
+    tat('SELECT sbd, mu, ao, dan, ha FROM st_mac WHERE sbd IN (SELECT value FROM json_each(?))', j),
+    doiKy ? tat('SELECT sbd, doi FROM st_doi_ky WHERE ky = ? AND sbd IN (SELECT value FROM json_each(?))', maHocKy(nay), j) : Promise.resolve([] as Row[]),
+    docHaiTuan(env, tuan, truoc, nay).catch(() => [] as Row[]),
+  ])
+  const lay = (s: string): DoEm => { let d = ra.get(s); if (!d) ra.set(s, (d = { c: '', dh: -1 })); return d }
+  for (const r of mac) { const c = gonMac(chuanMac(r)); if (c) lay(String(r.sbd)).c = c }
+  for (const r of doi) { const d = Number(r.doi); if (d >= 0 && d < 4) lay(String(r.sbd)).doi = d }
+  const can = new Set(ds)
+  for (const k of [10, 11, 12]) {
+    // Một em có thể giữ nhiều danh hiệu ⇒ hiện cái ĐẦU theo thứ tự DANH_HIEU (Thợ săn tuần · Kẻ phá thủ khoa · Hạ gục Thầy).
+    for (const d of xetDanhHieu(hai.filter((r) => r.tuan === truoc && lopDongTuan(r) === k).map(dongTuan))) {
+      const i = DANH_HIEU.findIndex((h) => h.loai === d.loai)
+      for (const s of d.sbd) if (can.has(s)) { const e = lay(s); if (e.dh < 0) e.dh = i }
+    }
+  }
+  return ra
+}
+
+/** GOM ĐỌC của phòng: các em vào trong `choMs` đọc chung MỘT lô `docDoPhong`; quá `hanMs` chưa có ⇒ trả null (phòng dùng cách cũ: đội ít em nhất, không đồ). */
+export class GomDocDo {
+  private cho = new Map<string, ((d: DoEm | null) => void)[]>()
+  private hen: ReturnType<typeof setTimeout> | null = null
+  constructor(private env: Env, private doiKy: boolean, private choMs = 80, private hanMs = 1500) {}
+  doc(sbd: string): Promise<DoEm | null> {
+    if (!this.env.DB || !laEmThat(sbd)) return Promise.resolve(null)
+    return new Promise((xong) => {
+      let da = false
+      const tra = (d: DoEm | null) => { if (!da) { da = true; xong(d) } }
+      const ds = this.cho.get(sbd) ?? []
+      ds.push(tra); this.cho.set(sbd, ds)
+      setTimeout(() => tra(null), this.hanMs)
+      this.hen ??= setTimeout(() => this.chay(), this.choMs)
+    })
+  }
+  private chay(): void {
+    this.hen = null
+    const lo = this.cho
+    this.cho = new Map()
+    void docDoPhong(this.env, [...lo.keys()], this.doiKy).catch(() => new Map<string, DoEm>()).then((m) => {
+      for (const [s, ds] of lo) for (const f of ds) f(m.get(s) ?? { c: '', dh: -1 })
+    })
+  }
+}
+
+/** Nơi phòng trò gọi ra ngoài (tiêm vào KenhLopMay / PhongSinhTonCa ⇒ luật phòng test được không cần D1). */
+export interface NoiDuLieuSt {
+  /** Ghi thống kê theo LÔ (không chờ, lỗi bỏ qua). `ma` = mã phòng (mã buổi live / `ca:<mã ca>:<k>`). */
+  ghi(ma: string, ds: readonly KetQuaVanEm[]): void
+  /** Đồ + danh hiệu (+ đội cả kỳ ở phòng ca) của một em — gom lô, có hạn chờ. */
+  doc(sbd: string): Promise<DoEm | null>
+}
+/** Nối thật cho Durable Object: ghi qua `ctx.waitUntil` (không chặn nhịp, lỗi D1 nuốt), đọc qua `GomDocDo`. Thầy (THAY) và máy bù không bao giờ ghi. */
+export function noiDuLieuSt(env: Env, ctx: { waitUntil(p: Promise<unknown>): void }, doiKy: boolean): NoiDuLieuSt {
+  const gom = new GomDocDo(env, doiKy)
+  return {
+    ghi: (ma, ds) => { if (env.DB && ds.length) ctx.waitUntil(ghiCuoiVanSinhTon(env, { ma, idThay: 'THAY' }, ds).catch((e) => console.error('[sinh-ton] ghi thống kê lỗi:', e instanceof Error ? e.message : e))) },
+    doc: (sbd) => gom.doc(sbd),
   }
 }
 

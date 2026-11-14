@@ -20,6 +20,7 @@ import { LiveMay, type KemBpu } from './phong-live'
 import { GIAO_DIEN_DOT_2, datCoLive, duocPhatMic, laEmXaDangLive, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 import { KHOA_CH_XEM_LAI, NhatKyXl, xemLaiBat } from './live-xem-lai'
 import { KenhLopMay } from './kenh-lop-may'
+import { noiDuLieuSt } from './sinh-ton-du-lieu'
 import { NAP_LAM_MOI_MS, chupAnToan, conKhop, docBan, docNap, duocNhanh, locMaCau, type AnToanNap, type CauNap } from './bpu-nap-san'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
@@ -321,7 +322,7 @@ export class PhongBinhPhanUng {
   constructor(private ctx: DurableObjectState, private env: Env) {
     this.xl = new NhatKyXl({ ctx, env, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), ghiSom: () => this.ghiD1(), chamSo })
     this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), bao: (ds) => this.ctx.waitUntil(baoMayCacEm(this.env, ds, 'bpu').catch(() => 0)), xl: this.xl })
-    this.lop = new KenhLopMay(ctx, () => this.st)
+    this.lop = new KenhLopMay(ctx, () => this.st, noiDuLieuSt(env, ctx, false)) // Sinh Tồn đợt 4: đồ + danh hiệu lúc em vào, thống kê ghi theo lô
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
 

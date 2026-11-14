@@ -12,6 +12,7 @@ import {
   NAY_BK, NO_BK, TAM_XA, THAY, VAN_MS, apHop, capBanDo, capSung, dangNghi, hopSo, laMay, loaiHopO, satThuongCua, taoBanDo, vanSo, viTriHop, type BanDo, type NhanVat,
 } from '../../src/lib/live-khoi/sinh-ton-loi'
 import { buocMay, khopMay, mayLenCap, mayThanh, type May } from '../../src/lib/live-khoi/sinh-ton-may'
+import type { KetQuaVanEm } from './sinh-ton-du-lieu'
 
 /** Phòng phát một ảnh chụp mỗi 250 ms. */
 export const TRO_NHIP_MS = 250
@@ -43,6 +44,12 @@ type Tro = { p: SinhTonDong; luc: number; gui: number; ha: number }
 /** Ma Mực đang trên sân: `dmg` = sát thương bốn đội đã gây (máu thật, số thực). */
 interface Boss { x: number; y: number; mau: number; max: number; t: string; dmg: [number, number, number, number] }
 const nguoiThat = (id: string): boolean => id !== THAY && id !== MA_MUC
+/** Em THẬT (được ghi thống kê): không phải Thầy, Ma Mực, máy bù. */
+const laEm = (id: string): boolean => nguoiThat(id) && !laMay(id)
+/** Thống kê cộng dồn một em (bước ghép đợt 4) — ghi D1 theo LÔ: phòng rút bằng `layThongKe()`. */
+type TkEm = Required<Omit<KetQuaVanEm, 'id' | 'doi'>>
+/** Ghi D1 sau mỗi chừng này ván đã chốt (ngoài lúc phòng đóng / trò dừng). */
+export const GHI_MOI_VAN = 5
 
 export class MaySinhTon {
   private tro = new Map<string, Tro>()
@@ -78,6 +85,12 @@ export class MaySinhTon {
   private hang = new Map<string, number>()
   /** Số thứ tự nhịp trong ván (0 = nhịp đầu ván) — quyết ảnh mỏng / có `dd`. */
   private nhipVan = 0
+  /** THỐNG KÊ (bước ghép đợt 4): KHÔNG bị `dung()` xoá (trò dừng là lúc phải ghi); `layThongKe()` rút sạch. `thamGia` = em thật đã lên sân trong ván đang chạy;
+   *  `vanChot` = ván (vanSo) đã chốt (`van` + thủ khoa cuối ván, ở nhịp nghỉ ĐẦU TIÊN — lúc ấy `tk` còn nguyên); `vanXong` = số ván đã chốt chưa rút. */
+  private tke = new Map<string, TkEm>()
+  private thamGia = new Set<string>()
+  private vanChot = -1
+  private vanXong = 0
   /** `tenTranh` = tên em thật mà máy bù phải tránh (máy mang tên như học sinh — src/lib/live-khoi/ten-may.ts); chỉ gọi lúc phải thêm máy. */
   constructor(private rng: () => number = Math.random, private tenTranh?: () => Iterable<string>) {}
 
@@ -99,6 +112,7 @@ export class MaySinhTon {
     if (!moi) return
     if (dau) this.lucNhip = nay
     this.tro.set(id, moi)
+    if (laEm(id)) this.thamGia.add(id)
     const mau = moi.p[2]
     // Hộp tiếp tế: em chạm đầu tiên của mỗi hộp được nhận (`k` = chỉ số trong `viTriHop`: 0 / thiếu = hộp tâm sân, k ≥ 1 = hộp giữa trang).
     if (typeof x.h === 'number' && x.h === hopSo(nay) && mau > 0 && !dangNghi(nay)) {
@@ -168,8 +182,30 @@ export class MaySinhTon {
       if (ha >= TK_TOI_THIEU && ai !== this.tk && (!this.tk || ha > (this.haVan.get(this.tk) ?? 0))) this.tk = ai
     }
     this.an.push([ai, bi, chuoiBi, chuoiAi, laTk])
+    // Thống kê em thật: bị hạ (bởi bất kỳ ai); hạ Thầy ⇒ `haThay` (không vào `ha` — «Thợ săn tuần» xếp theo `ha`); hạ người ⇒ `ha` + diệt thủ khoa + hạ liền.
+    if (laEm(bi)) this.tkCua(bi).biHa++
+    if (laEm(ai)) {
+      const t = this.tkCua(ai)
+      if (bi === THAY) t.haThay++
+      else if (bi !== MA_MUC) { t.ha++; if (laTk) t.dietTk++; if (chuoiAi > t.chuoiMax) t.chuoiMax = chuoiAi }
+    }
     if (bi !== THAY && doiAi >= 0 && doiAi < 4) this.diem[doiAi]++
     if (laMay(ai)) { const m = this.may.find((v) => v.id === ai); if (m) { mayLenCap(m); if (laTk) mayLenCap(m) } }
+  }
+
+  private tkCua(id: string): TkEm {
+    let t = this.tke.get(id)
+    if (!t) this.tke.set(id, (t = { ha: 0, biHa: 0, haThay: 0, dietTk: 0, chuoiMax: 0, thuKhoa: 0, van: 0 }))
+    return t
+  }
+  /** Số ván đã chốt chưa ghi — chủ phòng ghi khi ≥ GHI_MOI_VAN. */
+  get vanChoGhi(): number { return this.vanXong }
+  /** RÚT thống kê (đồng bộ, đổi bản đồ mới ⇒ lần ghi bất đồng bộ sau đó không cộng trùng). `van` luôn truyền rõ (0 cũng truyền — nơi ghi coi thiếu là 1). */
+  layThongKe(): KetQuaVanEm[] {
+    const ds: KetQuaVanEm[] = []
+    for (const [id, t] of this.tke) if (t.ha || t.biHa || t.haThay || t.dietTk || t.thuKhoa || t.van) ds.push({ id, ...t })
+    this.tke = new Map(); this.vanXong = 0
+    return ds
   }
 
   /** Thủ khoa rời sân ⇒ chọn lại: nhiều lượt hạ nhất (≥ 3) trong số còn trên sân, bằng nhau ⇒ ai đạt mức đó trước. */
@@ -186,11 +222,11 @@ export class MaySinhTon {
   /** Em rời phòng ⇒ gỡ ngay (không đợi 5 giây im); nhịp kế máy bù vào thay. */
   xoa(id: string): void { this.tro.delete(id); this.chuoi.delete(id); this.bc.delete(id) }
 
-  /** Trò dừng hẳn (thầy bấm Bắt đầu, phòng đóng, hết em thật): xoá mọi trạng thái, máy bù rời sân. */
+  /** Trò dừng hẳn (thầy bấm Bắt đầu, phòng đóng, hết em thật): xoá mọi trạng thái, máy bù rời sân — TRỪ thống kê chờ ghi (ván dở không tính ván). */
   dung(): void {
     this.tro.clear(); this.an = []; this.may = []; this.van = -1; this.soVan = 0; this.diem = [0, 0, 0, 0]; this.hop = [-1, '']
     this.thay = null; this.boss = null; this.bossVan = -1; this.bh = -1; this.hopTrang.clear(); this.hopTrangSo = -1
-    this.haVan.clear(); this.lucHa.clear(); this.chuoi.clear(); this.tk = ''; this.bc.clear(); this.lucBc.clear(); this.hang.clear()
+    this.haVan.clear(); this.lucHa.clear(); this.chuoi.clear(); this.tk = ''; this.bc.clear(); this.lucBc.clear(); this.hang.clear(); this.thamGia.clear()
   }
 
   /** Một nhịp 250 ms: gỡ em im, ván mới, khớp + bước máy bù. Trả ảnh chụp ĐỦ (máy thầy nhận nguyên; máy em nhận bản lọc qua `goi`); không còn em thật ⇒
@@ -207,6 +243,7 @@ export class MaySinhTon {
       // Ván ĐẦU (trò vừa bắt đầu) giữ lượt hạ đã ghi trước nhịp đầu; các ván sau xoá điểm, lượt hạ ván, chuỗi, thủ khoa.
       if (this.van !== -1) { this.diem = [0, 0, 0, 0]; this.an = []; this.haVan.clear(); this.lucHa.clear(); this.chuoi.clear(); this.tk = '' }
       this.van = van; this.soVan++; this.may = []; this.nhipVan = -1; this.boss = null
+      this.thamGia = new Set([...this.tro.keys()].filter(laEm))
       this.bd = taoBanDo(capBanDo(soEm.reduce((t, n) => t + Math.max(4, n), 0)))
     }
     this.nhipVan++
@@ -284,6 +321,12 @@ export class MaySinhTon {
       em.sort((a, b) => b[1] - a[1] || a[2] - b[2])
       anh.bv = em.filter((e) => e[1] > 0).slice(0, 3).map((e) => [e[0], e[1]])
       for (const [id, n] of em) { let h = 1; for (const k of em) if (k[1] > n) h++; this.hang.set(id, h) }
+      // Chốt ván cho thống kê (một lần mỗi ván, ở nhịp nghỉ đầu tiên): mọi em đã chơi ván +1 ván; thủ khoa cuối ván (em thật) +1.
+      if (this.vanChot !== van) {
+        this.vanChot = van; this.vanXong++
+        for (const id of this.thamGia) this.tkCua(id).van++
+        if (this.tk && laEm(this.tk) && this.thamGia.has(this.tk)) this.tkCua(this.tk).thuKhoa++
+      }
     }
     this.an = []
     return anh

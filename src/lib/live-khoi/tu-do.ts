@@ -135,3 +135,21 @@ export function xetDanhHieu(ds: readonly DongTuan[]): { loai: LoaiDanhHieu; sbd:
   }
   return ra
 }
+
+// ── Đồ + danh hiệu TRONG TRẬN (bước ghép đợt 4): phòng đọc một lô khi em vào, gắn vào danh sách phòng (`lop-ds` / `st-ds`) ──
+/** Mã GỌN của bộ đồ: 4 chữ số theo thứ tự `NGAN_DO` (mũ · áo · vệt đạn · khi hạ), mỗi chữ = chỉ số món trong `DO_BE_MA` + 1, 0 = để trống. Trống cả ⇒ ''. */
+export function gonMac(mac: BoMac): string {
+  const s = NGAN_DO.map(({ loai }) => { const i = DO_BE_MA.findIndex((d) => d.ma === mac[loai]); return i >= 0 && DO_BE_MA[i]!.loai === loai ? String(i + 1) : '0' }).join('')
+  return s === '0000' ? '' : s
+}
+/** Đọc mã gọn (từ danh sách phòng — dữ liệu lạ): sai dạng / sai ngăn ⇒ ngăn đó trống. */
+export function moGon(s: unknown): BoMac {
+  const ra: BoMac = { ...MAC_TRONG }
+  if (typeof s !== 'string' || s.length !== 4) return ra
+  NGAN_DO.forEach(({ loai }, k) => { const d = DO_BE_MA[Number(s[k]) - 1]; if (d && d.loai === loai) ra[loai] = d.ma })
+  return ra
+}
+/** Đồ + danh hiệu của một em trong phòng: `c` mã gọn ('' = không mặc gì), `dh` chỉ số trong `DANH_HIEU` (-1 = không có), `doi` đội cả học kỳ (chỉ phòng ca). */
+export interface DoEm { c: string; dh: number; doi?: number }
+/** Chữ danh hiệu cạnh tên trong trận (chỉ số lạ ⇒ ''). */
+export const chuDanhHieu = (dh: unknown): string => (typeof dh === 'number' && Number.isInteger(dh) ? DANH_HIEU[dh]?.ten ?? '' : '')
