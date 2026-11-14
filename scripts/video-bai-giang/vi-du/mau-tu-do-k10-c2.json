@@ -1,0 +1,356 @@
+{
+ "id": "c2",
+ "tieuDe": "Cách nhìn định tính: hai nguyên tố khác nhau",
+ "cheDo": [
+  [
+   "dau",
+   "minh"
+  ]
+ ],
+ "hoat": {
+  "loai": "tu-do",
+  "cao": 640,
+  "p": {
+   "phanTu": [
+    {
+     "id": "A",
+     "kieu": "nguyen-tu",
+     "ky": "A",
+     "mau": "vang",
+     "o": 1,
+     "h": 0,
+     "r": 3,
+     "c": 2
+    },
+    {
+     "id": "B",
+     "kieu": "nguyen-tu",
+     "ky": "B",
+     "mau": "xanh",
+     "o": 8,
+     "h": 0,
+     "r": 3,
+     "c": 2
+    },
+    {
+     "id": "ab",
+     "kieu": "lien-ket",
+     "tu": "A",
+     "den": "B",
+     "bac": 1,
+     "mau": "trang"
+    },
+    {
+     "id": "t1",
+     "kieu": "chu",
+     "chu": "Khác nhau ⇒ lực kéo khác nhau",
+     "co": "nho",
+     "o": 0,
+     "h": 2,
+     "r": 12,
+     "c": 1
+    },
+    {
+     "id": "kq",
+     "kieu": "chu",
+     "chu": "2 nguyên tố khác nhau ⇒ **phân cực**",
+     "co": "vua",
+     "mau": "hong",
+     "o": 0,
+     "h": 3,
+     "r": 12,
+     "c": 1
+    },
+    {
+     "id": "x1",
+     "kieu": "chu",
+     "chu": "HCl",
+     "ct": true,
+     "co": "vua",
+     "mau": "hong",
+     "o": 1,
+     "h": 4,
+     "r": 3,
+     "c": 1
+    },
+    {
+     "id": "x2",
+     "kieu": "chu",
+     "chu": "H2O",
+     "ct": true,
+     "co": "vua",
+     "mau": "hong",
+     "o": 4,
+     "h": 4,
+     "r": 3,
+     "c": 1
+    },
+    {
+     "id": "x3",
+     "kieu": "chu",
+     "chu": "CH4",
+     "ct": true,
+     "co": "vua",
+     "mau": "ngoc",
+     "o": 8,
+     "h": 4,
+     "r": 3,
+     "c": 1
+    },
+    {
+     "id": "dt",
+     "kieu": "chu",
+     "chu": "Định tính: nhìn bằng cảm tính",
+     "co": "nho",
+     "mau": "tim",
+     "o": 0,
+     "h": 5,
+     "r": 12,
+     "c": 1
+    },
+    {
+     "id": "ch4",
+     "kieu": "chu",
+     "chu": "CH4 thực tế: **không phân cực**",
+     "ct": true,
+     "co": "vua",
+     "mau": "ngoc",
+     "o": 0,
+     "h": 6,
+     "r": 12,
+     "c": 1
+    },
+    {
+     "id": "s1",
+     "kieu": "so",
+     "gt": 19,
+     "dv": "ước lượng",
+     "mau": "hong",
+     "o": 0,
+     "h": 7,
+     "r": 4,
+     "c": 2
+    },
+    {
+     "id": "s2",
+     "kieu": "so",
+     "gt": 17,
+     "dv": "trả giá",
+     "mau": "xanh",
+     "o": 4,
+     "h": 7,
+     "r": 4,
+     "c": 2
+    },
+    {
+     "id": "s3",
+     "kieu": "so",
+     "gt": 0,
+     "dv": "cân thật",
+     "mau": "ngoc",
+     "o": 8,
+     "h": 7,
+     "r": 4,
+     "c": 2
+    },
+    {
+     "id": "dl",
+     "kieu": "chu",
+     "chu": "Định lượng: **cái cân** ⇒ hết cãi",
+     "co": "vua",
+     "mau": "ngoc",
+     "o": 0,
+     "h": 9,
+     "r": 12,
+     "c": 1
+    }
+   ],
+   "buoc": [
+    {
+     "moc": "m0",
+     "lam": "hien",
+     "id": "A"
+    },
+    {
+     "moc": "m1",
+     "lam": "hien",
+     "id": "B"
+    },
+    {
+     "moc": "m2",
+     "lam": "hien",
+     "id": "ab"
+    },
+    {
+     "moc": "m3",
+     "lam": "hien",
+     "id": "t1"
+    },
+    {
+     "moc": "m4",
+     "lam": "nay",
+     "id": "A"
+    },
+    {
+     "moc": "m5",
+     "lam": "hien",
+     "id": "kq"
+    },
+    {
+     "moc": "m6",
+     "lam": "sang",
+     "id": "kq"
+    },
+    {
+     "moc": "m7",
+     "lam": "hien",
+     "id": "x1"
+    },
+    {
+     "moc": "m8",
+     "lam": "hien",
+     "id": "x2"
+    },
+    {
+     "moc": "m9",
+     "lam": "hien",
+     "id": "dt"
+    },
+    {
+     "moc": "m10",
+     "lam": "hien",
+     "id": "x3"
+    },
+    {
+     "moc": "m11",
+     "lam": "gach",
+     "id": "x3"
+    },
+    {
+     "moc": "m12",
+     "lam": "hien",
+     "id": "ch4"
+    },
+    {
+     "moc": "m13",
+     "lam": "sang",
+     "id": "ch4"
+    },
+    {
+     "moc": "m14",
+     "lam": "hien",
+     "id": "s1"
+    },
+    {
+     "moc": "m15",
+     "lam": "hien",
+     "id": "s2"
+    },
+    {
+     "moc": "m16",
+     "lam": "nay",
+     "id": "s1"
+    },
+    {
+     "moc": "m17",
+     "lam": "hien",
+     "id": "dl"
+    },
+    {
+     "moc": "m18",
+     "lam": "sang",
+     "id": "dl"
+    },
+    {
+     "moc": "m17",
+     "lam": "hien",
+     "id": "s3"
+    },
+    {
+     "moc": "m17",
+     "lam": "dem",
+     "id": "s3",
+     "gt": 18
+    }
+   ]
+  },
+  "moc": {
+   "m0": [
+    0,
+    "Ông"
+   ],
+   "m1": [
+    0,
+    "B"
+   ],
+   "m2": [
+    0,
+    "lực"
+   ],
+   "m3": [
+    1,
+    "Lực"
+   ],
+   "m4": [
+    1,
+    "mạnh"
+   ],
+   "m5": [
+    2,
+    "hai"
+   ],
+   "m6": [
+    2,
+    "phân"
+   ],
+   "m7": [
+    3,
+    "HCl:"
+   ],
+   "m8": [
+    4,
+    "H₂O:"
+   ],
+   "m9": [
+    5,
+    "định"
+   ],
+   "m10": [
+    8,
+    "CH₄"
+   ],
+   "m11": [
+    9,
+    "phải"
+   ],
+   "m12": [
+    10,
+    "không"
+   ],
+   "m13": [
+    10,
+    "phân"
+   ],
+   "m14": [
+    13,
+    "19"
+   ],
+   "m15": [
+    14,
+    "17"
+   ],
+   "m16": [
+    15,
+    "19"
+   ],
+   "m17": [
+    16,
+    "cân,"
+   ],
+   "m18": [
+    16,
+    "cãi"
+   ]
+  }
+ }
+}

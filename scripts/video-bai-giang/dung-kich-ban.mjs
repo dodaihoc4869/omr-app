@@ -287,6 +287,10 @@ for (const cc of ch.canh) {
     for (const [k, tt] of Object.entries(canh.hoat.moc)) if (TD[k] && tt != null) sfx.push({ t: tt, loai: TD[k] })
     if (cc.hoat.loai === 'cau-truc') sfx.push({ t: canh.hoat.moc.noi + 1.05, loai: 'bot' })
     if (cc.hoat.loai === 'chuoi') sfx.push({ t: canh.hoat.moc.cat + 0.55, loai: 'bot' })
+    if (cc.hoat.loai === 'tu-do') { // hoạt hoạ tự do (hoat-hoa-5.js): mỗi bước một tiếng động hợp động tác
+      const TDB = { hien: 'bop', di: 'vut', doi: 'bip', sang: 'lap', nay: 'nhay', gach: 'gach', dem: 'dem1', hang: 'bip' }
+      for (const b of cc.hoat.p?.buoc ?? []) { const tt = canh.hoat.moc[b.moc]; if (TDB[b.lam] && Number.isFinite(tt)) sfx.push({ t: tt, loai: TDB[b.lam] }) }
+    }
     if (cc.hoat.loai === 'bazo') { // tiếng đi kèm chuyển động phụ (khớp hoat-hoa-3.js): Na gắn vào COO⁻ · 2 liên kết đứt · giọt thứ 2, 3 · Na gắn vào Gly · = 111
       const m = canh.hoat.moc, them = (tt, loai) => { if (tt != null && Number.isFinite(tt)) sfx.push({ t: tt, loai }) }
       them(m.a_gCN3, 'gan'); them(m.c_can + 0.12, 'giot'); them(m.c_can + 0.45, 'gay'); them(m.c_can + 0.57, 'gay')

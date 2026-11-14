@@ -68,7 +68,25 @@ Mốc chữ: `[3, "lệch"]` = lúc Thầy nói chữ chứa «lệch» lần đ
 | `dem-lk` | nối đơn / đôi / ba có mấy σ, π | `moc: don, doi, ba, kq1, kq2, kq3, ket` |
 | `thu-vien`, `cau-truc`, `chuoi`, `hat`, `phuong-trinh`, `dong-phan`, `cat-lk`, `biuret`, `bazo` | amino acid, peptide, thuỷ phân, biuret | xem `vi-du/k12-peptide-moi.json` |
 
-Chủ đề khác ⇒ KHÔNG ép hoạt hoạ: cảnh `bang` + khoanh + thẻ nổi + Em nhẩm + Đoán nhanh vẫn đủ cuốn (nguyên tắc dư thừa của Mayer: hình chỉ khi bảng chưa nói hết).
+**MỌI cảnh nội dung PHẢI có hoạt hoạ** (thầy 14/11 «tất cả phải có hoạt hoạ đầy đủ như video K12»): đúng chủ đề ⇒ mô-đun có sẵn ở bảng trên; chủ đề khác ⇒ **`tu-do`** (dưới). Chỉ cảnh thuần dặn dò / tổng kết miệng mới được không có hình.
+
+### `tu-do` — hoạt hoạ tự soạn bằng dữ liệu (`public/video-bai/hoat-hoa-5.js`)
+Cột minh hoạ = **lưới 12 cột × hàng 56 px** (cao 640 ⇒ 11 hàng, 0–10). Mỗi phần tử một ô: `o` cột trái (0–11), `h` hàng trên, `r` số cột rộng, `c` số hàng cao (`o + r ≤ 12`, `h + c ≤ số hàng`). Không đặt hai phần tử chồng ô nhau.
+| `kieu` | trường | dùng cho |
+|---|---|---|
+| `chu` | `chu` (**đậm** được), `co: lon|vua|nho`, `mau`, `ct: true` (tự chỉ số: `H2O` ⇒ H₂O, `SO4^2-` ⇒ SO₄²⁻), `nen: false` (bỏ nền thẻ) | ý chốt, ví dụ, công thức, kết luận |
+| `nguyen-tu` | `ky`, `mau`, `nhan?` | nguyên tử / ion / chất (vòng tròn) — ô nên `r: 3, c: 2` |
+| `lien-ket` | `tu`, `den` (id), `bac: 1|2|3` | nối hai nguyên tử (vẽ dần) |
+| `mui-ten` | `tu`, `den`, `cong: 0|1|-1`, `nhan?` | phản ứng, chuyển hoá, «⇒» giữa hai ô |
+| `so` | `gt`, `dv?` | con số lớn; bước `dem { gt }` cho số chạy tới giá trị mới (mol, gam, %, M) |
+| `pt` | `tu: ['2H2', '+', 'O2', '→', '2H2O']` | phương trình; từng ô gọi bằng `<id>.<k>` (vd `pt1.4`) để sáng / gạch riêng |
+| `cot` | `tieuDe: [trái, phải]`, `hang: [[chất, số], …]` | **sơ đồ cột dọc** của Thầy (chất | mol) — bước `hang { i }` hiện từng hàng |
+| `khung` | `quanh: [id, …]` | khung sáng bao nhiều ô (nhấn kết quả) |
+Bước (`p.buoc`): `{ moc, lam, id, … }` — `lam`: `hien` (mọi phần tử PHẢI có) · `an` · `di { o, h }` · `doi { chu }` · `sang` · `nay` · `gach` · `dem { gt }` · `hang { i }`. `moc` là TÊN mốc; khai giờ ở `hoat.moc: { m0: [dòng, "từ"], … }` (mốc lời thật). Tiếng động theo động tác tự có.
+Nhịp: mỗi ý Thầy nói ⇒ 1 bước hình ngay lúc nói chữ đó (không dồn trước); 6–20 bước / cảnh; con số / kết quả xuất hiện đúng lúc Thầy nói số. Màu: `vang` (chính), `ngoc` (đúng / kết luận), `hong` (sai / chú ý), `xanh`, `tim`.
+**Mẫu đã duyệt:** `scripts/video-bai-giang/vi-du/mau-tu-do-k10-c2.json` (định tính / định lượng: hai nguyên tử + liên kết, thẻ kết luận, ví dụ có chỉ số, CH₄ bị gạch, ba con số 19 / 17 / đếm tới 18, kết luận định lượng). Đặt `cheDo: [["dau","minh"]]` cho cảnh có `tu-do`.
+**Cổng kiểm** `node scripts/video-bai-giang/kiem-hoat.mjs <ra>/kich-ban.json` (hoan-tat-buoi.sh tự chạy, hỏng là DỪNG): mốc rỗng, id sai, ngoài lưới / tràn đáy, thiếu bước `hien`, chữ quá dài cho ô, phương án Đoán nhanh > 24 kí tự, tiêu đề mở đầu > 12 kí tự.
+**Giờ tải:** `tu-do` cần bản app có `hoat-hoa-5.js` (lên lượt phát hành 23:40 ngày 14/11). Đêm 14/11: cấu hình dùng `tu-do` ⇒ chỉ tải sau 23:50. Từ 15/11 tải lúc nào cũng được.
 
 ## Đã có sẵn trong máy (không phải làm tay)
 - Giọng chuẩn theo mẫu K12 (`mau-giong.json`): độ to −22,4 LUFS giọng ghép + EQ âm sắc theo phổ K12; nhạc + tiếng động mức K12; tổng −16 LUFS.

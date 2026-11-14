@@ -14,6 +14,7 @@ RA="$D/ra"; AM="$D/am"; mkdir -p "$RA" "$AM"
 python3 "$HERE/sinh-loi.py" "$D" "$SPEC"
 node "$HERE/dung-kich-ban.mjs" "$D" "$CH" "$RA" > "$D/dung.log"
 grep "^tổng" "$D/dung.log"
+node "$HERE/kiem-hoat.mjs" "$RA/kich-ban.json" || { echo "CỔNG KIỂM HỎNG — sửa cấu hình / spec rồi chạy lại; KHÔNG tải"; exit 1; }
 python3 - "$RA/kich-ban.json" <<'EOF'
 import json, re, sys
 kb = json.load(open(sys.argv[1])); bad = []

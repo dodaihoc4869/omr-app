@@ -25,6 +25,7 @@ const DOAN = k10 ? Object.fromEntries(Object.entries({
   'kim Δχ c8': c('c8')?.hoat.moc.kim - 0.3,
   'CO₂ triệt tiêu c10': c('c10')?.hoat.moc.triet - 0.3,
   'σ π c12': c('c12')?.hoat.moc.pp - 0.3,
+  'tự do c2': c('c2')?.hoat?.loai === 'tu-do' ? c('c2').hoat.moc.m17 - 0.3 : NaN,
 }).filter(([, v]) => Number.isFinite(v))) : b ? { 'bút + mũi tên cong': b.a_cung0 - 0.5, 'H₂O thành': b.a_gH2O - 0.3, 'NaOH gắn đầu C': b.b_3a, 'nước rơi + đứt': b.c_can, 'Na gắn Gly': b.d_na } : {
   'thẻ chương': c('c2').t0 - 2.4,
   'chuỗi hạt c2': c('c2').hoat.moc.dem50,

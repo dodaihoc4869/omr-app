@@ -426,3 +426,28 @@ html.nhe .bz-bay { filter: none; }
 .lk4-thang { margin-top: 8px; }
 /* tiêu đề mở đầu có dấu (thầy 14/11 ảnh «LIÊN KẾT» mất mũ chữ Ê / Ế): ô chữ tô nền theo chữ ⇒ dấu nhô khỏi ô bị cắt ⇒ nới ô lên trên, giữ nguyên vị trí chữ */
 #mo-ten .ch { padding-top: .24em; margin-top: -.24em; }
+/* HOẠT HOẠ TỰ DO THEO DỮ LIỆU (hoat-hoa-5.js «tu-do», thầy 14/11 «tất cả phải có hoạt hoạ đầy đủ như K12, văn phòng làm tự động») — lưới 12 cột × hàng 56 px */
+.lk5 { position: relative; }
+.lk5-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.lk5-pt { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center; transform-origin: 50% 50%; color: var(--m); font-weight: 800; }
+.lk5-pt > span, .lk5-pt > i { position: relative; display: inline-block; max-width: 100%; line-height: 1.15; font-style: normal; }
+.lk5-pt > span::after, .lk5-pt em::after { content: ''; position: absolute; left: -4%; right: -4%; top: 52%; height: 5px; border-radius: 3px; background: var(--hong, #fda4af); transform: scaleX(var(--gach, 0)); transform-origin: 0 50%; }
+.lk5-pt::before { content: ''; position: absolute; inset: -6px; border-radius: 18px; box-shadow: 0 0 0 3px var(--m), 0 0 28px var(--m); opacity: var(--sang, 0); pointer-events: none; }
+.lk5-chu.co-lon { font-size: 44px; } .lk5-chu.co-vua { font-size: 34px; } .lk5-chu.co-nho { font-size: 27px; font-weight: 700; }
+.lk5-chu.nen { border-radius: 16px; background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .1); padding: 0 12px; color: #eef3f4; }
+.lk5-chu.nen b, .lk5-cot b { color: var(--m); }
+.lk5-nguyen-tu { flex-direction: column; }
+.lk5-nguyen-tu > i { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; font-size: 44px; background: #14232a; box-shadow: inset 0 0 0 5px var(--m); }
+.lk5-nguyen-tu > small { margin-top: 6px; font-size: 24px; font-weight: 700; color: #9fb1b7; }
+.lk5-nguyen-tu::before { border-radius: 50%; inset: auto; width: 104px; height: 104px; }
+.lk5-so > span { font-size: 52px; font-weight: 900; } .lk5-so small { font-size: 28px; color: #9fb1b7; font-weight: 700; }
+.lk5-pt.lk5-pt-dong { gap: 10px; }
+.lk5-pt em { position: relative; font-style: normal; font-size: 38px; margin: 0 7px; padding: 2px 6px; border-radius: 10px; box-shadow: 0 0 0 3px rgba(255, 210, 122, calc(var(--sang, 0) * 1)); }
+.lk5-cot { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 6px; font-size: 32px; color: #eef3f4; }
+.lk5-cot .td, .lk5-cot .h { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.lk5-cot .td { font-size: 24px; color: #9fb1b7; border-bottom: 2px solid rgba(255, 255, 255, .15); padding-bottom: 4px; }
+.lk5-cot .h span:first-child, .lk5-cot .td span:first-child { border-right: 3px solid var(--m); padding-right: 14px; text-align: right; }
+.lk5-cot .h span:last-child, .lk5-cot .td span:last-child { padding-left: 14px; text-align: left; color: var(--m); }
+.lk5-khung { border-radius: 18px; box-shadow: inset 0 0 0 4px var(--m), 0 0 26px var(--m); background: transparent; }
+.lk5-nhan { position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: 700; color: #eef3f4; background: rgba(20, 35, 42, .92); padding: 4px 12px; border-radius: 12px; white-space: nowrap; pointer-events: none; }
+html.nhe .lk5-pt::before { box-shadow: 0 0 0 3px var(--m); }
