@@ -8,7 +8,8 @@
 //  · Thầy bấm Bắt đầu ⇒ `dongTatCa('bat-dau')`: báo `{ t: 'dong' }` rồi đóng mọi kết nối mã 4000 — trò không được cản việc vào bài.
 //  · Bước ghép đợt 4: Durable Object đọc đồ + danh hiệu + ĐỘI CẢ HỌC KỲ lúc nhận vé (gom lô, có hạn chờ) rồi mới gọi `vao(kn, ve, doEm)` ⇒ em vào đội cả kỳ
 //    (thiếu dữ liệu ⇒ đội ít em nhất như cũ; lệch người ⇒ máy bù bù đủ 4 mỗi đội — `soMayCan`). Danh sách: [sbd, tên, đội, mã đồ gọn?, danh hiệu?].
-//    Thống kê ghi theo LÔ qua `du.ghi` (mã phòng `ca:<mã ca>:<k>`): mỗi GHI_MOI_VAN ván, hết em trên sân, em cuối rời, thầy bắt đầu ca.
+//    Thống kê ghi theo LÔ qua `du.ghi` (mã phòng `ca:<mã ca>:<k>`): mỗi GHI_MOI_VAN ván, hết em trên sân, em cuối rời, thầy bắt đầu ca — kèm ván thắng / ván
+//    chơi theo đội (14/11, chỉ phòng ca: `demDoi`), cùng lô.
 import type { SinhTonGui } from '../../src/lib/live-khoi/kieu'
 import type { DoEm } from '../../src/lib/live-khoi/tu-do'
 import type { NoiDuLieuSt } from './sinh-ton-du-lieu'
@@ -53,11 +54,12 @@ export class PhongSinhTonCa {
   // Máy bù mang tên như học sinh: tránh tên em đang trong phòng (phòng ca không có danh sách lớp).
   constructor(private bayGio: () => number = Date.now, rng: () => number = Math.random, readonly soPhong = 0, private du?: Pick<NoiDuLieuSt, 'ghi'>) {
     this.may = new MaySinhTon(rng, () => [...this.nguoi.values()].map((n) => n.ten))
+    this.may.demDoi = true // phòng ca: đội = đội cả kỳ ⇒ đếm ván thắng / ván chơi theo đội
   }
   /** Ghi thống kê theo LÔ (không chờ; lỗi D1 không chạm phòng). */
   private ghiTk(): void {
-    const ds = this.may.layThongKe()
-    if (ds.length && this.du && this.ma) this.du.ghi(`ca:${this.ma}:${this.soPhong}`, ds)
+    const ds = this.may.layThongKe(), vd = this.may.layVanDoi()
+    if (ds.length && this.du && this.ma) this.du.ghi(`ca:${this.ma}:${this.soPhong}`, ds, vd)
   }
 
   get soNguoi(): number { return this.nguoi.size }

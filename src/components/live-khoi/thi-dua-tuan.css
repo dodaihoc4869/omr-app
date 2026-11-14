@@ -21,6 +21,7 @@
 .tdt-dh li:nth-child(even) { transform: rotate(.5deg); }
 .tdt-dh li b { font-weight: 700; color: var(--tr-sai); }
 .tdt-dh li em { font-style: normal; color: var(--tr-sao); }
+.tdt-dh li.tdt-thang b { font-weight: 400; color: var(--doi); }
 .tdt-dh p { margin: 0 0 12px; font-size: 16px; color: var(--tr-chu-2); }
 .tdt-dh .tdt-ghi { font-size: 14px; color: var(--tr-chu-3); }
 @media (max-width: 760px) { .tdt { padding: 16px; overflow-y: auto; } .tdt-than { grid-template-columns: 1fr; } .tdt-cot { height: 300px; } }

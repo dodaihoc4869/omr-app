@@ -5,7 +5,8 @@
 //  · `/hs/bpu/st-tu-do`  (em: `token` game HOẶC `ve` = vé phòng chờ ca): cấp EXP, chuỗi ngày, đồ đã mở + đang mặc, thành tích + huy hiệu, đội cả kỳ,
 //    danh hiệu tuần của em (trao từ tuần trước), thi đua tuần của LỚP em (4 vạch, không tên bạn). Đọc SONG SONG một đợt; em chưa có đội cả kỳ ⇒ gán (một lô, một lần / học kỳ).
 //  · `/hs/bpu/st-mac`    (em): mặc đồ — máy chủ KIỂM quyền mở theo cấp + chuỗi đọc lại tại chỗ, lưu `st_mac`.
-//  · `/gv/bpu/st-thi-dua` (thầy, sau cổng mã bí mật; `khoi` 10/11/12 hoặc `lop`): 4 vạch tuần này + người đang dẫn danh hiệu tuần này + danh hiệu tuần trước (có tên).
+//  · `/gv/bpu/st-thi-dua` (thầy, sau cổng mã bí mật; `khoi` 10/11/12 hoặc `lop`): 4 vạch tuần này + người đang dẫn danh hiệu tuần này + danh hiệu tuần trước (có tên)
+//    + `van` / `thang` mỗi đội (ván chơi / ván thắng tuần này ở PHÒNG CHỜ CA — `st_tuan_doi`, đọc song song cùng đợt).
 // GHI CUỐI VÁN: `ghiCuoiVanSinhTon` (bước ghép gọi khi đóng phòng / mỗi 5 ván) — MỘT `batch` cho cả phòng, bỏ máy bù (`~…`) và bé ma Thầy.
 // Bảng CHỈ-THÊM, tạo tại chỗ bằng `chayDdlMotLan` CHỈ ở đường ghi; đường đọc bảng chưa có ⇒ coi như rỗng.
 import type { Env } from './kieu'
@@ -33,6 +34,27 @@ export const SQL_SINH_TON_DU_LIEU = [
 ] as const
 /** Tạo bảng (một lần mỗi isolate) — chỉ đường GHI gọi. */
 export const taoBang = (env: Env) => chayDdlMotLan(env, 'sinh_ton_du_lieu', SQL_SINH_TON_DU_LIEU)
+/** Lớp để chia đội / thi đua: tên lớp thầy đặt, không có thì cột `lop` (cùng biểu thức ở SQL dưới). */
+const SQL_LOP = "COALESCE(NULLIF(h.ten_lop, ''), h.lop)"
+/** VÁN THẮNG THEO ĐỘI (14/11, bản vẽ 17): mỗi (tuần, phạm vi, đội) một dòng — phạm vi `k:<khối>` hoặc `l:<lớp>` (đúng cách `gvThiDua` lọc). CHỈ ván ở phòng chờ
+ *  CA (đội = đội cả kỳ); một ván cộng MỘT lần cho mỗi phạm vi có em của đội ấy (hai lớp cùng khối chung đội ⇒ khối vẫn +1). Khoá DDL riêng (nhóm cũ đã chạy ở D1 thật). */
+export const SQL_SINH_TON_DOI_TUAN = [
+  'CREATE TABLE IF NOT EXISTS st_tuan_doi (tuan TEXT NOT NULL, pham_vi TEXT NOT NULL, doi INTEGER NOT NULL, van INTEGER NOT NULL DEFAULT 0, thang INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (tuan, pham_vi, doi))',
+] as const
+export const taoBangDoiTuan = (env: Env) => chayDdlMotLan(env, 'sinh_ton_doi_tuan', SQL_SINH_TON_DOI_TUAN)
+/** Khối của cột chữ `cot` trong SQL — y hệt `khoiTuLop` (số 10/11/12 ĐẦU TIÊN không dính chữ số hai bên): mỗi số lấy vị trí đầu tiên, giữ số có viền, nhỏ nhất thắng. */
+const khoiSql = (cot: string): string => {
+  const x = `(' ' || ${cot} || ' ')`
+  const so = (n: number) => `SELECT ${n} AS k, instr(${x}, '${n}') AS i`
+  return `(SELECT k FROM (${so(10)} UNION ALL ${so(11)} UNION ALL ${so(12)}) WHERE i > 1 AND substr(${x}, i - 1, 1) NOT GLOB '[0-9]' AND substr(${x}, i + 2, 1) NOT GLOB '[0-9]' ORDER BY i LIMIT 1)`
+}
+/** Cộng ván theo đội: `?1` tuần, `?2` JSON [{v: số ván trong lô, s, d: đội, w: 1 thắng}] ⇒ gộp theo (phạm vi, đội), mỗi ván một lần mỗi phạm vi. */
+const SQL_GHI_DOI_TUAN = `WITH j AS (SELECT json_extract(value, '$.v') AS v, json_extract(value, '$.s') AS s, json_extract(value, '$.d') AS d, json_extract(value, '$.w') AS w FROM json_each(?2)),
+  l AS (SELECT j.v, j.d, j.w, ${SQL_LOP} AS lop, h.lop AS goc FROM j JOIN hoc_sinh h ON h.sbd = j.s),
+  m AS (SELECT v, d, w, lop, COALESCE(${khoiSql('lop')}, ${khoiSql('goc')}) AS k FROM l),
+  p AS (SELECT 'l:' || lop AS pv, v, d, w FROM m WHERE lop IS NOT NULL AND lop <> '' UNION SELECT 'k:' || k, v, d, w FROM m WHERE k IS NOT NULL)
+  INSERT INTO st_tuan_doi (tuan, pham_vi, doi, van, thang) SELECT ?1, pv, d, COUNT(*), SUM(w) FROM p WHERE true GROUP BY pv, d
+  ON CONFLICT (tuan, pham_vi, doi) DO UPDATE SET van = van + excluded.van, thang = thang + excluded.thang`
 /** Đệm hai tuần thi đua (xem `docHaiTuan`). */
 const demTuan = new DemTTL<Row[]>(60_000, 8)
 
@@ -40,8 +62,6 @@ const so0 = (v: unknown): number => { const n = Math.floor(Number(v)); return Nu
 const RE_SBD = /^[A-Za-z0-9_-]{1,40}$/
 /** Em thật: số báo danh hợp lệ, không phải máy bù (`~…`), không phải bé ma Thầy. */
 export const laEmThat = (id: unknown, idThay?: string): id is string => typeof id === 'string' && RE_SBD.test(id) && id !== idThay && id !== 'gv' && id !== 'thay' && id !== 'THAY' && id !== 'MM'
-/** Lớp để chia đội / thi đua: tên lớp thầy đặt, không có thì cột `lop` (cùng biểu thức ở SQL dưới). */
-const SQL_LOP = "COALESCE(NULLIF(h.ten_lop, ''), h.lop)"
 const bamSbd = (s: string): number => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 4 }
 /** Gán đội cả kỳ LẦN ĐẦU: đội đang ít em nhất trong cùng lớp ở học kỳ này (hoà ⇒ xoay theo băm số báo danh). Đã có ⇒ bỏ qua (INSERT OR IGNORE). */
 const SQL_GAN_DOI = `INSERT OR IGNORE INTO st_doi_ky (sbd, ky, doi, luc)
@@ -51,6 +71,9 @@ const SQL_GAN_DOI = `INSERT OR IGNORE INTO st_doi_ky (sbd, ky, doi, luc)
   ORDER BY COALESCE(c.n, 0), (d.doi + 4 - ?3) % 4 LIMIT 1`
 const ganDoi = (env: Env, sbd: string, ky: string, luc: number) => env.DB.prepare(SQL_GAN_DOI).bind(sbd, ky, bamSbd(sbd), luc)
 
+/** Một ván đã chốt ở PHÒNG CHỜ CA: đội nhất (điểm đội cao nhất; hoà ⇒ mọi đội hoà; cả bốn 0 ⇒ rỗng) + em thật đã chơi kèm đội trong trận (= đội cả kỳ). */
+export interface KetQuaVanDoi { thang: number[]; em: [string, number][] }
+
 /** Kết quả một em (cộng dồn từ một hay nhiều ván của phòng). `doi` (đội trong trận) KHÔNG dùng cho thi đua tuần: thi đua luôn theo ĐỘI CẢ KỲ. */
 export interface KetQuaVanEm { id: string; ha?: number; biHa?: number; haThay?: number; dietTk?: number; chuoiMax?: number; thuKhoa?: number; van?: number; doi?: number }
 
@@ -59,7 +82,7 @@ export interface KetQuaVanEm { id: string; ha?: number; biHa?: number; haThay?: 
  * cộng dồn `st_tuan` (tuần VN của `phong.luc`) và `st_thanh_tich` (kỷ lục hạ liền lấy MAX). Bỏ máy bù (`~…`), bé ma Thầy (`phong.idThay`), id sai dạng.
  * Trả số em đã ghi. Không ai ⇒ 0 lệnh D1.
  */
-export async function ghiCuoiVanSinhTon(env: Env, phong: { ma: string; luc?: number; idThay?: string }, dsKetQua: readonly KetQuaVanEm[]): Promise<{ ghi: number }> {
+export async function ghiCuoiVanSinhTon(env: Env, phong: { ma: string; luc?: number; idThay?: string }, dsKetQua: readonly KetQuaVanEm[], vanDoi: readonly KetQuaVanDoi[] = []): Promise<{ ghi: number }> {
   const luc = Number.isFinite(phong.luc) ? Number(phong.luc) : Date.now()
   const gop = new Map<string, Required<Omit<KetQuaVanEm, 'id' | 'doi'>>>()
   for (const k of dsKetQua) {
@@ -70,7 +93,10 @@ export async function ghiCuoiVanSinhTon(env: Env, phong: { ma: string; luc?: num
     gop.set(k.id, c)
   }
   if (!gop.size) return { ghi: 0 }
-  await taoBang(env)
+  // Ván theo đội (chỉ phòng ca truyền): một dòng mỗi (ván, em thật, đội) — SQL gộp theo phạm vi.
+  const dongDoi: { v: number; s: string; d: number; w: number }[] = []
+  vanDoi.forEach((x, v) => { for (const [s, d] of x?.em ?? []) if (laEmThat(s, phong.idThay) && (d === 0 || d === 1 || d === 2 || d === 3)) dongDoi.push({ v, s, d, w: x.thang.includes(d) ? 1 : 0 }) })
+  await (dongDoi.length ? Promise.all([taoBang(env), taoBangDoiTuan(env)]) : taoBang(env))
   const ky = maHocKy(luc), tuan = maTuan(luc)
   const ds = JSON.stringify([...gop].map(([s, c]) => ({ s, ...c })))
   await env.DB.batch([
@@ -86,6 +112,7 @@ export async function ghiCuoiVanSinhTon(env: Env, phong: { ma: string; luc?: num
         json_extract(value, '$.van'), ?2 FROM json_each(?1) WHERE true
       ON CONFLICT (sbd) DO UPDATE SET ha = ha + excluded.ha, chuoi_max = MAX(chuoi_max, excluded.chuoi_max), thu_khoa = thu_khoa + excluded.thu_khoa,
         ha_thay = ha_thay + excluded.ha_thay, van = van + excluded.van, luc = excluded.luc`).bind(ds, luc),
+    ...(dongDoi.length ? [env.DB.prepare(SQL_GHI_DOI_TUAN).bind(tuan, JSON.stringify(dongDoi))] : []),
   ])
   demTuan.xoaKhoa(tuan)
   return { ghi: gop.size }
@@ -188,13 +215,18 @@ export async function gvThiDua(envDoc: Env, b: Dong, nay = Date.now()): Promise<
   const khoi = [10, 11, 12].includes(Number(b.khoi)) ? Number(b.khoi) : null, lop = typeof b.lop === 'string' ? b.lop.trim() : ''
   if (!khoi && !lop) return { ok: false, error: 'Thiếu khối hoặc lớp.' }
   const tuan = maTuan(nay), truoc = tuanTruoc(tuan)
-  const ds = await docHaiTuan(envDoc, tuan, truoc, nay)
+  // Ván thắng theo đội đọc SONG SONG với hai tuần thi đua (một đợt chờ). Bảng chưa có / lỗi ⇒ rỗng.
+  let pDoi: Promise<Row[]>
+  try { pDoi = envDoc.DB.prepare('SELECT doi, van, thang FROM st_tuan_doi WHERE tuan = ? AND pham_vi = ?').bind(tuan, khoi ? `k:${khoi}` : `l:${lop}`).all<Row>().then((r) => r.results ?? [], () => []) } catch { pDoi = Promise.resolve([]) }
+  const [ds, dongDoi] = await Promise.all([docHaiTuan(envDoc, tuan, truoc, nay), pDoi])
+  const van = [0, 0, 0, 0], thang = [0, 0, 0, 0]
+  for (const r of dongDoi) { const d = Number(r.doi); if (d >= 0 && d < 4) { van[d] = so0(r.van); thang[d] = so0(r.thang) } }
   const trong = (r: Row) => { const l = String((r.ten_lop as string) || (r.lop as string) || ''); return khoi ? (khoiTuLop(l) ?? khoiTuLop(r.lop)) === khoi : l === lop }
   const ten = new Map(ds.map((r) => [String(r.sbd), tenGoi(r.ho_ten) || 'Một bạn']))
   const nayDs = ds.filter((r) => r.tuan === tuan && trong(r)), truocDs = ds.filter((r) => r.tuan === truoc && trong(r))
   const coTen = (x: ReturnType<typeof xetDanhHieu>) => x.map((d) => ({ loai: d.loai, ten: DANH_HIEU.find((h) => h.loai === d.loai)!.ten, nguoi: d.sbd.map((s) => ten.get(s) ?? 'Một bạn'), so: d.so }))
   return {
-    ok: true, tuan, chuTuan: chuTuan(tuan), doi: vachDoi(nayDs), soEm: nayDs.length,
+    ok: true, tuan, chuTuan: chuTuan(tuan), doi: vachDoi(nayDs), soEm: nayDs.length, van, thang,
     danhHieuTuanNay: coTen(xetDanhHieu(nayDs.map(dongTuan))), danhHieuTuanTruoc: coTen(xetDanhHieu(truocDs.map(dongTuan))),
   }
 }
@@ -260,8 +292,8 @@ class GomDocDo {
 
 /** Nơi phòng trò gọi ra ngoài (tiêm vào KenhLopMay / PhongSinhTonCa ⇒ luật phòng test được không cần D1). */
 export interface NoiDuLieuSt {
-  /** Ghi thống kê theo LÔ (không chờ, lỗi bỏ qua). `ma` = mã phòng (mã buổi live / `ca:<mã ca>:<k>`). */
-  ghi(ma: string, ds: readonly KetQuaVanEm[]): void
+  /** Ghi thống kê theo LÔ (không chờ, lỗi bỏ qua). `ma` = mã phòng (mã buổi live / `ca:<mã ca>:<k>`). `vanDoi` chỉ phòng ca truyền (cùng lô). */
+  ghi(ma: string, ds: readonly KetQuaVanEm[], vanDoi?: readonly KetQuaVanDoi[]): void
   /** Đồ + danh hiệu (+ đội cả kỳ ở phòng ca) của một em — gom lô, có hạn chờ. */
   doc(sbd: string): Promise<DoEm | null>
 }
@@ -269,7 +301,7 @@ export interface NoiDuLieuSt {
 export function noiDuLieuSt(env: Env, ctx: { waitUntil(p: Promise<unknown>): void }, doiKy: boolean): NoiDuLieuSt {
   const gom = new GomDocDo(env, doiKy)
   return {
-    ghi: (ma, ds) => { if (env.DB && ds.length) ctx.waitUntil(ghiCuoiVanSinhTon(env, { ma, idThay: 'THAY' }, ds).catch((e) => console.error('[sinh-ton] ghi thống kê lỗi:', e instanceof Error ? e.message : e))) },
+    ghi: (ma, ds, vanDoi) => { if (env.DB && ds.length) ctx.waitUntil(ghiCuoiVanSinhTon(env, { ma, idThay: 'THAY' }, ds, vanDoi).catch((e) => console.error('[sinh-ton] ghi thống kê lỗi:', e instanceof Error ? e.message : e))) },
     doc: (sbd) => gom.doc(sbd),
   }
 }

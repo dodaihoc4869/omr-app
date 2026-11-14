@@ -12,7 +12,7 @@ import {
   NAY_BK, NO_BK, TAM_XA, THAY, VAN_MS, apHop, capBanDo, capSung, dangNghi, hopSo, laMay, loaiHopO, satThuongCua, taoBanDo, vanSo, viTriHop, type BanDo, type NhanVat,
 } from '../../src/lib/live-khoi/sinh-ton-loi'
 import { buocMay, khopMay, mayLenCap, mayThanh, type May } from '../../src/lib/live-khoi/sinh-ton-may'
-import type { KetQuaVanEm } from './sinh-ton-du-lieu'
+import type { KetQuaVanDoi, KetQuaVanEm } from './sinh-ton-du-lieu'
 
 /** Phòng phát một ảnh chụp mỗi 250 ms. */
 export const TRO_NHIP_MS = 250
@@ -51,6 +51,9 @@ type TkEm = Required<Omit<KetQuaVanEm, 'id' | 'doi'>>
 /** Ghi D1 sau mỗi chừng này ván đã chốt (ngoài lúc phòng đóng / trò dừng). */
 export const GHI_MOI_VAN = 5
 
+/** Đội nhất ván theo điểm đội: điểm cao nhất; hoà nhất ⇒ mọi đội hoà đều thắng; cả bốn 0 điểm ⇒ không đội nào. */
+export const doiNhatVan = (diem: readonly number[]): number[] => { const nhat = Math.max(...diem); return nhat > 0 ? [0, 1, 2, 3].filter((d) => diem[d] === nhat) : [] }
+
 export class MaySinhTon {
   private tro = new Map<string, Tro>()
   /** Bé ma Thầy (chỉ phòng live; null = Thầy không trong trận). Tách khỏi `tro` ⇒ không tính sĩ số đội, máy bù, bảng vàng, thủ khoa. */
@@ -88,7 +91,11 @@ export class MaySinhTon {
   /** THỐNG KÊ (bước ghép đợt 4): KHÔNG bị `dung()` xoá (trò dừng là lúc phải ghi); `layThongKe()` rút sạch. `thamGia` = em thật đã lên sân trong ván đang chạy;
    *  `vanChot` = ván (vanSo) đã chốt (`van` + thủ khoa cuối ván, ở nhịp nghỉ ĐẦU TIÊN — lúc ấy `tk` còn nguyên); `vanXong` = số ván đã chốt chưa rút. */
   private tke = new Map<string, TkEm>()
-  private thamGia = new Set<string>()
+  private thamGia = new Map<string, number>()
+  /** THẮNG / CHƠI THEO ĐỘI (14/11, bản vẽ 17 «Đội Kali thắng 9 / 14 ván»): CHỈ phòng chờ CA bật (`demDoi = true`) — ở đó đội = đội cả kỳ; phòng LIVE chia
+   *  lại đội mỗi buổi ⇒ tắt, không gom gì. Mỗi ván chốt ⇒ một mục { đội nhất, em thật + đội }; KHÔNG bị `dung()` xoá; `layVanDoi()` rút sạch (cùng lúc `layThongKe`). */
+  demDoi = false
+  private vanDoi: KetQuaVanDoi[] = []
   private vanChot = -1
   private vanXong = 0
   /** `tenTranh` = tên em thật mà máy bù phải tránh (máy mang tên như học sinh — src/lib/live-khoi/ten-may.ts); chỉ gọi lúc phải thêm máy. */
@@ -112,7 +119,7 @@ export class MaySinhTon {
     if (!moi) return
     if (dau) this.lucNhip = nay
     this.tro.set(id, moi)
-    if (laEm(id)) this.thamGia.add(id)
+    if (laEm(id)) this.thamGia.set(id, doi)
     const mau = moi.p[2]
     // Hộp tiếp tế: em chạm đầu tiên của mỗi hộp được nhận (`k` = chỉ số trong `viTriHop`: 0 / thiếu = hộp tâm sân, k ≥ 1 = hộp giữa trang).
     if (typeof x.h === 'number' && x.h === hopSo(nay) && mau > 0 && !dangNghi(nay)) {
@@ -207,6 +214,8 @@ export class MaySinhTon {
     this.tke = new Map(); this.vanXong = 0
     return ds
   }
+  /** RÚT kết quả ván theo đội (chỉ phòng ca có — `demDoi`). Chủ phòng gọi CÙNG lượt `layThongKe` ⇒ hai phần ghi chung một lô. */
+  layVanDoi(): KetQuaVanDoi[] { const ds = this.vanDoi; this.vanDoi = []; return ds }
 
   /** Thủ khoa rời sân ⇒ chọn lại: nhiều lượt hạ nhất (≥ 3) trong số còn trên sân, bằng nhau ⇒ ai đạt mức đó trước. */
   private chonLaiTk(): void {
@@ -243,7 +252,7 @@ export class MaySinhTon {
       // Ván ĐẦU (trò vừa bắt đầu) giữ lượt hạ đã ghi trước nhịp đầu; các ván sau xoá điểm, lượt hạ ván, chuỗi, thủ khoa.
       if (this.van !== -1) { this.diem = [0, 0, 0, 0]; this.an = []; this.haVan.clear(); this.lucHa.clear(); this.chuoi.clear(); this.tk = '' }
       this.van = van; this.soVan++; this.may = []; this.nhipVan = -1; this.boss = null
-      this.thamGia = new Set([...this.tro.keys()].filter(laEm))
+      this.thamGia = new Map([...this.tro].filter(([s]) => laEm(s)).map(([s, v]) => [s, v.p[3]]))
       this.bd = taoBanDo(capBanDo(soEm.reduce((t, n) => t + Math.max(4, n), 0)))
     }
     this.nhipVan++
@@ -324,8 +333,12 @@ export class MaySinhTon {
       // Chốt ván cho thống kê (một lần mỗi ván, ở nhịp nghỉ đầu tiên): mọi em đã chơi ván +1 ván; thủ khoa cuối ván (em thật) +1.
       if (this.vanChot !== van) {
         this.vanChot = van; this.vanXong++
-        for (const id of this.thamGia) this.tkCua(id).van++
+        for (const id of this.thamGia.keys()) this.tkCua(id).van++
         if (this.tk && laEm(this.tk) && this.thamGia.has(this.tk)) this.tkCua(this.tk).thuKhoa++
+        // Đội nhất ván theo điểm đội (hoà nhất ⇒ mọi đội hoà đều thắng; cả bốn 0 điểm ⇒ không đội nào thắng).
+        if (this.demDoi && this.thamGia.size) {
+          this.vanDoi.push({ thang: doiNhatVan(this.diem), em: [...this.thamGia] })
+        }
       }
     }
     this.an = []
