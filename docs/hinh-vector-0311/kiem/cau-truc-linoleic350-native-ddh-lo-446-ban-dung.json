@@ -1,0 +1,29 @@
+[
+  {
+    "i": 350,
+    "hash": "3e1fb2042ac6010ac2a8513e3e17ec941ad5c06159f9f293073a8cc9fc3a53e4",
+    "fileNguon": "anh/3e1fb2042ac6010ac2a8513e3e17ec941ad5c06159f9f293073a8cc9fc3a53e4.png",
+    "svg": "linoleic350-native-ddh-2c619f3b0de2850372c1fc2c9003dcc305f4d61c8974768775d271e496598503.svg",
+    "hashSvg": "2c619f3b0de2850372c1fc2c9003dcc305f4d61c8974768775d271e496598503",
+    "byteSvg": 2348,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D5-I-1",
+        "de": "Linoleic acid có tác dụng ngăn ngừa các bệnh về tim.\nCông thức cấu tạo của linoleic acid như sau: Linoleic acid thuộc loại",
+        "refs": [
+          {
+            "hash": "3e1fb2042ac6010ac2a8513e3e17ec941ad5c06159f9f293073a8cc9fc3a53e4",
+            "where": "12-KT-C1-D5-I-1.hinh.0.du_lieu",
+            "hashDataUrl": "8c768788fa76233efbda26f78168f151780c4f70debad1e78d10857e7fd67a6d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18C2O=17barevertices+COOHfirstC/2CCdouble/condensedCOOH-NOexpandedCO/ALLregularUPRIGHT/individualnonperiodicvertices-rays/0arrow-stereo-charge-caption-nums/NOaddedH-formula-name-answer/nativeapproxNOTsubpixel",
+    "hashSvgDaSoat": "2c619f3b0de2850372c1fc2c9003dcc305f4d61c8974768775d271e496598503",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

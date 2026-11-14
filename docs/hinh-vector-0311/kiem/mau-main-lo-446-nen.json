@@ -1,0 +1,18 @@
+{
+  "lo": 446,
+  "main": "d6453489b4479fa2a0c294b1315a8747ad0687ac",
+  "previousMain": "d6453489b4479fa2a0c294b1315a8747ad0687ac",
+  "diffStat": "",
+  "files": [],
+  "appChanged": false,
+  "serverChanged": false,
+  "viteChanged": false,
+  "ddhFontChanged": false,
+  "speedBaselineChanged": false,
+  "notMerged": true,
+  "colorViolations": 2011,
+  "checkerFiles": 377,
+  "colorLogSha256": "d98bc57a328bbc99c3f748859592212f1cd3a0851480b65cd96d933ed61026b5",
+  "release": "Main d6453489 nguyênbyte so445; appsrc-server-Vite-DDHfont-mốc không đổi; khônggộp. LatestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/377 baseline RED; no gate raised.",
+  "ketLuan": "Main d6453489 nguyênbyte so445; appsrc-server-Vite-DDHfont-mốc không đổi; khônggộp. LatestMAINfullBYNAME-buildspeed-beforemerge-release. Color2011/377 baseline RED; no gate raised."
+}
