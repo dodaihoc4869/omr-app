@@ -15,7 +15,8 @@ await trang.addStyleTag({ content: 'html,body{width:844px;height:390px} #san{tra
 const cdp = await trang.context().newCDPSession(trang)
 await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(hamS) })
 const c = (id) => kb.doan.find((d) => d.id === id)
-const DOAN = {
+const b = c('c11')?.hoat?.loai === 'bazo' && !c('c2') ? c('c11').hoat.moc : null // kịch bản thử phần 10 (peptide + NaOH)
+const DOAN = b ? { 'bút + mũi tên cong': b.a_cung0 - 0.5, 'H₂O thành': b.a_gH2O - 0.3, 'NaOH gắn đầu C': b.b_3a, 'nước rơi + đứt': b.c_can, 'Na gắn Gly': b.d_na } : {
   'thẻ chương': c('c2').t0 - 2.4,
   'chuỗi hạt c2': c('c2').hoat.moc.dem50,
   'quả cầu - que c3': c('c3').hoat.moc.noi - 0.3,
