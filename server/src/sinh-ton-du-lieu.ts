@@ -233,7 +233,7 @@ export async function docDoPhong(env: Env, sbds: readonly string[], doiKy: boole
 }
 
 /** GOM ĐỌC của phòng: các em vào trong `choMs` đọc chung MỘT lô `docDoPhong`; quá `hanMs` chưa có ⇒ trả null (phòng dùng cách cũ: đội ít em nhất, không đồ). */
-export class GomDocDo {
+class GomDocDo {
   private cho = new Map<string, ((d: DoEm | null) => void)[]>()
   private hen: ReturnType<typeof setTimeout> | null = null
   constructor(private env: Env, private doiKy: boolean, private choMs = 80, private hanMs = 1500) {}
