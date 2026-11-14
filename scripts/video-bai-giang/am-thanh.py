@@ -41,7 +41,45 @@ for m in kb['giong']:
     doan[:k] *= np.linspace(0, 1, k); doan[len(doan) - k:] *= np.linspace(1, 0, k)
     e = min(N, o + len(doan)); giong[o:e] += doan[:e - o]
 ghi_wav(f'{ra}/giong-tho.wav', giong)
-chay('ffmpeg', '-y', '-v', 'error', '-i', f'{ra}/giong-tho.wav', '-af', 'highpass=f=85,afftdn=nf=-28,equalizer=f=3200:t=q:w=1.2:g=2.5,acompressor=threshold=-22dB:ratio=3:attack=5:release=140:makeup=2.5,alimiter=limit=0.89', '-ar', str(SR), f'{ra}/giong.wav')
+# GIỌNG THEO MẪU K12 (thầy 14/11 «nhạc nền lớp 10 to hơn tiếng nói của thầy» · «chỉnh tone giọng của thầy và nhạc theo thông số của video k12» ·
+# «sửa giọng k10 giống y giọng thầy lớp 12»): tiếng gốc mỗi buổi khác mức micro (K10 −36 LUFS, K12 −22 LUFS) ⇒ trước lọc / nén:
+#   1) ĐỘ TO: đưa giọng đã ghép về đúng độ to giọng ghép của K12 (mau-giong.json · lufs);
+#   2) ÂM SẮC: phổ trung bình (1/3 octave, chỉ khung có tiếng) so với phổ mẫu K12 ⇒ EQ bù từng dải (kẹp ±9 dB, làm mượt) ⇒ trầm / bổng như K12.
+# Nhạc + tiếng động giữ mức cố định như K12 ⇒ tỉ lệ giọng / nhạc giống K12. Lấy mẫu mới: python3 am-thanh.py <kb> <tieng> <ra> --lay-mau-giong
+import re as _re
+MAU_GIONG = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mau-giong.json')
+DAI = [100 * 2 ** (k / 3) for k in range(0, 22)]  # 100 Hz … ~12,7 kHz
+def do_lufs(tep):
+    r = subprocess.run(['ffmpeg', '-nostdin', '-i', tep, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
+    m = _re.findall(r'I:\s+(-?[\d.]+) LUFS', r)
+    return float(m[-1]) if m else None
+def pho(x):
+    """mức trung bình (dB) từng dải 1/3 octave trên các khung 46 ms có tiếng (bỏ khung lặng), chuẩn hoá về trung bình 0"""
+    L = 2048; w = np.hanning(L); f = np.fft.rfftfreq(L, 1 / SR); ds = []
+    for o in range(0, len(x) - L, L):
+        k = x[o:o + L]
+        if np.sqrt(np.mean(k * k)) < 10 ** (-45 / 20): continue
+        ds.append(np.abs(np.fft.rfft(k * w)) ** 2)
+    if not ds: return None
+    P = np.mean(ds, axis=0); ra2 = []
+    for c in DAI:
+        m = (f >= c / 2 ** (1 / 6)) & (f < c * 2 ** (1 / 6)); ra2.append(10 * np.log10(np.mean(P[m]) + 1e-20))
+    ra2 = np.array(ra2); return (ra2 - ra2.mean()).tolist()
+_I = do_lufs(f'{ra}/giong-tho.wav'); _P = pho(giong)
+if '--lay-mau-giong' in sys.argv:
+    json.dump({'lufs': _I, 'dai': [round(c, 1) for c in DAI], 'pho': [round(v, 2) for v in _P], 'ghiChu': 'giọng ghép video K12 Peptide 13/11 (mẫu âm sắc + độ to)'}, open(MAU_GIONG, 'w'), ensure_ascii=False)
+    print('đã ghi mẫu giọng', MAU_GIONG)
+_mau = json.load(open(MAU_GIONG)) if os.path.exists(MAU_GIONG) else None
+_bu, _eq = 0.0, ''
+if _mau and _I is not None:
+    _bu = max(-6.0, min(24.0, _mau['lufs'] - _I))
+    if _P:
+        g = np.clip(np.array(_mau['pho']) - np.array(_P), -9, 9)
+        g = np.convolve(np.pad(g, 1, mode='edge'), [0.25, 0.5, 0.25], mode='valid')  # làm mượt giữa các dải
+        g[np.array(DAI) > 10000] = 0  # tiếng gốc 24 kHz ⇒ trên 10 kHz không có gì để chỉnh
+        if np.max(np.abs(g)) >= 0.3: _eq = 'firequalizer=gain_entry=\'' + ';'.join(f'entry({c:.0f},{v:.2f})' for c, v in zip(DAI, g)) + '\','
+print(f'giọng ghép {_I} LUFS ⇒ bù {_bu:+.1f} dB · EQ theo mẫu: {"có" if _eq else "không"}')
+chay('ffmpeg', '-y', '-v', 'error', '-i', f'{ra}/giong-tho.wav', '-af', f'volume={_bu:.2f}dB,{_eq}' + 'highpass=f=85,afftdn=nf=-28,equalizer=f=3200:t=q:w=1.2:g=2.5,acompressor=threshold=-22dB:ratio=3:attack=5:release=140:makeup=2.5,alimiter=limit=0.89', '-ar', str(SR), f'{ra}/giong.wav')
 
 # ── 2) NHẠC (MIDI tự viết) ──
 BPM, PPQ = kb.get('nhip', 112), 480

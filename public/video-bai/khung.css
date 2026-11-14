@@ -424,3 +424,5 @@ html.nhe .bz-bay { filter: none; }
 .lk4-pt i:first-child { color: #ffd27a; }
 .lk4-pt .kq { color: #172126; background: #ffd27a; border-radius: 12px; padding: 0 12px; }
 .lk4-thang { margin-top: 8px; }
+/* tiêu đề mở đầu có dấu (thầy 14/11 ảnh «LIÊN KẾT» mất mũ chữ Ê / Ế): ô chữ tô nền theo chữ ⇒ dấu nhô khỏi ô bị cắt ⇒ nới ô lên trên, giữ nguyên vị trí chữ */
+#mo-ten .ch { padding-top: .24em; margin-top: -.24em; }
