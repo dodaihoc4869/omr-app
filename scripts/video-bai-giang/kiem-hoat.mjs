@@ -1,5 +1,5 @@
 // VIDEO TÓM TẮT — CỔNG KIỂM KỊCH BẢN TRƯỚC KHI TẢI (thầy 14/11: văn phòng làm tự động, không ai xem tay ⇒ lỗi phải chặn, không được im lặng).
-// Hỏng (thoát 1) khi: mốc hoạt hoạ / khoanh / Em nhẩm / Đoán nhanh ra rỗng · hoạt hoạ «tu-do»: trùng id, bước gọi id / mốc không có, nét nối gọi phần tử
+// Hỏng (thoát 1) khi: cảnh nội dung KHÔNG có hoạt hoạ · mốc hoạt hoạ / khoanh / Em nhẩm / Đoán nhanh ra rỗng · hoạt hoạ «tu-do»: trùng id, bước gọi id / mốc không có, nét nối gọi phần tử
 // không có, phần tử ngoài lưới 12 cột hoặc tràn đáy cột, phần tử không có bước «hien», chữ dài quá sức ô (kể cả khi đã thu cỡ) · Đoán nhanh phương án dài.
 // Dùng: node kiem-hoat.mjs <kich-ban.json>
 import { readFileSync } from 'node:fs'
@@ -9,6 +9,8 @@ const COT_W = 828, HANG = 56, CO = { lon: 44, vua: 34, nho: 27 }
 const bo = (s) => String(s ?? '').replace(/\*\*/g, '')
 for (const d of canh) {
   const ten = `${d.id} «${d.tieuDe}»`
+  // Thầy 14/11 «tất cả phải có hoạt hoạ đầy đủ như video K12»: cảnh nội dung không có hoạt hoạ ⇒ HỎNG (chỉ bảng phấn chưa đủ; không có mô-đun hợp ⇒ dùng «tu-do»).
+  if (!d.hoat) loi.push(`${ten}: cảnh không có hoạt hoạ — mọi cảnh nội dung phải có «hoat» (không có mô-đun hợp ⇒ soạn «tu-do»)`)
   if (d.hoat) {
     for (const [k, v] of Object.entries(d.hoat.moc || {})) if (!Number.isFinite(v)) loi.push(`${ten}: mốc hoạt hoạ «${k}» không tìm được chữ trong lời`)
     if (d.hoat.loai === 'tu-do') {

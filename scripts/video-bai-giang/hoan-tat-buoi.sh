@@ -30,7 +30,11 @@ echo "chữ nghi là tên trong đoạn giọng: $(tail -1 "$D/ten-trong-giong.t
 python3 "$HERE/am-thanh.py" "$RA/kich-ban.json" "$D/tieng.mp3" "$AM" | grep "giọng ghép\|^xong"
 find "$AM" -name '*.wav' -delete
 [ "$KHONG_TAI" = "--khong-tai" ] && { echo "chưa tải (--khong-tai)"; exit 0; }
-bash "$HERE/dang-len.sh" "$B" "$RA/kich-ban.json" "$RA/net.json" "$AM/am-thanh.m4a" | grep -o "← [a-z]* HTTP [0-9]*"
+# Máy làm một mình ⇒ tải hỏng phải THOÁT 1 (không được báo đạt khi máy chủ trả 401 / 500): 3 tệp 200, HEAD kịch bản 200, Range tiếng 206.
+KQ=$(bash "$HERE/dang-len.sh" "$B" "$RA/kich-ban.json" "$RA/net.json" "$AM/am-thanh.m4a" | grep -o "← [a-z]* HTTP [0-9]*" || true); echo "$KQ"
+[ "$(echo "$KQ" | grep -c "HTTP 200$")" = 3 ] || { echo "TẢI HỎNG — chưa đủ 3 tệp HTTP 200"; exit 1; }
 VE=$(node -e 'console.log(encodeURIComponent(require("fs").readFileSync(process.argv[1], "utf8")))' "$D/ve.txt")
-curl -sS -I "$W/live-tep/$B/video-kb.json?ve=$VE" -o /dev/null -w "HEAD video-kb %{http_code}\n"
-curl -sS -r 0-1023 "$W/live-tep/$B/video-am.m4a?ve=$VE" -o /dev/null -w "Range video-am %{http_code}\n"
+H=$(curl -sS -I "$W/live-tep/$B/video-kb.json?ve=$VE" -o /dev/null -w "%{http_code}"); echo "HEAD video-kb $H"
+R=$(curl -sS -r 0-1023 "$W/live-tep/$B/video-am.m4a?ve=$VE" -o /dev/null -w "%{http_code}"); echo "Range video-am $R"
+[ "$H" = 200 ] && [ "$R" = 206 ] || { echo "KIỂM SAU TẢI HỎNG — HEAD $H (cần 200), Range $R (cần 206)"; exit 1; }
+echo "ĐÃ LÊN APP: thẻ «Video tóm tắt» hiện trong Xem lại Live của buổi $B"
